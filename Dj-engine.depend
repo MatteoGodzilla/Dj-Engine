@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1562241886 source:/home/matteo/codeblocks/Dj-engine/main.cpp
+1562326546 source:/home/matteo/codeblocks/Dj-engine/main.cpp
+	<iostream>
 	<SFML/Graphics.hpp>
+	"Note.h"
 
 1539885013 /home/matteo/codeblocks/Dj-engine/libraries/SFML-2.5.1/include/SFML/Graphics.hpp
 	<SFML/Window.hpp>
@@ -410,4 +412,16 @@
 	<SFML/Graphics/PrimitiveType.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
+
+1562326191 source:/home/matteo/codeblocks/Dj-engine/src/Note.cpp
+	"Note.h"
+	<math.h>
+	<string>
+	<iostream>
+	<SFML/Graphics.hpp>
+
+1562325642 /home/matteo/codeblocks/Dj-engine/include/Note.h
+	<vector>
+	<string>
+	<SFML/Graphics.hpp>
 
