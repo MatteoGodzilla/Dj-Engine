@@ -5,11 +5,7 @@
 float global_time;
 sf::RenderWindow window;
 
-//texture to load
-sf::Texture blue_note,red_note,green_note;
-
-//Single note at 2 seconds
-Note n(2.0,"res/red note.png");
+Note n1(2.0);
 
 void check_events(sf::Event e)
 {
@@ -18,22 +14,18 @@ void check_events(sf::Event e)
     if(e.type == sf::Event::KeyPressed){
         if(e.key.code == sf::Keyboard::Escape)window.close();
         else if (e.key.code == sf::Keyboard::Space){
-            n.click(global_time);
-        }
-
-    }
-    else if(e.type == sf::Event::KeyReleased){
-        if (e.key.code == sf::Keyboard::Space){
+            n1.click(global_time);
         }
 
     }
 }
 
 void tick(){
-    n.tick(global_time);
+    n1.tick(global_time);
+
 }
 void render(){
-    n.render(window);
+    n1.render(window);
 }
 
 int main()
@@ -41,9 +33,14 @@ int main()
     sf::Clock c;
     window.create(sf::VideoMode(1024, 600), "Dj-Engine");
 
+    sf::Texture temp;
+    temp.loadFromFile("res/green note.png");
+    n1.set_sprite(temp);
+
     while (window.isOpen())
     {
         global_time += c.restart().asSeconds();
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -51,11 +48,11 @@ int main()
             check_events(event);
         }
         tick();
-
         //render cycle
         window.clear();
         render();
         window.display();
+
     }
 
     return 0;

@@ -49,8 +49,10 @@
 			<Add library="sfml-audio" />
 			<Add directory="libraries/SFML-2.5.1/lib" />
 		</Linker>
+		<Unit filename="include/Generator.h" />
 		<Unit filename="include/Note.h" />
 		<Unit filename="main.cpp" />
+		<Unit filename="src/Generator.cpp" />
 		<Unit filename="src/Note.cpp" />
 		<Extensions>
 			<code_completion />
