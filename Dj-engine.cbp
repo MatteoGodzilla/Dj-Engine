@@ -51,9 +51,11 @@
 		</Linker>
 		<Unit filename="include/Generator.h" />
 		<Unit filename="include/Note.h" />
+		<Unit filename="include/Rendr.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/Generator.cpp" />
 		<Unit filename="src/Note.cpp" />
+		<Unit filename="src/Rendr.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

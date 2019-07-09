@@ -1,11 +1,16 @@
 #include <iostream>
+#include <vector>
 #include <SFML/Graphics.hpp>
 #include "Note.h"
+#include "Rendr.h"
+#include "Generator.h"
 
 float global_time;
 sf::RenderWindow window;
 
-Note n1(2.0);
+std::vector<Note> note_arr;
+Rendr rendr;
+Generator gen;
 
 void check_events(sf::Event e)
 {
@@ -14,28 +19,27 @@ void check_events(sf::Event e)
     if(e.type == sf::Event::KeyPressed){
         if(e.key.code == sf::Keyboard::Escape)window.close();
         else if (e.key.code == sf::Keyboard::Space){
-            n1.click(global_time);
+            for(int i = 0; i < note_arr.size();i++){
+                note_arr[i].click(global_time);
+            }
         }
 
     }
 }
 
 void tick(){
-    n1.tick(global_time);
-
+    gen.tick(global_time,note_arr);
 }
+
 void render(){
-    n1.render(window);
+    //render notes from 'note_arr' based on time, all to window
+    rendr.render(global_time,note_arr,window);
 }
 
 int main()
 {
     sf::Clock c;
     window.create(sf::VideoMode(1024, 600), "Dj-Engine");
-
-    sf::Texture temp;
-    temp.loadFromFile("res/green note.png");
-    n1.set_sprite(temp);
 
     while (window.isOpen())
     {

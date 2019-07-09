@@ -11,16 +11,13 @@ class Note
         Note(float milli);
         virtual ~Note();
         void click(float time);
-        void render(sf::RenderWindow& w);
         void set_sprite(sf::Texture t);
         void tick(float time);
+        float getMilli();
     protected:
 
     private:
         float m_milli;
-        float m_dt;
-        sf::Sprite m_sprite;
-        sf::Texture m_tex;
         sf::Vector2f m_start;
         sf::Vector2f m_end;
         sf::Vector2f m_vel;
