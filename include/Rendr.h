@@ -12,9 +12,10 @@ class Rendr
     protected:
 
     private:
-        sf::Texture m_red;
-        sf::Texture m_blue;
-        sf::Texture m_green;
+        sf::Texture m_tex;
+
+        sf::Sprite m_tray1,m_tray2,m_clicker;
+
         sf::Vector2f m_start;
         sf::Vector2f m_end;
         sf::Vector2f m_vel;

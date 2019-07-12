@@ -4,14 +4,17 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
+
+
 Note::Note(){
 
 }
 
-Note::Note(float milli)
+Note::Note(float milli,int ty)
 {
     //set hit time
     m_milli = milli;
+    m_type = ty;
 }
 
 void Note::click(float time)

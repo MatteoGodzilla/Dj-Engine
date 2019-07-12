@@ -19,8 +19,10 @@ void check_events(sf::Event e)
     if(e.type == sf::Event::KeyPressed){
         if(e.key.code == sf::Keyboard::Escape)window.close();
         else if (e.key.code == sf::Keyboard::Space){
+            float reference_time = note_arr[0].getMilli();
             for(int i = 0; i < note_arr.size();i++){
-                note_arr[i].click(global_time);
+                if(note_arr[i].getMilli() == reference_time)note_arr[i].click(global_time);
+                else break;
             }
         }
 

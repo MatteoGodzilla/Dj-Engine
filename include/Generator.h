@@ -13,6 +13,7 @@ class Generator
 
     private:
         std::vector<float> m_note_times;
+        std::vector<int> m_note_types;
 };
 
 #endif // GENERATOR_H
