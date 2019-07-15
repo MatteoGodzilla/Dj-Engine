@@ -1,17 +1,11 @@
 #include "Generator.h"
-#include "Note.h"
-#include <iostream>
 
 Generator::Generator()
 {
-    for(int i = 0; i < 10; i++)
+    for(int i = 0; i < 3; i++)
     {
         m_note_times.push_back(0.2f*i+2.0);
-        m_note_times.push_back(0.2f*i+2.0);
-        m_note_times.push_back(0.2f*i+2.0);
-        m_note_types.push_back(0);
-        m_note_types.push_back(1);
-        m_note_types.push_back(2);
+        m_note_types.push_back(TAP_G);
     }
 }
 
@@ -31,7 +25,7 @@ void Generator::tick(float time,std::vector<Note> &v)
     for (int i = 0; i < v.size(); i++)
     {
         //remove if outside hit area
-        if(time >= v[i].getMilli()+0.2f)
+        if(time >= v[i].getMilli()+0.2f || v[i].getActive() == false)
         {
             v.erase(v.begin()+i);
         }

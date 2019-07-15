@@ -4,38 +4,32 @@
 #include "Note.h"
 #include "Rendr.h"
 #include "Generator.h"
+#include "Player.h"
 
 float global_time;
 sf::RenderWindow window;
 
 std::vector<Note> note_arr;
-Rendr rendr;
+Rendr rendr(window);
 Generator gen;
+Player player;
 
 void check_events(sf::Event e)
 {
     if(e.type == sf::Event::Closed)window.close();
-    //keyboard pressed
-    if(e.type == sf::Event::KeyPressed){
-        if(e.key.code == sf::Keyboard::Escape)window.close();
-        else if (e.key.code == sf::Keyboard::Space){
-            float reference_time = note_arr[0].getMilli();
-            for(int i = 0; i < note_arr.size();i++){
-                if(note_arr[i].getMilli() == reference_time)note_arr[i].click(global_time);
-                else break;
-            }
-        }
-
-    }
+    if(e.key.code == sf::Keyboard::Escape)window.close();
+    player.tick(e,global_time);
 }
 
 void tick(){
     gen.tick(global_time,note_arr);
+    rendr.pollState(player);
 }
 
 void render(){
+
     //render notes from 'note_arr' based on time, all to window
-    rendr.render(global_time,note_arr,window);
+    rendr.render(global_time,note_arr);
 }
 
 int main()

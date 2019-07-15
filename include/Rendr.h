@@ -1,12 +1,15 @@
 #ifndef RENDR_H
 #define RENDR_H
 #include "Note.h"
+#include "Player.h"
+#include <SFML/Graphics.hpp>
 
 class Rendr
 {
     public:
-        Rendr();
-        void render(float time,std::vector<Note> &v,sf::RenderWindow &w);
+        Rendr(sf::RenderWindow& w);
+        void render(float time,std::vector<Note> &v);
+        void pollState(Player& p);
         virtual ~Rendr();
 
     protected:
@@ -22,6 +25,8 @@ class Rendr
         sf::Vector2f m_scl_start;
         sf::Vector2f m_scl_end;
         sf::Vector2f m_scl_vel;
+        sf::RenderWindow &m_window;
+        bool m_red,m_green,m_blue;
 };
 
 #endif // RENDR_H

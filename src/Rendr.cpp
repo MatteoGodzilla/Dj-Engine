@@ -1,9 +1,8 @@
 #include "Rendr.h"
-#include "Note.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-Rendr::Rendr()
+Rendr::Rendr(sf::RenderWindow &w):m_window(w)
 {
     sf::Texture loader;
     if(loader.loadFromFile("res/texture.png"))
@@ -37,36 +36,35 @@ Rendr::Rendr()
     m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
 }
 
-void Rendr::render(float time,std::vector<Note> &v,sf::RenderWindow &w)
+void Rendr::render(float time,std::vector<Note> &v)
 {
-
-    w.draw(m_tray1);
-    w.draw(m_tray2);
-    w.draw(m_clicker);
-
-
-    for(int i = v.size(); i > 0; i--)
+    if(m_red || m_green || m_blue)m_clicker.setScale(0.15,0.15);
+    else m_clicker.setScale(0.2,0.2);
+    m_window.draw(m_tray1);
+    m_window.draw(m_tray2);
+    m_window.draw(m_clicker);
+    for(int i = 0 ; i < v.size();i++)
     {
         Note temp = v[i];
         float dt = temp.getMilli()-time;
 
         sf::Sprite sprite;
         sprite.setTexture(m_tex);
-        if(temp.m_type == TAP_R)
+        if(temp.getType() == TAP_R)
         {
             sprite.setTextureRect(sf::IntRect(400,0,400,400));
             m_start = sf::Vector2f(512.0,200.0);
             m_end = sf::Vector2f(512.0,500.0);
             m_vel = (m_end-m_start)/1.0f;
         }
-        else if (temp.m_type == TAP_G)
+        else if (temp.getType() == TAP_G)
         {
             sprite.setTextureRect(sf::IntRect(0,0,400,400));
             m_start = sf::Vector2f(472.0,200.0);
             m_end = sf::Vector2f(422.0,500.0);
             m_vel = (m_end-m_start)/1.0f;
         }
-        else if (temp.m_type == TAP_B)
+        else if (temp.getType() == TAP_B)
         {
             sprite.setTextureRect(sf::IntRect(800,0,400,400));
             m_start = sf::Vector2f(552.0,200.0);
@@ -84,11 +82,17 @@ void Rendr::render(float time,std::vector<Note> &v,sf::RenderWindow &w)
             //sprite drawn on screen
             sprite.setScale(scl);
             sprite.setPosition(pos);
-            w.draw(sprite);
+            m_window.draw(sprite);
         }
 
     }
     //std::cout <<"------"<<std::endl;
+}
+
+void Rendr::pollState(Player& p){
+    m_red = p.m_red;
+    m_blue = p.m_blue;
+    m_green = p.m_green;
 }
 
 Rendr::~Rendr()

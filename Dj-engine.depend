@@ -1,11 +1,12 @@
 # depslib dependency file v1.0
-1562911468 source:/home/matteo/codeblocks/Dj-engine/main.cpp
+1563180124 source:/home/matteo/codeblocks/Dj-engine/main.cpp
 	<iostream>
 	<vector>
 	<SFML/Graphics.hpp>
 	"Note.h"
 	"Rendr.h"
 	"Generator.h"
+	"Player.h"
 
 1539885013 /home/matteo/codeblocks/Dj-engine/libraries/SFML-2.5.1/include/SFML/Graphics.hpp
 	<SFML/Window.hpp>
@@ -416,33 +417,43 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Window/GlResource.hpp>
 
-1562761732 source:/home/matteo/codeblocks/Dj-engine/src/Note.cpp
+1563179150 source:/home/matteo/codeblocks/Dj-engine/src/Note.cpp
 	"Note.h"
-	<math.h>
-	<string>
 	<iostream>
-	<SFML/Graphics.hpp>
 
-1562761919 /home/matteo/codeblocks/Dj-engine/include/Note.h
+1563013825 /home/matteo/codeblocks/Dj-engine/include/Note.h
 	<vector>
 	<string>
-	<SFML/Graphics.hpp>
+	<SFML/System.hpp>
 
-1562769317 source:/home/matteo/codeblocks/Dj-engine/src/Generator.cpp
+1563179150 source:/home/matteo/codeblocks/Dj-engine/src/Generator.cpp
 	"Generator.h"
-	"Note.h"
-	<iostream>
 
 1562762586 /home/matteo/codeblocks/Dj-engine/include/Generator.h
 	<vector>
 	"Note.h"
 
-1562913604 /home/matteo/codeblocks/Dj-engine/include/Rendr.h
+1563179070 /home/matteo/codeblocks/Dj-engine/include/Rendr.h
 	"Note.h"
-
-1562913138 source:/home/matteo/codeblocks/Dj-engine/src/Rendr.cpp
-	"Rendr.h"
-	"Note.h"
+	"Player.h"
 	<SFML/Graphics.hpp>
+
+1563180145 source:/home/matteo/codeblocks/Dj-engine/src/Rendr.cpp
+	"Rendr.h"
+	<SFML/Graphics.hpp>
+	<iostream>
+
+1563177623 /home/matteo/codeblocks/Dj-engine/include/KeyClicker.h
+	<SFML/Window.hpp>
+
+1563177597 source:/home/matteo/codeblocks/Dj-engine/src/KeyClicker.cpp
+	"KeyClicker.h"
+	<iostream>
+
+1563179325 /home/matteo/codeblocks/Dj-engine/include/Player.h
+	<SFML/Window.hpp>
+
+1563179293 source:/home/matteo/codeblocks/Dj-engine/src/Player.cpp
+	"Player.h"
 	<iostream>
 
