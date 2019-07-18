@@ -3,12 +3,12 @@
 #include <vector>
 #include <string>
 #include <SFML/System.hpp>
+#include <iostream>
 
 enum events {TAP_G,TAP_R,TAP_B,CROSS_L,CROSS_R,CROSS_C};
 
 class Note {
 public:
-    Note();
     Note(float milli,int ty);
     virtual ~Note();
     void click(float time);
@@ -20,6 +20,7 @@ public:
 protected:
 
 private:
+    float m_hit_window;
     bool m_active = true;
     float m_milli;
     int m_type;

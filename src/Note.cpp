@@ -1,11 +1,8 @@
 #include "Note.h"
-#include <iostream>
-
-Note::Note() {
-}
 
 Note::Note(float milli,int ty) {
     //set hit time
+    m_hit_window = 0.1;
     m_milli = milli;
     m_type = ty;
     m_active = true;
@@ -13,13 +10,16 @@ Note::Note(float milli,int ty) {
 
 void Note::click(float time) {
     //if it's too early, don't count
-    if(m_milli-time <= 0.300) {
-        if(abs(m_milli-time)<=0.300 && m_active == true) {
+    if (time >= m_milli+m_hit_window){
+        std::cout << "Miss: " << m_type << " at "<< time  <<std::endl;
+        m_active = false;
+    } else if(m_milli-time <= m_hit_window*2 ) {
+        if(abs(m_milli-time)<= m_hit_window && m_active == true) {
             std::cout << "Hit: " << m_type << " at "<<time  <<std::endl;
             m_active = false;
-        } else std::cout << "Miss: " << m_type << " at "<< time  <<std::endl;
-
+        }
     }
+
 }
 
 float Note::getMilli() {

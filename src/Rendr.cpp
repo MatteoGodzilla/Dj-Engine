@@ -91,7 +91,7 @@ void Rendr::render(float time,std::vector<Note> &v) {
 
         sf::Sprite sprite;
         sprite.setTexture(m_tex);
-        if(temp.getType() == TAP_R) {
+        if(temp.getType() == TAP_R || temp.getType() == CROSS_L) {
             sprite.setTextureRect(sf::IntRect(400,0,400,400));
             m_start = sf::Vector2f(512.0,200.0);
             m_end = sf::Vector2f(512.0,500.0);

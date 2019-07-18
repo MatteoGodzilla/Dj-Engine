@@ -28,6 +28,8 @@ private:
     bool m_just_r = false;
     bool m_just_g = false;
     bool m_just_b = false;
+    bool m_just_cross_l = false;
+    bool m_just_cross_r = false;
     Generator &m_gen;
 };
 
