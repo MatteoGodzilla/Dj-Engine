@@ -10,6 +10,7 @@ float global_time;
 sf::RenderWindow window;
 
 std::vector<Note> note_arr;
+std::vector<Note> event_arr;
 Rendr rendr(window);
 Generator gen;
 Player player(gen);
@@ -21,18 +22,23 @@ void check_events(sf::Event e) {
 }
 
 void tick() {
-    gen.tick(global_time,note_arr);
-    rendr.pollState(player);
+    gen.tick(global_time,note_arr,event_arr);
+    rendr.pollState(player,gen);
     player.tick(global_time, note_arr);
 }
 
 void render() {
-    rendr.render(global_time,note_arr);
+    rendr.clicker();
+    rendr.events(global_time,event_arr);
+    rendr.notes(global_time,note_arr);
+
 }
 
 int main() {
     sf::Clock c;
-    window.create(sf::VideoMode(1024, 600), "Dj-Engine");
+    sf::ContextSettings settings;
+    settings.antialiasingLevel = 2;
+    window.create(sf::VideoMode(1024, 600), "Dj-Engine",sf::Style::Default,settings);
     while (window.isOpen()) {
         global_time += c.restart().asSeconds();
 

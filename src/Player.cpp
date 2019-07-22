@@ -37,6 +37,12 @@ void Player::key(sf::Event e) {
         if(e.key.code == CROSS_R_CODE) {
             m_cross = 2;
         }
+        if(e.key.code == SCRATCH_UP){
+            m_scr_up = true;
+        }
+        if(e.key.code == SCRATCH_DOWN){
+            m_scr_down = true;
+        }
     } else if(e.type == sf::Event::KeyReleased) {
         if(e.key.code == GREEN_CODE) {
             m_green = false;
@@ -52,6 +58,12 @@ void Player::key(sf::Event e) {
         }
         if(e.key.code == CROSS_R_CODE && m_cross == 2) {
             m_cross = 1;
+        }
+        if(e.key.code == SCRATCH_UP){
+            m_scr_up = false;
+        }
+        if(e.key.code == SCRATCH_UP){
+            m_scr_down = false;
         }
     }
 
@@ -82,6 +94,24 @@ void Player::tick(float time,std::vector<Note>&v) {
             break;
         }
         if(v[i].getType()==CROSS_C && m_cross == 1) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_G_UP && m_green && m_scr_up) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_G_DOWN && m_green && m_scr_down) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_G_ANY && m_green && (m_scr_down || m_scr_up)) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_B_UP && m_blue && m_scr_up) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_B_DOWN && m_blue && m_scr_down) {
+            v[i].click(time);
+            break;
+        }if(v[i].getType()==SCR_B_ANY && m_blue && (m_scr_down || m_scr_up)) {
             v[i].click(time);
             break;
         }

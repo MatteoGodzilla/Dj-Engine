@@ -2,13 +2,18 @@
 #define RENDR_H
 #include "Note.h"
 #include "Player.h"
+#include "Generator.h"
 #include <SFML/Graphics.hpp>
+#include <vector>
+#include <iostream>
 
 class Rendr {
 public:
     Rendr(sf::RenderWindow& w);
-    void render(float time,std::vector<Note> &v);
-    void pollState(Player& p);
+    void clicker();
+    void notes(float time,std::vector<Note> &v);
+    void events(float time,std::vector<Note>&ev);
+    void pollState(Player& p,Generator &g);
     virtual ~Rendr();
 
 protected:
@@ -29,8 +34,11 @@ private:
     sf::Vector2f m_scl_end;
     sf::Vector2f m_scl_vel;
     sf::RenderWindow &m_window;
+
     bool m_red,m_green,m_blue;
     int m_cross;
+    bool m_scr_g = false;
+    bool m_scr_b = false;
 };
 
 #endif // RENDR_H

@@ -1,6 +1,4 @@
 #include "Rendr.h"
-#include <SFML/Graphics.hpp>
-#include <iostream>
 
 Rendr::Rendr(sf::RenderWindow &w):m_window(w) {
     sf::Texture loader;
@@ -16,6 +14,11 @@ Rendr::Rendr(sf::RenderWindow &w):m_window(w) {
     m_time_counter.setPosition(0.0,0.0);
     m_time_counter.setColor(sf::Color::White);
 
+
+    //scale setup
+    m_scl_start = sf::Vector2f(0.1,0.1);
+    m_scl_end = sf::Vector2f(0.2,0.2);
+    m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
 
     m_tray1.setTexture(m_tex);
     m_tray1.setTextureRect(sf::IntRect(1320,0,440,880));
@@ -49,15 +52,9 @@ Rendr::Rendr(sf::RenderWindow &w):m_window(w) {
     m_blue_click.setScale(0.2,0.2);
     m_blue_click.setPosition(600.0,500.0);
 
-    //scale setup
-    m_scl_start = sf::Vector2f(0.1,0.1);
-    m_scl_end = sf::Vector2f(0.2,0.2);
-    m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
 }
 
-void Rendr::render(float time,std::vector<Note> &v) {
-    m_time_counter.setString("Time:"+std::to_string(time));
-
+void Rendr::clicker() {
     if(m_red)m_red_click.setScale(0.15,0.15);
     else m_red_click.setScale(0.2,0.2);
 
@@ -71,10 +68,10 @@ void Rendr::render(float time,std::vector<Note> &v) {
         m_green_click.setPosition(338.0,500.0);
         m_blue_click.setPosition(600.0,500.0);
     } else if(m_cross == 1) {
-        m_green_click.setPosition(424.0,500.0);
+        m_green_click.setPosition(426.0,500.0);
         m_blue_click.setPosition(600.0,500.0);
     } else if(m_cross == 2) {
-        m_green_click.setPosition(424.0,500.0);
+        m_green_click.setPosition(426.0,500.0);
         m_blue_click.setPosition(688.0,500.0);
     }
 
@@ -84,30 +81,53 @@ void Rendr::render(float time,std::vector<Note> &v) {
     m_window.draw(m_green_click);
     m_window.draw(m_blue_click);
     m_window.draw(m_time_counter);
+}
 
+void Rendr::notes(float time,std::vector<Note> &v) {
+    m_time_counter.setString("Time:"+std::to_string(time));
     for(int i = 0 ; i < v.size(); i++) {
         Note temp = v[i];
         float dt = temp.getMilli()-time;
 
         sf::Sprite sprite;
         sprite.setTexture(m_tex);
-        if(temp.getType() == TAP_R || temp.getType() == CROSS_L) {
+        int type = temp.getType();
+
+        if(type == TAP_R ) {
             sprite.setTextureRect(sf::IntRect(400,0,400,400));
             m_start = sf::Vector2f(512.0,200.0);
             m_end = sf::Vector2f(512.0,500.0);
             m_vel = (m_end-m_start)/1.0f;
-        } else if (temp.getType() == TAP_G) {
-            sprite.setTextureRect(sf::IntRect(0,0,400,400));
+        } else if (type == TAP_G || type == SCR_G_UP || type == SCR_G_DOWN || type == SCR_G_ANY) {
+            if(type== TAP_G) {
+                sprite.setTextureRect(sf::IntRect(0,0,400,400));
+            } else if(type == SCR_G_UP) {
+                sprite.setTextureRect(sf::IntRect(800,840,400,400));
+            } else if(type == SCR_G_DOWN) {
+                sprite.setTextureRect(sf::IntRect(400,840,400,400));
+            } else if(type == SCR_G_ANY) {
+                sprite.setTextureRect(sf::IntRect(0,840,400,400));
+            }
             m_start = sf::Vector2f(472.0,200.0);
             m_end = sf::Vector2f(422.0,500.0);
             m_vel = (m_end-m_start)/1.0f;
-        } else if (temp.getType() == TAP_B) {
-            sprite.setTextureRect(sf::IntRect(800,0,400,400));
+        } else if (type == TAP_B || type == SCR_B_UP || type == SCR_B_DOWN || type == SCR_B_ANY) {
+            if(type== TAP_B) {
+                sprite.setTextureRect(sf::IntRect(800,0,400,400));
+            } else if(type == SCR_B_UP) {
+                sprite.setTextureRect(sf::IntRect(800,840,400,400));
+            } else if(type == SCR_B_DOWN) {
+                sprite.setTextureRect(sf::IntRect(400,840,400,400));
+            } else if(type == SCR_B_ANY) {
+                sprite.setTextureRect(sf::IntRect(0,840,400,400));
+            }
             m_start = sf::Vector2f(552.0,200.0);
             m_end = sf::Vector2f(602.0,500.0);
             m_vel = (m_end-m_start)/1.0f;
-        }
+        } else sprite.setTextureRect(sf::IntRect(0,0,0,0));
         sprite.setOrigin(200.0,200.0);
+
+
 
         if(dt >= -0.2 && dt <= 1.0) {
             //position and scale calculations
@@ -115,7 +135,7 @@ void Rendr::render(float time,std::vector<Note> &v) {
             sf::Vector2f scl = m_scl_start +m_scl_vel*(1.0f-dt);
 
             //sprite drawn on screen
-            if(temp.getActive() == true){
+            if(temp.getActive() == true) {
                 sprite.setScale(scl);
                 sprite.setPosition(pos);
                 m_window.draw(sprite);
@@ -126,11 +146,95 @@ void Rendr::render(float time,std::vector<Note> &v) {
     //std::cout <<"------"<<std::endl;
 }
 
-void Rendr::pollState(Player& p) {
+void Rendr::events(float time,std::vector<Note>&ev) {
+    for(int i = 0; i < ev.size(); i++) {
+        int type = ev[i].getType();
+        float diff_start = ev[i].getMilli()-time;
+        if(type == SCR_G_START) {
+            float diff_end = -1;
+            for(int j = 0; j < ev.size(); j++) {
+                if(ev[j].getType()==SCR_G_END) {
+                    diff_end = ev[j].getMilli()-time;
+                    break;
+                }
+            }
+            sf::VertexArray varr(sf::Quads,4);
+            for(int i = 0; i < varr.getVertexCount(); i++)varr[i].color = sf::Color(57,172,64);
+
+            sf::Vector2f start_l = sf::Vector2f(446.0,200.0);
+            sf::Vector2f end_l = sf::Vector2f(386.0,500.0);
+            sf::Vector2f start_r = sf::Vector2f(492,200.0);
+            sf::Vector2f end_r = sf::Vector2f(466.0,500.0);
+
+            sf::Vector2f vel_l = (end_l-start_l)/1.0f;
+            sf::Vector2f vel_r = (end_r-start_r)/1.0f;
+
+            if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
+                if(diff_start <= 1.0 && diff_start >= 0.0) {
+                    varr[2].position = start_r+vel_r*(1.0f-diff_start);
+                    varr[3].position = start_l+vel_l*(1.0f-diff_start);
+                } else {
+                    varr[2].position = end_r;
+                    varr[3].position = end_l;
+                }
+                if(diff_end <= 1.0 && diff_end >= 0.0) {
+                    varr[0].position = start_l+vel_l*(1.0f-diff_end);
+                    varr[1].position = start_r+vel_r*(1.0f-diff_end);
+                } else {
+                    varr[0].position = start_l;
+                    varr[1].position = start_r;
+                }
+            }
+
+            m_window.draw(varr);
+        }else if(type == SCR_B_START) {
+            float diff_end = -1;
+            for(int j = 0; j < ev.size(); j++) {
+                if(ev[j].getType()==SCR_B_END) {
+                    diff_end = ev[j].getMilli()-time;
+                    break;
+                }
+            }
+            sf::VertexArray varr(sf::Quads,4);
+            for(int i = 0; i < varr.getVertexCount(); i++)varr[i].color = sf::Color(40,51,177);
+
+            sf::Vector2f start_l = sf::Vector2f(526.0,200.0);
+            sf::Vector2f end_l = sf::Vector2f(560.0,500.0);
+            sf::Vector2f start_r = sf::Vector2f(578,200.0);
+            sf::Vector2f end_r = sf::Vector2f(640.0,500.0);
+
+            sf::Vector2f vel_l = (end_l-start_l)/1.0f;
+            sf::Vector2f vel_r = (end_r-start_r)/1.0f;
+
+            if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
+                if(diff_start <= 1.0 && diff_start >= 0.0) {
+                    varr[2].position = start_r+vel_r*(1.0f-diff_start);
+                    varr[3].position = start_l+vel_l*(1.0f-diff_start);
+                } else {
+                    varr[2].position = end_r;
+                    varr[3].position = end_l;
+                }
+                if(diff_end <= 1.0 && diff_end >= 0.0) {
+                    varr[0].position = start_l+vel_l*(1.0f-diff_end);
+                    varr[1].position = start_r+vel_r*(1.0f-diff_end);
+                } else {
+                    varr[0].position = start_l;
+                    varr[1].position = start_r;
+                }
+            }
+
+            m_window.draw(varr);
+        }
+    }
+}
+
+void Rendr::pollState(Player& p,Generator &g) {
     m_red = p.m_red;
     m_blue = p.m_blue;
     m_green = p.m_green;
     m_cross = p.m_cross;
+    m_scr_g = g.m_scr_g;
+    m_scr_b = g.m_scr_b;
 }
 
 Rendr::~Rendr() {

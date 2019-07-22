@@ -9,7 +9,9 @@ enum K {
     RED_CODE = sf::Keyboard::K,
     BLUE_CODE = sf::Keyboard::L,
     CROSS_L_CODE = sf::Keyboard::A,
-    CROSS_R_CODE = sf::Keyboard::D
+    CROSS_R_CODE = sf::Keyboard::D,
+    SCRATCH_UP = sf::Keyboard::W,
+    SCRATCH_DOWN = sf::Keyboard::S
 };
 
 class Player {
@@ -30,6 +32,8 @@ private:
     bool m_just_b = false;
     bool m_just_cross_l = false;
     bool m_just_cross_r = false;
+    bool m_scr_up = false;
+    bool m_scr_down = false;
     Generator &m_gen;
 };
 
