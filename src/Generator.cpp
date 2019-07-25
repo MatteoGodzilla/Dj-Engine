@@ -3,7 +3,7 @@
 Generator::Generator() {
 
     m_event_times.push_back(2.0f);
-    m_event_types.push_back(CROSS_R);
+    m_event_types.push_back(CROSS_L);
 
     m_note_times.push_back(4.0f);
     m_note_types.push_back(TAP_B);

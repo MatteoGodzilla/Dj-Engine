@@ -1,0 +1,49 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "compile file",
+            "type": "shell",
+            "command": "/bin/g++",
+            "args": [
+                "-Wall",
+                "-I/usr/include",
+                "-Iinclude",
+                "-c",
+                "${file}",
+                "-o",
+                "${workspaceFolder}/obj/${fileBasenameNoExtension}.o"
+            ],
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "type": "shell",
+            "label": "link all files",
+            "command": "/bin/g++",
+            "args": [
+                "-L/usr/lib",
+                "-o",
+                "${workspaceFolder}/Dj-engine",
+                "${workspaceFolder}/obj/main.o",
+                "${workspaceFolder}/obj/Generator.o",
+                "${workspaceFolder}/obj/Note.o",
+                "${workspaceFolder}/obj/Player.o",
+                "${workspaceFolder}/obj/Rendr.o",
+                "-lsfml-graphics",
+                "-lsfml-window",
+                "-lsfml-system",
+                "-lsfml-audio"
+            ],
+            "options": {
+                "cwd": "/bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
