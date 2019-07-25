@@ -13,6 +13,7 @@ public:
     void clicker();
     void notes(float time,std::vector<Note> &v);
     void events(float time,std::vector<Note>&ev);
+    void lanes(float time, std::vector<Note>&ev);
     void pollState(Player& p,Generator &g);
     virtual ~Rendr();
 
@@ -36,9 +37,14 @@ private:
     sf::RenderWindow &m_window;
 
     bool m_red,m_green,m_blue;
-    int m_cross;
+    int m_play_cross;
     bool m_scr_g = false;
     bool m_scr_b = false;
+
+    int m_ren_cross = 1;
+    int resolution = 200;
+    std::vector<int> m_lanes;
+
 };
 
 #endif // RENDR_H

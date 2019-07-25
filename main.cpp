@@ -29,6 +29,7 @@ void tick() {
 
 void render() {
     rendr.clicker();
+    rendr.lanes(global_time,event_arr);
     rendr.events(global_time,event_arr);
     rendr.notes(global_time,note_arr);
 

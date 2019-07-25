@@ -1,32 +1,12 @@
 #include "Generator.h"
 
 Generator::Generator() {
+
     m_event_times.push_back(2.0f);
-    m_event_types.push_back(SCR_B_START);
-    m_note_times.push_back(2.2f);
-    m_note_types.push_back(SCR_B_UP);
-    m_note_times.push_back(2.4f);
-    m_note_types.push_back(SCR_B_DOWN);
-    m_note_times.push_back(2.6f);
-    m_note_types.push_back(SCR_B_UP);
-    m_note_times.push_back(2.8f);
-    m_note_types.push_back(SCR_B_DOWN);
-    m_event_times.push_back(3.0f);
-    m_event_types.push_back(SCR_B_END);
+    m_event_types.push_back(CROSS_R);
 
-    m_event_times.push_back(4.0f);
-    m_event_types.push_back(SCR_G_START);
-    m_note_times.push_back(4.2f);
-    m_note_types.push_back(SCR_G_UP);
-    m_note_times.push_back(4.4f);
-    m_note_types.push_back(SCR_G_DOWN);
-    m_note_times.push_back(4.6f);
-    m_note_types.push_back(SCR_G_UP);
-    m_note_times.push_back(4.8f);
-    m_note_types.push_back(SCR_G_DOWN);
-    m_event_times.push_back(5.0f);
-    m_event_types.push_back(SCR_G_END);
-
+    m_note_times.push_back(4.0f);
+    m_note_types.push_back(TAP_B);
 }
 
 void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
@@ -39,20 +19,25 @@ void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
             m_note_types.erase(m_note_types.begin()+i);
         }
     }
-    for(int j = 0;j < m_event_times.size();j++){
-        if(m_event_types[j] == SCR_G_START)m_scr_g = true;
-        if(m_event_types[j] == SCR_G_END)m_scr_g = false;
-        Note temp(m_event_times[j],m_event_types[j]);
+    for(int i = 0;i < m_event_times.size();i++){
+        if(m_event_types[i] == SCR_G_START)m_scr_g = true;
+        if(m_event_types[i] == SCR_G_END)m_scr_g = false;
+        Note temp(m_event_times[i],m_event_types[i]);
         ev.push_back(temp);
-        m_event_times.erase(m_event_times.begin()+j);
-        m_event_types.erase(m_event_types.begin()+j);
+        m_event_times.erase(m_event_times.begin()+i);
+        m_event_types.erase(m_event_types.begin()+i);
     }
 
     for (int i = 0; i < v.size(); i++) {
-        //remove if outside hit areaù
+        //remove if outside hit area
         if(time >= v[i].getMilli()+0.2f  || v[i].getActive() == false) {
             v[i].click(time);
             v.erase(v.begin()+i);
+        }
+    }
+    for (int i = 0; i < ev.size(); i++){
+        if(time >= ev[i].getMilli() || ev[i].getActive() == false){
+            ev.erase(ev.begin()+i);
         }
     }
 }
