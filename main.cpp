@@ -39,6 +39,7 @@ int main() {
     sf::Clock c;
     sf::ContextSettings settings;
     settings.antialiasingLevel = 2;
+
     window.create(sf::VideoMode(1024, 600), "Dj-Engine",sf::Style::Default,settings);
     while (window.isOpen()) {
         global_time += c.restart().asSeconds();
@@ -55,6 +56,8 @@ int main() {
         window.display();
 
     }
+    note_arr.clear();
+    event_arr.clear();
 
     return 0;
 }

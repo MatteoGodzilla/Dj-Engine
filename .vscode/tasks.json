@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "compile file",
+            "label": "Compile file",
             "type": "shell",
             "command": "/bin/g++",
             "args": [
@@ -22,12 +22,12 @@
         },
         {
             "type": "shell",
-            "label": "link all files",
+            "label": "Build",
             "command": "/bin/g++",
             "args": [
                 "-L/usr/lib",
                 "-o",
-                "${workspaceFolder}/Dj-engine",
+                "${workspaceFolder}/Dj-Engine",
                 "${workspaceFolder}/obj/main.o",
                 "${workspaceFolder}/obj/Generator.o",
                 "${workspaceFolder}/obj/Note.o",
@@ -38,12 +38,19 @@
                 "-lsfml-system",
                 "-lsfml-audio"
             ],
+            "dependsOn": [
+                "Compile file"
+            ],
             "options": {
                 "cwd": "/bin"
             },
             "problemMatcher": [
                 "$gcc"
-            ]
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }

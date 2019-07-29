@@ -42,9 +42,9 @@ private:
     bool m_scr_b = false;
 
     int m_ren_cross = 1;
-    int resolution = 200;
+    const int resolution = 200;
     std::vector<int> m_lanes;
-
+    
 };
 
 #endif // RENDR_H
