@@ -13,7 +13,7 @@ std::vector<Note> note_arr;
 std::vector<Note> event_arr;
 Rendr rendr(window);
 Generator gen;
-Player player(gen);
+Player player;
 
 void check_events(sf::Event e) {
     if(e.type == sf::Event::Closed)window.close();
@@ -24,7 +24,7 @@ void check_events(sf::Event e) {
 void tick() {
     gen.tick(global_time,note_arr,event_arr);
     rendr.pollState(player,gen);
-    player.tick(global_time, note_arr);
+    player.tick(global_time, note_arr,event_arr);
 }
 
 void render() {

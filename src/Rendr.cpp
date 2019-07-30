@@ -177,11 +177,10 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
 
     sf::Vector2f blue_center_vel = (blue_center_end-blue_center_start)/1.0f;
     sf::Vector2f blue_right_vel = (blue_right_end-blue_right_start)/1.0f;
-    
+
     std::vector<sf::Vertex> green_lane;
     std::vector<sf::Vertex> blue_lane;
 
-    
     for(size_t i = 0; i < ev.size(); ++i){
         if(ev.at(i).getMilli() <= time +1.0f && ev.at(i).getMilli()> time){
             float dt = 1.0f-(ev.at(i).getMilli()-time);
@@ -337,7 +336,6 @@ void Rendr::events(float time,std::vector<Note>&ev) {
                 start_r = sf::Vector2f(614,200.0);
                 end_r = sf::Vector2f(728.0,500.0);
             }
-            
 
             sf::Vector2f vel_l = (end_l-start_l)/1.0f;
             sf::Vector2f vel_r = (end_r-start_r)/1.0f;

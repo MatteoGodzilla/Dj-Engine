@@ -16,9 +16,9 @@ enum K {
 
 class Player {
 public:
-    Player(Generator &g);
+    Player();
     void key(sf::Event e);
-    void tick(float time,std::vector<Note>& v);
+    void tick(float time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
     bool m_red = false;
     bool m_green = false;
@@ -34,7 +34,7 @@ private:
     bool m_just_cross_r = false;
     bool m_scr_up = false;
     bool m_scr_down = false;
-    Generator &m_gen;
+
 };
 
 #endif // Player_H

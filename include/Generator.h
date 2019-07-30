@@ -18,7 +18,6 @@ private:
     std::vector<int> m_note_types;
     std::vector<float>m_event_times;
     std::vector<int>m_event_types;
-    
 
 };
 

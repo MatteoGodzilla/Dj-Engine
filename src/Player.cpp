@@ -1,11 +1,10 @@
 #include "Player.h"
 #include <iostream>
 
-Player::Player(Generator &g) :m_gen(g) {
+Player::Player() {
 }
 
 void Player::key(sf::Event e) {
-
     if(e.type == sf::Event::KeyPressed) {
         if(e.key.code == GREEN_CODE) {
             if(m_green == false) {
@@ -32,9 +31,19 @@ void Player::key(sf::Event e) {
             m_blue = true;
         }
         if(e.key.code == CROSS_L_CODE) {
+            if(m_cross != 0){
+                m_just_cross_l = true;
+            }else {
+                m_just_cross_l = false;
+            }
             m_cross = 0;
         }
         if(e.key.code == CROSS_R_CODE) {
+            if(m_cross != 2){
+                m_just_cross_r = true;
+            }else {
+                m_just_cross_r = false;
+            }
             m_cross = 2;
         }
         if(e.key.code == SCRATCH_UP){
@@ -70,9 +79,9 @@ void Player::key(sf::Event e) {
 
 }
 
-void Player::tick(float time,std::vector<Note>&v) {
+void Player::tick(float time,std::vector<Note>&v,std::vector<Note>&ev) {
     //Note check
-    for(int i = 0; i < v.size(); i++) {
+    for(size_t i = 0; i < v.size(); ++i) {
         if(v[i].getType()==TAP_R && m_just_r) {
             v[i].click(time);
             break;
@@ -85,18 +94,7 @@ void Player::tick(float time,std::vector<Note>&v) {
             v[i].click(time);
             break;
         }
-        if(v[i].getType()==CROSS_L && m_just_cross_l) {
-            v[i].click(time);
-            break;
-        }
-        if(v[i].getType()==CROSS_R && m_just_cross_r) {
-            v[i].click(time);
-            break;
-        }
-        if(v[i].getType()==CROSS_C && m_cross == 1) {
-            v[i].click(time);
-            break;
-        }if(v[i].getType()==SCR_G_UP && m_green && m_scr_up) {
+        if(v[i].getType()==SCR_G_UP && m_green && m_scr_up) {
             v[i].click(time);
             break;
         }if(v[i].getType()==SCR_G_DOWN && m_green && m_scr_down) {
@@ -117,13 +115,25 @@ void Player::tick(float time,std::vector<Note>&v) {
         }
 
     }
+    for(size_t i = 0; i < ev.size(); ++i){
+        if(ev[i].getType()==CROSS_L && m_just_cross_l) {
+            ev[i].click(time);
+            break;
+        }
+        if(ev[i].getType()==CROSS_R && m_just_cross_r) {
+            ev[i].click(time);
+            break;
+        }
+        if(ev[i].getType()==CROSS_C && m_cross == 1) {
+            ev[i].click(time);
+            break;
+        }
+    }
     if(m_just_r) m_just_r = false;
     if(m_just_g) m_just_g = false;
     if(m_just_b) m_just_b = false;
     if(m_just_cross_l) m_just_cross_l = false;
     if(m_just_cross_r) m_just_cross_r = false;
-
-    //std::cout << m_green << "\\" << m_red << "\\" << m_blue << "\\" << m_cross << std::endl;
 }
 
 

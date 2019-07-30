@@ -35,9 +35,10 @@ void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
         }
     }
     for (size_t i = 0; i < ev.size(); ++i){
-        if(ev.at(i).getActive() == false){
+        int type = ev.at(i).getType();
+        if(ev.at(i).getActive() == false && !(type == CROSS_L || type == CROSS_C || type == CROSS_R )){
             ev.erase(ev.begin()+i);
-        }else if(ev.at(i).getType()==SCR_G_START){
+        }else if(type==SCR_G_START){
             int e = -1;
             for(size_t j = 0; j < ev.size();++j){
                 if(ev.at(j).getType()==SCR_G_END && time >= ev.at(j).getMilli()+0.2f)e = j;
@@ -45,6 +46,13 @@ void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
             if(e != -1){
                 ev.erase(ev.begin()+i);
                 ev.erase(ev.begin()+e);
+            }
+        }else if (type == CROSS_L || type == CROSS_C || type == CROSS_R){
+            for(size_t j = i+1; j < ev.size();++j){
+                int next_type = ev.at(j).getType();
+                if((next_type == CROSS_L || next_type == CROSS_C || next_type == CROSS_R) && ev.at(j).getMilli()<=time+0.2f){
+                    ev.erase(ev.begin()+i);
+                }
             }
         }
     }
