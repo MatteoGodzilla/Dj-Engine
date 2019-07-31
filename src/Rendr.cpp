@@ -90,12 +90,10 @@ void Rendr::clicker() {
 void Rendr::notes(float time,std::vector<Note> &v) {
     m_time_counter.setString("Time:"+std::to_string(time));
     for(size_t i = 0 ; i < v.size(); ++i) {
-        Note temp = v.at(i);
-        float dt = temp.getMilli()-time;
-
+        float dt = v.at(i).getMilli()-time;
         sf::Sprite sprite;
         sprite.setTexture(m_tex);
-        int type = temp.getType();
+        int type = v.at(i).getType();
 
         if(type == TAP_R ) {
             sprite.setTextureRect(sf::IntRect(400,0,400,400));
@@ -112,11 +110,16 @@ void Rendr::notes(float time,std::vector<Note> &v) {
             } else if(type == SCR_G_ANY) {
                 sprite.setTextureRect(sf::IntRect(0,840,400,400));
             }
-            if(m_ren_cross == 0){
+            if(v.at(i).getLanMod() == -1 && m_ren_cross == 0){
+                v.at(i).setLanMod(1);//true
+            }else if(v.at(i).getLanMod() == -1 && (m_ren_cross == 1 || m_ren_cross == 2)){
+                v.at(i).setLanMod(0);//false
+            }
+            if(v.at(i).getLanMod()==1){
                 //green left
                 m_start = sf::Vector2f(436.0,200.0);
                 m_end = sf::Vector2f(338.0,500.0);
-            }else if(m_ren_cross == 1 || m_ren_cross == 2){
+            }else if(v.at(i).getLanMod()==0){
                 //green center
                 m_start = sf::Vector2f(472.0,200.0);
                 m_end = sf::Vector2f(426.0,500.0);
@@ -132,11 +135,16 @@ void Rendr::notes(float time,std::vector<Note> &v) {
             } else if(type == SCR_B_ANY) {
                 sprite.setTextureRect(sf::IntRect(0,840,400,400));
             }
-            if(m_ren_cross == 0 || m_ren_cross == 1){
-                //blue center
+            if(v.at(i).getLanMod() == -1 && m_ren_cross == 2){
+                v.at(i).setLanMod(1);
+            }else if(v.at(i).getLanMod() == -1 &&(m_ren_cross == 0 || m_ren_cross == 1)){
+                v.at(i).setLanMod(0);
+            }
+            if(v.at(i).getLanMod()==0){
+               //blue center
                 m_start = sf::Vector2f(554.0,200.0);
                 m_end = sf::Vector2f(600.0,500.0);
-            }else if (m_ren_cross == 2){
+            }else if(v.at(i).getLanMod()==1){
                 //blue right
                 m_start = sf::Vector2f(590.0,200.0);
                 m_end = sf::Vector2f(688.0,500.0);
@@ -151,7 +159,7 @@ void Rendr::notes(float time,std::vector<Note> &v) {
             sf::Vector2f scl = m_scl_start +m_scl_vel*(1.0f-dt);
 
             //sprite drawn on screen
-            if(temp.getActive() == true) {
+            if(v.at(i).getActive() == true) {
                 sprite.setScale(scl);
                 sprite.setPosition(pos);
                 m_window.draw(sprite);

@@ -44,7 +44,6 @@ private:
     int m_ren_cross = 1;
     const int resolution = 200;
     std::vector<int> m_lanes;
-    
 };
 
 #endif // RENDR_H

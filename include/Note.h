@@ -20,6 +20,8 @@ public:
     float getMilli();
     int getType();
     bool getActive();
+    int getLanMod();
+    void setLanMod(int i);
     void destroy();
 protected:
 
@@ -28,6 +30,7 @@ private:
     bool m_active = true;
     float m_milli;
     int m_type;
+    int m_lan_mod = -1;
 };
 
 #endif // NOTE_H

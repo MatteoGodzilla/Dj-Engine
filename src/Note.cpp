@@ -16,7 +16,7 @@ void Note::click(float time) {
             m_active = false;
         } else if(m_milli-time <= m_hit_window*2 ) {
             if(abs(m_milli-time)<= m_hit_window ) {
-                std::cout << "Hit: " << m_type << " at "<<time  <<std::endl;
+                std::cout << "Hit : " << m_type << " at "<<time  <<std::endl;
                 m_active = false;
             }
         }
@@ -33,6 +33,13 @@ int Note::getType() {
 
 bool Note::getActive() {
     return m_active;
+}
+
+int Note::getLanMod(){
+    return m_lan_mod;
+}
+void Note::setLanMod(int i){
+    m_lan_mod = i;
 }
 
 void Note::destroy() {
