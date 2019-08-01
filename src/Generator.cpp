@@ -1,12 +1,84 @@
 #include "Generator.h"
 
 Generator::Generator() {
-    pushEvent(2.0f,CROSS_L);
-    pushEvent(3.0f,CROSS_C);
-    pushEvent(4.0f,CROSS_R);
-    pushEvent(5.0f,CROSS_L);
-    pushEvent(6.0f,CROSS_R);
-    pushEvent(7.0f,CROSS_C);
+    pushNote(2.0f,TAP_G);
+    pushNote(2.2f,TAP_R);
+    pushNote(2.4f,TAP_B);
+    pushNote(2.6f,TAP_R);
+    pushNote(2.8f,TAP_G);
+    pushNote(3.0f,TAP_R);
+    pushNote(3.2f,TAP_B);
+    pushNote(3.4f,TAP_R);
+    pushNote(3.6f,TAP_G);
+    pushNote(3.8f,TAP_R);
+    pushNote(4.0f,TAP_B);
+    pushNote(4.2f,TAP_R);
+    pushNote(4.4f,TAP_G);
+    pushNote(4.6f,TAP_R);
+    pushNote(4.8f,TAP_B);
+    pushNote(5.0f,TAP_R);
+
+    pushNote(5.2f,TAP_G);
+    pushNote(5.4f,TAP_R);
+    pushNote(5.6f,TAP_B);
+    pushNote(5.8f,TAP_R);
+    pushNote(6.0f,TAP_G);
+    pushNote(6.2f,TAP_R);
+    pushNote(6.4f,TAP_B);
+    pushNote(6.6f,TAP_R);
+    pushNote(6.8f,TAP_G);
+    pushNote(7.0f,TAP_R);
+    pushNote(7.2f,TAP_B);
+    pushNote(7.4f,TAP_R);
+    pushNote(7.6f,TAP_G);
+    pushNote(7.8f,TAP_R);
+    pushNote(8.0f,TAP_B);
+    pushNote(8.2f,TAP_R);
+
+    pushNote(8.4f,TAP_G);
+    pushNote(8.6f,TAP_R);
+    pushNote(8.8f,TAP_B);
+    pushNote(9.0f,TAP_R);
+    pushNote(9.2f,TAP_G);
+    pushNote(9.4f,TAP_R);
+    pushNote(9.6f,TAP_B);
+    pushNote(9.8f,TAP_R);
+    pushNote(10.0f,TAP_G);
+    pushNote(10.2f,TAP_R);
+    pushNote(10.4f,TAP_B);
+    pushNote(10.6f,TAP_R);
+    pushNote(10.8f,TAP_G);
+    pushNote(11.0f,TAP_R);
+    pushNote(11.2f,TAP_B);
+    pushNote(11.4f,TAP_R);
+
+    pushNote(11.6f,TAP_G);
+    pushNote(11.8f,TAP_R);
+    pushNote(12.0f,TAP_B);
+    pushNote(12.2f,TAP_R);
+    pushNote(12.4f,TAP_G);
+    pushNote(12.6f,TAP_R);
+    pushNote(12.8f,TAP_B);
+    pushNote(13.0f,TAP_R);
+    pushNote(13.2f,TAP_G);
+    pushNote(13.4f,TAP_R);
+    pushNote(13.6f,TAP_B);
+    pushNote(13.8f,TAP_R);
+    pushNote(14.0f,TAP_G);
+    pushNote(14.2f,TAP_R);
+    pushNote(14.4f,TAP_B);
+    pushNote(14.6f,TAP_R);
+
+    pushNote(15.1f,TAP_G);
+    pushNote(15.1f,TAP_R);
+    pushNote(15.1f,TAP_B);
+
+    pushEvent(5.2f,CROSS_L);
+    pushEvent(8.4f,CROSS_R);
+    pushEvent(11.6f,CROSS_L);
+    pushEvent(13.2f,CROSS_R);
+    pushEvent(14.0f,CROSS_C);
+
 }
 
 void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
