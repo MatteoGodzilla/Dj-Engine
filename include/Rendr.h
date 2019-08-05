@@ -14,7 +14,7 @@ public:
     void notes(float time,std::vector<Note> &v);
     void events(float time,std::vector<Note>&ev);
     void lanes(float time, std::vector<Note>&ev);
-    void pollState(Player& p,Generator &g);
+    void pollState(float time,Player& p,Generator &g);
     virtual ~Rendr();
 
 protected:
@@ -22,11 +22,14 @@ protected:
 private:
     sf::Texture m_tex;
 
-    sf::Sprite m_tray1,m_tray2;
+    sf::Sprite m_trayL,m_trayR;
     sf::Sprite m_red_click,m_green_click,m_blue_click;
 
     sf::Font m_font;
-    sf::Text m_time_counter;
+    sf::Text m_time_txt;
+    sf::Text m_score_txt;
+    sf::Text m_combo_txt;
+    sf::Text m_mult_txt;
 
     sf::Vector2f m_start;
     sf::Vector2f m_end;
@@ -37,7 +40,7 @@ private:
     sf::RenderWindow &m_window;
 
     bool m_red,m_green,m_blue;
-    int m_play_cross;
+    int m_player_cross;
     bool m_scr_g = false;
     bool m_scr_b = false;
 

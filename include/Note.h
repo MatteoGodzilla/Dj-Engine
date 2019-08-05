@@ -13,21 +13,28 @@ enum note {TAP_G,TAP_R,TAP_B,
 
 class Note {
 public:
-    Note(float milli,int ty);
+    Note(float milli,int ty,bool ev = false);
     virtual ~Note();
     void click(float time);
     void tick(float time);
     float getMilli();
     int getType();
-    bool getActive();
+    bool getRender();
+    bool getHit();
+    bool getTouched();
+    bool getDead();
+    bool getIsEvent();
     int getLanMod();
     void setLanMod(int i);
-    void destroy();
 protected:
 
 private:
     float m_hit_window;
-    bool m_active = true;
+    bool m_is_event;
+    bool m_render = true;
+    bool m_hittable = false;
+    bool m_touched = false;
+    bool m_dead = false;
     float m_milli;
     int m_type;
     int m_lan_mod = -1;

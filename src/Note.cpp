@@ -1,25 +1,39 @@
 #include "Note.h"
 
-Note::Note(float milli,int ty) {
+Note::Note(float milli,int ty,bool ev){
     //set hit time
-    m_hit_window = 0.1;
+    m_hit_window = 0.15;
     m_milli = milli;
     m_type = ty;
-    m_active = true;
+    m_is_event = ev;
 }
 
 void Note::click(float time) {
-    //if it's too early, don't count
-    if(m_active == true){
-        if (time >= m_milli+m_hit_window ){
-            std::cout << "Miss: " << m_type << " at "<< time  <<std::endl;
-            m_active = false;
-        } else if(m_milli-time <= m_hit_window*2 ) {
-            if(abs(m_milli-time)<= m_hit_window ) {
-                std::cout << "Hit : " << m_type << " at "<<time  <<std::endl;
-                m_active = false;
-            }
-        }
+    if(m_hittable){
+        std::cout << "Hit :" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
+        m_touched = true;
+    }else {
+        std::cout << "Miss:" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
+    }
+    if(!m_is_event){
+        m_dead = true;
+    }
+}
+
+void Note::tick(float time){
+    if(time +1.0f >= m_milli && time <= m_milli+m_hit_window){
+        m_render = true;
+    }else{
+        m_render = false;
+    }
+
+    if(m_milli-time <= m_hit_window && time-m_milli <= m_hit_window){
+        //std::cout << "hittable " << m_milli-time <<  std::endl;
+        m_hittable = true;
+    }else m_hittable = false;
+
+    if(time > m_milli+m_hit_window && !m_is_event){
+        m_dead = true;
     }
 }
 
@@ -31,8 +45,22 @@ int Note::getType() {
     return m_type;
 }
 
-bool Note::getActive() {
-    return m_active;
+bool Note::getRender() {
+    return m_render;
+}
+
+bool Note::getHit(){
+    return m_hittable;
+}
+bool Note::getTouched(){
+    return m_touched;
+}
+
+bool Note::getIsEvent(){
+    return m_is_event;
+}
+bool Note::getDead(){
+    return m_dead;
 }
 
 int Note::getLanMod(){
@@ -42,8 +70,5 @@ void Note::setLanMod(int i){
     m_lan_mod = i;
 }
 
-void Note::destroy() {
-    m_active = false;
-}
 Note::~Note() {
 }

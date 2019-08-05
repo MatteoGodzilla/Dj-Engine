@@ -17,24 +17,25 @@ enum K {
 class Player {
 public:
     Player();
-    void key(sf::Event e);
-    void tick(float time,std::vector<Note>& v,std::vector<Note>&ev);
+    void key(sf::Event e,float time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
     bool m_red = false;
     bool m_green = false;
     bool m_blue = false;
     int m_cross = 1;
+    int getScore();
+    int getCombo();
+    int getMult();
+    void pollState(Generator &g);
 protected:
 
 private:
-    bool m_just_r = false;
-    bool m_just_g = false;
-    bool m_just_b = false;
-    bool m_just_cross_l = false;
-    bool m_just_cross_r = false;
     bool m_scr_up = false;
     bool m_scr_down = false;
-
+    int m_score = 0;
+    int m_mult = 1;
+    int m_combo = 0;
+    int m_scr_tick = 0;
 };
 
 #endif // Player_H

@@ -18,13 +18,13 @@ Player player;
 void check_events(sf::Event e) {
     if(e.type == sf::Event::Closed)window.close();
     if(e.key.code == sf::Keyboard::Escape)window.close();
-    player.key(e);
+    player.key(e,global_time,note_arr,event_arr);
 }
 
 void tick() {
     gen.tick(global_time,note_arr,event_arr);
-    rendr.pollState(player,gen);
-    player.tick(global_time, note_arr,event_arr);
+    player.pollState(gen);
+    rendr.pollState(global_time,player,gen);
 }
 
 void render() {
