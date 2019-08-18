@@ -70,6 +70,10 @@ Rendr::Rendr(sf::RenderWindow &w):m_window(w) {
 
 }
 
+void print(sf::Vector2f v){
+    std::cout << v.x  << ";" << v.y << std::endl;
+}
+
 void Rendr::clicker() {
     if(m_red)m_red_click.setScale(0.15,0.15);
     else m_red_click.setScale(0.2,0.2);
@@ -135,14 +139,15 @@ void Rendr::notes(float time,std::vector<Note> &v) {
             }
             if(v.at(i).getLanMod() == 0){
                 //green left
-                m_start = sf::Vector2f(436.0,200.0);
-                m_end = sf::Vector2f(338.0,500.0);
+                m_start = green_left_start;
+                m_end = green_left_end;
+                m_vel = green_left_vel;
             }else if(v.at(i).getLanMod() >= 1){
                 //green center
-                m_start = sf::Vector2f(472.0,200.0);
-                m_end = sf::Vector2f(426.0,500.0);
+                m_start = green_center_start;
+                m_end = green_center_end;
+                m_vel = green_center_vel;
             }
-            m_vel = (m_end-m_start)/1.0f;
         } else if (type == TAP_B || type == SCR_B_UP || type == SCR_B_DOWN || type == SCR_B_ANY) {
             if(type== TAP_B) {
                 sprite.setTextureRect(sf::IntRect(800,0,400,400));
@@ -155,14 +160,15 @@ void Rendr::notes(float time,std::vector<Note> &v) {
             }
             if(v.at(i).getLanMod() <= 1){
                //blue center
-                m_start = sf::Vector2f(554.0,200.0);
-                m_end = sf::Vector2f(600.0,500.0);
+                m_start = blue_center_start;
+                m_end = blue_center_end;
+                m_vel = blue_center_vel;
             }else if(v.at(i).getLanMod()==2){
                 //blue right
-                m_start = sf::Vector2f(590.0,200.0);
-                m_end = sf::Vector2f(688.0,500.0);
+                m_start = blue_right_start;
+                m_end = blue_right_end;
+                m_vel = blue_right_vel;
             }
-            m_vel = (m_end-m_start)/1.0f;
         } else sprite.setTextureRect(sf::IntRect(0,0,0,0));
         sprite.setOrigin(200.0,200.0);
 
@@ -183,22 +189,6 @@ void Rendr::notes(float time,std::vector<Note> &v) {
 }
 
 void Rendr::lanes(float time, std::vector<Note>& ev) {
-    sf::Vector2f green_center_start = sf::Vector2f(472.0,200.0);
-    sf::Vector2f green_center_end = sf::Vector2f(426.0f,500.0f);
-    sf::Vector2f green_left_start = sf::Vector2f(436.0,200.0);
-    sf::Vector2f green_left_end = sf::Vector2f(338.0,500.0);
-
-    sf::Vector2f blue_center_start = sf::Vector2f(554.0,200.0);
-    sf::Vector2f blue_center_end = sf::Vector2f(600.0,500.0);
-    sf::Vector2f blue_right_start = sf::Vector2f(590.0,200.0);
-    sf::Vector2f blue_right_end = sf::Vector2f(688.0,500.0);
-
-    sf::Vector2f green_center_vel = (green_center_end-green_center_start)/1.0f;
-    sf::Vector2f green_left_vel = (green_left_end-green_left_start)/1.0f;
-
-    sf::Vector2f blue_center_vel = (blue_center_end-blue_center_start)/1.0f;
-    sf::Vector2f blue_right_vel = (blue_right_end-blue_right_start)/1.0f;
-
     std::vector<sf::Vertex> green_lane;
     std::vector<sf::Vertex> blue_lane;
 
@@ -235,9 +225,9 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
             sf::Vector2f right = blue_center_start+blue_center_vel*perc;
 
             sf::Vertex g(left);
-            g.color = sf::Color::Green;
+            g.color = sf::Color(145,255,150);
             sf::Vertex b(right);
-            b.color = sf::Color::Blue;
+            b.color = sf::Color(35,70,90);
 
             green_lane.push_back(g);
             blue_lane.push_back(b);
@@ -246,9 +236,9 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
             sf::Vector2f right = blue_center_start+blue_center_vel*perc;
 
             sf::Vertex g(left);
-            g.color = sf::Color::Green;
+            g.color = sf::Color(145,255,150);
             sf::Vertex b(right);
-            b.color = sf::Color::Blue;
+            b.color = sf::Color(160,240,255);
 
             green_lane.push_back(g);
             blue_lane.push_back(b);
@@ -257,9 +247,9 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
             sf::Vector2f right = blue_right_start+blue_right_vel*perc;
 
             sf::Vertex g(left);
-            g.color = sf::Color::Green;
+            g.color = sf::Color(0,112,25);
             sf::Vertex b(right);
-            b.color = sf::Color::Blue;
+            b.color = sf::Color(160,240,255);
 
             green_lane.push_back(g);
             blue_lane.push_back(b);
@@ -268,9 +258,9 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
 
     sf::VertexArray red(sf::Lines, 2);
     red[0].position = sf::Vector2f(512.0,200.0);
-    red[0].color = sf::Color::Red;
+    red[0].color = sf::Color(255,60,60);
     red[1].position = sf::Vector2f(512.0,500.0);
-    red[1].color = sf::Color::Red;
+    red[1].color = sf::Color(255,60,60);
 
     m_window.draw(&green_lane[0],green_lane.size(),sf::LineStrip);
     m_window.draw(&blue_lane[0],blue_lane.size(),sf::LineStrip);
@@ -292,16 +282,16 @@ void Rendr::events(float time,std::vector<Note>&ev) {
             sf::VertexArray varr(sf::Quads,4);
             for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(57,172,64);
 
-            sf::Vector2f start_l = sf::Vector2f(446.0,200.0);
-            sf::Vector2f end_l = sf::Vector2f(386.0,500.0);
-            sf::Vector2f start_r = sf::Vector2f(492,200.0);
-            sf::Vector2f end_r = sf::Vector2f(466.0,500.0);
+            sf::Vector2f start_l = green_center_start + sf::Vector2f(-23.0,0.0);
+            sf::Vector2f end_l = green_center_end + sf::Vector2f(-40.0,0.0);
+            sf::Vector2f start_r = green_center_start + sf::Vector2f(23,0.0);
+            sf::Vector2f end_r = green_center_end + sf::Vector2f(40.0,0.0);
 
             if(m_ren_cross == 0){
-                start_l = sf::Vector2f(410.0,200.0);
-                end_l = sf::Vector2f(298.0,500.0);
-                start_r = sf::Vector2f(456,200.0);
-                end_r = sf::Vector2f(378.0,500.0);
+                start_l = green_left_start + sf::Vector2f(-23.0,0.0);
+                end_l = green_left_end + sf::Vector2f(-40.0,0.0);
+                start_r =green_left_start + sf::Vector2f(23,0.0);
+                end_r = green_left_end+  sf::Vector2f(40.0,0.0);
             }
 
             sf::Vector2f vel_l = (end_l-start_l)/1.0f;
@@ -336,17 +326,16 @@ void Rendr::events(float time,std::vector<Note>&ev) {
             sf::VertexArray varr(sf::Quads,4);
             for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(40,51,177);
 
-            sf::Vector2f start_l = sf::Vector2f(526.0,200.0);
-
-            sf::Vector2f end_l = sf::Vector2f(560.0,500.0);
-            sf::Vector2f start_r = sf::Vector2f(578,200.0);
-            sf::Vector2f end_r = sf::Vector2f(640.0,500.0);
+            sf::Vector2f start_l = blue_center_start + sf::Vector2f(-23.0,0.0);
+            sf::Vector2f end_l = blue_center_end + sf::Vector2f(-40.0,0.0);
+            sf::Vector2f start_r = blue_center_start + sf::Vector2f(23,0.0);
+            sf::Vector2f end_r = blue_center_end + sf::Vector2f(40.0,0.0);
 
             if (m_ren_cross == 2){
-                start_l = sf::Vector2f(562.0,200.0);
-                end_l = sf::Vector2f(648.0,500.0);
-                start_r = sf::Vector2f(614,200.0);
-                end_r = sf::Vector2f(728.0,500.0);
+                start_l = blue_right_start + sf::Vector2f(-23.0,0.0);
+                end_l = blue_right_end + sf::Vector2f(-40.0,0.0);
+                start_r = blue_right_start + sf::Vector2f(23,0.0);
+                end_r = blue_right_end + sf::Vector2f(40.0,0.0);
             }
 
             sf::Vector2f vel_l = (end_l-start_l)/1.0f;

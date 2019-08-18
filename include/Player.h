@@ -36,6 +36,7 @@ private:
     int m_mult = 1;
     int m_combo = 0;
     int m_scr_tick = 0;
+    float m_past_tap = -1;
 };
 
 #endif // Player_H

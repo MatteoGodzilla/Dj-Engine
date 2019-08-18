@@ -18,7 +18,8 @@ Generator::Generator() {
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
 
-    pushNote(0.2f,TAP_G);
+    pushEvent(0.2f,CROSS_L);
+    pushNote(0.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
@@ -35,7 +36,8 @@ Generator::Generator() {
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
 
-    pushNote(0.2f,TAP_G);
+    pushEvent(0.2f,CROSS_R);
+    pushNote(0.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
@@ -52,7 +54,8 @@ Generator::Generator() {
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
 
-    pushNote(0.2f,TAP_G);
+    pushEvent(0.2f,CROSS_L);
+    pushNote(0.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
@@ -60,11 +63,15 @@ Generator::Generator() {
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
-    pushNote(0.2f,TAP_G);
+
+    pushEvent(0.2f,CROSS_R);
+    pushNote(0.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
-    pushNote(0.2f,TAP_G);
+
+    pushEvent(0.2f,CROSS_C);
+    pushNote(0.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
     pushNote(0.2f,TAP_R);
@@ -72,12 +79,6 @@ Generator::Generator() {
     pushNote(0.5f,TAP_G);
     pushNote(0.0f,TAP_R);
     pushNote(0.0f,TAP_B);
-
-    pushEvent(5.19f,CROSS_L);
-    pushEvent(3.19f,CROSS_R);
-    pushEvent(3.19f,CROSS_L);
-    pushEvent(1.59f,CROSS_R);
-    pushEvent(0.79f,CROSS_C);
 
 }
 
@@ -158,14 +159,14 @@ void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
 }
 
 void Generator::pushNote(float time, int type){
-    m_note_diff += time;
-    m_note_times.push_back(m_note_diff);
+    m_time += time;
+    m_note_times.push_back(m_time);
     m_note_types.push_back(type);
 }
 
 void Generator::pushEvent(float time, int type){
-    m_event_diff += time;
-    m_event_times.push_back(m_event_diff);
+    m_time += time;
+    m_event_times.push_back(m_time);
     m_event_types.push_back(type);
 }
 

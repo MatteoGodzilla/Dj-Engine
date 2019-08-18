@@ -12,9 +12,12 @@ void Player::key(sf::Event e,float time,std::vector<Note>&v,std::vector<Note>&ev
                 for(size_t i = 0; i < v.size();++i){
                     if(v.at(i).getHit() && v.at(i).getType() == TAP_G){
                         found = true;
-                        v.at(i).click(time);
                         m_score += 100*m_mult;
-                        m_combo++;
+                        if(v.at(i).getMilli() != m_past_tap){
+                            m_combo++;
+                            m_past_tap = v.at(i).getMilli();
+                        }
+                        v.at(i).click(time);
                         break;
                     }
                 }
@@ -36,9 +39,12 @@ void Player::key(sf::Event e,float time,std::vector<Note>&v,std::vector<Note>&ev
                 for(size_t i = 0; i < v.size();++i){
                     if(v.at(i).getHit() && v.at(i).getType() == TAP_R){
                         found = true;
-                        v.at(i).click(time);
                         m_score += 100*m_mult;
-                        m_combo++;
+                        if(v.at(i).getMilli() != m_past_tap){
+                            m_combo++;
+                            m_past_tap = v.at(i).getMilli();
+                        }
+                        v.at(i).click(time);
                         break;
                     }
                 }
@@ -54,9 +60,12 @@ void Player::key(sf::Event e,float time,std::vector<Note>&v,std::vector<Note>&ev
                 for(size_t i = 0; i < v.size();++i){
                     if(v.at(i).getHit() && v.at(i).getType() == TAP_B){
                         found = true;
-                        v.at(i).click(time);
                         m_score += 100*m_mult;
-                        m_combo++;
+                        if(v.at(i).getMilli() != m_past_tap){
+                            m_combo++;
+                            m_past_tap = v.at(i).getMilli();
+                        }
+                        v.at(i).click(time);
                         break;
                     }
                 }

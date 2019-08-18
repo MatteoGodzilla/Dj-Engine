@@ -13,8 +13,7 @@ public:
 protected:
 
 private:
-    float m_note_diff = 0.0f;
-    float m_event_diff = 0.0f;
+    float m_time = 0.0f;
     void pushNote(float time, int type);
     void pushEvent(float time, int type);
     std::vector<float> m_note_times;
