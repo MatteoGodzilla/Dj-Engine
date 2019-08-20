@@ -36,7 +36,8 @@
                 "-lsfml-graphics",
                 "-lsfml-window",
                 "-lsfml-system",
-                "-lsfml-audio"
+                "-lsfml-audio",
+                "-lOpenGL"
             ],
             "dependsOn": [
                 "Compile file"
