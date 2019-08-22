@@ -1,8 +1,48 @@
 #include "GL/glew.h"
+#include "glm/glm.hpp"
+#include "glm/gtc/matrix_transform.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "header/Generator.h"
 
+int width = 1024;
+int height = 600;
+
+void getErrors() {
+	std::cout << "START" << std::endl;
+	unsigned int error = glGetError();
+	while (error != GL_NO_ERROR) {
+		std::cout << "GL_ERROR: ";
+		switch (error) {
+		case GL_NO_ERROR:
+			std::cout << "NO ERROR" << std::endl;
+			break;
+		case GL_INVALID_ENUM:
+			std::cout << "INVALID ENUM" << std::endl;
+			break;
+		case GL_INVALID_VALUE:
+			std::cout << "INVALID VALUE" << std::endl;
+			break;
+		case GL_INVALID_OPERATION:
+			std::cout << "INVALID OPERATION" << std::endl;
+			break;
+		case GL_STACK_OVERFLOW:
+			std::cout << "STACK OVERFLOW" << std::endl;
+			break;
+		case GL_STACK_UNDERFLOW:
+			std::cout << "STACK UNDERFLOW" << std::endl;
+			break;
+		case GL_OUT_OF_MEMORY:
+			std::cout << "OUT OF MEMORY" << std::endl;
+			break;
+		case GL_TABLE_TOO_LARGE:
+			std::cout << "TABLE TOO LARGE" << std::endl;
+			break;
+		}
+		error = glGetError();
+	}
+	std::cout << "END" << std::endl << std::endl;
+}
 
 int main(void)
 {
@@ -15,7 +55,8 @@ int main(void)
 	}
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(1024, 600, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Hello World", NULL, NULL);
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 	if (!window)
 	{
 		std::cout << "GLFW WINDOW ERROR" << std::endl;
@@ -26,6 +67,7 @@ int main(void)
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
 
+
 	if (glewInit() != GLEW_OK) {
 		std::cout << "GLEW INIT ERROR" << std::endl;
 		return -1;
@@ -33,15 +75,15 @@ int main(void)
 	
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
-	
 
 	const char* vshadersource = "\n"
 		"#version 330 core\n"
-		"layout(location = 0) in vec3 aPos;\n"
+		"layout(location = 0) in vec4 aPos;\n"
+		"uniform mat4 u_proj;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
-		"	gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+		"	gl_Position = u_proj * aPos;\n"
 		"}";
 
 	const char* fshadersource = "\n"
@@ -53,6 +95,7 @@ int main(void)
 		"	FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
 		"}\n";
 
+	glm::mat4 proj = glm::ortho(0.0, (double)width, (double)height, 0.0);
 
 	unsigned int vbo;
 	unsigned int ibo;
@@ -60,10 +103,10 @@ int main(void)
 	glGenBuffers(1, &ibo);
 
 	float data[] = {
-		-0.5,0.5,0.0,
-		-0.5,-0.5,0.0,
-		0.5,-0.5,0.0,
-		0.5,0.5,0.0
+		100.0,200.0,0.0,
+		100.0,300.0,0.0,
+		200.0,300.0,0.0,
+		200.0,200.0,0.0
 	};
 
 	unsigned int indices[] = {
@@ -123,6 +166,11 @@ int main(void)
 		glGetProgramInfoLog(program, 256, NULL, linkLog);
 		std::cout << "ERROR::PROGRAM::LINK_FAILED\n" << linkLog << std::endl;
 	}
+
+	int location = glGetUniformLocation(program, "u_proj");
+	glUseProgram(program);
+
+	glUniformMatrix4fv(location, 1, GL_FALSE,&proj[0][0]); 
 
 	bool even = true;
 
