@@ -1,9 +1,9 @@
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include "stb/stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
-#include "header/Generator.h"
 
 int width = 1024;
 int height = 600;
@@ -79,23 +79,28 @@ int main(void)
 	const char* vshadersource = "\n"
 		"#version 330 core\n"
 		"layout(location = 0) in vec4 aPos;\n"
+		"layout(location = 1) in vec2 tCoords;\n"
 		"uniform mat4 u_proj;\n"
+		"out vec2 tex_coords;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
 		"	gl_Position = u_proj * aPos;\n"
+		"	tex_coords = tCoords;\n"
 		"}";
 
 	const char* fshadersource = "\n"
 		"#version 330 core\n"
 		"out vec4 FragColor;\n"
+		"in vec2 tex_coords;\n"
+		"uniform sampler2D t;\n"
 		"\n"
 		"void main()"
 		"{\n"
-		"	FragColor = vec4(1.0f, 1.0f, 1.0f, 1.0f);\n"
+		"	FragColor = texture(t,tex_coords);\n"
+		"	if(FragColor.a < 0.1)discard;\n"
 		"}\n";
 
-	glm::mat4 proj = glm::ortho(0.0, (double)width, (double)height, 0.0);
 
 	unsigned int vbo;
 	unsigned int ibo;
@@ -103,25 +108,39 @@ int main(void)
 	glGenBuffers(1, &ibo);
 
 	float data[] = {
-		100.0,200.0,0.0,
-		100.0,300.0,0.0,
-		200.0,300.0,0.0,
-		200.0,200.0,0.0
+		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
+		 0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
+		-0.5f,-0.5f, 0.0f, 0.0f, 0.0f,
+		 0.5f,-0.5f, 0.0f, 1.0f, 0.0f
 	};
 
 	unsigned int indices[] = {
-		0,1,2,
-		2,3,0
+		0,2,3,
+		3,1,0
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), data, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+	glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), data, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
+	int width, height,channels;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char *texture = stbi_load("res/texture.png",&width,&height,&channels,0);
+
+	unsigned int t;
+	glGenTextures(1, &t);
+	glBindTexture(GL_TEXTURE_2D, t);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+
+	stbi_image_free(texture);
 
 	unsigned int vertexshader;
 	unsigned int fragmentshader;
@@ -168,9 +187,6 @@ int main(void)
 	}
 
 	int location = glGetUniformLocation(program, "u_proj");
-	glUseProgram(program);
-
-	glUniformMatrix4fv(location, 1, GL_FALSE,&proj[0][0]); 
 
 	bool even = true;
 
@@ -181,7 +197,12 @@ int main(void)
 		glClearColor(0.3, 0.3, 0.3, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
+
+		glm::mat4 proj = glm::perspective(glm::radians(45.0), (double)width / height, 1.0, -1.0);
+		proj = glm::translate(proj, glm::vec3(0.0, 0.0, -5.0));
+
 		glUseProgram(program);
+		glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
