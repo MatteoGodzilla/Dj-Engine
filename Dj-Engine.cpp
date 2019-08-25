@@ -97,8 +97,8 @@ int main(void)
 		"\n"
 		"void main()"
 		"{\n"
-		"	FragColor = texture(t,tex_coords);\n"
-		"	if(FragColor.a < 0.1)discard;\n"
+		"	FragColor = vec4(tex_coords.x,tex_coords.y,0.0,1.0);\n"
+		"	//if(FragColor.a < 0.1)discard;\n"
 		"}\n";
 
 
@@ -108,10 +108,10 @@ int main(void)
 	glGenBuffers(1, &ibo);
 
 	float data[] = {
-		-0.5f, 0.5f, 0.0f, 0.0f, 1.0f,
-		 0.5f, 0.5f, 0.0f, 1.0f, 1.0f,
-		-0.5f,-0.5f, 0.0f, 0.0f, 0.0f,
-		 0.5f,-0.5f, 0.0f, 1.0f, 0.0f
+		-0.5f, -0.5f, -2.5f, 0.0f, 1.0f,
+		 0.5f, -0.5f, -2.5f, 1.0f, 1.0f,
+		-0.5f, -0.5f,  1.0f, 0.0f, 0.0f,
+		 0.5f, -0.5f,  1.0f, 1.0f, 0.0f
 	};
 
 	unsigned int indices[] = {
@@ -120,14 +120,14 @@ int main(void)
 	};
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 20 * sizeof(float), data, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data) , data, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
 	int width, height,channels;
 	stbi_set_flip_vertically_on_load(true);
@@ -190,6 +190,8 @@ int main(void)
 
 	bool even = true;
 
+	float x = 0.0f;
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -198,17 +200,21 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 
+
 		glm::mat4 proj = glm::perspective(glm::radians(45.0), (double)width / height, 1.0, -1.0);
-		proj = glm::translate(proj, glm::vec3(0.0, 0.0, -5.0));
+		
+		glm::mat4 look = glm::lookAt(glm::vec3(0.0,1.0,2.5), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		proj = proj * look;
 
 		glUseProgram(program);
 		glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(float), GL_UNSIGNED_INT, 0);
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
 		/* Poll for and process events */
 		glfwPollEvents();
+		x += 0.0005;
 	}
 
 	glfwTerminate();
