@@ -1,6 +1,103 @@
 #include "Rendr.h"
 
-Rendr::Rendr(sf::Window &w):m_window(w) {
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb/stb_image.h"
+
+Rendr::Rendr() {
+	//ctor
+}
+
+void Rendr::init(GLFWwindow* w) {
+	m_window = w;
+	glfwMakeContextCurrent(m_window);
+	if (glewInit() != GLEW_OK) {
+		std::cout << "GLEW INIT ERROR" << std::endl;
+		return;
+	}
+	std::cout << glGetString(GL_VERSION) << std::endl;
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	//shader init
+	{
+		const char* vShaderSource = "\n"
+			"#version 330 core\n"
+			"layout(location = 0) in vec4 aPos;\n"
+			//"layout(location = 1) in vec2 tCoords;\n"
+			"uniform mat4 u_proj;\n"
+			//"out vec2 tex_coords;\n"
+			"\n"
+			"void main()\n"
+			"{\n"
+			"	gl_Position = u_proj * aPos;\n"
+			//"	tex_coords = tCoords;\n"
+			"}";
+
+		const char* fShaderSource = "\n"
+			"#version 330 core\n"
+			"out vec4 FragColor;\n"
+			//"in vec2 tex_coords;\n"
+			//"uniform sampler2D t;\n"
+			"\n"
+			"void main()"
+			"{\n"
+			"	FragColor = vec4(1.0,0.0,0.5,1.0);"
+			//"	FragColor = texture(t,tex_coords);\n"
+			"}\n";
+
+		unsigned int vertexshader, fragmentshader;
+		vertexshader = glCreateShader(GL_VERTEX_SHADER);
+		fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
+
+		glShaderSource(vertexshader, 1, &vShaderSource, NULL);
+		glShaderSource(fragmentshader, 1, &fShaderSource, NULL);
+
+		glCompileShader(vertexshader);
+		glCompileShader(fragmentshader);
+
+		m_gl_program = glCreateProgram();
+		glAttachShader(m_gl_program, vertexshader);
+		glAttachShader(m_gl_program, fragmentshader);
+		glLinkProgram(m_gl_program);
+		glDeleteShader(vertexshader);
+		glDeleteShader(fragmentshader);
+	}
+
+	//texture load
+	{
+		int width, height, channels;
+		stbi_set_flip_vertically_on_load(true);
+		unsigned char *texture = stbi_load("res/texture.png", &width, &height, &channels, 0);
+
+		unsigned int t;
+		glGenTextures(1, &t);
+		glBindTexture(GL_TEXTURE_2D, t);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (channels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+
+		stbi_image_free(texture);
+	}
+
+	//projection init
+	{
+		glm::mat4 proj = glm::perspective(45.0f, 1024.0f/600,1.0f,-1.0f);
+		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 1.0, 2.5), 
+			glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		proj = proj * look;
+		glUseProgram(m_gl_program);
+		int location = glGetUniformLocation(m_gl_program, "u_proj");
+		std::cout << location << std::endl;
+		if (location != -1) {
+			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
+			std::cout << "successful" << std::endl;
+		}
+		
+	}
+	/*
     sf::Texture loader;
     if(loader.loadFromFile("res/texture.png")) {
         m_tex = loader;
@@ -63,18 +160,15 @@ Rendr::Rendr(sf::Window &w):m_window(w) {
     m_blue_click.setOrigin(220,220);
     m_blue_click.setScale(0.2,0.2);
     m_blue_click.setPosition(600.0,500.0);
-
+	*/
     for(int i = 0; i < resolution; ++i){
         m_lanes.push_back(1);
     }
 
 }
 
-void print(sf::Vector2f v){
-    std::cout << v.x  << ";" << v.y << std::endl;
-}
-
 void Rendr::clicker() {
+	/*
     if(m_red)m_red_click.setScale(0.15,0.15);
     else m_red_click.setScale(0.2,0.2);
 
@@ -104,9 +198,11 @@ void Rendr::clicker() {
     m_window.draw(m_score_txt);
     m_window.draw(m_combo_txt);
     m_window.draw(m_mult_txt);
+	*/
 }
 
-void Rendr::notes(float time,std::vector<Note> &v) {
+void Rendr::notes(double time,std::vector<Note> &v) {
+	/*
     for(size_t i = 0 ; i < v.size(); ++i) {
         float dt = v.at(i).getMilli()-time;
         sf::Sprite sprite;
@@ -186,9 +282,11 @@ void Rendr::notes(float time,std::vector<Note> &v) {
         }
 
     }
+	*/
 }
 
-void Rendr::lanes(float time, std::vector<Note>& ev) {
+void Rendr::lanes(double time, std::vector<Note>& ev) {
+	/*
     std::vector<sf::Vertex> green_lane;
     std::vector<sf::Vertex> blue_lane;
 
@@ -265,9 +363,11 @@ void Rendr::lanes(float time, std::vector<Note>& ev) {
     m_window.draw(&green_lane[0],green_lane.size(),sf::LineStrip);
     m_window.draw(&blue_lane[0],blue_lane.size(),sf::LineStrip);
     m_window.draw(red);
+	*/
 }
 
-void Rendr::events(float time,std::vector<Note>&ev) {
+void Rendr::events(double time,std::vector<Note>&ev) {
+	/*
     for(size_t i = 0; i < ev.size(); ++i) {
         int type = ev.at(i).getType();
         float diff_start = ev.at(i).getMilli()-time;
@@ -361,19 +461,22 @@ void Rendr::events(float time,std::vector<Note>&ev) {
             m_window.draw(varr);
         }
     }
+	*/
 }
 
-void Rendr::pollState(float time,Player& p,Generator &g) {
+void Rendr::pollState(double time,Player& p,Generator &g) {
+	/*
     m_time_txt.setString("Time:"+std::to_string(time));
     m_score_txt.setString("Score:"+std::to_string(p.getScore()));
     m_combo_txt.setString("Combo:"+std::to_string(p.getCombo()));
     m_mult_txt.setString("Mult:"+std::to_string(p.getMult()));
-
+	*/
     m_red = p.m_red;
     m_blue = p.m_blue;
     m_green = p.m_green;
     m_player_cross = p.m_cross;
 }
+
 
 Rendr::~Rendr() {
     //dtor

@@ -1,6 +1,7 @@
 #include "Generator.h"
 
 Generator::Generator() {
+	/*
     pushNote(2.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
@@ -79,10 +80,10 @@ Generator::Generator() {
     pushNote(0.5f,TAP_G);
     pushNote(0.0f,TAP_R);
     pushNote(0.0f,TAP_B);
-
+	*/
 }
 
-void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
+void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {
     m_combo_reset = false;
     size_t note_s = m_note_times.size();
 
@@ -158,13 +159,13 @@ void Generator::tick(float time,std::vector<Note> &v,std::vector<Note>&ev) {
     }
 }
 
-void Generator::pushNote(float time, int type){
+void Generator::pushNote(double time, int type){
     m_time += time;
     m_note_times.push_back(m_time);
     m_note_types.push_back(type);
 }
 
-void Generator::pushEvent(float time, int type){
+void Generator::pushEvent(double time, int type){
     m_time += time;
     m_event_times.push_back(m_time);
     m_event_types.push_back(type);

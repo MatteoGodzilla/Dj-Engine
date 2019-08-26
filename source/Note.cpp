@@ -1,6 +1,6 @@
 #include "Note.h"
 
-Note::Note(float milli,int ty,bool ev){
+Note::Note(double milli,int ty,bool ev){
     //set hit time
     m_hit_window = 0.15;
     m_milli = milli;

@@ -1,23 +1,23 @@
 #ifndef Player_H
 #define Player_H
-#include <SFML/Window.hpp>
+#include "GLFW/glfw3.h"
 #include <vector>
 #include "Generator.h"
 
 enum K {
-    GREEN_CODE = sf::Keyboard::J,
-    RED_CODE = sf::Keyboard::K,
-    BLUE_CODE = sf::Keyboard::L,
-    CROSS_L_CODE = sf::Keyboard::A,
-    CROSS_R_CODE = sf::Keyboard::D,
-    SCRATCH_UP = sf::Keyboard::W,
-    SCRATCH_DOWN = sf::Keyboard::S
+    GREEN_CODE = GLFW_KEY_J,
+    RED_CODE = GLFW_KEY_K,
+    BLUE_CODE = GLFW_KEY_L,
+    CROSS_L_CODE = GLFW_KEY_A,
+    CROSS_R_CODE = GLFW_KEY_D,
+    SCRATCH_UP = GLFW_KEY_W,
+    SCRATCH_DOWN = GLFW_KEY_S
 };
 
 class Player {
 public:
     Player();
-    void key(sf::Event e,float time,std::vector<Note>& v,std::vector<Note>&ev);
+    //void key(sf::Event e,double time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
     bool m_red = false;
     bool m_green = false;

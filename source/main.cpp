@@ -41,8 +41,7 @@ int main() {
     settings.antialiasingLevel = 2;
 
     window.create(sf::VideoMode(1024, 600), "Dj-Engine",sf::Style::Default,settings);
-    glEnable(GL_TEXTURE_2D);
-    glClearColor(0.0,0.0,0.0,0.0);
+
     while (window.isOpen()) {
         global_time += c.restart().asSeconds();
 

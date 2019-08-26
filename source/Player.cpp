@@ -3,8 +3,8 @@
 
 Player::Player() {
 }
-
-void Player::key(sf::Event e,float time,std::vector<Note>&v,std::vector<Note>&ev) {
+/*
+void Player::key(sf::Event e,double time,std::vector<Note>&v,std::vector<Note>&ev) {
     if(e.type == sf::Event::KeyPressed) {
         if(e.key.code == GREEN_CODE) {
             if(!m_green) {
@@ -264,6 +264,7 @@ void Player::key(sf::Event e,float time,std::vector<Note>&v,std::vector<Note>&ev
     }
 
 }
+*/
 
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){

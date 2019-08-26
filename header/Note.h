@@ -12,7 +12,7 @@ enum note {TAP_G,TAP_R,TAP_B,
 
 class Note {
 public:
-    Note(float milli,int ty,bool ev = false);
+    Note(double milli,int ty,bool ev = false);
     virtual ~Note();
     void click(float time);
     void tick(float time);
@@ -34,7 +34,7 @@ private:
     bool m_hittable = false;
     bool m_touched = false;
     bool m_dead = false;
-    float m_milli;
+    double m_milli;
     int m_type;
     int m_lan_mod = -1;
 };
