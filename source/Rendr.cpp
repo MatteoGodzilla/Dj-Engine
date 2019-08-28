@@ -98,32 +98,6 @@ void Rendr::init(GLFWwindow* w) {
 		
 	}
 	/*
-    sf::Texture loader;
-    if(loader.loadFromFile("res/texture.png")) {
-        m_tex = loader;
-    }
-
-    sf::Font font_loader;
-    if(font_loader.loadFromFile("res/NotoSans-Regular.ttf")) {
-        m_font = font_loader;
-    }
-
-    m_time_txt.setFont(m_font);
-    m_time_txt.setPosition(0.0,0.0);
-    m_time_txt.setFillColor(sf::Color::White);
-
-    m_score_txt.setFont(m_font);
-    m_score_txt.setPosition(0.0,30.0);
-    m_score_txt.setFillColor(sf::Color::White);
-
-    m_combo_txt.setFont(m_font);
-    m_combo_txt.setPosition(0.0,60.0);
-    m_combo_txt.setFillColor(sf::Color::White);
-
-    m_mult_txt.setFont(m_font);
-    m_mult_txt.setPosition(0.0,90.0);
-    m_mult_txt.setFillColor(sf::Color::White);
-
     //scale setup
     m_scl_start = sf::Vector2f(0.1,0.1);
     m_scl_end = sf::Vector2f(0.2,0.2);

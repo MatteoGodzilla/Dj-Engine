@@ -24,6 +24,7 @@ Player player;
 
 void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window,true);
+	player.keyCallback(key,action,global_time,note_arr,event_arr);
 }
 
 void render() {

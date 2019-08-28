@@ -17,6 +17,8 @@ enum K {
 class Player {
 public:
     Player();
+	void keyCallback(int key, int action, 
+		double time, std::vector<Note>& v, std::vector<Note>& ev);
     //void key(sf::Event e,double time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
     bool m_red = false;
@@ -37,6 +39,9 @@ private:
     int m_combo = 0;
     int m_scr_tick = 0;
     float m_past_tap = -1;
+
+	std::vector<Note> m_note_arr;
+	std::vector<Note> m_ev_arr;
 };
 
 #endif // Player_H
