@@ -16,6 +16,7 @@ class Rendr {
 public:
     Rendr();
 	void init(GLFWwindow* w);
+	void highway(double time);
     void clicker();
     void notes(double time,std::vector<Note> &v);
     void events(double time,std::vector<Note>&ev);
@@ -38,6 +39,7 @@ private:
 
 	unsigned int m_gl_program;
 	unsigned int m_gl_texture;
+	unsigned int m_gl_test_id;
 	/*
 	sf::Texture m_tex;
 
