@@ -37,9 +37,11 @@ private:
     const int resolution = 200;
     std::vector<int> m_lanes;
 
-	unsigned int m_gl_program;
+	unsigned int m_TextureProgram;
+	unsigned int m_ColorProgram;
 	unsigned int m_gl_texture;
-	unsigned int m_gl_test_id;
+	unsigned int m_HighwayVAO;
+	unsigned int m_lanesVAO;
 	/*
 	sf::Texture m_tex;
 

@@ -7,6 +7,16 @@ Rendr::Rendr() {
 	//ctor
 }
 
+void checkError() {
+	std::cout << "started error checking" << std::endl;
+	GLenum error = glGetError();
+	while (error != GL_NO_ERROR) {
+		std::cout << "OpenGL Error: "<<error << std::endl;
+		error = glGetError();
+	}
+	std::cout << "ended error checking" << std::endl;
+}
+
 void Rendr::init(GLFWwindow* w) {
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -21,7 +31,7 @@ void Rendr::init(GLFWwindow* w) {
 	
 	//shader init
 	{
-		const char* vShaderSource = "\n"
+		const char* vTextureSource = "\n"
 			"#version 330 core\n"
 			"layout(location = 0) in vec4 aPos;\n"
 			"layout(location = 1) in vec2 tCoords;\n"
@@ -34,7 +44,7 @@ void Rendr::init(GLFWwindow* w) {
 			"	tex_coords = tCoords;\n"
 			"}";
 
-		const char* fShaderSource = "\n"
+		const char* fTextureSource = "\n"
 			"#version 330 core\n"
 			"out vec4 FragColor;\n"
 			"in vec2 tex_coords;\n"
@@ -42,26 +52,74 @@ void Rendr::init(GLFWwindow* w) {
 			"\n"
 			"void main()"
 			"{\n"
-			"	FragColor = texture(t,tex_coords);\n"
+			"	FragColor = vec4(0.0,0.0,0.0,1.0)+texture(t,tex_coords);\n"
 			"}\n";
 
 
-		unsigned int vertexshader, fragmentshader;
-		vertexshader = glCreateShader(GL_VERTEX_SHADER);
-		fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
+		const char* vColorSource = "\n"
+			"#version 330 core\n"
+			"layout(location = 0) in vec4 aPos;\n"
+			"layout(location = 1) in vec4 c;\n"
+			"uniform mat4 u_proj;\n"
+			"out vec4 color;\n"
+			"\n"
+			"void main()\n"
+			"{\n"
+			"	gl_Position = u_proj * aPos;\n"
+			"	color = c;\n"
+			"}";
 
-		glShaderSource(vertexshader, 1, &vShaderSource, NULL);
-		glShaderSource(fragmentshader, 1, &fShaderSource, NULL);
+		const char* fColorSource = "\n"
+			"#version 330 core\n"
+			"out vec4 FragColor;\n"
+			"in vec4 color;\n"
+			"\n"
+			"void main()"
+			"{\n"
+			"	FragColor = color;\n"
+			"}\n";
 
-		glCompileShader(vertexshader);
-		glCompileShader(fragmentshader);
 
-		m_gl_program = glCreateProgram();
-		glAttachShader(m_gl_program, vertexshader);
-		glAttachShader(m_gl_program, fragmentshader);
-		glLinkProgram(m_gl_program);
-		glDeleteShader(vertexshader);
-		glDeleteShader(fragmentshader);
+		unsigned int vShaderTexture, fShaderTexture;
+		unsigned int vShaderColor, fShaderColor;
+
+		vShaderTexture = glCreateShader(GL_VERTEX_SHADER);
+		fShaderTexture = glCreateShader(GL_FRAGMENT_SHADER);
+		vShaderColor = glCreateShader(GL_VERTEX_SHADER);
+		fShaderColor = glCreateShader(GL_FRAGMENT_SHADER);
+
+		glShaderSource(vShaderTexture, 1, &vTextureSource, NULL);
+		glShaderSource(fShaderTexture, 1, &fTextureSource, NULL);
+		glShaderSource(vShaderColor, 1, &vColorSource, NULL);
+		glShaderSource(fShaderColor, 1, &fColorSource, NULL);
+
+		glCompileShader(vShaderTexture);
+		glCompileShader(fShaderTexture);
+		glCompileShader(vShaderColor);
+		glCompileShader(fShaderColor);
+		/*
+		int successful;
+		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &successful);
+		std::cout << successful << std::endl;
+		*/
+		m_TextureProgram = glCreateProgram();
+		glAttachShader(m_TextureProgram, vShaderTexture);
+		glAttachShader(m_TextureProgram, fShaderTexture);
+		glLinkProgram(m_TextureProgram);
+		glDeleteShader(vShaderTexture);
+		glDeleteShader(fShaderTexture);
+
+		m_ColorProgram = glCreateProgram();
+		glAttachShader(m_ColorProgram, vShaderColor);
+		glAttachShader(m_ColorProgram, fShaderColor);
+		glLinkProgram(m_ColorProgram);
+		glDeleteShader(vShaderColor);
+		glDeleteShader(fShaderColor);
+		/*
+		int success;
+		glGetProgramiv(m_ColorProgram, GL_LINK_STATUS, &success);
+		std::cout << success << std::endl;
+		*/
 
 	}
 
@@ -85,26 +143,32 @@ void Rendr::init(GLFWwindow* w) {
 
 	//projection init
 	{
-		glm::mat4 proj = glm::perspective(45.0f, 1024.0f/600,1.0f,-1.0f);
+		glm::mat4 proj = glm::perspective(45.0f, 1024.0f/600,1.0f,-2.0f);
 		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0), 
 			glm::vec3(0.0, 0.0, 1.5), glm::vec3(0.0, 1.0, 0.0));
 		proj = proj * look;
-		glUseProgram(m_gl_program);		
-		int location = glGetUniformLocation(m_gl_program, "u_proj");
+		glUseProgram(m_TextureProgram);		
+		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
 		if (location != -1) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
-			std::cout << "successful" << std::endl;
+			std::cout << "uniform texture successful" << std::endl;
+		}
+		
+		glUseProgram(m_ColorProgram);
+		location = glGetUniformLocation(m_ColorProgram, "u_proj");
+		if (location != -1) {
+			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
+			std::cout << "uniform color successful" << std::endl;
 		}
 		
 	}
 	
-	unsigned int error = glGetError();
-	while (error != GL_NO_ERROR) {
-		std::cout << error << std::endl;
-		error = glGetError();
+	//vao setup
+	{
+		glGenVertexArrays(1, &m_HighwayVAO);
+		glGenVertexArrays(1, &m_lanesVAO);
+		glBindVertexArray(0);
 	}
-
-
 
 	/*
     //scale setup
@@ -153,10 +217,10 @@ void Rendr::init(GLFWwindow* w) {
 void Rendr::highway(double time) {
 	float factor = time / 3;
 	float data[] = {
-			-1.0, 0.0, 0.0, 0.0, 1.0+factor,
-			 1.0, 0.0, 0.0, 1.0, 1.0+factor,
-			-1.0, 0.0, 6.0, 0.0, 0.0+factor,
-			 1.0, 0.0, 6.0, 1.0, 0.0+factor
+			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f+factor,
+			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f+factor,
+			-1.0f, 0.0f, 6.0f, 0.0f, 0.0f+factor,
+			 1.0f, 0.0f, 6.0f, 1.0f, 0.0f+factor
 	};
 
 	unsigned int indices[] = {
@@ -164,8 +228,7 @@ void Rendr::highway(double time) {
 		3,1,0
 	};
 
-	glGenVertexArrays(1, &m_gl_test_id);
-	glBindVertexArray(m_gl_test_id);
+	glBindVertexArray(m_HighwayVAO);
 
 	unsigned int vbo, ebo;
 	glGenBuffers(1, &vbo);
@@ -177,16 +240,17 @@ void Rendr::highway(double time) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
 
+	//Vertex: x,y,z, u,v
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	
+	glUseProgram(m_TextureProgram);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
 }
 
 void Rendr::clicker() {
-	glBindTexture(GL_TEXTURE_2D, m_gl_texture);
-	glBindVertexArray(m_gl_test_id);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	/*
     if(m_red)m_red_click.setScale(0.15,0.15);
@@ -306,6 +370,38 @@ void Rendr::notes(double time,std::vector<Note> &v) {
 }
 
 void Rendr::lanes(double time, std::vector<Note>& ev) {
+	float data[] = {
+		 -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		  0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
+
+		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
+		 -0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
+		 -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f
+	};
+
+	//TODO:add index buffer
+
+	glBindVertexArray(m_lanesVAO);
+
+	unsigned int buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+	//Vertex: x,y,z, r,g,b,a
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+
+	glUseProgram(m_ColorProgram);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	
+	
+	
+
 	/*
     std::vector<sf::Vertex> green_lane;
     std::vector<sf::Vertex> blue_lane;
