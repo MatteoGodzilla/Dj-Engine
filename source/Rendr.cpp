@@ -145,7 +145,7 @@ void Rendr::init(GLFWwindow* w) {
 	{
 		glm::mat4 proj = glm::perspective(45.0f, 1024.0f/600,1.0f,-2.0f);
 		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0), 
-			glm::vec3(0.0, 0.0, 1.5), glm::vec3(0.0, 1.0, 0.0));
+			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
 		proj = proj * look;
 		glUseProgram(m_TextureProgram);		
 		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
@@ -167,9 +167,55 @@ void Rendr::init(GLFWwindow* w) {
 	{
 		glGenVertexArrays(1, &m_HighwayVAO);
 		glGenVertexArrays(1, &m_lanesVAO);
-		glBindVertexArray(0);
-	}
+		
+		
+		
+		{
+			glBindVertexArray(m_HighwayVAO);
 
+			unsigned int ebo;
+			glGenBuffers(1, &m_HighwayVBO);
+			glGenBuffers(1, &ebo);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_HighwayVBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+			//Vertex: x,y,z, u,v
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+		
+		
+		{
+			
+			glBindVertexArray(m_lanesVAO);
+
+			unsigned int index;
+			glGenBuffers(1, &m_lanesVBO);
+			glGenBuffers(1, &index);
+			glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+
+			//Vertex: x,y,z, r,g,b,
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+		
+	}
+	
 	/*
     //scale setup
     m_scl_start = sf::Vector2f(0.1,0.1);
@@ -215,39 +261,31 @@ void Rendr::init(GLFWwindow* w) {
 }
 
 void Rendr::highway(double time) {
+
 	float factor = time / 3;
 	float data[] = {
-			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f+factor,
-			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f+factor,
-			-1.0f, 0.0f, 6.0f, 0.0f, 0.0f+factor,
-			 1.0f, 0.0f, 6.0f, 1.0f, 0.0f+factor
+			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f + factor,
+			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f + factor,
+			-1.0f, 0.0f, 6.0f, 0.0f, 0.0f + factor,
+			 1.0f, 0.0f, 6.0f, 1.0f, 0.0f + factor
 	};
 
 	unsigned int indices[] = {
-		0,2,3,
-		3,1,0
+			0,2,3,
+			3,1,0
 	};
 
 	glBindVertexArray(m_HighwayVAO);
-
-	unsigned int vbo, ebo;
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &ebo);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_HighwayVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
-
-	//Vertex: x,y,z, u,v
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
 	
 	glUseProgram(m_TextureProgram);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, (void*)0);
+
+	glBindVertexArray(0);
+
 }
 
 void Rendr::clicker() {
@@ -370,36 +408,68 @@ void Rendr::notes(double time,std::vector<Note> &v) {
 }
 
 void Rendr::lanes(double time, std::vector<Note>& ev) {
-	float data[] = {
+	
+	float redLaneVertexData[] = {
 		 -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 		  0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
-
-		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
-		 -0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
-		 -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f
+		  -0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
+		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0
 	};
 
-	//TODO:add index buffer
+	unsigned int indices[] = {
+		0,2,3,
+		3,1,0
+	};
 
 	glBindVertexArray(m_lanesVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
 
-	unsigned int buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
-
-	//Vertex: x,y,z, r,g,b,a
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
+	glBufferData(GL_ARRAY_BUFFER, sizeof(redLaneVertexData), redLaneVertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		
 	glUseProgram(m_ColorProgram);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
 	
+	float greenLaneVertexData[] = {
+		 -0.02f-0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		  0.02f-0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		 -0.02f-0.35f, 0.0f, 6.0f, 0.0f, 1.0f, 0.0f,
+		  0.02f-0.35f, 0.0f, 6.0f, 0.0f, 1.0f, 0.0f
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(greenLaneVertexData), greenLaneVertexData, GL_STATIC_DRAW);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+	float blueLaneVertexData[] = {
+		 -0.02f+0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		  0.02f+0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		 -0.02f+0.35f, 0.0f, 6.0f, 0.0f, 0.0f, 1.0f,
+		  0.02f+0.35f, 0.0f, 6.0f, 0.0f, 0.0f, 1.0f
+	};
 	
-	
+	glBufferData(GL_ARRAY_BUFFER, sizeof(blueLaneVertexData), blueLaneVertexData, GL_STATIC_DRAW);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+	float leftGreenLaneVertexData[] = {
+		 -0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
+		  0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
+		 -0.02f - 0.7f, 0.0f, 6.0f, 0.0f, 0.5f, 0.0f,
+		  0.02f - 0.7f, 0.0f, 6.0f, 0.0f, 0.5f, 0.0f
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(leftGreenLaneVertexData), leftGreenLaneVertexData, GL_STATIC_DRAW);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
+	float rightBlueLaneVertexData[] = {
+		 -0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
+		  0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
+		 -0.02f + 0.7f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f,
+		  0.02f + 0.7f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f
+	};
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(rightBlueLaneVertexData), rightBlueLaneVertexData, GL_STATIC_DRAW);
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+
 	
 
 	/*
