@@ -20,8 +20,8 @@ void Note::click(float time) {
     }
 }
 
-void Note::tick(float time){
-    if(time +1.0f >= m_milli && time <= m_milli+m_hit_window){
+void Note::tick(double time){
+    if(time +1.0 >= m_milli && time <= m_milli+m_hit_window){
         m_render = true;
     }else{
         m_render = false;

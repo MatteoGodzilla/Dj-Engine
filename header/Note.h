@@ -15,7 +15,7 @@ public:
     Note(double milli,int ty,bool ev = false);
     virtual ~Note();
     void click(float time);
-    void tick(float time);
+    void tick(double time);
     float getMilli();
     int getType();
     bool getRender();

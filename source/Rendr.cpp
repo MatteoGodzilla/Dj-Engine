@@ -11,10 +11,28 @@ void checkError() {
 	std::cout << "started error checking" << std::endl;
 	GLenum error = glGetError();
 	while (error != GL_NO_ERROR) {
-		std::cout << "OpenGL Error: "<<error << std::endl;
+		std::cout << "OpenGL Error: " << error << std::endl;
 		error = glGetError();
 	}
 	std::cout << "ended error checking" << std::endl;
+}
+
+void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r = 0.0, float g = 0.0, float b = 0.0) {
+	v.push_back(x);
+	v.push_back(y);
+	v.push_back(z);
+	v.push_back(r);
+	v.push_back(g);
+	v.push_back(b);
+}
+
+void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int value) {
+	v.push_back(value);
+	v.push_back(value + 1);
+	v.push_back(value + 2);
+	v.push_back(value + 2);
+	v.push_back(value + 3);
+	v.push_back(value);
 }
 
 void Rendr::init(GLFWwindow* w) {
@@ -28,7 +46,7 @@ void Rendr::init(GLFWwindow* w) {
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	
+
 	//shader init
 	{
 		const char* vTextureSource = "\n"
@@ -48,11 +66,11 @@ void Rendr::init(GLFWwindow* w) {
 			"#version 330 core\n"
 			"out vec4 FragColor;\n"
 			"in vec2 tex_coords;\n"
-			"uniform sampler2D t;\n"
+			"uniform sampler2D u_t;\n"
 			"\n"
 			"void main()"
 			"{\n"
-			"	FragColor = vec4(0.0,0.0,0.0,1.0)+texture(t,tex_coords);\n"
+			"	FragColor = texture(u_t,tex_coords);\n"
 			"}\n";
 
 
@@ -127,49 +145,60 @@ void Rendr::init(GLFWwindow* w) {
 	{
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(true);
-		unsigned char *texture = stbi_load("res/highway.png", &width, &height, &channels, 0);
+		unsigned char* high = stbi_load("res/highway.png", &width, &height, &channels, 0);
 
-		glGenTextures(1, &m_gl_texture);
-		glBindTexture(GL_TEXTURE_2D, m_gl_texture);
+		glGenTextures(1, &m_HighwayTexture);
+		glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		if (channels == 4)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture);
-		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, high);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, high);
 
-		stbi_image_free(texture);
+		unsigned char* obj = stbi_load("res/objects.png", &width, &height, &channels, 0);
+
+		glGenTextures(1, &m_ObjTexture);
+		glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (channels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, obj);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, obj);
+
+		stbi_image_free(high);
+		stbi_image_free(obj);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 
 	//projection init
 	{
-		glm::mat4 proj = glm::perspective(45.0f, 1024.0f/600,1.0f,-2.0f);
-		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0), 
+		glm::mat4 proj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
+		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0),
 			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
 		proj = proj * look;
-		glUseProgram(m_TextureProgram);		
+		glUseProgram(m_TextureProgram);
 		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
 		if (location != -1) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
 			std::cout << "uniform texture successful" << std::endl;
 		}
-		
+
 		glUseProgram(m_ColorProgram);
 		location = glGetUniformLocation(m_ColorProgram, "u_proj");
 		if (location != -1) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
 			std::cout << "uniform color successful" << std::endl;
 		}
-		
+
 	}
-	
+
 	//vao setup
 	{
 		glGenVertexArrays(1, &m_HighwayVAO);
 		glGenVertexArrays(1, &m_lanesVAO);
-		
-		
-		
+		glGenVertexArrays(1, &m_testVAO);
+
 		{
 			glBindVertexArray(m_HighwayVAO);
 
@@ -190,10 +219,9 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
-		
-		
+
+
 		{
-			
 			glBindVertexArray(m_lanesVAO);
 
 			unsigned int index;
@@ -213,61 +241,83 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
-		
+
+		{
+			glBindVertexArray(m_testVAO);
+
+			unsigned int ebo;
+			glGenBuffers(1, &m_testVBO);
+			glGenBuffers(1, &ebo);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
+			//Vertex: x,y,z, u,v
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+
+
 	}
-	
+
 	/*
-    //scale setup
-    m_scl_start = sf::Vector2f(0.1,0.1);
-    m_scl_end = sf::Vector2f(0.2,0.2);
-    m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
+	//scale setup
+	m_scl_start = sf::Vector2f(0.1,0.1);
+	m_scl_end = sf::Vector2f(0.2,0.2);
+	m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
 
-    m_trayL.setTexture(m_tex);
-    m_trayL.setTextureRect(sf::IntRect(1320,0,440,880));
-    m_trayL.setOrigin(220,440);
-    m_trayL.setRotation(90);
-    m_trayL.setScale(0.2,0.2);
-    m_trayL.setPosition(382.0,500.0);
+	m_trayL.setTexture(m_tex);
+	m_trayL.setTextureRect(sf::IntRect(1320,0,440,880));
+	m_trayL.setOrigin(220,440);
+	m_trayL.setRotation(90);
+	m_trayL.setScale(0.2,0.2);
+	m_trayL.setPosition(382.0,500.0);
 
-    m_trayR.setTexture(m_tex);
-    m_trayR.setTextureRect(sf::IntRect(1320,0,440,880));
-    m_trayR.setOrigin(220,400);
-    m_trayR.setRotation(90);
-    m_trayR.setScale(0.2,0.2);
-    m_trayR.setPosition(652.0,500.0);
+	m_trayR.setTexture(m_tex);
+	m_trayR.setTextureRect(sf::IntRect(1320,0,440,880));
+	m_trayR.setOrigin(220,400);
+	m_trayR.setRotation(90);
+	m_trayR.setScale(0.2,0.2);
+	m_trayR.setPosition(652.0,500.0);
 
-    m_red_click.setTexture(m_tex);
-    m_red_click.setTextureRect(sf::IntRect(440,400,440,440));
-    m_red_click.setOrigin(220,220);
-    m_red_click.setScale(0.2,0.2);
-    m_red_click.setPosition(512.0,500.0);
+	m_red_click.setTexture(m_tex);
+	m_red_click.setTextureRect(sf::IntRect(440,400,440,440));
+	m_red_click.setOrigin(220,220);
+	m_red_click.setScale(0.2,0.2);
+	m_red_click.setPosition(512.0,500.0);
 
-    m_green_click.setTexture(m_tex);
-    m_green_click.setTextureRect(sf::IntRect(0,400,440,440));
-    m_green_click.setOrigin(220,220);
-    m_green_click.setScale(0.2,0.2);
-    m_green_click.setPosition(424.0,500.0);
+	m_green_click.setTexture(m_tex);
+	m_green_click.setTextureRect(sf::IntRect(0,400,440,440));
+	m_green_click.setOrigin(220,220);
+	m_green_click.setScale(0.2,0.2);
+	m_green_click.setPosition(424.0,500.0);
 
-    m_blue_click.setTexture(m_tex);
-    m_blue_click.setTextureRect(sf::IntRect(880,400,440,440));
-    m_blue_click.setOrigin(220,220);
-    m_blue_click.setScale(0.2,0.2);
-    m_blue_click.setPosition(600.0,500.0);
+	m_blue_click.setTexture(m_tex);
+	m_blue_click.setTextureRect(sf::IntRect(880,400,440,440));
+	m_blue_click.setOrigin(220,220);
+	m_blue_click.setScale(0.2,0.2);
+	m_blue_click.setPosition(600.0,500.0);
 	*/
-    for(int i = 0; i < resolution; ++i){
-        m_lanes.push_back(1);
-    }
+	for (int i = 0; i < resolution; ++i) {
+		m_lanes.push_back(1);
+	}
 
 }
 
 void Rendr::highway(double time) {
 
-	float factor = time / 3;
+	float factor = time * 0.875f;
 	float data[] = {
 			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f + factor,
 			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f + factor,
-			-1.0f, 0.0f, 6.0f, 0.0f, 0.0f + factor,
-			 1.0f, 0.0f, 6.0f, 1.0f, 0.0f + factor
+			-1.0f, 0.0f, 4.0f, 0.0f, 0.0f + factor,
+			 1.0f, 0.0f, 4.0f, 1.0f, 0.0f + factor
 	};
 
 	unsigned int indices[] = {
@@ -277,10 +327,11 @@ void Rendr::highway(double time) {
 
 	glBindVertexArray(m_HighwayVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_HighwayVBO);
+	glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
-	
+
 	glUseProgram(m_TextureProgram);
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, (void*)0);
 
@@ -291,129 +342,46 @@ void Rendr::highway(double time) {
 void Rendr::clicker() {
 
 	/*
-    if(m_red)m_red_click.setScale(0.15,0.15);
-    else m_red_click.setScale(0.2,0.2);
+	if(m_red)m_red_click.setScale(0.15,0.15);
+	else m_red_click.setScale(0.2,0.2);
 
-    if(m_green)m_green_click.setScale(0.15,0.15);
-    else m_green_click.setScale(0.2,0.2);
+	if(m_green)m_green_click.setScale(0.15,0.15);
+	else m_green_click.setScale(0.2,0.2);
 
-    if(m_blue)m_blue_click.setScale(0.15,0.15);
-    else m_blue_click.setScale(0.2,0.2);
+	if(m_blue)m_blue_click.setScale(0.15,0.15);
+	else m_blue_click.setScale(0.2,0.2);
 
-    if(m_player_cross == 0) {
-        m_green_click.setPosition(338.0,500.0);
-        m_blue_click.setPosition(600.0,500.0);
-    } else if(m_player_cross == 1) {
-        m_green_click.setPosition(426.0,500.0);
-        m_blue_click.setPosition(600.0,500.0);
-    } else if(m_player_cross == 2) {
-        m_green_click.setPosition(426.0,500.0);
-        m_blue_click.setPosition(688.0,500.0);
-    }
+	if(m_player_cross == 0) {
+		m_green_click.setPosition(338.0,500.0);
+		m_blue_click.setPosition(600.0,500.0);
+	} else if(m_player_cross == 1) {
+		m_green_click.setPosition(426.0,500.0);
+		m_blue_click.setPosition(600.0,500.0);
+	} else if(m_player_cross == 2) {
+		m_green_click.setPosition(426.0,500.0);
+		m_blue_click.setPosition(688.0,500.0);
+	}
 
-    m_window.draw(m_trayL);
-    m_window.draw(m_trayR);
-    m_window.draw(m_red_click);
-    m_window.draw(m_green_click);
-    m_window.draw(m_blue_click);
-    m_window.draw(m_time_txt);
-    m_window.draw(m_score_txt);
-    m_window.draw(m_combo_txt);
-    m_window.draw(m_mult_txt);
+	m_window.draw(m_trayL);
+	m_window.draw(m_trayR);
+	m_window.draw(m_red_click);
+	m_window.draw(m_green_click);
+	m_window.draw(m_blue_click);
+	m_window.draw(m_time_txt);
+	m_window.draw(m_score_txt);
+	m_window.draw(m_combo_txt);
+	m_window.draw(m_mult_txt);
 	*/
 }
 
-void Rendr::notes(double time,std::vector<Note> &v) {
+void Rendr::notes(double time, std::vector<Note>& v) {
 	/*
-    for(size_t i = 0 ; i < v.size(); ++i) {
-        float dt = v.at(i).getMilli()-time;
-        sf::Sprite sprite;
-        sprite.setTexture(m_tex);
-        int type = v.at(i).getType();
-        if(!v.at(i).getRender()){
-            if(m_ren_cross == 0){
-                v.at(i).setLanMod(0);
-            }else if(m_ren_cross == 1){
-                v.at(i).setLanMod(1);
-            }else if(m_ren_cross == 2){
-                v.at(i).setLanMod(2);
-            }
-        }
-
-        if(type == TAP_R ) {
-            sprite.setTextureRect(sf::IntRect(400,0,400,400));
-            m_start = sf::Vector2f(512.0,200.0);
-            m_end = sf::Vector2f(512.0,500.0);
-            m_vel = (m_end-m_start)/1.0f;
-        } else if (type == TAP_G || type == SCR_G_UP || type == SCR_G_DOWN || type == SCR_G_ANY) {
-            if(type== TAP_G) {
-                sprite.setTextureRect(sf::IntRect(0,0,400,400));
-            } else if(type == SCR_G_UP) {
-                sprite.setTextureRect(sf::IntRect(800,840,400,400));
-            } else if(type == SCR_G_DOWN) {
-                sprite.setTextureRect(sf::IntRect(400,840,400,400));
-            } else if(type == SCR_G_ANY) {
-                sprite.setTextureRect(sf::IntRect(0,840,400,400));
-            }
-            if(v.at(i).getLanMod() == 0){
-                //green left
-                m_start = green_left_start;
-                m_end = green_left_end;
-                m_vel = green_left_vel;
-            }else if(v.at(i).getLanMod() >= 1){
-                //green center
-                m_start = green_center_start;
-                m_end = green_center_end;
-                m_vel = green_center_vel;
-            }
-        } else if (type == TAP_B || type == SCR_B_UP || type == SCR_B_DOWN || type == SCR_B_ANY) {
-            if(type== TAP_B) {
-                sprite.setTextureRect(sf::IntRect(800,0,400,400));
-            } else if(type == SCR_B_UP) {
-                sprite.setTextureRect(sf::IntRect(800,840,400,400));
-            } else if(type == SCR_B_DOWN) {
-                sprite.setTextureRect(sf::IntRect(400,840,400,400));
-            } else if(type == SCR_B_ANY) {
-                sprite.setTextureRect(sf::IntRect(0,840,400,400));
-            }
-            if(v.at(i).getLanMod() <= 1){
-               //blue center
-                m_start = blue_center_start;
-                m_end = blue_center_end;
-                m_vel = blue_center_vel;
-            }else if(v.at(i).getLanMod()==2){
-                //blue right
-                m_start = blue_right_start;
-                m_end = blue_right_end;
-                m_vel = blue_right_vel;
-            }
-        } else sprite.setTextureRect(sf::IntRect(0,0,0,0));
-        sprite.setOrigin(200.0,200.0);
-
-        if(dt >= -0.2 && dt <= 1.0) {
-            //position and scale calculations
-            sf::Vector2f pos = m_start + m_vel*(1.0f-dt);
-            sf::Vector2f scl = m_scl_start +m_scl_vel*(1.0f-dt);
-
-            //sprite drawn on screen
-            if(v.at(i).getRender() == true) {
-                sprite.setScale(scl);
-                sprite.setPosition(pos);
-                m_window.draw(sprite);
-            }
-        }
-
-    }
-	*/
-}
-
-void Rendr::lanes(double time, std::vector<Note>& ev) {
-	
-	float redLaneVertexData[] = {
-		 -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		  0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-		  -0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0f,
-		  0.02f, 0.0f, 6.0f, 1.0f, 0.0f, 0.0
+	float factor = time ;
+	float vertices[] = {
+		-0.15f, 0.1f, factor    , 400.0f / 1760 ,1.0f-(400.0f/1640.0f),
+		 0.15f, 0.1f, factor    , 800.0f / 1760 ,1.0f-(400.0f / 1640.0f),
+		-0.15f, 0.1f, factor-0.3, 400.0f / 1760 ,1.0f,
+		 0.15f, 0.1f, factor-0.3, 800.0f / 1760 ,1.0f
 	};
 
 	unsigned int indices[] = {
@@ -421,249 +389,468 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 		3,1,0
 	};
 
+	glBindVertexArray(m_testVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_TextureProgram);
+	glBindTexture(GL_TEXTURE_2D,m_ObjTexture);
+
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	*/
+	/*
+	for(size_t i = 0 ; i < v.size(); ++i) {
+		float dt = v.at(i).getMilli()-time;
+		sf::Sprite sprite;
+		sprite.setTexture(m_tex);
+		int type = v.at(i).getType();
+		if(!v.at(i).getRender()){
+			if(m_ren_cross == 0){
+				v.at(i).setLanMod(0);
+			}else if(m_ren_cross == 1){
+				v.at(i).setLanMod(1);
+			}else if(m_ren_cross == 2){
+				v.at(i).setLanMod(2);
+			}
+		}
+
+		if(type == TAP_R ) {
+			sprite.setTextureRect(sf::IntRect(400,0,400,400));
+			m_start = sf::Vector2f(512.0,200.0);
+			m_end = sf::Vector2f(512.0,500.0);
+			m_vel = (m_end-m_start)/1.0f;
+		} else if (type == TAP_G || type == SCR_G_UP || type == SCR_G_DOWN || type == SCR_G_ANY) {
+			if(type== TAP_G) {
+				sprite.setTextureRect(sf::IntRect(0,0,400,400));
+			} else if(type == SCR_G_UP) {
+				sprite.setTextureRect(sf::IntRect(800,840,400,400));
+			} else if(type == SCR_G_DOWN) {
+				sprite.setTextureRect(sf::IntRect(400,840,400,400));
+			} else if(type == SCR_G_ANY) {
+				sprite.setTextureRect(sf::IntRect(0,840,400,400));
+			}
+			if(v.at(i).getLanMod() == 0){
+				//green left
+				m_start = green_left_start;
+				m_end = green_left_end;
+				m_vel = green_left_vel;
+			}else if(v.at(i).getLanMod() >= 1){
+				//green center
+				m_start = green_center_start;
+				m_end = green_center_end;
+				m_vel = green_center_vel;
+			}
+		} else if (type == TAP_B || type == SCR_B_UP || type == SCR_B_DOWN || type == SCR_B_ANY) {
+			if(type== TAP_B) {
+				sprite.setTextureRect(sf::IntRect(800,0,400,400));
+			} else if(type == SCR_B_UP) {
+				sprite.setTextureRect(sf::IntRect(800,840,400,400));
+			} else if(type == SCR_B_DOWN) {
+				sprite.setTextureRect(sf::IntRect(400,840,400,400));
+			} else if(type == SCR_B_ANY) {
+				sprite.setTextureRect(sf::IntRect(0,840,400,400));
+			}
+			if(v.at(i).getLanMod() <= 1){
+			   //blue center
+				m_start = blue_center_start;
+				m_end = blue_center_end;
+				m_vel = blue_center_vel;
+			}else if(v.at(i).getLanMod()==2){
+				//blue right
+				m_start = blue_right_start;
+				m_end = blue_right_end;
+				m_vel = blue_right_vel;
+			}
+		} else sprite.setTextureRect(sf::IntRect(0,0,0,0));
+		sprite.setOrigin(200.0,200.0);
+
+		if(dt >= -0.2 && dt <= 1.0) {
+			//position and scale calculations
+			sf::Vector2f pos = m_start + m_vel*(1.0f-dt);
+			sf::Vector2f scl = m_scl_start +m_scl_vel*(1.0f-dt);
+
+			//sprite drawn on screen
+			if(v.at(i).getRender() == true) {
+				sprite.setScale(scl);
+				sprite.setPosition(pos);
+				m_window.draw(sprite);
+			}
+		}
+
+	}
+	*/
+}
+
+void Rendr::lanes(double time, std::vector<Note>& ev) {
+
+	std::vector<float> greenLaneVector = {};
+	std::vector<unsigned int> greenLaneIndices = {};
+	int greenLaneVertexCount = 0;
+
+	std::vector<float> blueLaneVector = {};
+	std::vector<unsigned int> blueLaneIndices = {};
+	int blueLaneVertexCount = 0;
+
+	std::vector<float> redLaneVector = {};
+	std::vector<unsigned int>redLaneIndices = {};
+
+	pushVertexColor(redLaneVector, -0.02f, 0.0f, 3.75f, 1.0f, 0.0f, 0.0f);
+	pushVertexColor(redLaneVector, 0.02f, 0.0f, 3.75f, 1.0f, 0.0f, 0.0f);
+	pushVertexColor(redLaneVector, 0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+	pushVertexColor(redLaneVector, -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
+
+
+	pushRectangleIndices(redLaneIndices, 0);
+
 	glBindVertexArray(m_lanesVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(redLaneVertexData), redLaneVertexData, GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-		
+	glBufferData(GL_ARRAY_BUFFER, redLaneVector.size() * sizeof(float), redLaneVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, redLaneIndices.size() * sizeof(int), redLaneIndices.data(), GL_DYNAMIC_DRAW);
+
 	glUseProgram(m_ColorProgram);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
-	
-	float greenLaneVertexData[] = {
-		 -0.02f-0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		  0.02f-0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		 -0.02f-0.35f, 0.0f, 6.0f, 0.0f, 1.0f, 0.0f,
-		  0.02f-0.35f, 0.0f, 6.0f, 0.0f, 1.0f, 0.0f
-	};
+	glDrawElements(GL_TRIANGLES, redLaneIndices.size(), GL_UNSIGNED_INT, 0);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(greenLaneVertexData), greenLaneVertexData, GL_STATIC_DRAW);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+	int start = 1;
+	for (size_t i = 0; i < ev.size(); i++) {
+		if (ev.at(i).getMilli() <= time) {
+			if (ev.at(i).getType() == CROSS_L) {
+				pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
+				pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
 
-	float blueLaneVertexData[] = {
-		 -0.02f+0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-		  0.02f+0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-		 -0.02f+0.35f, 0.0f, 6.0f, 0.0f, 0.0f, 1.0f,
-		  0.02f+0.35f, 0.0f, 6.0f, 0.0f, 0.0f, 1.0f
-	};
-	
-	glBufferData(GL_ARRAY_BUFFER, sizeof(blueLaneVertexData), blueLaneVertexData, GL_STATIC_DRAW);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				start = 0;
+				break;
+			}
+			else if (ev.at(i).getType() == CROSS_R) {
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
 
-	float leftGreenLaneVertexData[] = {
-		 -0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
-		  0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 0.5f, 0.0f,
-		 -0.02f - 0.7f, 0.0f, 6.0f, 0.0f, 0.5f, 0.0f,
-		  0.02f - 0.7f, 0.0f, 6.0f, 0.0f, 0.5f, 0.0f
-	};
+				pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				start = 2;
+				break;
+			}
+			else {
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, 3.75f, 0.0f, 1.0f, 0.0f);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(leftGreenLaneVertexData), leftGreenLaneVertexData, GL_STATIC_DRAW);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, 3.75f, 0.0f, 0.0f, 1.0f);
+				start = 1;
+				break;
+			}
+		}
+	}
 
-	float rightBlueLaneVertexData[] = {
-		 -0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
-		  0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 0.5f,
-		 -0.02f + 0.7f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f,
-		  0.02f + 0.7f, 0.0f, 6.0f, 0.0f, 0.0f, 0.5f
-	};
+	int middle = start;
+	float offset = 0.04;
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(rightBlueLaneVertexData), rightBlueLaneVertexData, GL_STATIC_DRAW);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, 0);
+	for (size_t i = 0; i < ev.size(); i++) {
+		if (ev.at(i).getRender()) {
+			if (ev.at(i).getType() == CROSS_L) {
+				double dt = ev.at(i).getMilli() - time;
+				float z = 3.5 - 3.5 * dt;
+				if (middle >= 1) {
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
-	
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
 
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
+
+
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+				}
+				if (middle == 2) {
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+				}
+				middle = 0;
+			}
+			else if (ev.at(i).getType() == CROSS_R)
+			{
+				double dt = ev.at(i).getMilli() - time;
+				float z = 3.5 - 3.5 * dt;
+
+				if (middle <= 1) {
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+				}
+				if (middle == 0) {
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
+
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
+
+
+					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+				}
+				middle = 2;
+			}
+			else {
+				double dt = ev.at(i).getMilli() - time;
+				float z = 3.5 - 3.5 * dt;
+				
+				if (middle == 0) {
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
+
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
+
+					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+					greenLaneVertexCount += 4;
+
+
+					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
+				}
+				else if (middle == 2) {
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
+
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+					blueLaneVertexCount += 4;
+
+
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
+				}
+				middle = 1;
+			}
+		}
+	}
+
+	int end = 1;
+	for (size_t i = 0; i < ev.size(); i++) {
+		if (ev.at(i).getMilli() <= time + 1.0f) {
+			if (ev.at(i).getType() == CROSS_L) {
+				end = 0;
+			}
+			else if (ev.at(i).getType() == CROSS_R) {
+				end = 2;
+			}
+			else {
+				end = 1;
+			}
+		}
+	}
+
+	if (end == 0) {
+		pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+
+		pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+		pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (end == 2) {
+		pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+
+		pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+		pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	}
+	else if (end == 1) {
+		pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+		pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
+
+		pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+		pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+	}
+
+
+	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+	greenLaneVertexCount += 4;
+
+	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+	blueLaneVertexCount += 4;
+
+	glBufferData(GL_ARRAY_BUFFER, greenLaneVector.size() * sizeof(float), greenLaneVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, greenLaneIndices.size() * sizeof(int), greenLaneIndices.data(), GL_DYNAMIC_DRAW);
+	glDrawElements(GL_TRIANGLES, greenLaneIndices.size(), GL_UNSIGNED_INT, 0);
+
+	glBufferData(GL_ARRAY_BUFFER, blueLaneVector.size() * sizeof(float), blueLaneVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, blueLaneIndices.size() * sizeof(int), blueLaneIndices.data(), GL_DYNAMIC_DRAW);
+	glDrawElements(GL_TRIANGLES, blueLaneIndices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Rendr::events(double time, std::vector<Note>& ev) {
 	/*
-    std::vector<sf::Vertex> green_lane;
-    std::vector<sf::Vertex> blue_lane;
+	for(size_t i = 0; i < ev.size(); ++i) {
+		int type = ev.at(i).getType();
+		float diff_start = ev.at(i).getMilli()-time;
+		if(type == SCR_G_START) {
+			float diff_end = -1;
+			for(size_t j = 0; j < ev.size(); ++j) {
+				if(ev.at(j).getType()==SCR_G_END) {
+					diff_end = ev.at(j).getMilli()-time;
+					break;
+				}
+			}
+			sf::VertexArray varr(sf::Quads,4);
+			for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(57,172,64);
 
-    for(size_t i = 0; i < ev.size(); ++i){
-        if(ev.at(i).getRender()){
-            float dt = 1.0f-(ev.at(i).getMilli()-time);
-            int s = dt*200;
-            if(s >= 200)s = 199;
+			sf::Vector2f start_l = green_center_start + sf::Vector2f(-23.0,0.0);
+			sf::Vector2f end_l = green_center_end + sf::Vector2f(-40.0,0.0);
+			sf::Vector2f start_r = green_center_start + sf::Vector2f(23,0.0);
+			sf::Vector2f end_r = green_center_end + sf::Vector2f(40.0,0.0);
 
-            if(ev.at(i).getType() == CROSS_L){
-                for(int j = s;j >= 0; j--){
-                    m_lanes.at(j) = 0;
-                    m_ren_cross = 0;
-                }
-            }if(ev.at(i).getType() == CROSS_C){
-                for(int j = s;j >= 0; j--){
-                    m_lanes.at(j) = 1;
-                    m_ren_cross = 1;
-                }
-            }
-            if(ev.at(i).getType() == CROSS_R){
-                for(int j = s;j >= 0; j--){
-                    m_lanes.at(j) = 2;
-                    m_ren_cross = 2;
-                }
-            }
-        }
-    }
+			if(m_ren_cross == 0){
+				start_l = green_left_start + sf::Vector2f(-23.0,0.0);
+				end_l = green_left_end + sf::Vector2f(-40.0,0.0);
+				start_r =green_left_start + sf::Vector2f(23,0.0);
+				end_r = green_left_end+  sf::Vector2f(40.0,0.0);
+			}
 
-    for(size_t i = 0 ; i < m_lanes.size(); ++i){
-        float perc = (float)(i+1)/resolution;
-        if(m_lanes.at(i)==0){
-            sf::Vector2f left = green_left_start+green_left_vel*perc;
-            sf::Vector2f right = blue_center_start+blue_center_vel*perc;
+			sf::Vector2f vel_l = (end_l-start_l)/1.0f;
+			sf::Vector2f vel_r = (end_r-start_r)/1.0f;
 
-            sf::Vertex g(left);
-            g.color = sf::Color(145,255,150);
-            sf::Vertex b(right);
-            b.color = sf::Color(35,70,90);
+			if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
+				if(diff_start <= 1.0 && diff_start >= 0.0) {
+					varr[2].position = start_r+vel_r*(1.0f-diff_start);
+					varr[3].position = start_l+vel_l*(1.0f-diff_start);
+				} else {
+					varr[2].position = end_r;
+					varr[3].position = end_l;
+				}
+				if(diff_end <= 1.0 && diff_end >= 0.0) {
+					varr[0].position = start_l+vel_l*(1.0f-diff_end);
+					varr[1].position = start_r+vel_r*(1.0f-diff_end);
+				} else {
+					varr[0].position = start_l;
+					varr[1].position = start_r;
+				}
+			}
 
-            green_lane.push_back(g);
-            blue_lane.push_back(b);
-        }else if(m_lanes.at(i)==1){
-            sf::Vector2f left = green_center_start+green_center_vel*perc;
-            sf::Vector2f right = blue_center_start+blue_center_vel*perc;
+			m_window.draw(varr);
+		} else if(type == SCR_B_START) {
+			float diff_end = -1;
+			for(size_t j = 0; j < ev.size(); ++j) {
+				if(ev.at(j).getType()==SCR_B_END) {
+					diff_end = ev.at(j).getMilli()-time;
+					break;
+				}
+			}
+			sf::VertexArray varr(sf::Quads,4);
+			for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(40,51,177);
 
-            sf::Vertex g(left);
-            g.color = sf::Color(145,255,150);
-            sf::Vertex b(right);
-            b.color = sf::Color(160,240,255);
+			sf::Vector2f start_l = blue_center_start + sf::Vector2f(-23.0,0.0);
+			sf::Vector2f end_l = blue_center_end + sf::Vector2f(-40.0,0.0);
+			sf::Vector2f start_r = blue_center_start + sf::Vector2f(23,0.0);
+			sf::Vector2f end_r = blue_center_end + sf::Vector2f(40.0,0.0);
 
-            green_lane.push_back(g);
-            blue_lane.push_back(b);
-        }else if(m_lanes.at(i)==2){
-            sf::Vector2f left = green_center_start+green_center_vel*perc;
-            sf::Vector2f right = blue_right_start+blue_right_vel*perc;
+			if (m_ren_cross == 2){
+				start_l = blue_right_start + sf::Vector2f(-23.0,0.0);
+				end_l = blue_right_end + sf::Vector2f(-40.0,0.0);
+				start_r = blue_right_start + sf::Vector2f(23,0.0);
+				end_r = blue_right_end + sf::Vector2f(40.0,0.0);
+			}
 
-            sf::Vertex g(left);
-            g.color = sf::Color(0,112,25);
-            sf::Vertex b(right);
-            b.color = sf::Color(160,240,255);
+			sf::Vector2f vel_l = (end_l-start_l)/1.0f;
+			sf::Vector2f vel_r = (end_r-start_r)/1.0f;
 
-            green_lane.push_back(g);
-            blue_lane.push_back(b);
-        }
-    }
+			if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
+				if(diff_start <= 1.0 && diff_start >= 0.0) {
+					varr[2].position = start_r+vel_r*(1.0f-diff_start);
+					varr[3].position = start_l+vel_l*(1.0f-diff_start);
+				} else {
+					varr[2].position = end_r;
+					varr[3].position = end_l;
+				}
+				if(diff_end <= 1.0 && diff_end >= 0.0) {
+					varr[0].position = start_l+vel_l*(1.0f-diff_end);
+					varr[1].position = start_r+vel_r*(1.0f-diff_end);
+				} else {
+					varr[0].position = start_l;
+					varr[1].position = start_r;
+				}
+			}
 
-    sf::VertexArray red(sf::Lines, 2);
-    red[0].position = sf::Vector2f(512.0,200.0);
-    red[0].color = sf::Color(255,60,60);
-    red[1].position = sf::Vector2f(512.0,500.0);
-    red[1].color = sf::Color(255,60,60);
-
-    m_window.draw(&green_lane[0],green_lane.size(),sf::LineStrip);
-    m_window.draw(&blue_lane[0],blue_lane.size(),sf::LineStrip);
-    m_window.draw(red);
+			m_window.draw(varr);
+		}
+	}
 	*/
 }
 
-void Rendr::events(double time,std::vector<Note>&ev) {
+void Rendr::pollState(double time, Player& p, Generator& g) {
 	/*
-    for(size_t i = 0; i < ev.size(); ++i) {
-        int type = ev.at(i).getType();
-        float diff_start = ev.at(i).getMilli()-time;
-        if(type == SCR_G_START) {
-            float diff_end = -1;
-            for(size_t j = 0; j < ev.size(); ++j) {
-                if(ev.at(j).getType()==SCR_G_END) {
-                    diff_end = ev.at(j).getMilli()-time;
-                    break;
-                }
-            }
-            sf::VertexArray varr(sf::Quads,4);
-            for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(57,172,64);
-
-            sf::Vector2f start_l = green_center_start + sf::Vector2f(-23.0,0.0);
-            sf::Vector2f end_l = green_center_end + sf::Vector2f(-40.0,0.0);
-            sf::Vector2f start_r = green_center_start + sf::Vector2f(23,0.0);
-            sf::Vector2f end_r = green_center_end + sf::Vector2f(40.0,0.0);
-
-            if(m_ren_cross == 0){
-                start_l = green_left_start + sf::Vector2f(-23.0,0.0);
-                end_l = green_left_end + sf::Vector2f(-40.0,0.0);
-                start_r =green_left_start + sf::Vector2f(23,0.0);
-                end_r = green_left_end+  sf::Vector2f(40.0,0.0);
-            }
-
-            sf::Vector2f vel_l = (end_l-start_l)/1.0f;
-            sf::Vector2f vel_r = (end_r-start_r)/1.0f;
-
-            if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
-                if(diff_start <= 1.0 && diff_start >= 0.0) {
-                    varr[2].position = start_r+vel_r*(1.0f-diff_start);
-                    varr[3].position = start_l+vel_l*(1.0f-diff_start);
-                } else {
-                    varr[2].position = end_r;
-                    varr[3].position = end_l;
-                }
-                if(diff_end <= 1.0 && diff_end >= 0.0) {
-                    varr[0].position = start_l+vel_l*(1.0f-diff_end);
-                    varr[1].position = start_r+vel_r*(1.0f-diff_end);
-                } else {
-                    varr[0].position = start_l;
-                    varr[1].position = start_r;
-                }
-            }
-
-            m_window.draw(varr);
-        } else if(type == SCR_B_START) {
-            float diff_end = -1;
-            for(size_t j = 0; j < ev.size(); ++j) {
-                if(ev.at(j).getType()==SCR_B_END) {
-                    diff_end = ev.at(j).getMilli()-time;
-                    break;
-                }
-            }
-            sf::VertexArray varr(sf::Quads,4);
-            for(size_t i = 0; i < varr.getVertexCount(); ++i)varr[i].color = sf::Color(40,51,177);
-
-            sf::Vector2f start_l = blue_center_start + sf::Vector2f(-23.0,0.0);
-            sf::Vector2f end_l = blue_center_end + sf::Vector2f(-40.0,0.0);
-            sf::Vector2f start_r = blue_center_start + sf::Vector2f(23,0.0);
-            sf::Vector2f end_r = blue_center_end + sf::Vector2f(40.0,0.0);
-
-            if (m_ren_cross == 2){
-                start_l = blue_right_start + sf::Vector2f(-23.0,0.0);
-                end_l = blue_right_end + sf::Vector2f(-40.0,0.0);
-                start_r = blue_right_start + sf::Vector2f(23,0.0);
-                end_r = blue_right_end + sf::Vector2f(40.0,0.0);
-            }
-
-            sf::Vector2f vel_l = (end_l-start_l)/1.0f;
-            sf::Vector2f vel_r = (end_r-start_r)/1.0f;
-
-            if(diff_end != -1 && diff_end >= 0.0 && diff_start <= 1.0) {
-                if(diff_start <= 1.0 && diff_start >= 0.0) {
-                    varr[2].position = start_r+vel_r*(1.0f-diff_start);
-                    varr[3].position = start_l+vel_l*(1.0f-diff_start);
-                } else {
-                    varr[2].position = end_r;
-                    varr[3].position = end_l;
-                }
-                if(diff_end <= 1.0 && diff_end >= 0.0) {
-                    varr[0].position = start_l+vel_l*(1.0f-diff_end);
-                    varr[1].position = start_r+vel_r*(1.0f-diff_end);
-                } else {
-                    varr[0].position = start_l;
-                    varr[1].position = start_r;
-                }
-            }
-
-            m_window.draw(varr);
-        }
-    }
+	m_time_txt.setString("Time:"+std::to_string(time));
+	m_score_txt.setString("Score:"+std::to_string(p.getScore()));
+	m_combo_txt.setString("Combo:"+std::to_string(p.getCombo()));
+	m_mult_txt.setString("Mult:"+std::to_string(p.getMult()));
 	*/
-}
-
-void Rendr::pollState(double time,Player& p,Generator &g) {
-	/*
-    m_time_txt.setString("Time:"+std::to_string(time));
-    m_score_txt.setString("Score:"+std::to_string(p.getScore()));
-    m_combo_txt.setString("Combo:"+std::to_string(p.getCombo()));
-    m_mult_txt.setString("Mult:"+std::to_string(p.getMult()));
-	*/
-    m_red = p.m_red;
-    m_blue = p.m_blue;
-    m_green = p.m_green;
-    m_player_cross = p.m_cross;
+	m_red = p.m_red;
+	m_blue = p.m_blue;
+	m_green = p.m_green;
+	m_player_cross = p.m_cross;
 }
 
 
 Rendr::~Rendr() {
-    //dtor
+	//dtor
 }

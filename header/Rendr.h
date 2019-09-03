@@ -39,11 +39,14 @@ private:
 
 	unsigned int m_TextureProgram = 0;
 	unsigned int m_ColorProgram = 0;
-	unsigned int m_gl_texture = 0;
+	unsigned int m_HighwayTexture = 0;
+	unsigned int m_ObjTexture = 0;
 	unsigned int m_HighwayVAO = 0;
 	unsigned int m_HighwayVBO = 0;
 	unsigned int m_lanesVAO = 0;
 	unsigned int m_lanesVBO = 0;
+	unsigned int m_testVAO = 0;
+	unsigned int m_testVBO = 0;
 	/*
 	sf::Texture m_tex;
 
