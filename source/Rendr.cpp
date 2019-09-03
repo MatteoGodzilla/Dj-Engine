@@ -26,13 +26,22 @@ void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r =
 	v.push_back(b);
 }
 
-void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int value) {
+void pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s = 0.0, float t = 0.0) {
+	v.push_back(x);
+	v.push_back(y);
+	v.push_back(z);
+	v.push_back(s);
+	v.push_back(t);
+}
+
+void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
 	v.push_back(value + 2);
 	v.push_back(value + 2);
 	v.push_back(value + 3);
 	v.push_back(value);
+	value += 4;
 }
 
 void Rendr::init(GLFWwindow* w) {
@@ -173,40 +182,42 @@ void Rendr::init(GLFWwindow* w) {
 
 	//projection init
 	{
-		glm::mat4 proj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
+		m_proj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
 		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0),
 			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
-		proj = proj * look;
+		m_proj = m_proj * look;
 		glUseProgram(m_TextureProgram);
 		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
 		if (location != -1) {
-			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
+			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
 			std::cout << "uniform texture successful" << std::endl;
 		}
 
 		glUseProgram(m_ColorProgram);
 		location = glGetUniformLocation(m_ColorProgram, "u_proj");
 		if (location != -1) {
-			glUniformMatrix4fv(location, 1, GL_FALSE, &proj[0][0]);
+			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
 			std::cout << "uniform color successful" << std::endl;
 		}
-
+		
 	}
 
 	//vao setup
 	{
-		glGenVertexArrays(1, &m_HighwayVAO);
+		glGenVertexArrays(1, &m_highwayVAO);
 		glGenVertexArrays(1, &m_lanesVAO);
-		glGenVertexArrays(1, &m_testVAO);
+		glGenVertexArrays(1, &m_notesVAO);
+		glGenVertexArrays(1, &m_clickerVAO);
 
+		//highway vao
 		{
-			glBindVertexArray(m_HighwayVAO);
+			glBindVertexArray(m_highwayVAO);
 
 			unsigned int ebo;
-			glGenBuffers(1, &m_HighwayVBO);
+			glGenBuffers(1, &m_highwayVBO);
 			glGenBuffers(1, &ebo);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_HighwayVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_highwayVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 			//Vertex: x,y,z, u,v
@@ -220,7 +231,7 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-
+		//lanes vao
 		{
 			glBindVertexArray(m_lanesVAO);
 
@@ -242,14 +253,15 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		//notes vao
 		{
-			glBindVertexArray(m_testVAO);
+			glBindVertexArray(m_notesVAO);
 
 			unsigned int ebo;
-			glGenBuffers(1, &m_testVBO);
+			glGenBuffers(1, &m_notesVBO);
 			glGenBuffers(1, &ebo);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_notesVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 			//Vertex: x,y,z, u,v
@@ -263,6 +275,28 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+		//clicker vao
+		{
+			glBindVertexArray(m_clickerVAO);
+
+			unsigned int index;
+			glGenBuffers(1, &m_clickerVBO);
+			glGenBuffers(1, &index);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+
+			//vertex: x,y,z, s,t
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+		}
 
 	}
 
@@ -312,7 +346,7 @@ void Rendr::init(GLFWwindow* w) {
 
 void Rendr::highway(double time) {
 
-	float factor = time * 0.875f;
+	float factor = (float)time * 0.875f;
 	float data[] = {
 			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f + factor,
 			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f + factor,
@@ -325,8 +359,8 @@ void Rendr::highway(double time) {
 			3,1,0
 	};
 
-	glBindVertexArray(m_HighwayVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_HighwayVBO);
+	glBindVertexArray(m_highwayVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_highwayVBO);
 	glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
@@ -340,48 +374,127 @@ void Rendr::highway(double time) {
 }
 
 void Rendr::clicker() {
+	float clickedOffset = 0.03f;
 
-	/*
-	if(m_red)m_red_click.setScale(0.15,0.15);
-	else m_red_click.setScale(0.2,0.2);
 
-	if(m_green)m_green_click.setScale(0.15,0.15);
-	else m_green_click.setScale(0.2,0.2);
+	std::vector<float> clickerVector = {};
+	std::vector<unsigned int> clickerIndices = {};
+	unsigned int clickerVertexCount = 0;
 
-	if(m_blue)m_blue_click.setScale(0.15,0.15);
-	else m_blue_click.setScale(0.2,0.2);
+	pushVertexTexture(clickerVector, -0.85f, 0.0f, 3.6f, 1320.0f / 1760.0f, 0.0f);
+	pushVertexTexture(clickerVector, -0.85f, 0.0f, 3.9f, 1.0f, 0.0f);
+	pushVertexTexture(clickerVector, -0.2f, 0.0f, 3.9f, 1.0f, 880.0f / 1640.0f);
+	pushVertexTexture(clickerVector, -0.2f, 0.0f, 3.6f, 1320.0f / 1760.0f, 880.0f / 1640.0f);
 
-	if(m_player_cross == 0) {
-		m_green_click.setPosition(338.0,500.0);
-		m_blue_click.setPosition(600.0,500.0);
-	} else if(m_player_cross == 1) {
-		m_green_click.setPosition(426.0,500.0);
-		m_blue_click.setPosition(600.0,500.0);
-	} else if(m_player_cross == 2) {
-		m_green_click.setPosition(426.0,500.0);
-		m_blue_click.setPosition(688.0,500.0);
+	pushRectangleIndices(clickerIndices, clickerVertexCount);
+	
+	pushVertexTexture(clickerVector, 0.85f, 0.0f, 3.6f, 1320.0f / 1760.0f, 0.0f);
+	pushVertexTexture(clickerVector, 0.85f, 0.0f, 3.9f, 1.0f, 0.0f);
+	pushVertexTexture(clickerVector, 0.2f, 0.0f, 3.9f, 1.0f, 880.0f / 1640.0f );
+	pushVertexTexture(clickerVector, 0.2f, 0.0f, 3.6f, 1320.0f / 1760.0f, 880.0f / 1640.0f );
+
+	pushRectangleIndices(clickerIndices, clickerVertexCount);
+	if (m_red) {
+		pushVertexTexture(clickerVector, -0.15f + clickedOffset, 0.0f, 3.6f + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, -0.15f + clickedOffset, 0.0f, 3.9f - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, 0.15f - clickedOffset, 0.0f, 3.9f - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, 0.15f - clickedOffset, 0.0f, 3.6f + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
+	}
+	else {
+		pushVertexTexture(clickerVector, -0.15f, 0.0f, 3.6f, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, -0.15f, 0.0f, 3.9f, 440.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, 0.15f, 0.0f, 3.9f, 880.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, 0.15f, 0.0f, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
+	}
+	pushRectangleIndices(clickerIndices, clickerVertexCount);
+	
+
+	if (m_green) {
+		if (m_player_cross >= 1) {
+			pushVertexTexture(clickerVector, -0.5f + clickedOffset, 0.0f, 3.6f + clickedOffset, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.5f + clickedOffset, 0.0f, 3.9f - clickedOffset, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.2f - clickedOffset, 0.0f, 3.9f - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.2f - clickedOffset, 0.0f, 3.6f + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		else {
+			pushVertexTexture(clickerVector, -0.85f + clickedOffset, 0.0f, 3.6f + clickedOffset, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.85f + clickedOffset, 0.0f, 3.9f - clickedOffset, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.55f - clickedOffset, 0.0f, 3.9f - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.55f - clickedOffset, 0.0f, 3.6f + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		pushRectangleIndices(clickerIndices, clickerVertexCount);
+	}
+	else {
+		if (m_player_cross >= 1) {
+			pushVertexTexture(clickerVector, -0.5f, 0.0f, 3.6f, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.5f, 0.0f, 3.9f, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.2f, 0.0f, 3.9f, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.2f, 0.0f, 3.6f, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		else {
+			pushVertexTexture(clickerVector, -0.85f, 0.0f, 3.6f, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.85f, 0.0f, 3.9f, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.55f, 0.0f, 3.9f, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, -0.55f, 0.0f, 3.6f, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
-	m_window.draw(m_trayL);
-	m_window.draw(m_trayR);
-	m_window.draw(m_red_click);
-	m_window.draw(m_green_click);
-	m_window.draw(m_blue_click);
-	m_window.draw(m_time_txt);
-	m_window.draw(m_score_txt);
-	m_window.draw(m_combo_txt);
-	m_window.draw(m_mult_txt);
-	*/
+	if (m_blue) {
+		if (m_player_cross <= 1) {
+			pushVertexTexture(clickerVector, 0.5f - clickedOffset, 0.0f, 3.6f + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.5f - clickedOffset, 0.0f, 3.9f - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.2f + clickedOffset, 0.0f, 3.9f - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.2f + clickedOffset, 0.0f, 3.6f + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		else {
+			pushVertexTexture(clickerVector, 0.85f - clickedOffset, 0.0f, 3.6f + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.85f - clickedOffset, 0.0f, 3.9f - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.55f + clickedOffset, 0.0f, 3.9f - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.55f + clickedOffset, 0.0f, 3.6f + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		pushRectangleIndices(clickerIndices, clickerVertexCount);
+	}
+	else {
+		if (m_player_cross <= 1) {
+			pushVertexTexture(clickerVector, 0.5f, 0.0f, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.5f, 0.0f, 3.9f, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.2f, 0.0f, 3.9f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.2f, 0.0f, 3.6f, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		else {
+			pushVertexTexture(clickerVector, 0.85f, 0.0f, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.85f, 0.0f, 3.9f, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.55f, 0.0f, 3.9f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, 0.55f, 0.0f, 3.6f, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		}
+		pushRectangleIndices(clickerIndices, clickerVertexCount);
+	}
+
+
+	
+
+	
+	glBindVertexArray(m_clickerVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
+	glBufferData(GL_ARRAY_BUFFER, clickerVector.size()*sizeof(float), clickerVector.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, clickerIndices.size()*sizeof(float), clickerIndices.data(), GL_STATIC_DRAW);
+
+	glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
+	glUseProgram(m_TextureProgram);
+	glDrawElements(GL_TRIANGLES, clickerIndices.size(), GL_UNSIGNED_INT, 0);
+
 }
 
 void Rendr::notes(double time, std::vector<Note>& v) {
 	/*
 	float factor = time ;
 	float vertices[] = {
-		-0.15f, 0.1f, factor    , 400.0f / 1760 ,1.0f-(400.0f/1640.0f),
-		 0.15f, 0.1f, factor    , 800.0f / 1760 ,1.0f-(400.0f / 1640.0f),
-		-0.15f, 0.1f, factor-0.3, 400.0f / 1760 ,1.0f,
-		 0.15f, 0.1f, factor-0.3, 800.0f / 1760 ,1.0f
+		-0.15f, 0.1f, factor    , 400.0f / 1760 ,400.0f / 1640.0f,
+		 0.15f, 0.1f, factor    , 800.0f / 1760 ,400.0f / 1640.0f,
+		-0.15f, 0.1f, factor-0.3, 400.0f / 1760 ,0.0f,
+		 0.15f, 0.1f, factor-0.3, 800.0f / 1760 ,0.0f
 	};
 
 	unsigned int indices[] = {
@@ -487,22 +600,21 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 
 	std::vector<float> greenLaneVector = {};
 	std::vector<unsigned int> greenLaneIndices = {};
-	int greenLaneVertexCount = 0;
+	unsigned int greenLaneVertexCount = 0;
 
 	std::vector<float> blueLaneVector = {};
 	std::vector<unsigned int> blueLaneIndices = {};
-	int blueLaneVertexCount = 0;
+	unsigned int blueLaneVertexCount = 0;
 
 	std::vector<float> redLaneVector = {};
 	std::vector<unsigned int>redLaneIndices = {};
+	unsigned int redLaneVertexCount = 0;
 
 	pushVertexColor(redLaneVector, -0.02f, 0.0f, 3.75f, 1.0f, 0.0f, 0.0f);
 	pushVertexColor(redLaneVector, 0.02f, 0.0f, 3.75f, 1.0f, 0.0f, 0.0f);
 	pushVertexColor(redLaneVector, 0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
 	pushVertexColor(redLaneVector, -0.02f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
-
-
-	pushRectangleIndices(redLaneIndices, 0);
+	pushRectangleIndices(redLaneIndices, redLaneVertexCount);
 
 	glBindVertexArray(m_lanesVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
@@ -547,29 +659,26 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	}
 
 	int middle = start;
-	float offset = 0.04;
+	float offset = 0.04f;
 
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getRender()) {
 			if (ev.at(i).getType() == CROSS_L) {
 				double dt = ev.at(i).getMilli() - time;
-				float z = 3.5 - 3.5 * dt;
+				float z = 3.5f - 3.5f * dt;
 				if (middle >= 1) {
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
-
+					
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
-
-
+					
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.7f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 				}
@@ -578,17 +687,14 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
-
+					
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
-
-
+					
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 				}
@@ -597,22 +703,20 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 			else if (ev.at(i).getType() == CROSS_R)
 			{
 				double dt = ev.at(i).getMilli() - time;
-				float z = 3.5 - 3.5 * dt;
+				float z = 3.5f - 3.5f * dt;
 
 				if (middle <= 1) {
 					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
-
+					
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
 
 
 					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
@@ -623,7 +727,6 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
 
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
@@ -631,8 +734,6 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
-
 
 					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
@@ -648,7 +749,6 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
 
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
@@ -656,8 +756,6 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, 0.0f, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					greenLaneVertexCount += 4;
-
 
 					pushVertexColor(greenLaneVector, -0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, 0.0f, z - offset, 0.0f, 1.0f, 0.0f);
@@ -666,8 +764,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount); 
 
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
@@ -675,8 +772,6 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					blueLaneVertexCount += 4;
-
 
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, z - offset, 0.0f, 0.0f, 1.0f);
@@ -723,12 +818,9 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 		pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
-
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-	greenLaneVertexCount += 4;
 
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-	blueLaneVertexCount += 4;
 
 	glBufferData(GL_ARRAY_BUFFER, greenLaneVector.size() * sizeof(float), greenLaneVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, greenLaneIndices.size() * sizeof(int), greenLaneIndices.data(), GL_DYNAMIC_DRAW);

@@ -38,7 +38,7 @@ private:
     int m_mult = 1;
     int m_combo = 0;
     int m_scr_tick = 0;
-    float m_past_tap = -1;
+    double m_past_tap = -1;
 
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_ev_arr;

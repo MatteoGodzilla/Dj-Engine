@@ -29,7 +29,7 @@ protected:
 private:
 	GLFWwindow* m_window;
 	bool m_red = false, m_green = false, m_blue = false;
-    int m_player_cross;
+    int m_player_cross = 1;
     bool m_scr_g = false;
     bool m_scr_b = false;
 
@@ -37,16 +37,20 @@ private:
     const int resolution = 200;
     std::vector<int> m_lanes;
 
+	glm::mat4 m_proj;
+
 	unsigned int m_TextureProgram = 0;
 	unsigned int m_ColorProgram = 0;
 	unsigned int m_HighwayTexture = 0;
 	unsigned int m_ObjTexture = 0;
-	unsigned int m_HighwayVAO = 0;
-	unsigned int m_HighwayVBO = 0;
+	unsigned int m_highwayVAO = 0;
+	unsigned int m_highwayVBO = 0;
 	unsigned int m_lanesVAO = 0;
 	unsigned int m_lanesVBO = 0;
-	unsigned int m_testVAO = 0;
-	unsigned int m_testVBO = 0;
+	unsigned int m_notesVAO = 0;
+	unsigned int m_notesVBO = 0;
+	unsigned int m_clickerVAO = 0;
+	unsigned int m_clickerVBO = 0;
 	/*
 	sf::Texture m_tex;
 

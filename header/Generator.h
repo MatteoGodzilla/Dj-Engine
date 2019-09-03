@@ -13,12 +13,12 @@ public:
 protected:
 
 private:
-    float m_time = 0.0f;
+    double m_time = 0.0f;
     void pushNote(double time, int type);
     void pushEvent(double time, int type);
-    std::vector<float> m_note_times;
+    std::vector<double> m_note_times;
     std::vector<int> m_note_types;
-    std::vector<float>m_event_times;
+    std::vector<double>m_event_times;
     std::vector<int>m_event_types;
 };
 

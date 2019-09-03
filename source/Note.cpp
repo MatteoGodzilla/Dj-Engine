@@ -8,7 +8,7 @@ Note::Note(double milli,int ty,bool ev){
     m_is_event = ev;
 }
 
-void Note::click(float time) {
+void Note::click(double time) {
     if(m_hittable){
         std::cout << "Hit :" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
         m_touched = true;
@@ -37,7 +37,7 @@ void Note::tick(double time){
     }
 }
 
-float Note::getMilli() {
+double Note::getMilli() {
     return m_milli;
 }
 

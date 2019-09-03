@@ -1,22 +1,7 @@
 #include "Generator.h"
 
 Generator::Generator() {
-	pushEvent(0.0, CROSS_C);//Do not remove
-	pushEvent(3.0, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
-	pushEvent(0.2, CROSS_R);
-	pushEvent(0.2, CROSS_L);
+	pushEvent(0.0, CROSS_C);//Do not remove 
 	/*
     pushNote(2.0f,TAP_G);
     pushNote(0.2f,TAP_R);
@@ -160,7 +145,7 @@ void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {
             if (type == CROSS_L || type == CROSS_C || type == CROSS_R){
                 for(size_t j = ev.size(); j-- > i;){
                     int next_type = ev.at(j).getType();
-                    float next_time = ev.at(j).getMilli();
+                    double next_time = ev.at(j).getMilli();
                     if(next_type == CROSS_L || next_type == CROSS_C || next_type == CROSS_R){
                         if(j > i && next_time+0.15 <= time){
                             if(!ev.at(i).getTouched()){

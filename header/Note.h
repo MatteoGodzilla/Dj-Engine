@@ -14,9 +14,9 @@ class Note {
 public:
     Note(double milli,int ty,bool ev = false);
     virtual ~Note();
-    void click(float time);
+    void click(double time);
     void tick(double time);
-    float getMilli();
+    double getMilli();
     int getType();
     bool getRender();
     bool getHit();
@@ -28,7 +28,7 @@ public:
 protected:
 
 private:
-    float m_hit_window;
+    double m_hit_window;
     bool m_is_event;
     bool m_render = true;
     bool m_hittable = false;
