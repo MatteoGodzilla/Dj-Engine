@@ -1,7 +1,7 @@
 #include "Generator.h"
 
 Generator::Generator() {
-	pushEvent(0.0, CROSS_C);//Do not remove 
+	pushEvent(0.0, CROSS_C);//Do not remove
 	/*
 	pushEvent(2.0, CROSS_L);
 	pushNote(0.5, TAP_G);
@@ -158,16 +158,18 @@ void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {
         for (size_t i = ev.size(); i-- > 0;){
             ev.at(i).tick(time);
             int type = ev.at(i).getType();
+			
             if(type==SCR_G_START){
                 int e = -1;
                 for(size_t j = ev.size(); j-- > 0;){
-                    if(i != j && ev.at(j).getType()==SCR_G_END && time >= ev.at(j).getMilli()+0.2)e = j;
+                    if(i != j && ev.at(j).getType()==SCR_G_END && time > ev.at(j).getMilli()+0.2)e = j;
                 }
                 if(e != -1){
                     ev.erase(ev.begin()+e);
                     ev.erase(ev.begin()+i);
                 }
             }
+			
             if(type==SCR_B_START){
                 int e = -1;
                 for(size_t j = ev.size();j-- > 0;){

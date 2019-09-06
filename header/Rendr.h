@@ -27,11 +27,10 @@ public:
 protected:
 
 private:
-	GLFWwindow* m_window;
+	GLFWwindow* m_window = nullptr;
 	bool m_red = false, m_green = false, m_blue = false;
     int m_player_cross = 1;
 	int m_render_cross = 1;
-    int m_ren_cross = 1;
 
 	glm::mat4 m_proj;
 
@@ -47,6 +46,8 @@ private:
 	unsigned int m_notesVBO = 0;
 	unsigned int m_clickerVAO = 0;
 	unsigned int m_clickerVBO = 0;
+	unsigned int m_eventVAO = 0;
+	unsigned int m_eventVBO = 0;
 	/*
 	sf::Texture m_tex;
 
