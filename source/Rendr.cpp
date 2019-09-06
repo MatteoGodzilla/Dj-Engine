@@ -299,49 +299,6 @@ void Rendr::init(GLFWwindow* w) {
 		}
 
 	}
-
-	/*
-	//scale setup
-	m_scl_start = sf::Vector2f(0.1,0.1);
-	m_scl_end = sf::Vector2f(0.2,0.2);
-	m_scl_vel = (m_scl_end-m_scl_start)/1.0f;
-
-	m_trayL.setTexture(m_tex);
-	m_trayL.setTextureRect(sf::IntRect(1320,0,440,880));
-	m_trayL.setOrigin(220,440);
-	m_trayL.setRotation(90);
-	m_trayL.setScale(0.2,0.2);
-	m_trayL.setPosition(382.0,500.0);
-
-	m_trayR.setTexture(m_tex);
-	m_trayR.setTextureRect(sf::IntRect(1320,0,440,880));
-	m_trayR.setOrigin(220,400);
-	m_trayR.setRotation(90);
-	m_trayR.setScale(0.2,0.2);
-	m_trayR.setPosition(652.0,500.0);
-
-	m_red_click.setTexture(m_tex);
-	m_red_click.setTextureRect(sf::IntRect(440,400,440,440));
-	m_red_click.setOrigin(220,220);
-	m_red_click.setScale(0.2,0.2);
-	m_red_click.setPosition(512.0,500.0);
-
-	m_green_click.setTexture(m_tex);
-	m_green_click.setTextureRect(sf::IntRect(0,400,440,440));
-	m_green_click.setOrigin(220,220);
-	m_green_click.setScale(0.2,0.2);
-	m_green_click.setPosition(424.0,500.0);
-
-	m_blue_click.setTexture(m_tex);
-	m_blue_click.setTextureRect(sf::IntRect(880,400,440,440));
-	m_blue_click.setOrigin(220,220);
-	m_blue_click.setScale(0.2,0.2);
-	m_blue_click.setPosition(600.0,500.0);
-	*/
-	for (int i = 0; i < resolution; ++i) {
-		m_lanes.push_back(1);
-	}
-
 }
 
 void Rendr::highway(double time) {
@@ -488,112 +445,158 @@ void Rendr::clicker() {
 }
 
 void Rendr::notes(double time, std::vector<Note>& v) {
-	/*
-	float factor = time ;
-	float vertices[] = {
-		-0.15f, 0.1f, factor    , 400.0f / 1760 ,400.0f / 1640.0f,
-		 0.15f, 0.1f, factor    , 800.0f / 1760 ,400.0f / 1640.0f,
-		-0.15f, 0.1f, factor-0.3, 400.0f / 1760 ,0.0f,
-		 0.15f, 0.1f, factor-0.3, 800.0f / 1760 ,0.0f
-	};
+	std::vector<float> noteVector = {};
+	std::vector<unsigned int> noteIndices = {};
+	unsigned int noteVertexCount = 0;
 
-	unsigned int indices[] = {
-		0,2,3,
-		3,1,0
-	};
+	for (size_t i = 0; i < v.size(); i++) {
+		if (v.at(i).getRender()) {
+			double dt = v.at(i).getMilli() - time;
+			float z = 3.5f - (3.5f * dt);
+			int type = v.at(i).getType();
 
-	glBindVertexArray(m_testVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+			if (type == TAP_R) {
+				pushVertexTexture(noteVector, -0.15f, 0.0f, z-0.15f, 400.0f / 1760.0f, 400.0f / 1760.0f);
+				pushVertexTexture(noteVector, -0.15f, 0.0f, z+0.15f, 400.0f / 1760.0f, 0.0f);
+				pushVertexTexture(noteVector, 0.15f, 0.0f, z+0.15f, 800.0f / 1760.0f, 0.0f);
+				pushVertexTexture(noteVector, 0.15f, 0.0f, z-0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == TAP_G) {
+				if (v.at(i).getLanMod() == 0) {
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z - 0.15f, 0.0f, 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z + 0.15f, 0.0f, 0.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z - 0.15f, 0.0f, 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z + 0.15f, 0.0f, 0.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_G_UP) {
+				if (v.at(i).getLanMod() == 0) {
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_G_DOWN) {
+				if (v.at(i).getLanMod() == 0) {
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_G_ANY) {
+				if (v.at(i).getLanMod() == 0) {
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, 0.0f, z + 0.15f, 0.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.55f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, 0.0f, z + 0.15f, 0.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.2f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == TAP_B) {
+				if (v.at(i).getLanMod() == 2) {
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 400.0f / 1760.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 0.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 400.0f / 1760.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_B_UP) {
+				if (v.at(i).getLanMod() == 2) {
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_B_DOWN) {
+				if (v.at(i).getLanMod() == 2) {
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+			else if (type == SCR_B_ANY) {
+				if (v.at(i).getLanMod() == 2) {
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, 0.0f, z + 0.15f, 0.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.85f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, 0.0f, z + 0.15f, 0.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.5f, 0.0f, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+				}
+				pushRectangleIndices(noteIndices, noteVertexCount);
+			}
+		}
+		else {
+			v.at(i).setLanMod(m_render_cross);
+		}
+	}
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
+	glBindVertexArray(m_notesVAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_notesVBO);
+	
+	glBufferData(GL_ARRAY_BUFFER, noteVector.size() * sizeof(float), noteVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, noteIndices.size() * sizeof(int), noteIndices.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_TextureProgram);
-	glBindTexture(GL_TEXTURE_2D,m_ObjTexture);
-
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	*/
-	/*
-	for(size_t i = 0 ; i < v.size(); ++i) {
-		float dt = v.at(i).getMilli()-time;
-		sf::Sprite sprite;
-		sprite.setTexture(m_tex);
-		int type = v.at(i).getType();
-		if(!v.at(i).getRender()){
-			if(m_ren_cross == 0){
-				v.at(i).setLanMod(0);
-			}else if(m_ren_cross == 1){
-				v.at(i).setLanMod(1);
-			}else if(m_ren_cross == 2){
-				v.at(i).setLanMod(2);
-			}
-		}
-
-		if(type == TAP_R ) {
-			sprite.setTextureRect(sf::IntRect(400,0,400,400));
-			m_start = sf::Vector2f(512.0,200.0);
-			m_end = sf::Vector2f(512.0,500.0);
-			m_vel = (m_end-m_start)/1.0f;
-		} else if (type == TAP_G || type == SCR_G_UP || type == SCR_G_DOWN || type == SCR_G_ANY) {
-			if(type== TAP_G) {
-				sprite.setTextureRect(sf::IntRect(0,0,400,400));
-			} else if(type == SCR_G_UP) {
-				sprite.setTextureRect(sf::IntRect(800,840,400,400));
-			} else if(type == SCR_G_DOWN) {
-				sprite.setTextureRect(sf::IntRect(400,840,400,400));
-			} else if(type == SCR_G_ANY) {
-				sprite.setTextureRect(sf::IntRect(0,840,400,400));
-			}
-			if(v.at(i).getLanMod() == 0){
-				//green left
-				m_start = green_left_start;
-				m_end = green_left_end;
-				m_vel = green_left_vel;
-			}else if(v.at(i).getLanMod() >= 1){
-				//green center
-				m_start = green_center_start;
-				m_end = green_center_end;
-				m_vel = green_center_vel;
-			}
-		} else if (type == TAP_B || type == SCR_B_UP || type == SCR_B_DOWN || type == SCR_B_ANY) {
-			if(type== TAP_B) {
-				sprite.setTextureRect(sf::IntRect(800,0,400,400));
-			} else if(type == SCR_B_UP) {
-				sprite.setTextureRect(sf::IntRect(800,840,400,400));
-			} else if(type == SCR_B_DOWN) {
-				sprite.setTextureRect(sf::IntRect(400,840,400,400));
-			} else if(type == SCR_B_ANY) {
-				sprite.setTextureRect(sf::IntRect(0,840,400,400));
-			}
-			if(v.at(i).getLanMod() <= 1){
-			   //blue center
-				m_start = blue_center_start;
-				m_end = blue_center_end;
-				m_vel = blue_center_vel;
-			}else if(v.at(i).getLanMod()==2){
-				//blue right
-				m_start = blue_right_start;
-				m_end = blue_right_end;
-				m_vel = blue_right_vel;
-			}
-		} else sprite.setTextureRect(sf::IntRect(0,0,0,0));
-		sprite.setOrigin(200.0,200.0);
-
-		if(dt >= -0.2 && dt <= 1.0) {
-			//position and scale calculations
-			sf::Vector2f pos = m_start + m_vel*(1.0f-dt);
-			sf::Vector2f scl = m_scl_start +m_scl_vel*(1.0f-dt);
-
-			//sprite drawn on screen
-			if(v.at(i).getRender() == true) {
-				sprite.setScale(scl);
-				sprite.setPosition(pos);
-				m_window.draw(sprite);
-			}
-		}
-
-	}
-	*/
+	glDrawElements(GL_TRIANGLES, noteIndices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Rendr::lanes(double time, std::vector<Note>& ev) {
@@ -817,6 +820,8 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 		pushVertexColor(blueLaneVector, 0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 		pushVertexColor(blueLaneVector, -0.02f + 0.35f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
 	}
+
+	m_render_cross = end;
 
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 

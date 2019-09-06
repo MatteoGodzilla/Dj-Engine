@@ -30,12 +30,8 @@ private:
 	GLFWwindow* m_window;
 	bool m_red = false, m_green = false, m_blue = false;
     int m_player_cross = 1;
-    bool m_scr_g = false;
-    bool m_scr_b = false;
-
+	int m_render_cross = 1;
     int m_ren_cross = 1;
-    const int resolution = 200;
-    std::vector<int> m_lanes;
 
 	glm::mat4 m_proj;
 

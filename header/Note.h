@@ -1,7 +1,5 @@
 #ifndef NOTE_H
 #define NOTE_H
-#include <vector>
-#include <string>
 #include <iostream>
 
 enum note {TAP_G,TAP_R,TAP_B,

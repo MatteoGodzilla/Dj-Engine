@@ -40,8 +40,6 @@ private:
     int m_scr_tick = 0;
     double m_past_tap = -1;
 
-	std::vector<Note> m_note_arr;
-	std::vector<Note> m_ev_arr;
 };
 
 #endif // Player_H
