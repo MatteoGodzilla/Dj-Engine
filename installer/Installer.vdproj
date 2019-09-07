@@ -4,9 +4,9 @@
 "ProjectType" = "8:{978C614F-708E-4E1A-B201-565925725DBA}"
 "IsWebType" = "8:FALSE"
 "ProjectName" = "8:Installer"
-"LanguageId" = "3:1033"
+"LanguageId" = "3:0"
 "CodePage" = "3:1252"
-"UILanguageId" = "3:1033"
+"UILanguageId" = "3:0"
 "SccProjectName" = "8:"
 "SccLocalPath" = "8:"
 "SccAuxPath" = "8:"
@@ -15,19 +15,7 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0288D21EB5D04C7996E098978457A553"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_041964E1EF72AC3DB93600150991FCBA"
-        "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_095A63C7E5D3CA6F37CFC829576CE2FE"
+        "MsmKey" = "8:_10BE019BF1B7881112510210DC4B5FF9"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -39,8 +27,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_1A73224EA7F88888F7BA5BF87006A987"
+        "MsmKey" = "8:_1EFAE9B5E3B1B02478AF67A3CAE2BBAF"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_222F4D2394D94EF8BF7CC1A728A12787"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -51,8 +45,8 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_3742D47EA1E8B5328CFA63EEA40096A2"
-        "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "MsmKey" = "8:_34C2D2EC015C492D8BF776C263B52932"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -63,13 +57,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_68F2A33840416F5E178D3F34C06F9403"
+        "MsmKey" = "8:_54CE2CB03835091257BFEAA6C0A83773"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_A2DF9160FE4849151A68C69A20CAA969"
+        "MsmKey" = "8:_564216D82294D2D79C79018FC3E7E211"
+        "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_8A9EE8AD938FA5519DD399CD66421439"
+        "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_918B51902EC7516E7D78F22780E360DC"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -81,19 +87,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_D343BD0C21464A8B9612A7C3F06E29CE"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_DB2808D10D61F6642D259F9A04B7545E"
+        "MsmKey" = "8:_C26B7F6DBC4B2A4363761CF08097EF49"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_EBB9D21455F3E4FE10EF89FE0747DED1"
+        "MsmKey" = "8:_E60D7A5B1AD4BD2F48CFDDB04CA5CDE7"
         "OwnerKey" = "8:_EDB3822929154E9889923762BA17242B"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -143,7 +143,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:..\\Dj-Engine\\installer\\Dj-Engine-Installer.msi"
+        "OutputFilename" = "8:Dj-Engine-Installer.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -190,50 +190,10 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0288D21EB5D04C7996E098978457A553"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_10BE019BF1B7881112510210DC4B5FF9"
             {
-            "SourcePath" = "8:..\\Dj-Engine\\res\\highway.png"
-            "TargetName" = "8:highway.png"
-            "Tag" = "8:"
-            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_041964E1EF72AC3DB93600150991FCBA"
-            {
-            "SourcePath" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_095A63C7E5D3CA6F37CFC829576CE2FE"
-            {
-            "SourcePath" = "8:api-ms-win-crt-locale-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-locale-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-string-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-string-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -270,10 +230,10 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1A73224EA7F88888F7BA5BF87006A987"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1EFAE9B5E3B1B02478AF67A3CAE2BBAF"
             {
-            "SourcePath" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-stdio-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -288,6 +248,26 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_222F4D2394D94EF8BF7CC1A728A12787"
+            {
+            "SourcePath" = "8:..\\res\\highway.png"
+            "TargetName" = "8:highway.png"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2A0D6D89993B768849E99947BB16C672"
@@ -310,12 +290,12 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3742D47EA1E8B5328CFA63EEA40096A2"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_34C2D2EC015C492D8BF776C263B52932"
             {
-            "SourcePath" = "8:api-ms-win-crt-utility-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-utility-l1-1-0.dll"
+            "SourcePath" = "8:..\\res\\objects.png"
+            "TargetName" = "8:objects.png"
             "Tag" = "8:"
-            "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -327,7 +307,7 @@
             "PackageAs" = "3:1"
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4D97125E4B51466ABACC26638AE2EA88"
@@ -350,10 +330,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_68F2A33840416F5E178D3F34C06F9403"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_54CE2CB03835091257BFEAA6C0A83773"
             {
-            "SourcePath" = "8:api-ms-win-crt-string-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-string-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-heap-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-heap-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -370,10 +350,50 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A2DF9160FE4849151A68C69A20CAA969"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_564216D82294D2D79C79018FC3E7E211"
             {
-            "SourcePath" = "8:api-ms-win-crt-heap-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-heap-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-locale-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-locale-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A9EE8AD938FA5519DD399CD66421439"
+            {
+            "SourcePath" = "8:api-ms-win-crt-convert-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-convert-l1-1-0.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_918B51902EC7516E7D78F22780E360DC"
+            {
+            "SourcePath" = "8:api-ms-win-crt-math-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-math-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -410,30 +430,10 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D343BD0C21464A8B9612A7C3F06E29CE"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C26B7F6DBC4B2A4363761CF08097EF49"
             {
-            "SourcePath" = "8:..\\Dj-Engine\\res\\objects.png"
-            "TargetName" = "8:objects.png"
-            "Tag" = "8:"
-            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_DB2808D10D61F6642D259F9A04B7545E"
-            {
-            "SourcePath" = "8:api-ms-win-crt-convert-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-convert-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-utility-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-utility-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -450,10 +450,10 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_EBB9D21455F3E4FE10EF89FE0747DED1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E60D7A5B1AD4BD2F48CFDDB04CA5CDE7"
             {
-            "SourcePath" = "8:api-ms-win-crt-math-l1-1-0.dll"
-            "TargetName" = "8:api-ms-win-crt-math-l1-1-0.dll"
+            "SourcePath" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
+            "TargetName" = "8:api-ms-win-crt-runtime-l1-1-0.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
             "Condition" = "8:"
@@ -530,7 +530,7 @@
         }
         "MsiBootstrapper"
         {
-        "LangId" = "3:1033"
+        "LangId" = "3:0"
         "RequiresElevation" = "11:FALSE"
         }
         "Product"
@@ -538,7 +538,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dj-Engine"
         "ProductCode" = "8:{851AD3B4-10DC-442C-8BA2-9B9E15550B4C}"
-        "PackageCode" = "8:{1A2E03B1-2313-48D4-B4D1-C83472494737}"
+        "PackageCode" = "8:{D5EA3B1A-78F5-4E1B-94EB-6A2701D07B65}"
         "UpgradeCode" = "8:{526D9FA9-9244-4B74-851D-FF7304ED25B1}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
@@ -671,7 +671,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_271E2793CF8545B6B2A33CA3E8E9725D"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Introduzione"
+                    "DisplayName" = "8:Welcome"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdAdminWelcomeDlg.wid"
@@ -719,7 +719,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_2A7EDAC11CE94DF1BCF530823492B518"
                     {
                     "Sequence" = "3:300"
-                    "DisplayName" = "8:Conferma installazione"
+                    "DisplayName" = "8:Confirm Installation"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdAdminConfirmDlg.wid"
@@ -741,7 +741,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_E41B4A16A9854583AA0B8440F387E2E6"
                     {
                     "Sequence" = "3:200"
-                    "DisplayName" = "8:Cartella di installazione"
+                    "DisplayName" = "8:Installation Folder"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdAdminFolderDlg.wid"
@@ -772,7 +772,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_FD9A747270614226BB3ED99770E305D8"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Stato"
+                    "DisplayName" = "8:Progress"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdProgressDlg.wid"
@@ -816,7 +816,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_AA627F7D26C84AA8AE601BA520B61A3B"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Installazione completata"
+                    "DisplayName" = "8:Finished"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdAdminFinishedDlg.wid"
@@ -853,7 +853,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_FBAA2AD56363498AAC6C980A7DF8B411"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Installazione completata"
+                    "DisplayName" = "8:Finished"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdFinishedDlg.wid"
@@ -897,7 +897,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_7A71F73DFE8241F49AFCDB482F7F89E7"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Introduzione"
+                    "DisplayName" = "8:Welcome"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdWelcomeDlg.wid"
@@ -945,7 +945,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_9C1134B2B5F541A7B856FBD83F189E0B"
                     {
                     "Sequence" = "3:200"
-                    "DisplayName" = "8:Cartella di installazione"
+                    "DisplayName" = "8:Installation Folder"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdFolderDlg.wid"
@@ -980,7 +980,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_AC0F23ECAC1B46DC93EC45A3D9B4D4BC"
                     {
                     "Sequence" = "3:300"
-                    "DisplayName" = "8:Conferma installazione"
+                    "DisplayName" = "8:Confirm Installation"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdConfirmDlg.wid"
@@ -1017,7 +1017,7 @@
                     "{688940B3-5CA9-4162-8DEE-2993FA9D8CBC}:_144B932042DF40EC9E4F9420BB734071"
                     {
                     "Sequence" = "3:100"
-                    "DisplayName" = "8:Stato"
+                    "DisplayName" = "8:Progress"
                     "UseDynamicProperties" = "11:TRUE"
                     "IsDependency" = "11:FALSE"
                     "SourcePath" = "8:<VsdDialogDir>\\VsdAdminProgressDlg.wid"
