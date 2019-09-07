@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.29209.62
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dj-Engine", "Dj-Engine.vcxproj", "{4E5D9315-CB6B-446E-B583-3A85C9855660}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Installer", "..\Installer\Installer.vdproj", "{73475DBC-EFF1-423D-8550-4EEF66E342F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,11 @@ Global
 		{4E5D9315-CB6B-446E-B583-3A85C9855660}.Release|x64.Build.0 = Release|x64
 		{4E5D9315-CB6B-446E-B583-3A85C9855660}.Release|x86.ActiveCfg = Release|Win32
 		{4E5D9315-CB6B-446E-B583-3A85C9855660}.Release|x86.Build.0 = Release|Win32
+		{73475DBC-EFF1-423D-8550-4EEF66E342F1}.Debug|x64.ActiveCfg = Debug
+		{73475DBC-EFF1-423D-8550-4EEF66E342F1}.Debug|x86.ActiveCfg = Debug
+		{73475DBC-EFF1-423D-8550-4EEF66E342F1}.Release|x64.ActiveCfg = Release
+		{73475DBC-EFF1-423D-8550-4EEF66E342F1}.Release|x86.ActiveCfg = Release
+		{73475DBC-EFF1-423D-8550-4EEF66E342F1}.Release|x86.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
