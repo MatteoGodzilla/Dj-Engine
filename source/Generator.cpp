@@ -38,7 +38,7 @@ Generator::Generator() {
 
 	pushEvent(1.0, CROSS_C);
 	*/
-	
+
     pushNote(2.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
@@ -117,7 +117,6 @@ Generator::Generator() {
     pushNote(0.5f,TAP_G);
     pushNote(0.0f,TAP_R);
     pushNote(0.0f,TAP_B);
-	
 }
 
 void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {

@@ -391,8 +391,25 @@ int Player::getScore(){
 int Player::getCombo(){
     return m_combo;
 }
+
 int Player::getMult(){
     return m_mult;
+}
+
+int Player::getCross() {
+	return m_cross;
+}
+
+bool Player::getRedClicker() {
+	return m_red;
+}
+
+bool Player::getGreenClicker() {
+	return m_green;
+}
+
+bool Player::getBlueClicker() {
+	return m_blue;
 }
 
 Player::~Player() {

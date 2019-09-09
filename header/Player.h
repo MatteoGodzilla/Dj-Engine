@@ -21,10 +21,10 @@ public:
 		double time, std::vector<Note>& v, std::vector<Note>& ev);
     //void key(sf::Event e,double time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
-    bool m_red = false;
-    bool m_green = false;
-    bool m_blue = false;
-    int m_cross = 1;
+	bool getRedClicker();
+	bool getGreenClicker();
+	bool getBlueClicker();
+	int getCross();
     int getScore();
     int getCombo();
     int getMult();
@@ -32,6 +32,10 @@ public:
 protected:
 
 private:
+	bool m_red = false;
+	bool m_green = false;
+	bool m_blue = false;
+	int m_cross = 1;
     bool m_scr_up = false;
     bool m_scr_down = false;
     int m_score = 0;

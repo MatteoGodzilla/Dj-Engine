@@ -30,6 +30,7 @@ void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
 void render() {
 	rendr.highway(global_time);
 	rendr.clicker();
+	rendr.meters();
 	rendr.lanes(global_time, event_arr);
 	rendr.events(global_time, event_arr);
 	rendr.notes(global_time, note_arr);

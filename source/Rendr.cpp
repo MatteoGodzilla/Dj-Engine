@@ -174,8 +174,20 @@ void Rendr::init(GLFWwindow* w) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, obj);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, obj);
 
+		unsigned char* meters = stbi_load("res/meters.png", &width, &height, &channels, 0);
+		glGenTextures(1, &m_MetersTexture);
+		glBindTexture(GL_TEXTURE_2D, m_MetersTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (channels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, meters);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, meters);
+
 		stbi_image_free(high);
 		stbi_image_free(obj);
+		stbi_image_free(meters);
+
+
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -209,6 +221,7 @@ void Rendr::init(GLFWwindow* w) {
 		glGenVertexArrays(1, &m_notesVAO);
 		glGenVertexArrays(1, &m_clickerVAO);
 		glGenVertexArrays(1, &m_eventVAO);
+		glGenVertexArrays(1, &m_metersVAO);
 
 		//highway vao
 		{
@@ -319,6 +332,29 @@ void Rendr::init(GLFWwindow* w) {
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		}
+
+		//meters vao
+		{
+			glBindVertexArray(m_metersVAO);
+
+			unsigned int index;
+			glGenBuffers(1, &m_metersVBO);
+			glGenBuffers(1, &index);
+
+			glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
+
+			//vertex: x,y,z, s,t
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 		}
 
 	}
@@ -1007,7 +1043,86 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, eventsIndices.size() * sizeof(int), eventsIndices.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_ColorProgram);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, eventsIndices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Rendr::meters() {
+
+	float plane = 0.1f;
+	
+	std::vector<float>metersVector;
+	std::vector<unsigned int> metersIndices;
+	unsigned int metersVertexCount = 0;
+
+	if (m_player_combo >= 8 && m_player_combo < 16) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 1.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.5);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 0.5, 0.5);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 0.5, 1.0);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}else if (m_player_combo >= 16 && m_player_combo < 24) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.5, 1.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.5, 0.5);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 1.0, 0.5);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 1.0, 1.0);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}else if (m_player_combo >= 24) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 0.5);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 0.5, 0.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 0.5, 0.5);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+
+	for (int i = 0; i < 8; i++) {
+		if (m_player_combo == 0) {
+			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 0.5, 0.5);
+			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 0.5, 0.25);
+			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 1.0, 0.25);
+			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 1.0, 0.5);
+			pushRectangleIndices(metersIndices, metersVertexCount);
+		}
+		else if (m_player_combo >= 24) {
+			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 0.5, 0.25);
+			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 0.5, 0.0);
+			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 1.0, 0.0);
+			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 1.0, 0.25);
+			pushRectangleIndices(metersIndices, metersVertexCount);
+		}
+		else {
+			int limit = m_player_combo % 8;
+			if (limit == 0)limit = 9;
+			if (i < limit) {
+				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 0.5, 0.25);
+				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 0.5, 0.0);
+				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 1.0, 0.0);
+				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 1.0, 0.25);
+				pushRectangleIndices(metersIndices, metersVertexCount);
+			}
+			else {
+				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 0.5, 0.5);
+				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 0.5, 0.25);
+				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 1.0, 0.25);
+				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 1.0, 0.5);
+				pushRectangleIndices(metersIndices, metersVertexCount);
+			}
+		}
+	}
+
+	   	 	
+	
+	glBindVertexArray(m_metersVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
+	
+	glBufferData(GL_ARRAY_BUFFER, metersVector.size()*sizeof(float), metersVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,metersIndices.size()*sizeof(int), metersIndices.data(), GL_DYNAMIC_DRAW);
+	
+	glUseProgram(m_TextureProgram);
+	
+	glBindTexture(GL_TEXTURE_2D,m_MetersTexture);
+	glDrawElements(GL_TRIANGLES,metersIndices.size(), GL_UNSIGNED_INT, 0);
+	
+
 }
 
 void Rendr::pollState(double time, Player& p, Generator& g) {
@@ -1017,10 +1132,11 @@ void Rendr::pollState(double time, Player& p, Generator& g) {
 	m_combo_txt.setString("Combo:"+std::to_string(p.getCombo()));
 	m_mult_txt.setString("Mult:"+std::to_string(p.getMult()));
 	*/
-	m_red = p.m_red;
-	m_blue = p.m_blue;
-	m_green = p.m_green;
-	m_player_cross = p.m_cross;
+	m_red = p.getRedClicker();
+	m_blue = p.getBlueClicker();
+	m_green = p.getGreenClicker();
+	m_player_cross = p.getCross();
+	m_player_combo = p.getCombo();
 }
 
 
