@@ -22,6 +22,7 @@ public:
     void events(double time,std::vector<Note>&ev);
     void lanes(double time, std::vector<Note>&ev);
 	void meters();
+	void splash();
     void pollState(double time,Player& p,Generator &g);
     virtual ~Rendr();
 
@@ -41,6 +42,7 @@ private:
 	unsigned int m_HighwayTexture = 0;
 	unsigned int m_ObjTexture = 0;
 	unsigned int m_MetersTexture = 0;
+	unsigned int m_splashTexture = 0;
 	unsigned int m_highwayVAO = 0;
 	unsigned int m_highwayVBO = 0;
 	unsigned int m_lanesVAO = 0;

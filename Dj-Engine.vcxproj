@@ -159,12 +159,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dj-Engine.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />
     <ClCompile Include="source\Note.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\Rendr.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Game.h" />
     <ClInclude Include="header\Generator.h" />
     <ClInclude Include="header\Note.h" />
     <ClInclude Include="header\Player.h" />

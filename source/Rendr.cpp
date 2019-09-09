@@ -183,9 +183,19 @@ void Rendr::init(GLFWwindow* w) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, meters);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, meters);
 
+		unsigned char* splash = stbi_load("res/splash.png", &width, &height, &channels, 0);
+		glGenTextures(1, &m_splashTexture);
+		glBindTexture(GL_TEXTURE_2D, m_splashTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (channels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, splash);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, splash);
+
 		stbi_image_free(high);
 		stbi_image_free(obj);
 		stbi_image_free(meters);
+		stbi_image_free(splash);
 
 
 		glBindTexture(GL_TEXTURE_2D, 0);
@@ -1109,8 +1119,6 @@ void Rendr::meters() {
 		}
 	}
 
-	   	 	
-	
 	glBindVertexArray(m_metersVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
 	
@@ -1123,6 +1131,28 @@ void Rendr::meters() {
 	glDrawElements(GL_TRIANGLES,metersIndices.size(), GL_UNSIGNED_INT, 0);
 	
 
+}
+
+void Rendr::splash() {
+	std::vector<float> splashVector;
+	std::vector<unsigned int> splashIndices;
+	unsigned int splashVertexCount = 0;
+
+	pushVertexTexture(splashVector, -0.5, 0.5, 3.5, 0.0, 0.0);
+	pushVertexTexture(splashVector, -0.5, 1.5, 3.5, 0.0, 1.0);
+	pushVertexTexture(splashVector, 0.5, 1.5, 3.5, 1.0, 1.0);
+	pushVertexTexture(splashVector, 0.5, 0.5, 3.5, 1.0, 0.0);
+	pushRectangleIndices(splashIndices, splashVertexCount);
+
+	glBindVertexArray(m_clickerVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
+
+	glBufferData(GL_ARRAY_BUFFER,splashVector.size()*sizeof(float),splashVector.data(),GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,splashIndices.size()*sizeof(int),splashIndices.data(),GL_STATIC_DRAW);
+
+	glUseProgram(m_TextureProgram);
+	glBindTexture(GL_TEXTURE_2D, m_splashTexture);
+	glDrawElements(GL_TRIANGLES, splashIndices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Rendr::pollState(double time, Player& p, Generator& g) {
