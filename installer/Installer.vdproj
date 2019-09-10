@@ -39,7 +39,25 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4FC6C877CD0149DC8453EFA6CF12CC40"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_519A6A667CE6480A9D12506FFF0BDE72"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_6CCE66E2F3514EC484CAA305ADFCE4B2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CA2770A6B9E84FA695ACE98C34793CE6"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -222,12 +240,72 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4FC6C877CD0149DC8453EFA6CF12CC40"
+            {
+            "SourcePath" = "8:..\\res\\meters.png"
+            "TargetName" = "8:meters.png"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_519A6A667CE6480A9D12506FFF0BDE72"
+            {
+            "SourcePath" = "8:..\\res\\splash.png"
+            "TargetName" = "8:splash.png"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6CCE66E2F3514EC484CAA305ADFCE4B2"
             {
             "SourcePath" = "8:..\\lib\\irrKlang.dll"
             "TargetName" = "8:irrKlang.dll"
             "Tag" = "8:"
             "Folder" = "8:_8B560BC50E1A4525850C185D471BDD62"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CA2770A6B9E84FA695ACE98C34793CE6"
+            {
+            "SourcePath" = "8:..\\res\\song.mp3"
+            "TargetName" = "8:song.mp3"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
