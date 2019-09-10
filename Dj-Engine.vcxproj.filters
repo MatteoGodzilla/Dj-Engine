@@ -33,6 +33,9 @@
     <ClCompile Include="Game.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="Audio.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\Generator.h">
@@ -48,6 +51,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="Game.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="Audio.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

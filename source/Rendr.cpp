@@ -124,11 +124,7 @@ void Rendr::init(GLFWwindow* w) {
 		glCompileShader(fShaderTexture);
 		glCompileShader(vShaderColor);
 		glCompileShader(fShaderColor);
-		/*
-		int successful;
-		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &successful);
-		std::cout << successful << std::endl;
-		*/
+
 		m_TextureProgram = glCreateProgram();
 		glAttachShader(m_TextureProgram, vShaderTexture);
 		glAttachShader(m_TextureProgram, fShaderTexture);
@@ -140,18 +136,14 @@ void Rendr::init(GLFWwindow* w) {
 		glAttachShader(m_ColorProgram, vShaderColor);
 		glAttachShader(m_ColorProgram, fShaderColor);
 		glLinkProgram(m_ColorProgram);
+
 		glDeleteShader(vShaderColor);
 		glDeleteShader(fShaderColor);
-		/*
-		int success;
-		glGetProgramiv(m_ColorProgram, GL_LINK_STATUS, &success);
-		std::cout << success << std::endl;
-		*/
-
 	}
 
 	//texture load
 	{
+		//variables reused for every load
 		int width, height, channels;
 		stbi_set_flip_vertically_on_load(true);
 		unsigned char* high = stbi_load("res/highway.png", &width, &height, &channels, 0);
@@ -192,6 +184,7 @@ void Rendr::init(GLFWwindow* w) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, splash);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, splash);
 
+		//removing image data
 		stbi_image_free(high);
 		stbi_image_free(obj);
 		stbi_image_free(meters);
@@ -204,10 +197,13 @@ void Rendr::init(GLFWwindow* w) {
 
 	//projection init
 	{
+		//m_proj = main perspective projection
 		m_proj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
 		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0),
 			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
 		m_proj = m_proj * look;
+
+		//settung up projection uniform
 		glUseProgram(m_TextureProgram);
 		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
 		if (location != -1) {
@@ -221,7 +217,7 @@ void Rendr::init(GLFWwindow* w) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
 			std::cout << "uniform color successful" << std::endl;
 		}
-		
+
 	}
 
 	//vao setup
@@ -373,27 +369,28 @@ void Rendr::init(GLFWwindow* w) {
 void Rendr::highway(double time) {
 
 	float factor = (float)time * 0.875f;
-	float data[] = {
-			-1.0f, 0.0f, 0.0f, 0.0f, 1.0f + factor,
-			 1.0f, 0.0f, 0.0f, 1.0f, 1.0f + factor,
-			-1.0f, 0.0f, 4.0f, 0.0f, 0.0f + factor,
-			 1.0f, 0.0f, 4.0f, 1.0f, 0.0f + factor
-	};
 
-	unsigned int indices[] = {
-			0,2,3,
-			3,1,0
-	};
+	float plane = 0.0f;
+
+	std::vector<float> highwayVector;
+	std::vector<unsigned int> highwayIndices;
+	unsigned int highwayVertexCount = 0;
+
+	pushVertexTexture(highwayVector, -1.0f, plane, 0.0f, 0.0f, 1.0f + factor);
+	pushVertexTexture(highwayVector, -1.0f, plane, 4.0f, 0.0f, 0.0f + factor);
+	pushVertexTexture(highwayVector, 1.0f, plane, 4.0f, 1.0f, 0.0f + factor);
+	pushVertexTexture(highwayVector, 1.0f, plane, 0.0f, 1.0f, 1.0f + factor);
+	pushRectangleIndices(highwayIndices, highwayVertexCount);
 
 	glBindVertexArray(m_highwayVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_highwayVBO);
 	glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, highwayVector.size() * sizeof(float), highwayVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, highwayIndices.size() * sizeof(int), highwayIndices.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_TextureProgram);
-	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(int), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, highwayIndices.size(), GL_UNSIGNED_INT, (void*)0);
 
 	glBindVertexArray(0);
 
@@ -414,11 +411,11 @@ void Rendr::clicker() {
 	pushVertexTexture(clickerVector, -0.2f, plane, 3.6f, 1320.0f / 1760.0f, 880.0f / 1640.0f);
 
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
-	
+
 	pushVertexTexture(clickerVector, 0.85f, plane, 3.6f, 1320.0f / 1760.0f, 0.0f);
 	pushVertexTexture(clickerVector, 0.85f, plane, 3.9f, 1.0f, 0.0f);
-	pushVertexTexture(clickerVector, 0.2f, plane, 3.9f, 1.0f, 880.0f / 1640.0f );
-	pushVertexTexture(clickerVector, 0.2f, plane, 3.6f, 1320.0f / 1760.0f, 880.0f / 1640.0f );
+	pushVertexTexture(clickerVector, 0.2f, plane, 3.9f, 1.0f, 880.0f / 1640.0f);
+	pushVertexTexture(clickerVector, 0.2f, plane, 3.6f, 1320.0f / 1760.0f, 880.0f / 1640.0f);
 
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 	if (m_red) {
@@ -434,7 +431,7 @@ void Rendr::clicker() {
 		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
 	}
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
-	
+
 
 	if (m_green) {
 		if (m_player_cross >= 1) {
@@ -498,15 +495,11 @@ void Rendr::clicker() {
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
-
-	
-
-	
 	glBindVertexArray(m_clickerVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
-	glBufferData(GL_ARRAY_BUFFER, clickerVector.size()*sizeof(float), clickerVector.data(), GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, clickerIndices.size()*sizeof(float), clickerIndices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, clickerVector.size() * sizeof(float), clickerVector.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, clickerIndices.size() * sizeof(float), clickerIndices.data(), GL_STATIC_DRAW);
 
 	glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
 	glUseProgram(m_TextureProgram);
@@ -529,10 +522,10 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 			int type = v.at(i).getType();
 
 			if (type == TAP_R) {
-				pushVertexTexture(noteVector, -0.15f, plane, z-0.15f, 400.0f / 1760.0f, 400.0f / 1760.0f);
-				pushVertexTexture(noteVector, -0.15f, plane, z+0.15f, 400.0f / 1760.0f, 0.0f);
-				pushVertexTexture(noteVector, 0.15f, plane, z+0.15f, 800.0f / 1760.0f, 0.0f);
-				pushVertexTexture(noteVector, 0.15f, plane, z-0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
+				pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1760.0f);
+				pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, 400.0f / 1760.0f, 0.0f);
+				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, 800.0f / 1760.0f, 0.0f);
+				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == TAP_G) {
@@ -664,12 +657,12 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 	glBindVertexArray(m_notesVAO);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_notesVBO);
-	
+
 	glBufferData(GL_ARRAY_BUFFER, noteVector.size() * sizeof(float), noteVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, noteIndices.size() * sizeof(int), noteIndices.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_TextureProgram);
-	glBindTexture(GL_TEXTURE_2D,m_ObjTexture);
+	glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
 	glDrawElements(GL_TRIANGLES, noteIndices.size(), GL_UNSIGNED_INT, 0);
 }
 
@@ -695,16 +688,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	pushVertexColor(redLaneVector, -0.02f, plane, 0.0f, 1.0f, 0.0f, 0.0f);
 	pushRectangleIndices(redLaneIndices, redLaneVertexCount);
 
-	glBindVertexArray(m_lanesVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, redLaneVector.size() * sizeof(float), redLaneVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, redLaneIndices.size() * sizeof(int), redLaneIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_ColorProgram);
-	glDrawElements(GL_TRIANGLES, redLaneIndices.size(), GL_UNSIGNED_INT, 0);
-
-	int start = 1;
+	int start = m_render_cross;
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getMilli() <= time) {
 			if (ev.at(i).getType() == CROSS_L) {
@@ -750,14 +734,14 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					
+
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-					
+
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
 				}
@@ -766,14 +750,14 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					
+
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					
+
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
 				}
@@ -788,7 +772,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-					
+
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
@@ -820,7 +804,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 			}
 			else {
 				float z = 3.75 - 3.75 * dt;
-				
+
 				if (middle == 0) {
 					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
@@ -841,7 +825,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount); 
+					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
@@ -900,6 +884,15 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+
+	glBindVertexArray(m_lanesVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, redLaneVector.size() * sizeof(float), redLaneVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, redLaneIndices.size() * sizeof(int), redLaneIndices.data(), GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_ColorProgram);
+	glDrawElements(GL_TRIANGLES, redLaneIndices.size(), GL_UNSIGNED_INT, 0);
 
 	glBufferData(GL_ARRAY_BUFFER, greenLaneVector.size() * sizeof(float), greenLaneVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, greenLaneIndices.size() * sizeof(int), greenLaneIndices.data(), GL_DYNAMIC_DRAW);
@@ -1059,7 +1052,7 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 void Rendr::meters() {
 
 	float plane = 0.1f;
-	
+
 	std::vector<float>metersVector;
 	std::vector<unsigned int> metersIndices;
 	unsigned int metersVertexCount = 0;
@@ -1070,13 +1063,15 @@ void Rendr::meters() {
 		pushVertexTexture(metersVector, 1.2, plane, 2.7, 0.5, 0.5);
 		pushVertexTexture(metersVector, 1.2, plane, 2.5, 0.5, 1.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
-	}else if (m_player_combo >= 16 && m_player_combo < 24) {
+	}
+	else if (m_player_combo >= 16 && m_player_combo < 24) {
 		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.5, 1.0);
 		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.5, 0.5);
 		pushVertexTexture(metersVector, 1.2, plane, 2.7, 1.0, 0.5);
 		pushVertexTexture(metersVector, 1.2, plane, 2.5, 1.0, 1.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
-	}else if (m_player_combo >= 24) {
+	}
+	else if (m_player_combo >= 24) {
 		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 0.5);
 		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.0);
 		pushVertexTexture(metersVector, 1.2, plane, 2.7, 0.5, 0.0);
@@ -1121,15 +1116,15 @@ void Rendr::meters() {
 
 	glBindVertexArray(m_metersVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
-	
-	glBufferData(GL_ARRAY_BUFFER, metersVector.size()*sizeof(float), metersVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,metersIndices.size()*sizeof(int), metersIndices.data(), GL_DYNAMIC_DRAW);
-	
+
+	glBufferData(GL_ARRAY_BUFFER, metersVector.size() * sizeof(float), metersVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, metersIndices.size() * sizeof(int), metersIndices.data(), GL_DYNAMIC_DRAW);
+
 	glUseProgram(m_TextureProgram);
-	
-	glBindTexture(GL_TEXTURE_2D,m_MetersTexture);
-	glDrawElements(GL_TRIANGLES,metersIndices.size(), GL_UNSIGNED_INT, 0);
-	
+
+	glBindTexture(GL_TEXTURE_2D, m_MetersTexture);
+	glDrawElements(GL_TRIANGLES, metersIndices.size(), GL_UNSIGNED_INT, 0);
+
 
 }
 
@@ -1147,8 +1142,8 @@ void Rendr::splash() {
 	glBindVertexArray(m_clickerVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
 
-	glBufferData(GL_ARRAY_BUFFER,splashVector.size()*sizeof(float),splashVector.data(),GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER,splashIndices.size()*sizeof(int),splashIndices.data(),GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, splashVector.size() * sizeof(float), splashVector.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, splashIndices.size() * sizeof(int), splashIndices.data(), GL_STATIC_DRAW);
 
 	glUseProgram(m_TextureProgram);
 	glBindTexture(GL_TEXTURE_2D, m_splashTexture);

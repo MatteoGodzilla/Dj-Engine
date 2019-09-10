@@ -2,6 +2,30 @@
 
 Generator::Generator() {
 	pushEvent(0.0, CROSS_C);//Do not remove
+
+	pushNote(1.7, TAP_G);
+	pushNote(1.5, TAP_R);
+	pushNote(0.35, TAP_G);
+	pushNote(0.9, TAP_R);
+	pushNote(0.9, TAP_G);
+
+	pushNote(1.5, TAP_R);
+	pushNote(0.35, TAP_G);
+	pushNote(0.9, TAP_R);
+	pushNote(0.9, TAP_G);
+
+	pushNote(1.5 , TAP_R);
+	pushNote(0.35, TAP_G);
+	pushNote(0.9, TAP_R);
+	pushNote(0.9, TAP_G);
+
+	pushNote(1.5, TAP_R);
+	pushNote(0.35, TAP_G);
+
+	pushNote(0.9, TAP_B);
+	pushNote(0.2, TAP_G);
+	pushNote(0.2, TAP_R);
+
 	/*
 	pushEvent(2.0, CROSS_L);
 	pushNote(0.5, TAP_G);
@@ -38,7 +62,7 @@ Generator::Generator() {
 
 	pushEvent(1.0, CROSS_C);
 	*/
-
+	/*
     pushNote(2.0f,TAP_G);
     pushNote(0.2f,TAP_R);
     pushNote(0.2f,TAP_B);
@@ -117,6 +141,7 @@ Generator::Generator() {
     pushNote(0.5f,TAP_G);
     pushNote(0.0f,TAP_R);
     pushNote(0.0f,TAP_B);
+	*/
 }
 
 void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {

@@ -13,7 +13,7 @@ public:
 protected:
 
 private:
-    double m_time = 0.0f;
+    double m_time = 0.0;
     void pushNote(double time, int type);
     void pushEvent(double time, int type);
     std::vector<double> m_note_times;
