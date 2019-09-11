@@ -31,9 +31,12 @@ protected:
 private:
 	GLFWwindow* m_window = nullptr;
 	bool m_red = false, m_green = false, m_blue = false;
-    int m_player_cross = 1;
-	int m_player_combo = 0;
-	int m_render_cross = 1;
+    int m_playerCross = 1;
+	int m_playerCombo = 0;
+	int m_renderCross = 1;
+	float m_renderEuValue = 0.0;
+	bool m_renderEuActive = false;
+	bool m_renderEuZone = false;
 
 	glm::mat4 m_proj;
 

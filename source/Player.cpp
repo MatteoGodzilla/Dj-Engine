@@ -28,6 +28,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			m_green = true;
 		}
@@ -48,6 +49,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			m_red = true;
 			
@@ -75,6 +77,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			m_blue = true;
 			
@@ -93,6 +96,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				}
 				if (!found) {
 					m_combo = 0;
+					m_eu_zone_active = false;
 				}
 			}
 			m_cross = 0;
@@ -112,6 +116,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				}
 				if (!found) {
 					m_combo = 0;
+					m_eu_zone_active = false;
 				}
 			}
 			m_cross = 2;
@@ -163,6 +168,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 		}
 		if (key== SCRATCH_DOWN) {
@@ -209,8 +215,14 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			
+		}
+		if (key == EUPHORIA) {
+			if (m_eu_value > 0.0) {
+				m_euphoria_active = true;
+			}
 		}
 	}
 	else if (action == GLFW_REPEAT) {
@@ -260,6 +272,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		}
 		if (!found) {
 			m_combo = 0;
+			m_eu_zone_active = false;
 		}
 	}
 	if (key == SCRATCH_DOWN) {
@@ -306,6 +319,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		}
 		if (!found) {
 			m_combo = 0;
+			m_eu_zone_active = false;
 		}
 
 	}
@@ -324,6 +338,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			m_cross = 1;
 			
@@ -341,6 +356,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			if (!found) {
 				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 			m_cross = 1;
 
@@ -381,7 +397,18 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){
         m_combo = 0;
+		m_eu_zone_active = false;
     }
+	if (g.m_eu_start) {
+		m_eu_zone_active = true;
+	}
+	if (g.m_eu_check && m_eu_zone_active) {
+		if(m_eu_value < 3.0)m_eu_value += 1.0;
+	}
+	if (m_euphoria_active) {
+		if (m_eu_value < 0.0)m_euphoria_active = false;
+		else m_eu_value -= 0.001;
+	}
 }
 
 int Player::getScore(){
@@ -410,6 +437,17 @@ bool Player::getGreenClicker() {
 
 bool Player::getBlueClicker() {
 	return m_blue;
+}
+
+float Player::getEuValue() {
+	return m_eu_value;
+}
+
+bool Player::getEuActive() {
+	return m_euphoria_active;
+}
+bool Player::getEuZoneActive() {
+	return m_eu_zone_active;
 }
 
 Player::~Player() {

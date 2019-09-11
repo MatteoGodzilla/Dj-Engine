@@ -6,7 +6,8 @@ enum note {TAP_G,TAP_R,TAP_B,
             CROSS_L,CROSS_R,CROSS_C,
             SCR_G_UP,SCR_G_DOWN,SCR_G_ANY,
             SCR_B_UP,SCR_B_DOWN,SCR_B_ANY,
-            SCR_G_START,SCR_G_END,SCR_B_START,SCR_B_END};
+            SCR_G_START,SCR_G_END,SCR_B_START,SCR_B_END,
+			EU_START,EU_END};
 
 class Note {
 public:

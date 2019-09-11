@@ -11,7 +11,8 @@ enum K {
     CROSS_L_CODE = GLFW_KEY_A,
     CROSS_R_CODE = GLFW_KEY_D,
     SCRATCH_UP = GLFW_KEY_W,
-    SCRATCH_DOWN = GLFW_KEY_S
+    SCRATCH_DOWN = GLFW_KEY_S,
+	EUPHORIA = GLFW_KEY_E
 };
 
 class Player {
@@ -28,6 +29,9 @@ public:
     int getScore();
     int getCombo();
     int getMult();
+	float getEuValue();
+	bool getEuActive();
+	bool getEuZoneActive();
     void pollState(Generator &g);
 protected:
 
@@ -43,7 +47,9 @@ private:
     int m_combo = 0;
     int m_scr_tick = 0;
     double m_past_tap = -1;
-
+	float m_eu_value = 0;
+	bool m_eu_zone_active = false;
+	bool m_euphoria_active = false;
 };
 
 #endif // Player_H

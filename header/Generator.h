@@ -10,6 +10,8 @@ public:
     virtual ~Generator();
     void tick(double time,std::vector<Note> &v,std::vector<Note>&ev);
     bool m_combo_reset = false;
+	bool m_eu_start = false;
+	bool m_eu_check = false;
 protected:
 
 private:
@@ -20,6 +22,7 @@ private:
     std::vector<int> m_note_types;
     std::vector<double>m_event_times;
     std::vector<int>m_event_types;
+
 };
 
 #endif // GENERATOR_H

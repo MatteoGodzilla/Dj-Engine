@@ -11,10 +11,10 @@ void Game::init(GLFWwindow* w) {
 void Game::render() {
 	if (active) {
 		m_render.highway(m_global_time);
+		m_render.events(m_global_time, m_event_arr);
 		m_render.clicker();
 		m_render.meters();
 		m_render.lanes(m_global_time, m_event_arr);
-		m_render.events(m_global_time, m_event_arr);
 		m_render.notes(m_global_time, m_note_arr);
 	}
 	else {

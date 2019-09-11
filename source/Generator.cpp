@@ -3,6 +3,18 @@
 Generator::Generator() {
 	pushEvent(0.0, CROSS_C);//Do not remove
 
+	pushEvent(1.0, EU_START);
+	pushEvent(1.0, EU_END);
+	pushEvent(1.0, EU_START);
+	pushEvent(1.0, EU_END);
+	pushEvent(1.0, EU_START);
+	pushEvent(1.0, EU_END);
+	pushEvent(1.0, EU_START);
+	pushEvent(1.0, EU_END);
+	pushEvent(1.0, EU_START);
+	pushEvent(1.0, EU_END);
+	
+	/*
 	pushNote(1.7, TAP_G);
 	pushNote(1.5, TAP_R);
 	pushNote(0.35, TAP_G);
@@ -26,6 +38,7 @@ Generator::Generator() {
 	pushNote(0.2, TAP_G);
 	pushNote(0.2, TAP_R);
 
+	*/	
 	/*
 	pushEvent(2.0, CROSS_L);
 	pushNote(0.5, TAP_G);
@@ -146,6 +159,8 @@ Generator::Generator() {
 
 void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {
     m_combo_reset = false;
+	m_eu_start = false;
+	m_eu_check = false;
     size_t note_s = m_note_times.size();
 
     for(size_t i = 0; i < note_s ; ++i) {
@@ -218,6 +233,20 @@ void Generator::tick(double time,std::vector<Note> &v,std::vector<Note>&ev) {
                     }
                 }
             }
+			if (type == EU_START) {
+				if (ev.at(i).getHit()) {
+					m_eu_start = true;
+				}
+				int e = -1;
+				for (size_t j = i; j < ev.size();j++) {
+					if (i != j && ev.at(j).getType() == EU_END && time >= ev.at(j).getMilli())e = j;
+				}
+				if (e != -1) {
+					m_eu_check = true;
+					ev.erase(ev.begin() + e);
+					ev.erase(ev.begin() + i);
+				}
+			}
         }
     }
 }
