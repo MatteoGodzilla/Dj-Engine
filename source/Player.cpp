@@ -86,7 +86,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			if (m_cross != 0) {
 				bool found = false;
 				for (size_t i = 0; i < ev.size(); ++i) {
-					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_L) {
+					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_G) {
 						found = true;
 						ev.at(i).click(time);
 						m_score += 100 * m_mult;
@@ -106,7 +106,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			if (m_cross != 2) {
 				bool found = false;
 				for (size_t i = 0; i < ev.size(); ++i) {
-					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_R) {
+					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_B) {
 						found = true;
 						ev.at(i).click(time);
 						m_score += 100 * m_mult;
@@ -388,10 +388,20 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 	else if (m_combo >= 8 && m_combo < 16) m_mult = 2;
 	else m_mult = 1;
 
+	if (m_euphoria_active) {
+		m_double_mult = true;
+	}
+	else {
+		m_double_mult = false;
+	}
+
+	if (m_double_mult)m_mult *= 2;
+
 	if (m_scr_tick >= 4) {
 		m_scr_tick = 0;
 		m_combo++;
 	}
+	
 }
 
 void Player::pollState(Generator &g){

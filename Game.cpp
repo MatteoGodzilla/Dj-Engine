@@ -26,6 +26,7 @@ void Game::tick() {
 	if (active) {
 		
 		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
+		m_gen.gen(m_note_arr, m_event_arr);
 		m_player.pollState(m_gen);
 		m_render.pollState(m_global_time, m_player, m_gen);
 		m_audio.play();

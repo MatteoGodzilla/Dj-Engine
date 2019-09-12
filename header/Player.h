@@ -50,6 +50,7 @@ private:
 	float m_eu_value = 0;
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
+	bool m_double_mult = false;
 };
 
 #endif // Player_H

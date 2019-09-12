@@ -522,130 +522,169 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 			float z = 3.75f - (3.75f * dt);
 			int type = v.at(i).getType();
 
+			float s = 0.0;
+			float t = 0.0;
+
 			if (type == TAP_R) {
-				pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1760.0f);
-				pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, 400.0f / 1760.0f, 0.0f);
-				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, 800.0f / 1760.0f, 0.0f);
-				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
+				if (m_renderEuActive) {
+					s = 1200.0 / 1760.0;
+					t = 0.0;
+				}
+				else {
+					s = 400.0 / 1760.0;
+					t = 0.0;
+				}
+				pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, s, t + 400.0f / 1760.0f);
+				pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, s, t);
+				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0/1760.0, t);
+				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0 / 1760.0, t + 400.0f / 1760.0f);
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == TAP_G) {
-				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, 0.0f, 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, 0.0f, 0.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, 400.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1640.0f);
+				if (m_renderEuActive) {
+					s = 1200.0 / 1760.0;
+					t = 0.0;
 				}
 				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, 0.0f, 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, 0.0f, 0.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, 400.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, 400.0f / 1760.0f, 400.0f / 1640.0f);
+					s = 0.0;
+					t = 0.0;
+				}
+				if (v.at(i).getLanMod() == 0) {
+					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_UP) {
+				s = 400.0 / 1760.0;
+				t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_DOWN) {
+				s = 800.0 / 1760.0;
+				t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_ANY) {
+				s = 0.0;
+				t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, 0.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, 0.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == TAP_B) {
-				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, 800.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, 1200.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, 1200.0f / 1760.0f, 400.0f / 1760.0f);
+				if (m_renderEuActive) {
+					s = 1200.0 / 1760.0;
+					t = 0.0;
 				}
 				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, 800.0f / 1760.0f, 400.0f / 1760.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, 800.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, 1200.0f / 1760.0f, 0.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, 1200.0f / 1760.0f, 400.0f / 1760.0f);
+					s = 800.0/1760.0;
+					t = 0.0;
+				}
+				if (v.at(i).getLanMod() == 2) {
+					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+				}
+				else {
+					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_UP) {
+			s = 400.0 / 1760.0;
+			t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_DOWN) {
+			s = 800.0 / 1760.0;
+			t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, 800.0f / 1760.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, 800.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, 1200.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, 1200.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_ANY) {
+			s = 0.0;
+			t = 840.0 / 1640.0;
 				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, 0.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, 0.0f, 1240.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, 0.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, 400.0f / 1760.0f, 840.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, 400.0f / 1760.0f, 1240.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
@@ -684,39 +723,117 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	std::vector<unsigned int>redLaneIndices = {};
 	unsigned int redLaneVertexCount = 0;
 
-	pushVertexColor(redLaneVector, -0.02f, plane, 3.75f, 1.0f, 0.0f, 0.0f);
-	pushVertexColor(redLaneVector, 0.02f, plane, 3.75f, 1.0f, 0.0f, 0.0f);
-	pushVertexColor(redLaneVector, 0.02f, plane, 0.0f, 1.0f, 0.0f, 0.0f);
-	pushVertexColor(redLaneVector, -0.02f, plane, 0.0f, 1.0f, 0.0f, 0.0f);
+	float r, g, b;
+
+
+	if (m_renderEuActive) {
+		r = 1.0;
+		g = 1.0;
+		b = 1.0;
+	}
+	else {
+		r = 1.0;
+		g = 0.0;
+		b = 0.0;
+	}
+
+	pushVertexColor(redLaneVector, -0.02f, plane, 3.75f, r, g, b);
+	pushVertexColor(redLaneVector, 0.02f, plane, 3.75f, r, g, b);
+	pushVertexColor(redLaneVector, 0.02f, plane, 0.0f, r, g, b);
+	pushVertexColor(redLaneVector, -0.02f, plane, 0.0f, r, g, b);
 	pushRectangleIndices(redLaneIndices, redLaneVertexCount);
 
 	int start = m_renderCross;
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getMilli() <= time) {
-			if (ev.at(i).getType() == CROSS_L) {
-				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+			if (ev.at(i).getType() == CROSS_G) {
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
 
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 3.75f, r, g, b);
+				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 3.75f, r, g, b);
+
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, r, g, b);
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, r, g, b);
 				start = 0;
 				break;
 			}
-			else if (ev.at(i).getType() == CROSS_R) {
-				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+			else if (ev.at(i).getType() == CROSS_B) {
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
 
-				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, r, g, b);
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, r, g, b);
+
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+
+				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 3.75f, r, g, b);
+				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 3.75f, r, g, b);
 				start = 2;
 				break;
 			}
 			else {
-				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, r, g, b);
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, r, g, b);
 
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, r, g, b);
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, r, g, b);
 				start = 1;
 				break;
 			}
@@ -729,78 +846,118 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getRender()) {
 			double dt = ev.at(i).getMilli() - time;
-			if (ev.at(i).getType() == CROSS_L) {
+			if (ev.at(i).getType() == CROSS_G) {
 				float z = 3.75f - 3.75f * dt;
 				if (middle >= 1) {
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 1.0;
+						b = 0.0;
+					}
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
 					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z - offset, r, g, b);
 				}
 				if (middle == 2) {
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 0.0;
+						b = 1.0;
+					}
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, r, g, b);
 				}
 				middle = 0;
 			}
-			else if (ev.at(i).getType() == CROSS_R)
+			else if (ev.at(i).getType() == CROSS_B)
 			{
 				float z = 3.75f - 3.75f * dt;
 
 				if (middle <= 1) {
-					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 0.0;
+						b = 1.0;
+					}
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
 
-					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
 				}
 				if (middle == 0) {
-					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 1.0;
+						b = 0.0;
+					}
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
 				}
 				middle = 2;
 			}
@@ -808,36 +965,56 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 				float z = 3.75 - 3.75 * dt;
 
 				if (middle == 0) {
-					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 1.0;
+						b = 0.0;
+					}
+					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 
-					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
 				}
 				else if (middle == 2) {
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					if (m_renderEuActive) {
+						r = 1.0;
+						g = 1.0;
+						b = 1.0;
+					}
+					else {
+						r = 0.0;
+						g = 0.0;
+						b = 1.0;
+					}
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
 
 					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
+					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, r, g, b);
 				}
 				middle = 1;
 			}
@@ -847,10 +1024,10 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	int end = 1;
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getMilli() <= time + 1.0f) {
-			if (ev.at(i).getType() == CROSS_L) {
+			if (ev.at(i).getType() == CROSS_G) {
 				end = 0;
 			}
-			else if (ev.at(i).getType() == CROSS_R) {
+			else if (ev.at(i).getType() == CROSS_B) {
 				end = 2;
 			}
 			else {
@@ -860,25 +1037,85 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	}
 
 	if (end == 0) {
-		pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-		pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 1.0;
+			b = 0.0;
+		}
+		pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 0.0f, r, g, b);
+		pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 0.0f, r, g, b);
 
-		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 0.0;
+			b = 1.0;
+		}
+		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 	}
 	else if (end == 2) {
-		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 1.0;
+			b = 0.0;
+		}
+		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
 
-		pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-		pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 0.0;
+			b = 1.0;
+		}
+		pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 0.0f, r, g, b);
+		pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 0.0f, r, g, b);
 	}
 	else if (end == 1) {
-		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 1.0;
+			b = 0.0;
+		}
+		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
 
-		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 0.0;
+			b = 1.0;
+		}
+		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 	}
 
 	m_renderCross = end;
@@ -1100,58 +1337,72 @@ void Rendr::meters() {
 	unsigned int metersVertexCount = 0;
 
 	//combo meter
-	if (m_playerCombo >= 8 && m_playerCombo < 16) {
+	if (m_playerMult == 2) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 800.0/1200.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 800.0/1200.0);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	else if (m_playerMult == 3) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 400.0/1000.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 400.0/1000.0, 400.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 800.0/1000.0, 400.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 800.0/1000.0, 800.0 / 1200.0);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	else if (m_playerMult == 4) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 400.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 0.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 400.0 / 1200.0);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	else if (m_playerMult == 6) {
 		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 1.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.5);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 0.5);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 800.0 / 1200.0);
 		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 1.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
-	else if (m_playerCombo >= 16 && m_playerCombo < 24) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 400.0/1000.0, 1.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 400.0/1000.0, 0.5);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 800.0/1000.0, 0.5);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 800.0/1000.0, 1.0);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else if (m_playerCombo >= 24) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 0.5);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 0.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 0.5);
+	else if (m_playerMult == 8) {
+		pushVertexTexture(metersVector, 1.0, plane, 2.5, 400.0 / 1000.0, 1.0);
+		pushVertexTexture(metersVector, 1.0, plane, 2.7, 400.0 / 1000.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.7, 800.0 / 1000.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.2, plane, 2.5, 800.0 / 1000.0, 1.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
 	for (int i = 0; i < 8; i++) {
 		if (m_playerCombo == 0) {
-			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 0.5);
-			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.25);
-			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.25);
-			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 0.5);
+			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 400.0/1200.0);
+			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
+			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
+			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 400.0/1200.0);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else if (m_playerCombo >= 24) {
-			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 0.25);
+			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
 			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.0);
 			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.0);
-			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 0.25);
+			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else {
 			int limit = m_playerCombo % 8;
 			if (limit == 0)limit = 9;
 			if (i < limit) {
-				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 0.25);
+				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
 				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.0);
 				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.0);
-				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 0.25);
+				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 			else {
-				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 0.5);
-				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.25);
-				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.25);
-				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 0.5);
+				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 400.0/1200.0);
+				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
+				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
+				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 400.0/1200.0);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 		}
@@ -1160,10 +1411,10 @@ void Rendr::meters() {
 	//euphoria meter
 
 	for (int i = 0; i < 3; i++) {
-		pushVertexTexture(metersVector, -1.1, plane, 3.75-0.35*i, 800.0 / 1000.0, 0.5);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75-0.35*i, 1.0, 0.5);
-		pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*i, 1.0, 1.0);
-		pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*i, 800.0 / 1000.0, 1.0);
+		pushVertexTexture(metersVector, -1.1, plane, 3.75-0.35*i, 800.0 / 1000.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, -1.0, plane, 3.75-0.35*i, 1.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*i, 1.0, 800.0/1200.0);
+		pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*i, 800.0 / 1000.0, 800.0 / 1200.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
@@ -1171,43 +1422,43 @@ void Rendr::meters() {
 		float z = m_renderEuValue;
 		pushVertexTexture(metersVector, -1.1, plane, 3.75, 800.0 / 1000.0, 0.0);
 		pushVertexTexture(metersVector, -1.0, plane, 3.75, 1.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75 - 0.35 * z, 1.0, 0.5);
-		pushVertexTexture(metersVector, -1.1, plane, 3.75 - 0.35 * z, 800.0 / 1000.0, 0.5);
+		pushVertexTexture(metersVector, -1.0, plane, 3.75 - 0.35 * z, 1.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, -1.1, plane, 3.75 - 0.35 * z, 800.0 / 1000.0, 400.0/1200.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_renderEuValue >= 1.0) {
 		pushVertexTexture(metersVector, -1.1, plane, 3.75, 800.0 / 1000.0, 0.0);
 		pushVertexTexture(metersVector, -1.0, plane, 3.75, 1.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 0.5);
-		pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 0.5);
+		pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 400.0/1200.0);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 		if (m_renderEuValue < 2.0) {
 			float z = m_renderEuValue - 1.0;
 			pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 0.0);
 			pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*z, 1.0, 0.5);
-			pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*z, 800.0 / 1000.0, 0.5);
+			pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*z, 1.0, 400.0/1200.0);
+			pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*z, 800.0 / 1000.0, 400.0/1200.0);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else if (m_renderEuValue >= 2.0) {
 			pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 0.0);
 			pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 0.5);
-			pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 0.5);
+			pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 400.0/1200.0);
+			pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 400.0/1200.0);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 			if (m_renderEuValue < 3.0) {
 				float z = m_renderEuValue - 2.0;
 				pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 0.0);
 				pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 3.05 - 0.35 * z, 1.0, 0.5);
-				pushVertexTexture(metersVector, -1.1, plane, 3.05 - 0.35 * z, 800.0 / 1000.0, 0.5);
+				pushVertexTexture(metersVector, -1.0, plane, 3.05 - 0.35 * z, 1.0, 400.0/1200.0);
+				pushVertexTexture(metersVector, -1.1, plane, 3.05 - 0.35 * z, 800.0 / 1000.0, 400.0/1200.0);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 			else {
 				pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 0.0);
 				pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 2.7, 1.0, 0.5);
-				pushVertexTexture(metersVector, -1.1, plane, 2.7, 800.0 / 1000.0, 0.5);
+				pushVertexTexture(metersVector, -1.0, plane, 2.7, 1.0, 400.0/1200.0);
+				pushVertexTexture(metersVector, -1.1, plane, 2.7, 800.0 / 1000.0, 400.0/1200.0);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 		}
@@ -1252,17 +1503,12 @@ void Rendr::splash() {
 }
 
 void Rendr::pollState(double time, Player& p, Generator& g) {
-	/*
-	m_time_txt.setString("Time:"+std::to_string(time));
-	m_score_txt.setString("Score:"+std::to_string(p.getScore()));
-	m_combo_txt.setString("Combo:"+std::to_string(p.getCombo()));
-	m_mult_txt.setString("Mult:"+std::to_string(p.getMult()));
-	*/
 	m_red = p.getRedClicker();
 	m_blue = p.getBlueClicker();
 	m_green = p.getGreenClicker();
 	m_playerCross = p.getCross();
 	m_playerCombo = p.getCombo();
+	m_playerMult = p.getMult();
 	m_renderEuValue = p.getEuValue();
 	m_renderEuActive = p.getEuActive();
 	m_renderEuZone = p.getEuZoneActive();

@@ -33,6 +33,7 @@ private:
 	bool m_red = false, m_green = false, m_blue = false;
     int m_playerCross = 1;
 	int m_playerCombo = 0;
+	int m_playerMult = 0;
 	int m_renderCross = 1;
 	float m_renderEuValue = 0.0;
 	bool m_renderEuActive = false;
