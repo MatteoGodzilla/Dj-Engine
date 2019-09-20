@@ -13,5 +13,6 @@ Crossfade left = A
 Crossfade left = D
 Scratch up = W
 Scratch down = S
+Euphoria = E
 
 __Thanks to MexicanPB for making the logo__
