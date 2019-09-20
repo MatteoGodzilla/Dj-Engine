@@ -328,12 +328,17 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		if (key== CROSS_L_CODE && m_cross == 0) {
 			bool found = false;
 			for (size_t i = 0; i < ev.size(); ++i) {
-				if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_C) {
-					found = true;
-					ev.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					break;
+				int type = ev.at(i).getType();
+				if (ev.at(i).getHit()) {
+					if (type == CROSS_C || type == CROSS_B) {
+						if (type == CROSS_C) {
+							ev.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+						}
+						found = true;
+						break;
+					}
 				}
 			}
 			if (!found) {
@@ -346,12 +351,17 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		if (key== CROSS_R_CODE && m_cross == 2) {
 			bool found = false;
 			for (size_t i = 0; i < ev.size(); ++i) {
-				if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_C) {
-					found = true;
-					ev.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					break;
+				int type = ev.at(i).getType();
+				if (ev.at(i).getHit()) {
+					if (type == CROSS_C || type == CROSS_G) {
+						if (type == CROSS_C) {
+							ev.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+						}
+						found = true;
+						break;
+					}
 				}
 			}
 			if (!found) {

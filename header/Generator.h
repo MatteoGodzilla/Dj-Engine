@@ -11,7 +11,9 @@ public:
     Generator();
     virtual ~Generator();
     void tick(double time,std::vector<Note> &v,std::vector<Note>&ev);
-	void gen(std::vector<Note>& v, std::vector<Note>& ev);
+	void textParser(std::vector<Note>& v, std::vector<Note>& ev);
+	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev);
+	void bpm(double time, std::vector<double>& arr);
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
@@ -26,6 +28,11 @@ private:
     std::vector<double>m_event_times;
     std::vector<int>m_event_types;
 	std::ifstream m_chart;
+	bool m_isTextChart = true;
+	int m_bpm = 1;
+	double m_bpmChangeTime = -1;
+	int m_bpmChangeValue = -1;
+	double m_lastBpmTick = 0.0;
 };
 
 #endif // GENERATOR_H

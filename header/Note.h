@@ -11,9 +11,9 @@ enum note {TAP_G,TAP_R,TAP_B,
 
 class Note {
 public:
-    Note(double milli,int ty,bool ev = false);
+	Note(double milli, int ty, bool ev = false, float extra = 0.0);
     virtual ~Note();
-    void click(double time);
+	void click(double time);
     void tick(double time);
     double getMilli();
     int getType();
@@ -24,6 +24,7 @@ public:
     bool getIsEvent();
     int getLanMod();
     void setLanMod(int i);
+	float getExtra();
 protected:
 
 private:
@@ -36,6 +37,7 @@ private:
     double m_milli;
     int m_type;
     int m_lan_mod = -1;
+	float m_extraData = 0.0;
 };
 
 #endif // NOTE_H

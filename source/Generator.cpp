@@ -1,16 +1,49 @@
 #include "Generator.h"
 
+void readToInt(std::ifstream& stream, int* i) {
+	char c;
+	char* mod = (char*)i;
+	for (int i = 0; i < 4; i++) {
+		stream.read(&c, sizeof(c));
+		mod[3 - i] = c;
+	}
+}
+
+void readToFloat(std::ifstream& stream, float* f) {
+	char c;
+	char* mod = (char*)f;
+	for (int i = 0; i < 4; i++) {
+		stream.read(&c, sizeof(c));
+		mod[3 - i] = c;
+	}
+}
+
 Generator::Generator() {
-	pushEvent(0.0, CROSS_C);//Do not remove
+	pushEvent(-2.0, CROSS_C);//Do not remove
 	m_chart.open("res/chart.txt");
 	if (m_chart.is_open()) {
-		std::cout << "loaded chart" << std::endl;
+		m_isTextChart = true;
+		std::cout << "loaded text chart" << std::endl;
 		std::string version;
 		m_chart >> version;
 		std::cout << "Chart Version: " << version << std::endl;
 	}
 	else {
-		std::cout << "error loading chart" << std::endl;
+		std::cout << "text chart not found, opening fgsmub" << std::endl;
+		m_chart.open("res/chart.fsgmub",std::ios::binary);
+		if (m_chart.is_open()) {
+			m_isTextChart = false;
+			std::cout << "loaded fgsmub chart" << std::endl;
+
+			int version = 0;
+			int dummy = 0;
+			readToInt(m_chart, &version);
+			readToInt(m_chart, &dummy);
+			readToInt(m_chart, &dummy);
+			readToInt(m_chart, &dummy);
+
+			std::cout << "version: " << version << std::endl;
+		}
 	}
 }
 
@@ -106,10 +139,16 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			}
 		}
 	}
+
+	if (m_bpmChangeTime != -1 && m_bpmChangeValue != -1 && time + 1.0 >= m_bpmChangeTime) {
+		m_bpm = m_bpmChangeValue;
+		m_bpmChangeValue = -1;
+		m_bpmChangeTime = -1;
+	}
 }
 
-void Generator::gen(std::vector<Note>& v, std::vector<Note>& ev) {
-	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100) {
+void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
+	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && m_isTextChart) {
 		std::string token;
 		double t;
 		m_chart >> token;
@@ -239,17 +278,104 @@ void Generator::gen(std::vector<Note>& v, std::vector<Note>& ev) {
 				std::cerr << "error parsing token:S " << token << std::endl;
 			}
 		}
+		else if (token == "B" || token == "b") {
+			m_chart >> token;
+			m_bpmChangeTime = std::stod(token);
+			m_chart >> token;
+			m_bpmChangeValue = std::stoi(token);
+		}		
+	}
+}
+
+void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
+	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && !m_isTextChart) {
+		float time;
+		int type;
+		float length;
+		float extra;
+
+		readToFloat(m_chart, &time);
+		readToInt(m_chart, &type);
+		readToFloat(m_chart, &length);
+		readToFloat(m_chart, &extra);
+
+		int factor;
+		if (m_bpmChangeValue != -1 && m_bpmChangeTime != -1 && time >= m_bpmChangeTime) {
+			factor = (60*4)/m_bpmChangeValue;
+		}
+		else {
+			factor = (60*4)/m_bpm ;
+		}
+		
+		time = time * factor;
+		length = length * factor;
+		
+
+		if (type == 0)pushNote((double)time, TAP_G);
+		else if (type == 1)pushNote((double)time, TAP_B);
+		else if (type == 2)pushNote((double)time, TAP_R);
+		else if (type == 3)pushNote((double)time, SCR_G_UP);
+		else if (type == 4)pushNote((double)time, SCR_B_UP);
+		else if (type == 5)pushNote((double)time, SCR_G_DOWN);
+		else if (type == 6)pushNote((double)time, SCR_B_DOWN);
+		else if (type == 7)pushNote((double)time, SCR_G_ANY);
+		else if (type == 8)pushNote((double)time, SCR_B_ANY);
+		else if (type == 9)pushEvent((double)time, CROSS_B);
+		else if (type == 10)pushEvent((double)time, CROSS_C);
+		else if (type == 11)pushEvent((double)time, CROSS_G);
+		else if (type == 15) {
+			pushEvent((double)time, EU_START);
+			pushEvent((double)time + (double)length, EU_END);
+		}
+		else if (type == 20) {
+			pushEvent((double)time, SCR_G_START);
+			pushEvent((double)time + (double)length, SCR_G_END);
+		}
+		else if (type == 20) {
+			pushEvent((double)time, SCR_B_START);
+			pushEvent((double)time + (double)length, SCR_B_END);
+		}
+		else if (type == 0x0B000001) {
+			//bpm marker
+		}
+		else if (type == 0x0B000002) {
+			m_bpmChangeTime = (double)time;
+			m_bpmChangeValue = extra;
+		}
+		else if (type == 0x0AFFFFFF) {}
+		else if (type == 0xFFFFFFFF) {
+			//chart start
+			//pushEvent(time,___)
+		}
+		else std::cerr << "error parsing entry" << std::endl;
+	}
+}
+
+void Generator::bpm(double time, std::vector<double>& arr)
+{
+	for (size_t i = 0; i < arr.size(); i++) {
+		if (arr.at(i) < time - 0.2) {
+			arr.erase(arr.begin() + i);
+		}
+	}
+	double nextTick = m_lastBpmTick + ((double)60 / m_bpm);
+	while (time + 1.0 >= nextTick) {
+		arr.push_back(nextTick);
+		m_lastBpmTick = nextTick;
+		nextTick = m_lastBpmTick + ((float)60 / m_bpm);
 	}
 }
 
 void Generator::pushNote(double time, int type) {
-	m_time += time;
+	if (m_isTextChart) m_time += time;
+	else m_time = time;
 	m_note_times.push_back(m_time);
 	m_note_types.push_back(type);
 }
 
 void Generator::pushEvent(double time, int type) {
-	m_time += time;
+	if (m_isTextChart) m_time += time;
+	else m_time = time;
 	m_event_times.push_back(m_time);
 	m_event_types.push_back(type);
 }

@@ -18,9 +18,10 @@ public:
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
-	double m_global_time = 0;
+	std::vector<double> m_bpm_arr;
+	double m_global_time = -2.0;
 private:
-	double m_pastTime;
+	double m_pastTime = 0.0;
 	bool active = false;
 	bool firstRun = true;
 	Rendr m_render;

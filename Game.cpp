@@ -5,12 +5,14 @@ Game::Game() {
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
+	m_audio.load("res/song.ogg");
 	std::cout << "Please press space to start game" << std::endl;
 }
 
 void Game::render() {
 	if (active) {
 		m_render.highway(m_global_time);
+		m_render.bpmTicks(m_global_time, m_bpm_arr);
 		m_render.events(m_global_time, m_event_arr);
 		m_render.clicker();
 		m_render.meters();
@@ -26,10 +28,13 @@ void Game::tick() {
 	if (active) {
 		
 		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
-		m_gen.gen(m_note_arr, m_event_arr);
+		m_gen.textParser(m_note_arr, m_event_arr);
+		m_gen.binaryParser(m_note_arr, m_event_arr);
+		m_gen.bpm(m_global_time, m_bpm_arr);
 		m_player.pollState(m_gen);
 		m_render.pollState(m_global_time, m_player, m_gen);
-		m_audio.play();
+		m_audio.buffer();
+		if(m_global_time >= 0.0)m_audio.play();
 
 		double nowTime = glfwGetTime();
 		m_global_time += nowTime - m_pastTime;

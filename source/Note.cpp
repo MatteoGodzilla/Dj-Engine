@@ -1,12 +1,14 @@
 #include "Note.h"
 
-Note::Note(double milli,int ty,bool ev){
+Note::Note(double milli,int ty,bool ev, float extra){
     //set hit time
     m_hit_window = 0.15;
     m_milli = milli;
     m_type = ty;
     m_is_event = ev;
+	m_extraData = extra;
 }
+
 
 void Note::click(double time) {
     if(m_hittable){
@@ -68,6 +70,11 @@ int Note::getLanMod(){
 }
 void Note::setLanMod(int i){
     m_lan_mod = i;
+}
+
+float Note::getExtra()
+{
+	return m_extraData;
 }
 
 Note::~Note() {

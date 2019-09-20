@@ -223,22 +223,22 @@ void Rendr::init(GLFWwindow* w) {
 
 	//vao setup
 	{
-		glGenVertexArrays(1, &m_highwayVAO);
-		glGenVertexArrays(1, &m_lanesVAO);
-		glGenVertexArrays(1, &m_notesVAO);
-		glGenVertexArrays(1, &m_clickerVAO);
-		glGenVertexArrays(1, &m_eventVAO);
-		glGenVertexArrays(1, &m_metersVAO);
+		glGenVertexArrays(1, &m_textureVAO);
+		glGenVertexArrays(1, &m_colorVAO);
+		glGenVertexArrays(1, &m_textureVAO);
+		glGenVertexArrays(1, &m_textureVAO);
+		glGenVertexArrays(1, &m_colorVAO);
+		glGenVertexArrays(1, &m_textureVAO);
 
-		//highway vao
+		//texture vao
 		{
-			glBindVertexArray(m_highwayVAO);
+			glBindVertexArray(m_textureVAO);
 
 			unsigned int ebo;
-			glGenBuffers(1, &m_highwayVBO);
+			glGenBuffers(1, &m_textureVBO);
 			glGenBuffers(1, &ebo);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_highwayVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 			//Vertex: x,y,z, u,v
@@ -252,14 +252,14 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
-		//lanes vao
+		//color vao
 		{
-			glBindVertexArray(m_lanesVAO);
+			glBindVertexArray(m_colorVAO);
 
 			unsigned int index;
-			glGenBuffers(1, &m_lanesVBO);
+			glGenBuffers(1, &m_colorVBO);
 			glGenBuffers(1, &index);
-			glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
 
 			//Vertex: x,y,z, r,g,b,a
@@ -272,96 +272,6 @@ void Rendr::init(GLFWwindow* w) {
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-
-		//notes vao
-		{
-			glBindVertexArray(m_notesVAO);
-
-			unsigned int ebo;
-			glGenBuffers(1, &m_notesVBO);
-			glGenBuffers(1, &ebo);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_notesVBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-			//Vertex: x,y,z, u,v
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-
-		//clicker vao
-		{
-			glBindVertexArray(m_clickerVAO);
-
-			unsigned int index;
-			glGenBuffers(1, &m_clickerVBO);
-			glGenBuffers(1, &index);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-
-			//vertex: x,y,z, s,t
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-		}
-
-		//event vao
-		{
-			glBindVertexArray(m_eventVAO);
-
-			unsigned int indices;
-			glGenBuffers(1, &m_eventVBO);
-			glGenBuffers(1, &indices);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_eventVBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indices);
-
-			//Vertex: x,y,z, r,g,b,a
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
-			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
-
-		//meters vao
-		{
-			glBindVertexArray(m_metersVAO);
-
-			unsigned int index;
-			glGenBuffers(1, &m_metersVBO);
-			glGenBuffers(1, &index);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
-
-			//vertex: x,y,z, s,t
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
 		}
 
 	}
@@ -383,8 +293,8 @@ void Rendr::highway(double time) {
 	pushVertexTexture(highwayVector, 1.0f, plane, 0.0f, 1.0f, 1.0f + factor);
 	pushRectangleIndices(highwayIndices, highwayVertexCount);
 
-	glBindVertexArray(m_highwayVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_highwayVBO);
+	glBindVertexArray(m_textureVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 	glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
 
 	glBufferData(GL_ARRAY_BUFFER, highwayVector.size() * sizeof(float), highwayVector.data(), GL_DYNAMIC_DRAW);
@@ -496,9 +406,9 @@ void Rendr::clicker() {
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
-	glBindVertexArray(m_clickerVAO);
+	glBindVertexArray(m_textureVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 	glBufferData(GL_ARRAY_BUFFER, clickerVector.size() * sizeof(float), clickerVector.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, clickerIndices.size() * sizeof(float), clickerIndices.data(), GL_STATIC_DRAW);
 
@@ -694,9 +604,9 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 		}
 	}
 
-	glBindVertexArray(m_notesVAO);
+	glBindVertexArray(m_textureVAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, m_notesVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, noteVector.size() * sizeof(float), noteVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, noteIndices.size() * sizeof(int), noteIndices.data(), GL_DYNAMIC_DRAW);
@@ -1124,8 +1034,8 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-	glBindVertexArray(m_lanesVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_lanesVBO);
+	glBindVertexArray(m_colorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, redLaneVector.size() * sizeof(float), redLaneVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, redLaneIndices.size() * sizeof(int), redLaneIndices.data(), GL_DYNAMIC_DRAW);
@@ -1140,6 +1050,44 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 	glBufferData(GL_ARRAY_BUFFER, blueLaneVector.size() * sizeof(float), blueLaneVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, blueLaneIndices.size() * sizeof(int), blueLaneIndices.data(), GL_DYNAMIC_DRAW);
 	glDrawElements(GL_TRIANGLES, blueLaneIndices.size(), GL_UNSIGNED_INT, 0);
+}
+
+void Rendr::bpmTicks(double time, std::vector<double>& bpmArr)
+{
+	
+	std::vector<float> bpmVector;
+	std::vector<unsigned int> bpmIndices;
+	unsigned int bpmVertexCount = 0;
+	
+	float plane = 0.0;
+	float size = 0.1;
+
+	float r = 0.3;
+	float g = 0.3;
+	float b = 0.3;
+	
+	for (size_t i = 0; i < bpmArr.size(); i++) {
+		double tickTime = bpmArr.at(i);
+		if (time + 1.0 >= tickTime && time <= tickTime + 0.2) {
+			float dt = tickTime - time;
+			float z = 3.75 - (3.75 * dt);
+			pushVertexColor(bpmVector, -1.0, plane, z - size / 2, r, g, b);
+			pushVertexColor(bpmVector, -1.0, plane, z + size / 2, r, g, b);
+			pushVertexColor(bpmVector, 1.0, plane, z + size / 2, r, g, b);
+			pushVertexColor(bpmVector, 1.0, plane, z - size / 2, r, g, b);
+			pushRectangleIndices(bpmIndices, bpmVertexCount);
+		}
+	}
+
+	glBindVertexArray(m_colorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, bpmVector.size() * sizeof(float), bpmVector.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, bpmIndices.size() * sizeof(int), bpmIndices.data(), GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_ColorProgram);
+
+	glDrawElements(GL_TRIANGLES, bpmIndices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Rendr::events(double time, std::vector<Note>& ev) {
@@ -1318,8 +1266,8 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 		}
 }
 	}
-	glBindVertexArray(m_eventVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_eventVBO);
+	glBindVertexArray(m_colorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, eventsVector.size() * sizeof(float), eventsVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, eventsIndices.size() * sizeof(int), eventsIndices.data(), GL_DYNAMIC_DRAW);
@@ -1465,8 +1413,8 @@ void Rendr::meters() {
 	}
 	
 
-	glBindVertexArray(m_metersVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_metersVBO);
+	glBindVertexArray(m_textureVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, metersVector.size() * sizeof(float), metersVector.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, metersIndices.size() * sizeof(int), metersIndices.data(), GL_DYNAMIC_DRAW);
@@ -1491,8 +1439,8 @@ void Rendr::splash() {
 	pushVertexTexture(splashVector, 0.5, 0.5, 3.5, 1.0, 0.0);
 	pushRectangleIndices(splashIndices, splashVertexCount);
 
-	glBindVertexArray(m_clickerVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_clickerVBO);
+	glBindVertexArray(m_textureVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 
 	glBufferData(GL_ARRAY_BUFFER, splashVector.size() * sizeof(float), splashVector.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, splashIndices.size() * sizeof(int), splashIndices.data(), GL_STATIC_DRAW);
