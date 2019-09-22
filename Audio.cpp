@@ -23,20 +23,27 @@ void Audio::load(const char* filename) {
 
 void Audio::buffer() {
 	unsigned int bufferId = 0;
+	unsigned int bufferRemoved = 0;
 	int processed = 0;
-	unsigned int buffersRemoved;
 	char bufferData[4096];
 	int bytesRead = 0;
 	vorbis_info* info;
 
-	alGenBuffers(1, &bufferId);
 	info = ov_info(&m_oggFile, -1);
 	m_frequency = info->rate;
-	bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
-	alBufferData(bufferId, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
-	alSourceQueueBuffers(m_source, 1, &bufferId);
+
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-	alSourceUnqueueBuffers(m_source, processed, &buffersRemoved);
+	while (processed > 0) {
+		alGenBuffers(1, &bufferId);
+		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
+
+		bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
+		alBufferData(bufferId, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
+		alSourceQueueBuffers(m_source, 1, &bufferId);
+
+		alDeleteBuffers(1, &bufferId);
+	}
+
 }
 
 void Audio::play() {

@@ -295,6 +295,9 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			}
 			else std::cerr << "error parsing token:SET" << std::endl;
 		}
+		else {
+		std::cerr << "unknown token:" << token << std::endl;
+		}
 	}
 }
 

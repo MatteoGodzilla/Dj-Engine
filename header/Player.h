@@ -53,7 +53,7 @@ private:
 	bool m_euphoria_active = false;
 	bool m_double_mult = false;
 	double m_lastTime = 0.0;
-	int m_genBpm = 1;
+	int m_genBpm = 0;
 };
 
 #endif // Player_H
