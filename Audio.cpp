@@ -42,6 +42,7 @@ void Audio::buffer() {
 		alSourceQueueBuffers(m_source, 1, &bufferId);
 
 		alDeleteBuffers(1, &bufferId);
+		processed--;
 	}
 
 }

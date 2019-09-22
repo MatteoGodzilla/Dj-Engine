@@ -1,6 +1,6 @@
 v0.2
 set time rel
-bPm 0.0 75
+bpm 0.0 75
 
 t g 2.0
 t r 0.2
