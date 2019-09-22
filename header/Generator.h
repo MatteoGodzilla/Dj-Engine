@@ -29,7 +29,7 @@ private:
     std::vector<double>m_event_times;
     std::vector<int>m_event_types;
 	std::ifstream m_chart;
-	bool m_isTextChart = true;
+	bool m_isTimeRelative = true;
 	double m_bpmChangeTime = -1;
 	int m_bpmChangeValue = -1;
 	double m_lastBpmTick = 0.0;

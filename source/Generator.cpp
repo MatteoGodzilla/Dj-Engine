@@ -22,17 +22,18 @@ Generator::Generator() {
 	pushEvent(-2.0, CROSS_C);//Do not remove
 	m_chart.open("res/chart.txt");
 	if (m_chart.is_open()) {
-		m_isTextChart = true;
+		m_isTimeRelative = true;
 		std::cout << "loaded text chart" << std::endl;
 		std::string version;
 		m_chart >> version;
 		std::cout << "Chart Version: " << version << std::endl;
+		m_isTimeRelative = true;
 	}
 	else {
 		std::cout << "text chart not found, opening fgsmub" << std::endl;
 		m_chart.open("res/chart.fsgmub",std::ios::binary);
 		if (m_chart.is_open()) {
-			m_isTextChart = false;
+			m_isTimeRelative = false;
 			std::cout << "loaded fgsmub chart" << std::endl;
 
 			int version = 0;
@@ -148,7 +149,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 }
 
 void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
-	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && m_isTextChart) {
+	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && m_isTimeRelative) {
 		std::string token;
 		double t;
 		m_chart >> token;
@@ -275,20 +276,30 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 				pushEvent(t, EU_END);
 			}
 			else {
-				std::cerr << "error parsing token:S " << token << std::endl;
+				std::cerr << "error parsing token:E " << token << std::endl;
 			}
 		}
-		else if (token == "B" || token == "b") {
+		else if (token == "BPM" || token == "bpm") {
 			m_chart >> token;
 			m_bpmChangeTime = std::stod(token);
 			m_chart >> token;
 			m_bpmChangeValue = std::stoi(token);
-		}		
+		}
+		else if (token == "SET" || token == "set") {
+			m_chart >> token;
+			if (token == "TIME" || token == "time") {
+				m_chart >> token;
+				if (token == "ABS" || token == "abs") m_isTimeRelative = false;
+				else if (token == "REL" || token == "rel") m_isTimeRelative = true;
+				else std::cerr << "error parsing token:SET TIME" << std::endl;
+			}
+			else std::cerr << "error parsing token:SET" << std::endl;
+		}
 	}
 }
 
 void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
-	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && !m_isTextChart) {
+	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && !m_isTimeRelative) {
 		float time;
 		int type;
 		float length;
@@ -367,14 +378,14 @@ void Generator::bpm(double time, std::vector<double>& arr)
 }
 
 void Generator::pushNote(double time, int type) {
-	if (m_isTextChart) m_time += time;
+	if (m_isTimeRelative) m_time += time;
 	else m_time = time;
 	m_note_times.push_back(m_time);
 	m_note_types.push_back(type);
 }
 
 void Generator::pushEvent(double time, int type) {
-	if (m_isTextChart) m_time += time;
+	if (m_isTimeRelative) m_time += time;
 	else m_time = time;
 	m_event_times.push_back(m_time);
 	m_event_types.push_back(type);
