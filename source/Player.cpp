@@ -414,6 +414,18 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 	
 }
 
+void Player::tick(double time) {
+	if (m_euphoria_active) {
+		if (m_eu_value < 0.0)m_euphoria_active = false;
+		else {
+			double dt = time - m_lastTime;
+			float de = (dt * m_genBpm) / (60 * 16);
+			m_eu_value -= de;
+		}
+	}
+	m_lastTime = time;
+}
+
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){
         m_combo = 0;
@@ -425,10 +437,7 @@ void Player::pollState(Generator &g){
 	if (g.m_eu_check && m_eu_zone_active) {
 		if(m_eu_value < 3.0)m_eu_value += 1.0;
 	}
-	if (m_euphoria_active) {
-		if (m_eu_value < 0.0)m_euphoria_active = false;
-		else m_eu_value -= 0.001;
-	}
+	m_genBpm = g.m_bpm;
 }
 
 int Player::getScore(){

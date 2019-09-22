@@ -17,6 +17,10 @@ void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
 	game1.input(key, action);
 }
 
+void resizeCallback(GLFWwindow* w,int width,int height) {
+	glViewport(0, 0, width, height);
+}
+
 int main() {
 	if (!glfwInit()) {
 		std::cout << "GLFW INIT ERROR" << std::endl;
@@ -25,6 +29,7 @@ int main() {
 
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
 	glfwSetKeyCallback(window, check_events);
+	glfwSetWindowSizeCallback(window, resizeCallback);
 
 	game1.init(window);
 	if (!window) {

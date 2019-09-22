@@ -32,6 +32,7 @@ void Game::tick() {
 		m_gen.binaryParser(m_note_arr, m_event_arr);
 		m_gen.bpm(m_global_time, m_bpm_arr);
 		m_player.pollState(m_gen);
+		m_player.tick(m_global_time);
 		m_render.pollState(m_global_time, m_player, m_gen);
 		m_audio.buffer();
 		if(m_global_time >= 0.0)m_audio.play();

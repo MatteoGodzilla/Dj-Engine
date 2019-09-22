@@ -33,6 +33,7 @@ public:
 	bool getEuActive();
 	bool getEuZoneActive();
     void pollState(Generator &g);
+	void tick(double time);
 protected:
 
 private:
@@ -51,6 +52,8 @@ private:
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
 	bool m_double_mult = false;
+	double m_lastTime = 0.0;
+	int m_genBpm = 1;
 };
 
 #endif // Player_H
