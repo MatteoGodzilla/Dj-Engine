@@ -392,37 +392,33 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			 
 		}
 	}
+}
 
+void Player::tick(double time) {
 	if (m_combo >= 24)m_mult = 4;
 	else if (m_combo >= 16 && m_combo < 24) m_mult = 3;
 	else if (m_combo >= 8 && m_combo < 16) m_mult = 2;
 	else m_mult = 1;
 
+	if (m_scr_tick >= 4) {
+		m_scr_tick = 0;
+		m_combo++;
+	}
+
 	if (m_euphoria_active) {
-		m_double_mult = true;
+		if (m_eu_value < 0.0)m_euphoria_active = false;
+		else {
+			m_double_mult = true;
+			double dt = time - m_lastTime;
+			double de = (dt * m_genBpm) / 960;
+			m_eu_value -= de;
+		}
 	}
 	else {
 		m_double_mult = false;
 	}
 
 	if (m_double_mult)m_mult *= 2;
-
-	if (m_scr_tick >= 4) {
-		m_scr_tick = 0;
-		m_combo++;
-	}
-	
-}
-
-void Player::tick(double time) {
-	if (m_euphoria_active) {
-		if (m_eu_value < 0.0)m_euphoria_active = false;
-		else {
-			double dt = time - m_lastTime;
-			float de = (dt * m_genBpm) / (60 * 16);
-			m_eu_value -= de;
-		}
-	}
 	m_lastTime = time;
 }
 

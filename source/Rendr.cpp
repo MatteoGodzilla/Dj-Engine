@@ -41,6 +41,34 @@ void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	value += 4;
 }
 
+void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+	glBindVertexArray(m_textureVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_textureProgram);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, (void*)0);
+
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void Rendr::renderColor(std::vector<float>& vertexArr,std::vector<unsigned int>& indexArr) {
+	glBindVertexArray(m_colorVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
+
+	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_colorProgram);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, 0);
+
+	glBindVertexArray(0);
+}
+
 Rendr::Rendr() {
 	//ctor
 }
@@ -126,17 +154,17 @@ void Rendr::init(GLFWwindow* w) {
 		glCompileShader(vShaderColor);
 		glCompileShader(fShaderColor);
 
-		m_TextureProgram = glCreateProgram();
-		glAttachShader(m_TextureProgram, vShaderTexture);
-		glAttachShader(m_TextureProgram, fShaderTexture);
-		glLinkProgram(m_TextureProgram);
+		m_textureProgram = glCreateProgram();
+		glAttachShader(m_textureProgram, vShaderTexture);
+		glAttachShader(m_textureProgram, fShaderTexture);
+		glLinkProgram(m_textureProgram);
 		glDeleteShader(vShaderTexture);
 		glDeleteShader(fShaderTexture);
 
-		m_ColorProgram = glCreateProgram();
-		glAttachShader(m_ColorProgram, vShaderColor);
-		glAttachShader(m_ColorProgram, fShaderColor);
-		glLinkProgram(m_ColorProgram);
+		m_colorProgram = glCreateProgram();
+		glAttachShader(m_colorProgram, vShaderColor);
+		glAttachShader(m_colorProgram, fShaderColor);
+		glLinkProgram(m_colorProgram);
 
 		glDeleteShader(vShaderColor);
 		glDeleteShader(fShaderColor);
@@ -149,8 +177,8 @@ void Rendr::init(GLFWwindow* w) {
 		stbi_set_flip_vertically_on_load(true);
 		unsigned char* high = stbi_load("res/highway.png", &width, &height, &channels, 0);
 
-		glGenTextures(1, &m_HighwayTexture);
-		glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
+		glGenTextures(1, &m_highwayTexture);
+		glBindTexture(GL_TEXTURE_2D, m_highwayTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		if (channels == 4)
@@ -159,8 +187,8 @@ void Rendr::init(GLFWwindow* w) {
 
 		unsigned char* obj = stbi_load("res/objects.png", &width, &height, &channels, 0);
 
-		glGenTextures(1, &m_ObjTexture);
-		glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
+		glGenTextures(1, &m_objTexture);
+		glBindTexture(GL_TEXTURE_2D, m_objTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		if (channels == 4)
@@ -168,8 +196,8 @@ void Rendr::init(GLFWwindow* w) {
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, obj);
 
 		unsigned char* meters = stbi_load("res/meters.png", &width, &height, &channels, 0);
-		glGenTextures(1, &m_MetersTexture);
-		glBindTexture(GL_TEXTURE_2D, m_MetersTexture);
+		glGenTextures(1, &m_metersTexture);
+		glBindTexture(GL_TEXTURE_2D, m_metersTexture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		if (channels == 4)
@@ -185,12 +213,21 @@ void Rendr::init(GLFWwindow* w) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, splash);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, splash);
 
+		unsigned char* numbers = stbi_load("res/numbers.png", &width, &height, &channels, 0);
+		glGenTextures(1, &m_numbersTexture);
+		glBindTexture(GL_TEXTURE_2D, m_numbersTexture);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		if (channels == 4)
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, numbers);
+		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, numbers);
+
 		//removing image data
 		stbi_image_free(high);
 		stbi_image_free(obj);
 		stbi_image_free(meters);
 		stbi_image_free(splash);
-
+		stbi_image_free(numbers);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -205,15 +242,15 @@ void Rendr::init(GLFWwindow* w) {
 		m_proj = m_proj * look;
 
 		//settung up projection uniform
-		glUseProgram(m_TextureProgram);
-		int location = glGetUniformLocation(m_TextureProgram, "u_proj");
+		glUseProgram(m_textureProgram);
+		int location = glGetUniformLocation(m_textureProgram, "u_proj");
 		if (location != -1) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
 			std::cout << "uniform texture successful" << std::endl;
 		}
 
-		glUseProgram(m_ColorProgram);
-		location = glGetUniformLocation(m_ColorProgram, "u_proj");
+		glUseProgram(m_colorProgram);
+		location = glGetUniformLocation(m_colorProgram, "u_proj");
 		if (location != -1) {
 			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
 			std::cout << "uniform color successful" << std::endl;
@@ -293,18 +330,7 @@ void Rendr::highway(double time) {
 	pushVertexTexture(highwayVector, 1.0f, plane, 0.0f, 1.0f, 1.0f + factor);
 	pushRectangleIndices(highwayIndices, highwayVertexCount);
 
-	glBindVertexArray(m_textureVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
-	glBindTexture(GL_TEXTURE_2D, m_HighwayTexture);
-
-	glBufferData(GL_ARRAY_BUFFER, highwayVector.size() * sizeof(float), highwayVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, highwayIndices.size() * sizeof(int), highwayIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_TextureProgram);
-	glDrawElements(GL_TRIANGLES, highwayIndices.size(), GL_UNSIGNED_INT, (void*)0);
-
-	glBindVertexArray(0);
-
+	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
 }
 
 void Rendr::clicker() {
@@ -316,15 +342,15 @@ void Rendr::clicker() {
 	std::vector<unsigned int> clickerIndices = {};
 	unsigned int clickerVertexCount = 0;
 
-	pushVertexTexture(clickerVector, -0.85f, plane, 3.6f, 1320.0f / 1760.0f, 400.0/1640.0);
-	pushVertexTexture(clickerVector, -0.85f, plane, 3.9f, 1.0f, 400.0 / 1640.0);
+	pushVertexTexture(clickerVector, -0.85f, plane, 3.6f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+	pushVertexTexture(clickerVector, -0.85f, plane, 3.9f, 1.0f, 400.0f / 1640.0f);
 	pushVertexTexture(clickerVector, -0.2f, plane, 3.9f, 1.0f, 1280.0f / 1640.0f);
 	pushVertexTexture(clickerVector, -0.2f, plane, 3.6f, 1320.0f / 1760.0f, 1280.0f / 1640.0f);
 
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
-	pushVertexTexture(clickerVector, 0.85f, plane, 3.6f, 1320.0f / 1760.0f, 400.0 / 1640.0);
-	pushVertexTexture(clickerVector, 0.85f, plane, 3.9f, 1.0f, 400.0 / 1640.0);
+	pushVertexTexture(clickerVector, 0.85f, plane, 3.6f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+	pushVertexTexture(clickerVector, 0.85f, plane, 3.9f, 1.0f, 400.0f / 1640.0f);
 	pushVertexTexture(clickerVector, 0.2f, plane, 3.9f, 1.0f, 1280.0f / 1640.0f);
 	pushVertexTexture(clickerVector, 0.2f, plane, 3.6f, 1320.0f / 1760.0f, 1280.0f / 1640.0f);
 
@@ -406,16 +432,7 @@ void Rendr::clicker() {
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
-	glBindVertexArray(m_textureVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
-	glBufferData(GL_ARRAY_BUFFER, clickerVector.size() * sizeof(float), clickerVector.data(), GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, clickerIndices.size() * sizeof(float), clickerIndices.data(), GL_STATIC_DRAW);
-
-	glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
-	glUseProgram(m_TextureProgram);
-	glDrawElements(GL_TRIANGLES, clickerIndices.size(), GL_UNSIGNED_INT, 0);
-
+	renderTexture(clickerVector, clickerIndices, m_objTexture);
 }
 
 void Rendr::notes(double time, std::vector<Note>& v) {
@@ -429,7 +446,7 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 	for (size_t i = 0; i < v.size(); i++) {
 		if (v.at(i).getRender()) {
 			double dt = v.at(i).getMilli() - time;
-			float z = 3.75f - (3.75f * dt);
+			float z = 3.75f - (3.75f * (float)dt);
 			int type = v.at(i).getType();
 
 			float s = 0.0;
@@ -437,27 +454,27 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 
 			if (type == TAP_R) {
 				if (m_renderEuActive) {
-					s = 1200.0 / 1760.0;
-					t = 0.0;
+					s = 1200.0f / 1760.0f;
+					t = 0.0f;
 				}
 				else {
-					s = 400.0 / 1760.0;
+					s = 400.0f / 1760.0f;
 					t = 0.0;
 				}
 				pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, s, t + 400.0f / 1760.0f);
 				pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, s, t);
-				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0/1760.0, t);
-				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0 / 1760.0, t + 400.0f / 1760.0f);
+				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1760.0f);
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == TAP_G) {
 				if (m_renderEuActive) {
-					s = 1200.0 / 1760.0;
-					t = 0.0;
+					s = 1200.0f / 1760.0f;
+					t = 0.0f;
 				}
 				else {
-					s = 0.0;
-					t = 0.0;
+					s = 0.0f;
+					t = 0.0f;
 				}
 				if (v.at(i).getLanMod() == 0) {
 					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
@@ -474,8 +491,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_UP) {
-				s = 400.0 / 1760.0;
-				t = 840.0 / 1640.0;
+				s = 400.0f / 1760.0f;
+				t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 0) {
 					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
@@ -491,8 +508,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_DOWN) {
-				s = 800.0 / 1760.0;
-				t = 840.0 / 1640.0;
+				s = 800.0f / 1760.0f;
+				t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 0) {
 					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
@@ -508,8 +525,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_G_ANY) {
-				s = 0.0;
-				t = 840.0 / 1640.0;
+				s = 0.0f;
+				t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 0) {
 					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
@@ -526,12 +543,12 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 			}
 			else if (type == TAP_B) {
 				if (m_renderEuActive) {
-					s = 1200.0 / 1760.0;
-					t = 0.0;
+					s = 1200.0f / 1760.0f;
+					t = 0.0f;
 				}
 				else {
-					s = 800.0/1760.0;
-					t = 0.0;
+					s = 800.0f / 1760.0f;
+					t = 0.0f;
 				}
 				if (v.at(i).getLanMod() == 2) {
 					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
@@ -548,8 +565,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_UP) {
-			s = 400.0 / 1760.0;
-			t = 840.0 / 1640.0;
+			s = 400.0f / 1760.0f;
+			t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 2) {
 					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
@@ -565,8 +582,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_DOWN) {
-			s = 800.0 / 1760.0;
-			t = 840.0 / 1640.0;
+			s = 800.0f / 1760.0f;
+			t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 2) {
 					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
@@ -582,8 +599,8 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			else if (type == SCR_B_ANY) {
-			s = 0.0;
-			t = 840.0 / 1640.0;
+			s = 0.0f;
+			t = 840.0f / 1640.0f;
 				if (v.at(i).getLanMod() == 2) {
 					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
 					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
@@ -604,17 +621,7 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 		}
 	}
 
-	glBindVertexArray(m_textureVAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, noteVector.size() * sizeof(float), noteVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, noteIndices.size() * sizeof(int), noteIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_TextureProgram);
-	glBindTexture(GL_TEXTURE_2D, m_ObjTexture);
-	glDrawElements(GL_TRIANGLES, noteIndices.size(), GL_UNSIGNED_INT, 0);
-	
+	renderTexture(noteVector, noteIndices, m_objTexture);
 }
 
 void Rendr::lanes(double time, std::vector<Note>& ev) {
@@ -637,14 +644,14 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 
 
 	if (m_renderEuActive) {
-		r = 1.0;
-		g = 1.0;
-		b = 1.0;
+		r = 1.0f;
+		g = 1.0f;
+		b = 1.0f;
 	}
 	else {
-		r = 1.0;
-		g = 0.0;
-		b = 0.0;
+		r = 1.0f;
+		g = 0.0f;
+		b = 0.0f;
 	}
 
 	pushVertexColor(redLaneVector, -0.02f, plane, 3.75f, r, g, b);
@@ -757,7 +764,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 		if (ev.at(i).getRender()) {
 			double dt = ev.at(i).getMilli() - time;
 			if (ev.at(i).getType() == CROSS_G) {
-				float z = 3.75f - 3.75f * dt;
+				float z = 3.75f - 3.75f * (float)dt;
 				if (middle >= 1) {
 					if (m_renderEuActive) {
 						r = 1.0;
@@ -814,7 +821,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 			}
 			else if (ev.at(i).getType() == CROSS_B)
 			{
-				float z = 3.75f - 3.75f * dt;
+				float z = 3.75f - 3.75f * (float)dt;
 
 				if (middle <= 1) {
 					if (m_renderEuActive) {
@@ -872,7 +879,7 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 				middle = 2;
 			}
 			else {
-				float z = 3.75 - 3.75 * dt;
+				float z = 3.75f - 3.75f * (float)dt;
 
 				if (middle == 0) {
 					if (m_renderEuActive) {
@@ -1034,60 +1041,38 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
-	glBindVertexArray(m_colorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, redLaneVector.size() * sizeof(float), redLaneVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, redLaneIndices.size() * sizeof(int), redLaneIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_ColorProgram);
-	glDrawElements(GL_TRIANGLES, redLaneIndices.size(), GL_UNSIGNED_INT, 0);
-
-	glBufferData(GL_ARRAY_BUFFER, greenLaneVector.size() * sizeof(float), greenLaneVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, greenLaneIndices.size() * sizeof(int), greenLaneIndices.data(), GL_DYNAMIC_DRAW);
-	glDrawElements(GL_TRIANGLES, greenLaneIndices.size(), GL_UNSIGNED_INT, 0);
-
-	glBufferData(GL_ARRAY_BUFFER, blueLaneVector.size() * sizeof(float), blueLaneVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, blueLaneIndices.size() * sizeof(int), blueLaneIndices.data(), GL_DYNAMIC_DRAW);
-	glDrawElements(GL_TRIANGLES, blueLaneIndices.size(), GL_UNSIGNED_INT, 0);
+	renderColor(redLaneVector, redLaneIndices);
+	renderColor(greenLaneVector, greenLaneIndices);
+	renderColor(blueLaneVector, blueLaneIndices);
 }
 
 void Rendr::bpmTicks(double time, std::vector<double>& bpmArr)
 {
-	
 	std::vector<float> bpmVector;
 	std::vector<unsigned int> bpmIndices;
 	unsigned int bpmVertexCount = 0;
 	
-	float plane = 0.0;
-	float size = 0.1;
+	float plane = 0.0f;
+	float size = 0.1f;
 
-	float r = 0.3;
-	float g = 0.3;
-	float b = 0.3;
+	float r = 0.3f;
+	float g = 0.3f;
+	float b = 0.3f;
 	
 	for (size_t i = 0; i < bpmArr.size(); i++) {
 		double tickTime = bpmArr.at(i);
 		if (time + 1.0 >= tickTime && time <= tickTime + 0.2) {
-			float dt = tickTime - time;
-			float z = 3.75 - (3.75 * dt);
-			pushVertexColor(bpmVector, -1.0, plane, z - size / 2, r, g, b);
-			pushVertexColor(bpmVector, -1.0, plane, z + size / 2, r, g, b);
-			pushVertexColor(bpmVector, 1.0, plane, z + size / 2, r, g, b);
-			pushVertexColor(bpmVector, 1.0, plane, z - size / 2, r, g, b);
+			double dt = tickTime - time;
+			float z = 3.75f - (3.75f * (float)dt);
+			pushVertexColor(bpmVector, -1.0f, plane, z - size / 2, r, g, b);
+			pushVertexColor(bpmVector, -1.0f, plane, z + size / 2, r, g, b);
+			pushVertexColor(bpmVector, 1.0f, plane, z + size / 2, r, g, b);
+			pushVertexColor(bpmVector, 1.0f, plane, z - size / 2, r, g, b);
 			pushRectangleIndices(bpmIndices, bpmVertexCount);
 		}
 	}
 
-	glBindVertexArray(m_colorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, bpmVector.size() * sizeof(float), bpmVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, bpmIndices.size() * sizeof(int), bpmIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_ColorProgram);
-
-	glDrawElements(GL_TRIANGLES, bpmIndices.size(), GL_UNSIGNED_INT, 0);
+	renderColor(bpmVector, bpmIndices);
 }
 
 void Rendr::events(double time, std::vector<Note>& ev) {
@@ -1114,50 +1099,50 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 				double ev_time = ev.at(i).getMilli();
 				bool start_drawn = false;
 				if (dt >= 0.0 && dt < 1.0) {
-					float z = 3.75 - (3.75 * dt);
+					float z = 3.75f - (3.75f * (float)dt);
 					if (m_renderCross == 0) {
-						pushVertexColor(eventsVector, -0.85, plane, z, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.55, plane, z, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, -0.5, plane, z, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.2, plane, z, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
 					}
 					start_drawn = true;
 				}
 				else if (dt < 0.0) {
 					if (m_renderCross == 0) {
-						pushVertexColor(eventsVector, -0.85, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.55, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.85f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.55f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, -0.5, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.2, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.2f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 					}
 					start_drawn = true;
 				}
 				//end				
 				if (start_drawn) {
 					if (dt_end > 0.0 && dt_end <= 1.0) {
-						float z = 3.75 - (3.75 * dt_end);
+						float z = 3.75f - (3.75f * (float)dt_end);
 						if (m_renderCross == 0) {
-							pushVertexColor(eventsVector, -0.55, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, -0.2, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 					else if (dt_end > 1.0) {
 						if (m_renderCross == 0) {
-							pushVertexColor(eventsVector, -0.55, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, -0.2, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
@@ -1176,50 +1161,50 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 				double ev_time = ev.at(i).getMilli();
 				bool start_drawn = false;
 				if (dt >= 0.0 && dt < 1.0) {
-					float z = 3.75 - (3.75 * dt);
+					float z = 3.75f - (3.75f * (float)dt);
 					if (m_renderCross == 2) {
-						pushVertexColor(eventsVector, 0.55, plane, z, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.85, plane, z, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.2, plane, z, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.5, plane, z, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
 					}
 					start_drawn = true;
 				}
 				else if (dt < 0.0) {
 					if (m_renderCross == 2) {
-						pushVertexColor(eventsVector, 0.55, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.85, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.55f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.85f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.2, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.5, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.5f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 					}
 					start_drawn = true;
 				}
 				//end				
 				if (start_drawn) {
 					if (dt_end > 0.0 && dt_end <= 1.0) {
-						float z = 3.75 - (3.75 * dt_end);
+						float z = 3.75f - (3.75f * (float)dt_end);
 						if (m_renderCross == 2) {
-							pushVertexColor(eventsVector, 0.85, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, 0.5, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 					else if (dt_end > 1.0) {
 						if (m_renderCross == 2) {
-							pushVertexColor(eventsVector, 0.85, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, 0.5, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
@@ -1238,9 +1223,9 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 			double ev_time = ev.at(i).getMilli();
 			bool start_eu = false;
 			if (dt >= 0.0 && dt < 1.0) {
-				float z = 3.75 - (3.75 * dt);
-				pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
-				pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
+				float z = 3.75f - (3.75f * (float)dt);
+				pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
+				pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
 				start_eu = true;
 			}
 			else if(dt < 0.0){
@@ -1252,7 +1237,7 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 			}
 			if (start_eu) {
 				if (dt_end >= 0.0 && dt_end < 1.0) {
-					float z = 3.75 - (3.75 * dt_end);
+					float z = 3.75f - (3.75f * (float)dt_end);
 					pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 					pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 					
@@ -1266,19 +1251,12 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 		}
 }
 	}
-	glBindVertexArray(m_colorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 
-	glBufferData(GL_ARRAY_BUFFER, eventsVector.size() * sizeof(float), eventsVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, eventsIndices.size() * sizeof(int), eventsIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_ColorProgram);
-	glDrawElements(GL_TRIANGLES, eventsIndices.size(), GL_UNSIGNED_INT, 0);
+	renderColor(eventsVector, eventsIndices);
 }
 
 void Rendr::meters() {
-
-	float plane = 0.1f;
+	float yPlane = 0.1f;
 
 	std::vector<float>metersVector;
 	std::vector<unsigned int> metersIndices;
@@ -1286,71 +1264,71 @@ void Rendr::meters() {
 
 	//combo meter
 	if (m_playerMult == 2) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 800.0/1200.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 800.0/1200.0);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 3) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 400.0/1000.0, 800.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 400.0/1000.0, 400.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 800.0/1000.0, 400.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 800.0/1000.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 4) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 400.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 0.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 0.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 400.0 / 1200.0);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 0.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 6) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 0.0, 1.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 0.0, 800.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 400.0 / 1000.0, 800.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 400.0 / 1000.0, 1.0);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 1.0f);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 8) {
-		pushVertexTexture(metersVector, 1.0, plane, 2.5, 400.0 / 1000.0, 1.0);
-		pushVertexTexture(metersVector, 1.0, plane, 2.7, 400.0 / 1000.0, 800.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.7, 800.0 / 1000.0, 800.0 / 1200.0);
-		pushVertexTexture(metersVector, 1.2, plane, 2.5, 800.0 / 1000.0, 1.0);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
 	for (int i = 0; i < 8; i++) {
 		if (m_playerCombo == 0) {
-			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 400.0/1200.0);
-			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
-			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
-			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 400.0/1200.0);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else if (m_playerCombo >= 24) {
-			pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
-			pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.0);
-			pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.0);
-			pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else {
 			int limit = m_playerCombo % 8;
 			if (limit == 0)limit = 9;
 			if (i < limit) {
-				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
-				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 0.0);
-				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 0.0);
-				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
+				pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
+				pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 0.0f);
+				pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 0.0f);
+				pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 			else {
-				pushVertexTexture(metersVector, 1.0, plane, 3.6f - 0.11 * i, 400.0 / 1000.0, 400.0/1200.0);
-				pushVertexTexture(metersVector, 1.0, plane, 3.7f - 0.11 * i, 400.0 / 1000.0, 200.0/1200.0);
-				pushVertexTexture(metersVector, 1.2, plane, 3.7f - 0.11 * i, 800.0 / 1000.0, 200.0/1200.0);
-				pushVertexTexture(metersVector, 1.2, plane, 3.6f - 0.11 * i, 800.0 / 1000.0, 400.0/1200.0);
+				pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 400.0f / 1200.0f);
+				pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
+				pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
+				pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 		}
@@ -1359,73 +1337,79 @@ void Rendr::meters() {
 	//euphoria meter
 
 	for (int i = 0; i < 3; i++) {
-		pushVertexTexture(metersVector, -1.1, plane, 3.75-0.35*i, 800.0 / 1000.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75-0.35*i, 1.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*i, 1.0, 800.0/1200.0);
-		pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*i, 800.0 / 1000.0, 800.0 / 1200.0);
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f - 0.35f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f - 0.35f * i, 1.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f - 0.35f * i, 1.0f, 800.0f / 1200.0f);
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f - 0.35f * i, 800.0f / 1000.0f, 800.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
 	if (m_renderEuValue > 0.0 && m_renderEuValue < 1.0) {
-		float z = m_renderEuValue;
-		pushVertexTexture(metersVector, -1.1, plane, 3.75, 800.0 / 1000.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75, 1.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75 - 0.35 * z, 1.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, -1.1, plane, 3.75 - 0.35 * z, 800.0 / 1000.0, 400.0/1200.0);
+		float z = (float)m_renderEuValue;
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f, 800.0f / 1000.0f, 0.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f, 1.0f, 0.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f - 0.35f * z, 1.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_renderEuValue >= 1.0) {
-		pushVertexTexture(metersVector, -1.1, plane, 3.75, 800.0 / 1000.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.75, 1.0, 0.0);
-		pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 400.0/1200.0);
-		pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 400.0/1200.0);
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f, 800.0f / 1000.0f, 0.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f, 1.0f, 0.0f);
+		pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 400.0f / 1200.0f);
+		pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 400.0f / 1200.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 		if (m_renderEuValue < 2.0) {
-			float z = m_renderEuValue - 1.0;
-			pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.4-0.35*z, 1.0, 400.0/1200.0);
-			pushVertexTexture(metersVector, -1.1, plane, 3.4-0.35*z, 800.0 / 1000.0, 400.0/1200.0);
+			float z = (float)m_renderEuValue - 1.0f;
+			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 0.0f);
+			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f - 0.35f*z, 1.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f - 0.35f*z, 800.0f / 1000.0f, 400.0f / 1200.0f);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		else if (m_renderEuValue >= 2.0) {
-			pushVertexTexture(metersVector, -1.1, plane, 3.4, 800.0 / 1000.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.4, 1.0, 0.0);
-			pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 400.0/1200.0);
-			pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 400.0/1200.0);
+			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 0.0f);
+			pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 400.0f / 1200.0f);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 			if (m_renderEuValue < 3.0) {
-				float z = m_renderEuValue - 2.0;
-				pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 3.05 - 0.35 * z, 1.0, 400.0/1200.0);
-				pushVertexTexture(metersVector, -1.1, plane, 3.05 - 0.35 * z, 800.0 / 1000.0, 400.0/1200.0);
+				float z = (float)m_renderEuValue - 2.0f;
+				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 0.0f);
+				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 0.0f);
+				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f - 0.35f * z, 1.0, 400.0f / 1200.0f);
+				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 			else {
-				pushVertexTexture(metersVector, -1.1, plane, 3.05, 800.0 / 1000.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 3.05, 1.0, 0.0);
-				pushVertexTexture(metersVector, -1.0, plane, 2.7, 1.0, 400.0/1200.0);
-				pushVertexTexture(metersVector, -1.1, plane, 2.7, 800.0 / 1000.0, 400.0/1200.0);
+				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 0.0f);
+				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 0.0f);
+				pushVertexTexture(metersVector, -1.0f, yPlane, 2.7f, 1.0f, 400.0f / 1200.0f);
+				pushVertexTexture(metersVector, -1.1f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 		}
 	}
-	
 
-	glBindVertexArray(m_textureVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
+	renderTexture(metersVector, metersIndices, m_metersTexture);
+	//score meter
+	metersVector.erase(metersVector.begin(),metersVector.end());
+	metersIndices.erase(metersIndices.begin(), metersIndices.end());
+	metersVertexCount = 0;
 
-	glBufferData(GL_ARRAY_BUFFER, metersVector.size() * sizeof(float), metersVector.data(), GL_DYNAMIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, metersIndices.size() * sizeof(int), metersIndices.data(), GL_DYNAMIC_DRAW);
-
-	glUseProgram(m_TextureProgram);
-
-	glBindTexture(GL_TEXTURE_2D, m_MetersTexture);
-	glDrawElements(GL_TRIANGLES, metersIndices.size(), GL_UNSIGNED_INT, 0);
-
-
-
+	yPlane = 1.0;
+	float zPlane = 3.0f;
+	int scoreCopy = m_playerScore;
+	for (int i = 0; i < 8; i++) {
+		int digit = scoreCopy / (int)pow(10, 7 - i);
+		float x = 0.5f + 0.17f * i;
+		pushVertexTexture(metersVector, x, yPlane + 0.3f, zPlane, digit * 0.1f, 1.0f);
+		pushVertexTexture(metersVector, x, yPlane, zPlane, digit * 0.1f, 0.0f);
+		pushVertexTexture(metersVector, x + 0.2f, yPlane, zPlane, (digit + 1) * 0.1f, 0.0f);
+		pushVertexTexture(metersVector, x + 0.2f, yPlane + 0.3f, zPlane, (digit + 1) * 0.1f, 1.0f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+		scoreCopy -= digit * ((int)pow(10, 7 - i));
+	}
+	renderTexture(metersVector, metersIndices, m_numbersTexture);
 }
 
 void Rendr::splash() {
@@ -1439,15 +1423,7 @@ void Rendr::splash() {
 	pushVertexTexture(splashVector, 0.5, 0.5, 3.5, 1.0, 0.0);
 	pushRectangleIndices(splashIndices, splashVertexCount);
 
-	glBindVertexArray(m_textureVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
-
-	glBufferData(GL_ARRAY_BUFFER, splashVector.size() * sizeof(float), splashVector.data(), GL_STATIC_DRAW);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, splashIndices.size() * sizeof(int), splashIndices.data(), GL_STATIC_DRAW);
-
-	glUseProgram(m_TextureProgram);
-	glBindTexture(GL_TEXTURE_2D, m_splashTexture);
-	glDrawElements(GL_TRIANGLES, splashIndices.size(), GL_UNSIGNED_INT, 0);
+	renderTexture(splashVector, splashIndices, m_splashTexture);
 }
 
 void Rendr::pollState(double time, Player& p, Generator& g) {
@@ -1460,6 +1436,7 @@ void Rendr::pollState(double time, Player& p, Generator& g) {
 	m_renderEuValue = p.getEuValue();
 	m_renderEuActive = p.getEuActive();
 	m_renderEuZone = p.getEuZoneActive();
+	m_playerScore = p.getScore();
 }
 
 

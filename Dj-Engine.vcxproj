@@ -160,17 +160,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Audio.cpp" />
     <ClCompile Include="Dj-Engine.cpp" />
-    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="source\Audio.cpp" />
+    <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />
     <ClCompile Include="source\Note.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\Rendr.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Audio.h" />
-    <ClInclude Include="Game.h" />
+    <ClInclude Include="header\Audio.h" />
+    <ClInclude Include="header\Game.h" />
     <ClInclude Include="header\Generator.h" />
     <ClInclude Include="header\Note.h" />
     <ClInclude Include="header\Player.h" />

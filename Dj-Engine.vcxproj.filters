@@ -30,10 +30,10 @@
     <ClCompile Include="source\Rendr.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="source\Audio.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="Audio.cpp">
+    <ClCompile Include="source\Game.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,10 +50,10 @@
     <ClInclude Include="header\Rendr.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Game.h">
+    <ClInclude Include="header\Audio.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="Audio.h">
+    <ClInclude Include="header\Game.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

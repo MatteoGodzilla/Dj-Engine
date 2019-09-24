@@ -48,7 +48,7 @@ private:
     int m_combo = 0;
     int m_scr_tick = 0;
     double m_past_tap = -1;
-	float m_eu_value = 0;
+	double m_eu_value = 0;
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
 	bool m_double_mult = false;

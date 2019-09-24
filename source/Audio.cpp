@@ -33,7 +33,7 @@ void Audio::buffer() {
 	m_frequency = info->rate;
 
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-	while (processed > 0) {
+	while (processed >= 0) {
 		alGenBuffers(1, &bufferId);
 		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
 
