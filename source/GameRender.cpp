@@ -1,7 +1,18 @@
-#include "Rendr.h"
+#include "GameRender.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
+
+struct Character {
+	GLuint TextureID;
+	float bx;
+	float by;
+	float width;
+	float height;
+	float advance;
+};
+
+std::map<char, Character> ChMap;
 
 void checkError() {
 	std::cout << "started error checking" << std::endl;
@@ -41,7 +52,79 @@ void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	value += 4;
 }
 
-void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+void GameRender::usePersProj() {
+	//settung up projection uniform
+	glUseProgram(m_textureProgram);
+	int location = glGetUniformLocation(m_textureProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+
+	glUseProgram(m_colorProgram);
+	location = glGetUniformLocation(m_colorProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+
+	glUseProgram(m_textProgram);
+	location = glGetUniformLocation(m_textProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+}
+
+void GameRender::useOrthoProj() {
+	//settung up projection uniform
+	glUseProgram(m_textureProgram);
+	int location = glGetUniformLocation(m_textureProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+
+	glUseProgram(m_colorProgram);
+	location = glGetUniformLocation(m_colorProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+
+	glUseProgram(m_textProgram);
+	location = glGetUniformLocation(m_textProgram, "u_proj");
+	if (location != -1) {
+		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
+	}
+	else {
+		std::cerr << "error setting projection matrix" << std::endl;
+	}
+}
+
+void GameRender::setTextColor(float r, float g, float b, float a) {
+	std::cout << "Setting up color" << std::endl;
+	glUseProgram(m_textProgram);
+	int location = glGetUniformLocation(m_textProgram, "u_textColor");
+	if (location != -1) {
+		glUniform4f(location, r, g, b, a);
+	}
+	else {
+		std::cerr << "error setting text color" << std::endl;
+	}
+}
+
+void GameRender::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
 	glBindVertexArray(m_textureVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 	glBindTexture(GL_TEXTURE_2D, texture);
@@ -56,7 +139,22 @@ void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned in
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Rendr::renderColor(std::vector<float>& vertexArr,std::vector<unsigned int>& indexArr) {
+void GameRender::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+	glBindVertexArray(m_textureVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
+
+	glUseProgram(m_textProgram);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, (void*)0);
+
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GameRender::renderColor(std::vector<float>& vertexArr,std::vector<unsigned int>& indexArr) {
 	glBindVertexArray(m_colorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 
@@ -69,11 +167,46 @@ void Rendr::renderColor(std::vector<float>& vertexArr,std::vector<unsigned int>&
 	glBindVertexArray(0);
 }
 
-Rendr::Rendr() {
+void GameRender::drawText(const char* text, float x, float y, float scl)
+{
+	int i = 0;
+	char c = text[i];
+	while (c != '\0') {
+		if (c < 128) {
+			Character temp = ChMap[c];
+			std::vector<float> textVector;
+			std::vector<unsigned int> textIndices;
+			unsigned int textVertexCount = 0;
+
+			temp.bx *= scl;
+			temp.by *= scl;
+			temp.width *= scl;
+			temp.height *= scl;
+			temp.advance *= scl;
+
+			pushVertexTexture(textVector, x + temp.bx, y - temp.by, 0.0f, 0.0f, 0.0f);
+			pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
+			pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
+			pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
+			pushRectangleIndices(textIndices, textVertexCount);
+
+			useOrthoProj();
+			renderText(textVector, textIndices, temp.TextureID);
+			x += temp.advance / 64;
+		}
+		else {
+			std::cerr << "ERROR:Char not supported" << std::endl;
+		}
+		i++;
+		c = text[i];
+	}
+}
+
+GameRender::GameRender() {
 	//ctor
 }
 
-void Rendr::init(GLFWwindow* w) {
+void GameRender::init(GLFWwindow* w) {
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {
@@ -135,40 +268,86 @@ void Rendr::init(GLFWwindow* w) {
 			"	FragColor = color;\n"
 			"}\n";
 
+		const char* fTextSource = "\n"
+			"#version 330 core\n"
+			"out vec4 FragColor;\n"
+			"in vec2 tex_coords;\n"
+			"\n"
+			"uniform sampler2D u_t;\n"
+			"uniform vec4 u_textColor;\n"
+			"\n"
+			"void main()"
+			"{\n"
+			"	vec4 sample = vec4(1.0f,1.0f,1.0f,texture(u_t, tex_coords).r);\n"
+			"	FragColor = u_textColor * sample;\n"
+			"}\n";
+
 
 		unsigned int vShaderTexture, fShaderTexture;
 		unsigned int vShaderColor, fShaderColor;
+		unsigned int fShaderText;
 
 		vShaderTexture = glCreateShader(GL_VERTEX_SHADER);
 		fShaderTexture = glCreateShader(GL_FRAGMENT_SHADER);
 		vShaderColor = glCreateShader(GL_VERTEX_SHADER);
 		fShaderColor = glCreateShader(GL_FRAGMENT_SHADER);
+		fShaderText = glCreateShader(GL_FRAGMENT_SHADER);
 
 		glShaderSource(vShaderTexture, 1, &vTextureSource, NULL);
 		glShaderSource(fShaderTexture, 1, &fTextureSource, NULL);
 		glShaderSource(vShaderColor, 1, &vColorSource, NULL);
 		glShaderSource(fShaderColor, 1, &fColorSource, NULL);
+		glShaderSource(fShaderText, 1, &fTextSource, NULL);
 
 		glCompileShader(vShaderTexture);
 		glCompileShader(fShaderTexture);
 		glCompileShader(vShaderColor);
 		glCompileShader(fShaderColor);
+		glCompileShader(fShaderText);
+
+		
+		int success;
+		char infolog[512];
+		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(fShaderText, 512, NULL, infolog);
+			std::cerr << "error compiling shader" << infolog <<std::endl;
+		}
+		
 
 		m_textureProgram = glCreateProgram();
 		glAttachShader(m_textureProgram, vShaderTexture);
 		glAttachShader(m_textureProgram, fShaderTexture);
 		glLinkProgram(m_textureProgram);
-		glDeleteShader(vShaderTexture);
-		glDeleteShader(fShaderTexture);
 
 		m_colorProgram = glCreateProgram();
 		glAttachShader(m_colorProgram, vShaderColor);
 		glAttachShader(m_colorProgram, fShaderColor);
 		glLinkProgram(m_colorProgram);
 
+		m_textProgram = glCreateProgram();
+		glAttachShader(m_textProgram, vShaderTexture);
+		glAttachShader(m_textProgram, fShaderText);
+		glLinkProgram(m_textProgram);
+		
+		
+		int linked;
+		char log[512];
+		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
+		if (!linked) {
+			glGetProgramInfoLog(m_textProgram, 512, NULL, log);
+			std::cerr << "error linking program:" << log << std::endl;
+		}
+		
+
+		glDeleteShader(vShaderTexture);
+		glDeleteShader(fShaderTexture);
+
 		glDeleteShader(vShaderColor);
 		glDeleteShader(fShaderColor);
+		glDeleteShader(fShaderText);
 	}
+
 
 	//texture load
 	{
@@ -213,59 +392,32 @@ void Rendr::init(GLFWwindow* w) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, splash);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, splash);
 
-		unsigned char* numbers = stbi_load("res/numbers.png", &width, &height, &channels, 0);
-		glGenTextures(1, &m_numbersTexture);
-		glBindTexture(GL_TEXTURE_2D, m_numbersTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		if (channels == 4)
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, numbers);
-		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, numbers);
-
 		//removing image data
 		stbi_image_free(high);
 		stbi_image_free(obj);
 		stbi_image_free(meters);
 		stbi_image_free(splash);
-		stbi_image_free(numbers);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-
 	//projection init
 	{
-		//m_proj = main perspective projection
-		m_proj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
+		//m_persProj = main perspective projection
+		m_persProj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
 		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0),
 			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
-		m_proj = m_proj * look;
+		m_persProj = m_persProj * look;
 
-		//settung up projection uniform
-		glUseProgram(m_textureProgram);
-		int location = glGetUniformLocation(m_textureProgram, "u_proj");
-		if (location != -1) {
-			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
-			std::cout << "uniform texture successful" << std::endl;
-		}
+		m_orthoProj = glm::ortho(0.0f, 1280.0f, 720.0f, 0.0f,1.0f,-1.0f);
 
-		glUseProgram(m_colorProgram);
-		location = glGetUniformLocation(m_colorProgram, "u_proj");
-		if (location != -1) {
-			glUniformMatrix4fv(location, 1, GL_FALSE, &m_proj[0][0]);
-			std::cout << "uniform color successful" << std::endl;
-		}
-
+		usePersProj();
 	}
 
 	//vao setup
 	{
 		glGenVertexArrays(1, &m_textureVAO);
 		glGenVertexArrays(1, &m_colorVAO);
-		glGenVertexArrays(1, &m_textureVAO);
-		glGenVertexArrays(1, &m_textureVAO);
-		glGenVertexArrays(1, &m_colorVAO);
-		glGenVertexArrays(1, &m_textureVAO);
 
 		//texture vao
 		{
@@ -311,10 +463,63 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		}
 
+
 	}
+
+	//freetype init
+	{
+		if (FT_Init_FreeType(&m_FTLibrary)) {
+			std::cerr << "error opening freetype" << std::endl;
+		}
+		if (FT_New_Face(m_FTLibrary, "res/NotoSans-Regular.ttf", 0, &m_font)) {
+			std::cerr << "error loading font" << std::endl;
+		}
+		FT_Set_Pixel_Sizes(m_font, 0, 1024);
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+		
+		for (unsigned char c = 0; c < 128; c++)
+		{
+			// Load character glyph 
+			if (FT_Load_Char(m_font, c, FT_LOAD_RENDER))
+			{
+				std::cout << "ERROR::FREETYTPE: Failed to load Glyph:" << c <<std::endl;
+				
+			}
+			// Generate texture
+			GLuint texture;
+			glGenTextures(1, &texture);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			glTexImage2D(GL_TEXTURE_2D,0,GL_RED,m_font->glyph->bitmap.width,m_font->glyph->bitmap.rows,
+				0,GL_RED,GL_UNSIGNED_BYTE,m_font->glyph->bitmap.buffer);
+			// Set texture options
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			// Now store character for later use
+			Character character = {
+				texture,
+				(float)m_font->glyph->bitmap_left,
+				(float)m_font->glyph->bitmap_top,
+				(float)m_font->glyph->bitmap.width,
+				(float)m_font->glyph->bitmap.rows,
+				(float)m_font->glyph->advance.x
+			};
+			ChMap.insert(std::pair<char, Character>(c, character));
+
+		}
+		FT_Done_Face(m_font);
+		FT_Done_FreeType(m_FTLibrary);
+
+
+	}
+
+	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-void Rendr::highway(double time) {
+void GameRender::highway(double time) {
 
 	float factor = (float)time * 0.875f;
 
@@ -330,10 +535,11 @@ void Rendr::highway(double time) {
 	pushVertexTexture(highwayVector, 1.0f, plane, 0.0f, 1.0f, 1.0f + factor);
 	pushRectangleIndices(highwayIndices, highwayVertexCount);
 
+	usePersProj();
 	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
 }
 
-void Rendr::clicker() {
+void GameRender::clicker() {
 	float clickedOffset = 0.03f;
 
 	float plane = 0.0f;
@@ -431,11 +637,11 @@ void Rendr::clicker() {
 		}
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
-
+	usePersProj();
 	renderTexture(clickerVector, clickerIndices, m_objTexture);
 }
 
-void Rendr::notes(double time, std::vector<Note>& v) {
+void GameRender::notes(double time, std::vector<Note>& v) {
 
 	float plane = 0.0;
 
@@ -620,11 +826,11 @@ void Rendr::notes(double time, std::vector<Note>& v) {
 			v.at(i).setLanMod(m_renderCross);
 		}
 	}
-
+	usePersProj();
 	renderTexture(noteVector, noteIndices, m_objTexture);
 }
 
-void Rendr::lanes(double time, std::vector<Note>& ev) {
+void GameRender::lanes(double time, std::vector<Note>& ev) {
 
 	float plane = 0.0;
 
@@ -1041,12 +1247,13 @@ void Rendr::lanes(double time, std::vector<Note>& ev) {
 
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
+	usePersProj();
 	renderColor(redLaneVector, redLaneIndices);
 	renderColor(greenLaneVector, greenLaneIndices);
 	renderColor(blueLaneVector, blueLaneIndices);
 }
 
-void Rendr::bpmTicks(double time, std::vector<double>& bpmArr)
+void GameRender::bpmTicks(double time, std::vector<double>& bpmArr)
 {
 	std::vector<float> bpmVector;
 	std::vector<unsigned int> bpmIndices;
@@ -1071,11 +1278,11 @@ void Rendr::bpmTicks(double time, std::vector<double>& bpmArr)
 			pushRectangleIndices(bpmIndices, bpmVertexCount);
 		}
 	}
-
+	usePersProj();
 	renderColor(bpmVector, bpmIndices);
 }
 
-void Rendr::events(double time, std::vector<Note>& ev) {
+void GameRender::events(double time, std::vector<Note>& ev) {
 
 	float plane = 0.0;
 	float transparency = 0.5;
@@ -1251,11 +1458,11 @@ void Rendr::events(double time, std::vector<Note>& ev) {
 		}
 }
 	}
-
+	usePersProj();
 	renderColor(eventsVector, eventsIndices);
 }
 
-void Rendr::meters() {
+void GameRender::meters() {
 	float yPlane = 0.1f;
 
 	std::vector<float>metersVector;
@@ -1390,8 +1597,14 @@ void Rendr::meters() {
 		}
 	}
 
+	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
+	drawText("Hello World!", 940.0f, 230.0f, 0.05f);
 	//score meter
+
+	
+
+	/*
 	metersVector.erase(metersVector.begin(),metersVector.end());
 	metersIndices.erase(metersIndices.begin(), metersIndices.end());
 	metersVertexCount = 0;
@@ -1399,34 +1612,45 @@ void Rendr::meters() {
 	yPlane = 1.0;
 	float zPlane = 3.0f;
 	int scoreCopy = m_playerScore;
-	for (int i = 0; i < 8; i++) {
-		int digit = scoreCopy / (int)pow(10, 7 - i);
-		float x = 0.5f + 0.17f * i;
+	for (int i = 0; i < 7; i++) {
+		int digit = scoreCopy / (int)pow(10, 6 - i);
+		float x = 0.7f + 0.17f * i;
 		pushVertexTexture(metersVector, x, yPlane + 0.3f, zPlane, digit * 0.1f, 1.0f);
 		pushVertexTexture(metersVector, x, yPlane, zPlane, digit * 0.1f, 0.0f);
 		pushVertexTexture(metersVector, x + 0.2f, yPlane, zPlane, (digit + 1) * 0.1f, 0.0f);
 		pushVertexTexture(metersVector, x + 0.2f, yPlane + 0.3f, zPlane, (digit + 1) * 0.1f, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
-		scoreCopy -= digit * ((int)pow(10, 7 - i));
+		scoreCopy -= digit * ((int)pow(10, 6 - i));
 	}
 	renderTexture(metersVector, metersIndices, m_numbersTexture);
+	*/
 }
 
-void Rendr::splash() {
+void GameRender::splash() {
 	std::vector<float> splashVector;
 	std::vector<unsigned int> splashIndices;
 	unsigned int splashVertexCount = 0;
 
+	/*
 	pushVertexTexture(splashVector, -0.5, 0.5, 3.5, 0.0, 0.0);
 	pushVertexTexture(splashVector, -0.5, 1.5, 3.5, 0.0, 1.0);
 	pushVertexTexture(splashVector, 0.5, 1.5, 3.5, 1.0, 1.0);
 	pushVertexTexture(splashVector, 0.5, 0.5, 3.5, 1.0, 0.0);
 	pushRectangleIndices(splashIndices, splashVertexCount);
 
+	pushVertexTexture(splashVector, 320.0f, 180.0f, 0.0f, 0.0f, 1.0f);
+	pushVertexTexture(splashVector, 320.0f, 540.0f, 0.0f, 0.0f, 0.0f);
+	pushVertexTexture(splashVector, 960.0f, 540.0f, 0.0f, 1.0f, 0.0f);
+	pushVertexTexture(splashVector, 960.0f, 180.0f, 0.0f, 1.0f, 1.0f);
+	pushRectangleIndices(splashIndices, splashVertexCount);
+
+	useOrthoProj();
 	renderTexture(splashVector, splashIndices, m_splashTexture);
+	*/
+	drawText("Menu Text", 10.0f, 380.0f, 0.1f);
 }
 
-void Rendr::pollState(double time, Player& p, Generator& g) {
+void GameRender::pollState(double time, Player& p, Generator& g) {
 	m_red = p.getRedClicker();
 	m_blue = p.getBlueClicker();
 	m_green = p.getGreenClicker();
@@ -1440,6 +1664,6 @@ void Rendr::pollState(double time, Player& p, Generator& g) {
 }
 
 
-Rendr::~Rendr() {
+GameRender::~GameRender() {
 	//dtor
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Generator.h"
 #include "Note.h"
-#include "Rendr.h"
+#include "GameRender.h"
 #include "Player.h"
 #include "Audio.h"
 #include <vector>
@@ -20,13 +20,14 @@ public:
 	std::vector<Note> m_event_arr;
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
+
 private:
 	double m_pastTime = 0.0;
-	bool active = false;
 	bool firstRun = true;
-	Rendr m_render;
+	GameRender m_render;
 	Generator m_gen;
 	Player m_player;
 	Audio m_audio;
+	int m_scene = 0;
 };
 

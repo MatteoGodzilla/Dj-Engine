@@ -10,6 +10,8 @@ unsigned int HEIGHT = 600;
 
 Game game1;
 
+int scene = 0;
+
 GLFWwindow* window;
 
 void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
@@ -42,11 +44,12 @@ int main() {
 	while (!glfwWindowShouldClose(window)) {
 		
 		glfwPollEvents();
-		game1.tick();
-
+		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		game1.tick();
 		game1.render();
+
 		glfwSwapBuffers(window);
 
 	}

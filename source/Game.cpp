@@ -10,7 +10,10 @@ void Game::init(GLFWwindow* w) {
 }
 
 void Game::render() {
-	if (active) {
+	if (m_scene == 0) {
+		m_render.splash();
+	}
+	else if (m_scene == 1){
 		m_render.highway(m_global_time);
 		m_render.bpmTicks(m_global_time, m_bpm_arr);
 		m_render.events(m_global_time, m_event_arr);
@@ -19,13 +22,10 @@ void Game::render() {
 		m_render.lanes(m_global_time, m_event_arr);
 		m_render.notes(m_global_time, m_note_arr);
 	}
-	else {
-		m_render.splash();
-	}
 }
 
 void Game::tick() {
-	if (active) {
+	if (m_scene == 1) {
 		
 		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
 		m_gen.textParser(m_note_arr, m_event_arr);
@@ -45,18 +45,18 @@ void Game::tick() {
 }
 
 void Game::input(int key, int action) {
-	if (active)
-	{
-		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
-		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
-	}
-	else {
+	if(m_scene == 0) {
 		if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-			active = true;
+			m_scene = 1;
 			std::cout << "timer reset" << std::endl;
 			glfwSetTime(0.0);
 			m_pastTime = glfwGetTime();
 		}
+	}
+	else if (m_scene == 1)
+	{
+		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
+		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
 	}
 }
 

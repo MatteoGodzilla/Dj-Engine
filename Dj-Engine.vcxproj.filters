@@ -27,13 +27,13 @@
     <ClCompile Include="source\Player.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
-    <ClCompile Include="source\Rendr.cpp">
-      <Filter>File di origine</Filter>
-    </ClCompile>
     <ClCompile Include="source\Audio.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
     <ClCompile Include="source\Game.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GameRender.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,13 +47,13 @@
     <ClInclude Include="header\Player.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
-    <ClInclude Include="header\Rendr.h">
-      <Filter>File di intestazione</Filter>
-    </ClInclude>
     <ClInclude Include="header\Audio.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="header\Game.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="header\GameRender.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>
