@@ -1599,55 +1599,21 @@ void GameRender::meters() {
 
 	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
-	drawText("Hello World!", 940.0f, 230.0f, 0.05f);
 	//score meter
 
-	
+	std::string s = std::to_string(m_playerScore);
+	std::string scoreDisplay("00000000");
+	scoreDisplay.resize(scoreDisplay.length()-s.length());
+	scoreDisplay.append(s);
+	drawText(scoreDisplay.c_str(), 940.0f, 230.0f, 0.05f);
 
-	/*
-	metersVector.erase(metersVector.begin(),metersVector.end());
-	metersIndices.erase(metersIndices.begin(), metersIndices.end());
-	metersVertexCount = 0;
-
-	yPlane = 1.0;
-	float zPlane = 3.0f;
-	int scoreCopy = m_playerScore;
-	for (int i = 0; i < 7; i++) {
-		int digit = scoreCopy / (int)pow(10, 6 - i);
-		float x = 0.7f + 0.17f * i;
-		pushVertexTexture(metersVector, x, yPlane + 0.3f, zPlane, digit * 0.1f, 1.0f);
-		pushVertexTexture(metersVector, x, yPlane, zPlane, digit * 0.1f, 0.0f);
-		pushVertexTexture(metersVector, x + 0.2f, yPlane, zPlane, (digit + 1) * 0.1f, 0.0f);
-		pushVertexTexture(metersVector, x + 0.2f, yPlane + 0.3f, zPlane, (digit + 1) * 0.1f, 1.0f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-		scoreCopy -= digit * ((int)pow(10, 6 - i));
-	}
-	renderTexture(metersVector, metersIndices, m_numbersTexture);
-	*/
 }
 
 void GameRender::splash() {
 	std::vector<float> splashVector;
 	std::vector<unsigned int> splashIndices;
 	unsigned int splashVertexCount = 0;
-
-	/*
-	pushVertexTexture(splashVector, -0.5, 0.5, 3.5, 0.0, 0.0);
-	pushVertexTexture(splashVector, -0.5, 1.5, 3.5, 0.0, 1.0);
-	pushVertexTexture(splashVector, 0.5, 1.5, 3.5, 1.0, 1.0);
-	pushVertexTexture(splashVector, 0.5, 0.5, 3.5, 1.0, 0.0);
-	pushRectangleIndices(splashIndices, splashVertexCount);
-
-	pushVertexTexture(splashVector, 320.0f, 180.0f, 0.0f, 0.0f, 1.0f);
-	pushVertexTexture(splashVector, 320.0f, 540.0f, 0.0f, 0.0f, 0.0f);
-	pushVertexTexture(splashVector, 960.0f, 540.0f, 0.0f, 1.0f, 0.0f);
-	pushVertexTexture(splashVector, 960.0f, 180.0f, 0.0f, 1.0f, 1.0f);
-	pushRectangleIndices(splashIndices, splashVertexCount);
-
-	useOrthoProj();
-	renderTexture(splashVector, splashIndices, m_splashTexture);
-	*/
-	drawText("Menu Text", 10.0f, 380.0f, 0.1f);
+	drawText("Press space to start", 10.0f, 380.0f, 0.1f);
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {

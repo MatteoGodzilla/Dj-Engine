@@ -4,6 +4,7 @@
 #include "GameRender.h"
 #include "Player.h"
 #include "Audio.h"
+#include "MenuNavigator.h"
 #include <vector>
 #include <iostream>
 
@@ -22,12 +23,14 @@ public:
 	double m_global_time = -2.0;
 
 private:
+	void resetTime();
 	double m_pastTime = 0.0;
 	bool firstRun = true;
 	GameRender m_render;
 	Generator m_gen;
 	Player m_player;
 	Audio m_audio;
+	MenuNavigator m_menu;
 	int m_scene = 0;
 };
 

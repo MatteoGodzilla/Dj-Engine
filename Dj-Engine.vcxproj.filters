@@ -36,6 +36,12 @@
     <ClCompile Include="source\GameRender.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="source\MenuNavigator.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="source\MenuNode.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\Generator.h">
@@ -54,6 +60,12 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="header\GameRender.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="header\MenuNavigator.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="header\MenuNode.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

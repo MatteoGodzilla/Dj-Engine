@@ -1,12 +1,14 @@
 #include "Game.h"
 
-Game::Game() {
+Game::Game() 
+{
 }
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
 	m_audio.load("res/song.ogg");
 	std::cout << "Please press space to start game" << std::endl;
+	resetTime();
 }
 
 void Game::render() {
@@ -46,18 +48,25 @@ void Game::tick() {
 
 void Game::input(int key, int action) {
 	if(m_scene == 0) {
+		m_menu.input(key, action);
 		if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
 			m_scene = 1;
-			std::cout << "timer reset" << std::endl;
-			glfwSetTime(0.0);
-			m_pastTime = glfwGetTime();
+			resetTime();
 		}
 	}
 	else if (m_scene == 1)
 	{
 		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
 		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
+		if (action == GLFW_PRESS && key == GLFW_KEY_P)m_scene = 0;
 	}
+}
+
+void Game::resetTime() {
+	std::cout << "timer reset" << std::endl;
+	glfwSetTime(0.0);
+	m_pastTime = glfwGetTime();
+	m_global_time = -2.0f;
 }
 
 Game::~Game() {
