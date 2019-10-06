@@ -1,12 +1,6 @@
-#ifndef RENDR_H
-#define RENDR_H
+#pragma once
 
-#include "GL/glew.h"
-#include "GLFW/glfw3.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-#include "ft2build.h"
-#include FT_FREETYPE_H
+#include "Graphics.h"
 
 #include "Note.h"
 #include "Player.h"
@@ -49,12 +43,12 @@ private:
 	int m_playerMult = 0;
 	int m_playerScore = 0;
 	int m_renderCross = 1;
-	float m_renderEuValue = 0.0;
+	double m_renderEuValue = 0.0;
 	bool m_renderEuActive = false;
 	bool m_renderEuZone = false;
 
-	glm::mat4 m_persProj;
-	glm::mat4 m_orthoProj;
+	glm::mat4 m_persProj = glm::mat4(1.0f);
+	glm::mat4 m_orthoProj = glm::mat4(1.0f);
 
 	unsigned int m_textureProgram = 0;
 	unsigned int m_colorProgram = 0;
@@ -75,6 +69,3 @@ private:
 	
 };
 
-
-
-#endif // RENDR_H

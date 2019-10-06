@@ -354,7 +354,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		}
 		else if (type == 0x0B000002) {
 			m_bpmChangeTime = (double)time;
-			m_bpmChangeValue = extra;
+			m_bpmChangeValue = (int)extra;
 		}
 		else if (type == 0x0AFFFFFF) {}
 		else if (type == 0xFFFFFFFF) {

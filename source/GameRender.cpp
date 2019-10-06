@@ -207,6 +207,8 @@ GameRender::GameRender() {
 }
 
 void GameRender::init(GLFWwindow* w) {
+	std::cout << "GameRender Init:" << std::endl;
+
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {

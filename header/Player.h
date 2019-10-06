@@ -1,5 +1,4 @@
-#ifndef Player_H
-#define Player_H
+#pragma once
 #include "GLFW/glfw3.h"
 #include <vector>
 #include "Generator.h"
@@ -20,7 +19,6 @@ public:
     Player();
 	void keyCallback(int key, int action, 
 		double time, std::vector<Note>& v, std::vector<Note>& ev);
-    //void key(sf::Event e,double time,std::vector<Note>& v,std::vector<Note>&ev);
     virtual ~Player();
 	bool getRedClicker();
 	bool getGreenClicker();
@@ -29,7 +27,7 @@ public:
     int getScore();
     int getCombo();
     int getMult();
-	float getEuValue();
+	double getEuValue();
 	bool getEuActive();
 	bool getEuZoneActive();
     void pollState(Generator &g);
@@ -55,5 +53,3 @@ private:
 	double m_lastTime = 0.0;
 	int m_genBpm = 0;
 };
-
-#endif // Player_H

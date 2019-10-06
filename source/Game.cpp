@@ -12,10 +12,7 @@ void Game::init(GLFWwindow* w) {
 }
 
 void Game::render() {
-	if (m_scene == 0) {
-		m_render.splash();
-	}
-	else if (m_scene == 1){
+	if (m_active){
 		m_render.highway(m_global_time);
 		m_render.bpmTicks(m_global_time, m_bpm_arr);
 		m_render.events(m_global_time, m_event_arr);
@@ -27,7 +24,7 @@ void Game::render() {
 }
 
 void Game::tick() {
-	if (m_scene == 1) {
+	if (m_active) {
 		
 		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
 		m_gen.textParser(m_note_arr, m_event_arr);
@@ -47,19 +44,18 @@ void Game::tick() {
 }
 
 void Game::input(int key, int action) {
-	if(m_scene == 0) {
-		m_menu.input(key, action);
-		if (action == GLFW_PRESS && key == GLFW_KEY_SPACE) {
-			m_scene = 1;
-			resetTime();
-		}
-	}
-	else if (m_scene == 1)
+	if(m_active)
 	{
 		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
 		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
-		if (action == GLFW_PRESS && key == GLFW_KEY_P)m_scene = 0;
+		if (action == GLFW_PRESS && key == GLFW_KEY_P)m_active = 0;
 	}
+}
+
+void Game::setActive(bool active)
+{
+
+	m_active = active;
 }
 
 void Game::resetTime() {

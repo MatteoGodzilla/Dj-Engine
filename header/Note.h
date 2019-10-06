@@ -1,5 +1,4 @@
-#ifndef NOTE_H
-#define NOTE_H
+#pragma once
 #include <iostream>
 
 enum note {TAP_G,TAP_R,TAP_B,
@@ -39,5 +38,3 @@ private:
     int m_lan_mod = -1;
 	float m_extraData = 0.0;
 };
-
-#endif // NOTE_H

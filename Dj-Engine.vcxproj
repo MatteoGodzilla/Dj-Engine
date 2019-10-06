@@ -107,8 +107,9 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessToFile>true</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,8 +149,9 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessToFile>true</PreprocessToFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -164,8 +166,10 @@
     <ClCompile Include="source\Audio.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />
+    <ClCompile Include="source\Graphics.cpp" />
     <ClCompile Include="source\MenuNavigator.cpp" />
     <ClCompile Include="source\MenuNode.cpp" />
+    <ClCompile Include="source\MenuRender.cpp" />
     <ClCompile Include="source\Note.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\GameRender.cpp" />
@@ -174,8 +178,10 @@
     <ClInclude Include="header\Audio.h" />
     <ClInclude Include="header\Game.h" />
     <ClInclude Include="header\Generator.h" />
+    <ClInclude Include="header\Graphics.h" />
     <ClInclude Include="header\MenuNavigator.h" />
     <ClInclude Include="header\MenuNode.h" />
+    <ClInclude Include="header\MenuRender.h" />
     <ClInclude Include="header\Note.h" />
     <ClInclude Include="header\Player.h" />
     <ClInclude Include="header\GameRender.h" />

@@ -464,7 +464,7 @@ bool Player::getBlueClicker() {
 	return m_blue;
 }
 
-float Player::getEuValue() {
+double Player::getEuValue() {
 	return m_eu_value;
 }
 

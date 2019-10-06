@@ -1,10 +1,9 @@
 #pragma once
-#include "Generator.h"
-#include "Note.h"
 #include "GameRender.h"
+#include "Note.h"
+#include "Generator.h"
 #include "Player.h"
 #include "Audio.h"
-#include "MenuNavigator.h"
 #include <vector>
 #include <iostream>
 
@@ -16,6 +15,7 @@ public:
 	void render();
 	void tick();
 	void input(int key, int action);
+	void setActive(bool active);
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
@@ -30,7 +30,6 @@ private:
 	Generator m_gen;
 	Player m_player;
 	Audio m_audio;
-	MenuNavigator m_menu;
-	int m_scene = 0;
+	int m_active = 0;
 };
 
