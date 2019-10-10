@@ -48,6 +48,9 @@
     <ClCompile Include="source\Graphics.cpp">
       <Filter>File di origine</Filter>
     </ClCompile>
+    <ClCompile Include="source\Rendr.cpp">
+      <Filter>File di origine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\Generator.h">
@@ -78,6 +81,9 @@
       <Filter>File di intestazione</Filter>
     </ClInclude>
     <ClInclude Include="header\Graphics.h">
+      <Filter>File di intestazione</Filter>
+    </ClInclude>
+    <ClInclude Include="header\Rendr.h">
       <Filter>File di intestazione</Filter>
     </ClInclude>
   </ItemGroup>

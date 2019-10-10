@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Graphics.h"
+#include "Rendr.h"
 
 #include "Note.h"
 #include "Player.h"
@@ -10,7 +11,7 @@
 #include <string>
 #include <map>
 
-class GameRender {
+class GameRender : public Rendr{
 public:
     GameRender();
 	void init(GLFWwindow* w);
@@ -25,18 +26,7 @@ public:
     void pollState(double time,Player& p,Generator &g);
     virtual ~GameRender();
 	
-protected:
-
 private:
-	void renderTexture(std::vector<float>& vArr, std::vector<unsigned int>& iArr, unsigned int t);
-	void renderColor(std::vector<float>& vArr, std::vector<unsigned int>& iArr);
-	void renderText(std::vector<float>& vArr, std::vector<unsigned int>& iArr,unsigned int t);
-	void drawText(const char* text, float x, float y, float scl);
-	void usePersProj();
-	void useOrthoProj();
-	void setTextColor(float r, float g, float b, float a);
-
-	GLFWwindow* m_window = nullptr;
 	bool m_red = false, m_green = false, m_blue = false;
     int m_playerCross = 1;
 	int m_playerCombo = 0;

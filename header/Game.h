@@ -16,6 +16,7 @@ public:
 	void tick();
 	void input(int key, int action);
 	void setActive(bool active);
+	void start();
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
@@ -23,13 +24,12 @@ public:
 	double m_global_time = -2.0;
 
 private:
-	void resetTime();
 	double m_pastTime = 0.0;
 	bool firstRun = true;
 	GameRender m_render;
 	Generator m_gen;
 	Player m_player;
 	Audio m_audio;
-	int m_active = 0;
+	int m_active = false;
 };
 

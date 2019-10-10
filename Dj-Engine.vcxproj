@@ -173,6 +173,7 @@
     <ClCompile Include="source\Note.cpp" />
     <ClCompile Include="source\Player.cpp" />
     <ClCompile Include="source\GameRender.cpp" />
+    <ClCompile Include="source\Rendr.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="header\Audio.h" />
@@ -185,6 +186,7 @@
     <ClInclude Include="header\Note.h" />
     <ClInclude Include="header\Player.h" />
     <ClInclude Include="header\GameRender.h" />
+    <ClInclude Include="header\Rendr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,18 +1,9 @@
 #include "MenuNode.h"
 
-MenuNode::MenuNode(const char* text)
+MenuNode::MenuNode(const char* text,int id)
 {
 	m_text = std::string(text);
-}
-
-void MenuNode::link(void(*callback)())
-{
-	m_function = callback;
-}
-
-void MenuNode::activate()
-{
-	if(m_function != nullptr)m_function();
+	m_id = id;
 }
 
 void MenuNode::push(MenuNode n)
@@ -23,6 +14,11 @@ void MenuNode::push(MenuNode n)
 std::string MenuNode::getText()
 {
 	return m_text;
+}
+
+int MenuNode::getId()
+{
+	return m_id;
 }
 
 std::vector<MenuNode> MenuNode::getChildrens() {

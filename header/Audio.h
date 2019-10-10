@@ -13,6 +13,7 @@ public:
 	~Audio();
 	void play();
 	void load(const char* filename);
+	void stop();
 	void buffer();
 private:
 	ALCdevice* m_device;

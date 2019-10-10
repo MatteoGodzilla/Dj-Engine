@@ -1,6 +1,6 @@
 #pragma once
-#include "MenuNode.h"
 #include "MenuRender.h"
+#include "MenuNode.h"
 #include "GLFW/glfw3.h"
 #include <iostream>
 
@@ -18,10 +18,13 @@ public:
 	void input(int key, int action);
 	void render();
 	void setActive(bool active);
+	bool getActive();
+	void activate(MenuNode& menu);
 	~MenuNavigator();
 private:
 	bool m_active = false;
-	MenuNode m_root = MenuNode("Root");
+	MenuNode m_root = MenuNode("Main Menu",0);
+	MenuNode m_activeNode = m_root;
 	MenuRender m_render;
 	std::vector<int> m_selection;
 

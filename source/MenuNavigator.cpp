@@ -2,12 +2,12 @@
 
 MenuNavigator::MenuNavigator()
 {
-	MenuNode play("play!");
-	MenuNode options("options");
+	MenuNode play("play!",1);
+	MenuNode options("options",2);
 
-	MenuNode op1("Option 1");
-	MenuNode op2("Option 2");
-	MenuNode op3("Option 3");
+	MenuNode op1("Option 1",3);
+	MenuNode op2("Option 2",4);
+	MenuNode op3("Option 3",5);
 
 	options.push(op1);
 	options.push(op2);
@@ -17,81 +17,99 @@ MenuNavigator::MenuNavigator()
 	m_root.push(options);
 
 	m_selection.push_back(0);
-
-	
+	m_activeNode = m_root;
 }
 
-void MenuNavigator::init(GLFWwindow* w) {
+void MenuNavigator::init(GLFWwindow* w) 
+{
 	m_render.init(w);
+	render();
 }
 
 void MenuNavigator::input(int key, int action)
 {
 	if (m_active) {
-	MenuNode activeNode = m_root;
-	for (size_t i = 0; i < m_selection.size() - 1; i++) {
-		activeNode = activeNode.getChildrens().at(m_selection.at(i));
-	}
-	
-	if (action == GLFW_PRESS) {
-		if (key == UP_CODE) {
-			m_selection.back()--;
-			if (m_selection.back() < 0) {
-				m_selection.back() = activeNode.getChildCount() - 1;
+		MenuNode activeNode = m_root;
+		for (size_t i = 0; i < m_selection.size() - 1; i++) {
+			if (activeNode.getChildCount() > 0) {
+				activeNode = activeNode.getChildrens().at(m_selection.at(i));
 			}
 		}
-		else if (key == DOWN_CODE) {
-			m_selection.back()++;
-			if (m_selection.back() > activeNode.getChildCount()-1) {
-				m_selection.back() = 0;
+
+		if (action == GLFW_PRESS)
+		{
+			if (key == UP_CODE) {
+				m_selection.back()--;
+				if (m_selection.back() < 0) {
+					m_selection.back() = activeNode.getChildCount() - 1;
+				}
+			}
+			else if (key == DOWN_CODE) {
+				m_selection.back()++;
+				if (m_selection.back() > activeNode.getChildCount() - 1) {
+					m_selection.back() = 0;
+				}
+			}
+			else if (key == SELECT_CODE) {
+				if (activeNode.getChildCount() > 0)
+				{
+					activate(activeNode.getChildrens().at(m_selection.back()));
+					m_selection.push_back(0);
+				}
+				else {
+					std::cout << "Reached End of Tree" << std::endl;
+				}
+			}
+			else if (key == BACK_CODE) {
+				if (m_selection.size() > 1) m_selection.pop_back();
 			}
 		}
-		else if (key == SELECT_CODE) {
-			if (activeNode.getChildCount() > 0)
-			{
-				activeNode.getChildrens().at(m_selection.back()).activate();
-				m_selection.push_back(0);
+
+		else if (action == GLFW_RELEASE)
+		{
+			if (key == UP_CODE) {
+
 			}
-			else {
-				std::cout << "Reached End of Tree" << std::endl;
+			else if (key == DOWN_CODE) {
+
+			}
+			else if (key == SELECT_CODE) {
+
+			}
+			else if (key == BACK_CODE) {
+
 			}
 		}
-		else if (key == BACK_CODE) {
-			if(m_selection.size() > 1) m_selection.pop_back();
-		}
+		m_activeNode = activeNode;
 	}
-
-	
-	else if (action == GLFW_RELEASE) {
-		if (key == UP_CODE) {
-
-		}
-		else if (key == DOWN_CODE) {
-
-		}
-		else if (key == SELECT_CODE) {
-
-		}
-		else if (key == BACK_CODE) {
-
-		}
-		std::cout << "Selection vector size:" << m_selection.size() << std::endl;
-		std::cout << "Active Node size:" << activeNode.getChildCount() << std::endl;
-		std::cout << "Selection:" << m_selection.at(m_selection.size() - 1) << std::endl << std::endl;
-	}
-	}
-	
 }
 
 void MenuNavigator::render() {
 	if (m_active) {
-		m_render.render();
+		m_render.render(m_activeNode,m_selection.back());
 	}
 }
 
 void MenuNavigator::setActive(bool active)
 {
 	m_active = active;
+}
+
+bool MenuNavigator::getActive()
+{
+	return m_active;
+}
+
+void MenuNavigator::activate(MenuNode& menu)
+{
+	switch (menu.getId()) {
+	case 1:
+		m_active = false;
+		break;
+	default:
+		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
+		break;
+	}
 }
 
 MenuNavigator::~MenuNavigator()

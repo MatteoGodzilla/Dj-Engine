@@ -7,8 +7,6 @@ Game::Game()
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
 	m_audio.load("res/song.ogg");
-	std::cout << "Please press space to start game" << std::endl;
-	resetTime();
 }
 
 void Game::render() {
@@ -40,7 +38,10 @@ void Game::tick() {
 		m_global_time += nowTime - m_pastTime;
 		m_pastTime = nowTime;
 
-	}	
+	}
+	else {
+		m_audio.stop();
+	}
 }
 
 void Game::input(int key, int action) {
@@ -48,21 +49,23 @@ void Game::input(int key, int action) {
 	{
 		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
 		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
-		if (action == GLFW_PRESS && key == GLFW_KEY_P)m_active = 0;
 	}
 }
 
 void Game::setActive(bool active)
 {
-
 	m_active = active;
 }
 
-void Game::resetTime() {
-	std::cout << "timer reset" << std::endl;
-	glfwSetTime(0.0);
-	m_pastTime = glfwGetTime();
-	m_global_time = -2.0f;
+void Game::start() {
+	if (!m_active) {
+		std::cout << "Game msg: started game" << std::endl;
+		glfwSetTime(0.0);
+		m_pastTime = glfwGetTime();
+		m_global_time = -2.0f;
+		
+		m_active = true;
+	}
 }
 
 Game::~Game() {

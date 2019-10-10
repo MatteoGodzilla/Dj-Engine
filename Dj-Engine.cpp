@@ -18,10 +18,9 @@ int scene = 0;
 GLFWwindow* window;
 
 void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window,true);
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window, true);
 	if (scene == 0)menu.input(key, action);
 	else game1.input(key, action);
-	game1.input(key, action);
 }
 
 void resizeCallback(GLFWwindow* w,int width,int height) {
@@ -39,9 +38,10 @@ int main() {
 	glfwSetWindowSizeCallback(window, resizeCallback);
 
 	game1.init(window);
+	game1.setActive(false);
 	menu.init(window);
-
 	menu.setActive(true);
+
 	if (!window) {
 		std::cout << "GLFW WINDOW CREATION ERROR" << std::endl;
 		glfwTerminate();
@@ -53,9 +53,17 @@ int main() {
 		
 		glfwPollEvents();
 		
-		
+		if (!menu.getActive()) {
+			scene = 1;
+			game1.start();
+		}
+		else {
+			scene = 0;
+			game1.setActive(false);
+		}
+
 		if (scene == 0) {
-			glClearColor(1.0f, 0.6f, 0.0f, 0.2f);
+			glClearColor(0.13f, 0.21f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			menu.render();
 		}

@@ -16,7 +16,7 @@ Audio::Audio() {
 
 void Audio::load(const char* filename) {
 	if (ov_fopen(filename, &m_oggFile) == 0 && firstRun) {
-		std::cout << "successfully loaded 'song.ogg'" << std::endl;
+		std::cout << "Audio msg: successfully loaded 'song.ogg'" << std::endl;
 	}
 	buffer();
 }
@@ -49,10 +49,13 @@ void Audio::buffer() {
 
 void Audio::play() {
 	if (firstRun) {
-		std::cout << "first run" << std::endl;
 		alSourcePlay(m_source);
 		firstRun = false;
 	}
+}
+
+void Audio::stop() {
+	alSourceStop(m_source);
 }
 
 Audio::~Audio() {
