@@ -20,18 +20,15 @@ void MenuRender::init(GLFWwindow* w)
 
 void MenuRender::render(MenuNode menu,int selected)
 {
+	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;
 	unsigned int selVertexCount = 0;
 
+	//text scale
 	float scale = 0.1f;
 
-	/*
-	float r = 0.06f;
-	float g = 0.53f;
-	float b = 1.0f;
-	*/
-
+	//selection color
 	float r = 0.83f;
 	float g = 0.35f;
 	float b = 0.24f;
@@ -43,6 +40,7 @@ void MenuRender::render(MenuNode menu,int selected)
 
 	useOrthoProj();
 
+	//selection rectangle
 	pushVertexColor(selVector, 10.0f, 100.0f * selected + 125.0f, 0.0f, r, g, b);
 	pushVertexColor(selVector, 10.0f, 100.0f * selected + 225.0f, 0.0f, r, g, b);
 	pushVertexColor(selVector, 10.0f + right, 100.0f * selected + 225.0f, 0.0f, r, g, b);
@@ -52,6 +50,7 @@ void MenuRender::render(MenuNode menu,int selected)
 
 
 	if (menu.getChildCount() > 0) {
+		//draw every child from node
 		for (size_t i = 0; i < menu.getChildCount(); i++) {
 			drawText(menu.getChildrens().at(i).getText().c_str(), 10.0f, 100.0f * i + 200.0f, scale);
 		}

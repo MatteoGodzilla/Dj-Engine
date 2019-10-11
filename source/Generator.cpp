@@ -1,5 +1,6 @@
 #include "Generator.h"
 
+//read little endian int from data stream
 void readToInt(std::ifstream& stream, int* i) {
 	char c;
 	char* mod = (char*)i;
@@ -9,6 +10,7 @@ void readToInt(std::ifstream& stream, int* i) {
 	}
 }
 
+//read little endian float from data stream
 void readToFloat(std::ifstream& stream, float* f) {
 	char c;
 	char* mod = (char*)f;
@@ -22,6 +24,7 @@ Generator::Generator() {
 	pushEvent(-2.0, CROSS_C);//Do not remove
 	m_chart.open("res/chart.txt");
 	if (m_chart.is_open()) {
+		//write chart data to console
 		m_isTimeRelative = true;
 		std::cout << "loaded text chart" << std::endl;
 		std::string version;
@@ -33,6 +36,7 @@ Generator::Generator() {
 		std::cout << "text chart not found, opening fgsmub" << std::endl;
 		m_chart.open("res/chart.fsgmub",std::ios::binary);
 		if (m_chart.is_open()) {
+			//write chart data to console
 			m_isTimeRelative = false;
 			std::cout << "loaded fgsmub chart" << std::endl;
 
@@ -48,14 +52,15 @@ Generator::Generator() {
 	}
 }
 
+//update notes/events every frame
 void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	m_combo_reset = false;
 	m_eu_start = false;
 	m_eu_check = false;
 	size_t note_s = m_note_times.size();
 
+	//note generation from 'cache' (m_note_times)
 	for (size_t i = 0; i < note_s; ++i) {
-		//note generation
 		Note temp(m_note_times.at(0), m_note_types.at(0));
 		v.push_back(temp);
 		m_note_times.erase(m_note_times.begin());
@@ -63,6 +68,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	}
 	size_t event_s = m_event_times.size();
 
+	//event generation from ''cache (m_event_times)
 	for (size_t i = 0; i < event_s; ++i) {
 		Note e(m_event_times.at(0), m_event_types.at(0), true);
 		ev.push_back(e);
@@ -74,10 +80,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			//remove if outside hit area
 			v.at(i).tick(time);
 			if (v.at(i).getDead()) {
+				//if the player hasn't clicked the note
 				if (v.at(i).getTouched() == false) {
 					m_combo_reset = true;
 					v.at(i).click(time);
 				}
+				//actual remove
 				v.erase(v.begin() + i);
 				break;
 			}
@@ -89,11 +97,19 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			ev.at(i).tick(time);
 			int type = ev.at(i).getType();
 
+			/*
+			every event has a different way to be removed
+			for example: a scratch start cannot be removed
+			before the corrisponding scratch end
+			*/
+
 			if (type == SCR_G_START) {
 				int e = -1;
+				//find the corrisponding event end
 				for (size_t j = ev.size(); j-- > 0;) {
 					if (i != j && ev.at(j).getType() == SCR_G_END && time > ev.at(j).getMilli() + 0.2)e = j;
 				}
+				//if the end has already crossed, remove both start and end
 				if (e != -1) {
 					ev.erase(ev.begin() + e);
 					ev.erase(ev.begin() + i);
@@ -102,9 +118,11 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 
 			if (type == SCR_B_START) {
 				int e = -1;
+				//find the corrisponding event end
 				for (size_t j = ev.size(); j-- > 0;) {
 					if (i != j && ev.at(j).getType() == SCR_B_END && time >= ev.at(j).getMilli() + 0.2)e = j;
 				}
+				//if the end has already crossed, remove both startand end
 				if (e != -1) {
 					ev.erase(ev.begin() + e);
 					ev.erase(ev.begin() + i);
@@ -114,7 +132,9 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 				for (size_t j = ev.size(); j-- > i;) {
 					int next_type = ev.at(j).getType();
 					double next_time = ev.at(j).getMilli();
+					//find the first cross in the events
 					if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
+						//if the following crossfader has crossed the clickers
 						if (j > i && next_time + 0.15 <= time) {
 							if (!ev.at(i).getTouched()) {
 								m_combo_reset = true;
@@ -129,9 +149,11 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 					m_eu_start = true;
 				}
 				int e = -1;
+				//find the corrisponding end
 				for (size_t j = i; j < ev.size(); j++) {
 					if (i != j && ev.at(j).getType() == EU_END && time >= ev.at(j).getMilli())e = j;
 				}
+				//if the end has crossed the clickers
 				if (e != -1) {
 					m_eu_check = true;
 					ev.erase(ev.begin() + e);
@@ -149,10 +171,25 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 }
 
 void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
+	/*
+	read the chart IF there are less than 100 notes 
+	and less than 100 events on screen.
+
+	This limit is arbitrary and can change in the future.
+	Mostly it's there to use less amount of ram on the pc
+
+	(but really, 100 notes present on screen is ridiculous)
+	*/
+
 	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && m_isTimeRelative) {
 		std::string token;
 		double t;
 		m_chart >> token;
+
+		/*
+		depending by the tokens, add note/event to 'cache'
+		*/
+
 		if (token == "T" || token == "t") {
 			m_chart >> token;
 			if (token == "R" || token == "r") {
@@ -302,12 +339,23 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 }
 
 void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
+	/*
+	read the chart IF there are less than 100 notes
+	and less than 100 events on screen.
+
+	This limit is arbitrary and can change in the future.
+	Mostly it's there to use less amount of ram on the pc
+
+	(but really, 100 notes present on screen is ridiculous)
+	*/
+
 	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && !m_isTimeRelative) {
 		float time;
 		int type;
 		float length;
 		float extra;
 
+		//read entry from file
 		readToFloat(m_chart, &time);
 		readToInt(m_chart, &type);
 		readToFloat(m_chart, &length);
@@ -324,7 +372,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		time = time * factor;
 		length = length * factor;
 		
-
+		//decode type from entry
 		if (type == 0)pushNote((double)time, TAP_G);
 		else if (type == 1)pushNote((double)time, TAP_B);
 		else if (type == 2)pushNote((double)time, TAP_R);
@@ -359,7 +407,6 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		else if (type == 0x0AFFFFFF) {}
 		else if (type == 0xFFFFFFFF) {
 			//chart start
-			//pushEvent(time,___)
 		}
 		else std::cerr << "error parsing entry" << std::endl;
 	}
@@ -367,6 +414,8 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 
 void Generator::bpm(double time, std::vector<double>& arr)
 {
+	//update bpm tick array
+
 	for (size_t i = 0; i < arr.size(); i++) {
 		if (arr.at(i) < time - 0.2) {
 			arr.erase(arr.begin() + i);
@@ -380,6 +429,7 @@ void Generator::bpm(double time, std::vector<double>& arr)
 	}
 }
 
+//utility functions 
 void Generator::pushNote(double time, int type) {
 	if (m_isTimeRelative) m_time += time;
 	else m_time = time;

@@ -1,15 +1,18 @@
 #include "Note.h"
 
+double hitWindow = 0.15;
+double highwayTimeVisible = 1.0;
+
 Note::Note(double milli,int ty,bool ev, float extra){
     //set hit time
-    m_hit_window = 0.15;
+    m_hit_window = hitWindow;
     m_milli = milli;
     m_type = ty;
     m_is_event = ev;
 	m_extraData = extra;
 }
 
-
+//when the player clicks the corrisponding button
 void Note::click(double time) {
     if(m_hittable){
         std::cout << "Hit :" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
@@ -22,15 +25,15 @@ void Note::click(double time) {
     }
 }
 
+//updating note every frame
 void Note::tick(double time){
-    if(time +1.0 >= m_milli && time <= m_milli+m_hit_window){
+    if(time + highwayTimeVisible >= m_milli && time <= m_milli+m_hit_window){
         m_render = true;
     }else{
         m_render = false;
     }
 
     if(m_milli-time <= m_hit_window && time-m_milli <= m_hit_window){
-        //std::cout << "hittable " << m_milli-time <<  std::endl;
         m_hittable = true;
     }else m_hittable = false;
 
@@ -39,6 +42,7 @@ void Note::tick(double time){
     }
 }
 
+//utility function to return variables
 double Note::getMilli() {
     return m_milli;
 }

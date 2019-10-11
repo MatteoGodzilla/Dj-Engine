@@ -22,7 +22,6 @@ public:
     void lanes(double time, std::vector<Note>&ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void meters();
-	void splash();
     void pollState(double time,Player& p,Generator &g);
     virtual ~GameRender();
 	

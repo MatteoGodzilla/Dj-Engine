@@ -5,6 +5,8 @@ Audio::Audio() {
 	if (m_device != NULL) {
 		m_context = alcCreateContext(m_device, NULL);
 		if (m_context != NULL) {
+
+			//initialize audio
 			alcMakeContextCurrent(m_context);
 			alGenSources(1, &m_source);
 			alGenBuffers(1, &m_buffer);
@@ -23,7 +25,7 @@ void Audio::load(const char* filename) {
 
 void Audio::buffer() {
 	unsigned int bufferId = 0;
-	unsigned int bufferRemoved = 0;
+	unsigned int bufferRemoved = 0; //pointer never used
 	int processed = 0;
 	char bufferData[4096];
 	int bytesRead = 0;
@@ -32,15 +34,21 @@ void Audio::buffer() {
 	info = ov_info(&m_oggFile, -1);
 	m_frequency = info->rate;
 
+	//get already processed buffers
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+
+	//upload buffers until all are processed
 	while (processed >= 0) {
+		//generate temporary buffer
 		alGenBuffers(1, &bufferId);
 		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
 
+		//read and upload
 		bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
 		alBufferData(bufferId, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
 		alSourceQueueBuffers(m_source, 1, &bufferId);
 
+		//delete temp buffer
 		alDeleteBuffers(1, &bufferId);
 		processed--;
 	}

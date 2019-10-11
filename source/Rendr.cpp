@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+//character struct to store freetype glyph data
 struct Character {
 	GLuint TextureID;
 	float bx;
@@ -24,6 +25,7 @@ void Rendr::checkError() {
 	std::cout << "ended error checking" << std::endl;
 }
 
+//utility function
 void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) {
 	v.push_back(x);
 	v.push_back(y);
@@ -34,6 +36,7 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 	v.push_back(a);
 }
 
+//utility function
 void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) {
 	v.push_back(x);
 	v.push_back(y);
@@ -42,6 +45,7 @@ void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, 
 	v.push_back(t);
 }
 
+//utility function
 void Rendr::pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
@@ -53,7 +57,7 @@ void Rendr::pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& val
 }
 
 void Rendr::usePersProj() {
-	//settung up projection uniform
+	//setting up projection uniform on all programs
 	glUseProgram(m_textureProgram);
 	int location = glGetUniformLocation(m_textureProgram, "u_proj");
 	if (location != -1) {
@@ -83,7 +87,7 @@ void Rendr::usePersProj() {
 }
 
 void Rendr::useOrthoProj() {
-	//settung up projection uniform
+	//setting up projection uniform
 	glUseProgram(m_textureProgram);
 	int location = glGetUniformLocation(m_textureProgram, "u_proj");
 	if (location != -1) {
@@ -125,10 +129,12 @@ void Rendr::setTextColor(float r, float g, float b, float a) {
 }
 
 void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+	//bind texture VAO (layout and actual buffers)
 	glBindVertexArray(m_textureVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
+	//upload data on buffers
 	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
@@ -140,10 +146,12 @@ void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned in
 }
 
 void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+	//bind text VAO (layout and actual buffers)
 	glBindVertexArray(m_textureVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
+	//upload data on buffers
 	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
@@ -155,6 +163,7 @@ void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>&
 }
 
 void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr) {
+	//bind color VAO (layout and actual buffers)
 	glBindVertexArray(m_colorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 
@@ -171,6 +180,7 @@ void Rendr::drawText(const char* text, float x, float y, float scl)
 {
 	int i = 0;
 	char c = text[i];
+	//loop for every character in text (until null char)
 	while (c != '\0') {
 		if (c < 128) {
 			Character temp = ChMap[c];
@@ -178,6 +188,7 @@ void Rendr::drawText(const char* text, float x, float y, float scl)
 			std::vector<unsigned int> textIndices;
 			unsigned int textVertexCount = 0;
 
+			//scale by scl every value inside temp (Character utility struct)
 			temp.bx *= scl;
 			temp.by *= scl;
 			temp.width *= scl;
@@ -204,9 +215,10 @@ void Rendr::drawText(const char* text, float x, float y, float scl)
 
 float Rendr::getTextWidth(const char* text,float scale)
 {
-	float x = 0.0f;
+	float x = 0.0f; // return variable
 	int i = 0;
 	char c = text[i];
+	//loop for every character
 	while (c != '\0') {
 		Character temp = ChMap[c];
 		temp.advance *= scale;
@@ -219,13 +231,19 @@ float Rendr::getTextWidth(const char* text,float scale)
 
 void Rendr::loadTexture(const char* path, unsigned int* destination) {
 	int width, height, channels;
+
+	//using stb_image to actually load textures
 	unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
 
 	if (data != nullptr) {
+		//create texture object on graphics card
 		glGenTextures(1, destination);
 		glBindTexture(GL_TEXTURE_2D, *destination);
+		//set parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		//upload texture data
 		if (channels == 4)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -259,6 +277,7 @@ void Rendr::init(GLFWwindow* w) {
 
 	//shader init
 	{
+		//shaders source files
 		const char* vTextureSource = "\n"
 			"#version 330 core\n"
 			"layout(location = 0) in vec4 aPos;\n"
@@ -321,30 +340,33 @@ void Rendr::init(GLFWwindow* w) {
 			"	FragColor = u_textColor * sample;\n"
 			"}\n";
 
-
+		//shader ids
 		unsigned int vShaderTexture, fShaderTexture;
 		unsigned int vShaderColor, fShaderColor;
 		unsigned int fShaderText;
 
+		//create shaders
 		vShaderTexture = glCreateShader(GL_VERTEX_SHADER);
 		fShaderTexture = glCreateShader(GL_FRAGMENT_SHADER);
 		vShaderColor = glCreateShader(GL_VERTEX_SHADER);
 		fShaderColor = glCreateShader(GL_FRAGMENT_SHADER);
 		fShaderText = glCreateShader(GL_FRAGMENT_SHADER);
 
+		//upload shader source data (see above)
 		glShaderSource(vShaderTexture, 1, &vTextureSource, NULL);
 		glShaderSource(fShaderTexture, 1, &fTextureSource, NULL);
 		glShaderSource(vShaderColor, 1, &vColorSource, NULL);
 		glShaderSource(fShaderColor, 1, &fColorSource, NULL);
 		glShaderSource(fShaderText, 1, &fTextSource, NULL);
 
+		//compile shaders (hoping that they don't fail)
 		glCompileShader(vShaderTexture);
 		glCompileShader(fShaderTexture);
 		glCompileShader(vShaderColor);
 		glCompileShader(fShaderColor);
 		glCompileShader(fShaderText);
 
-
+		//example compile status check
 		int success;
 		char infolog[512];
 		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
@@ -353,7 +375,7 @@ void Rendr::init(GLFWwindow* w) {
 			std::cerr << "error compiling shader" << infolog << std::endl;
 		}
 
-
+		//create shader programs
 		m_textureProgram = glCreateProgram();
 		glAttachShader(m_textureProgram, vShaderTexture);
 		glAttachShader(m_textureProgram, fShaderTexture);
@@ -369,7 +391,7 @@ void Rendr::init(GLFWwindow* w) {
 		glAttachShader(m_textProgram, fShaderText);
 		glLinkProgram(m_textProgram);
 
-
+		//example program linking check
 		int linked;
 		char log[512];
 		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
@@ -378,7 +400,7 @@ void Rendr::init(GLFWwindow* w) {
 			std::cerr << "error linking program:" << log << std::endl;
 		}
 
-
+		//delete shader object files
 		glDeleteShader(vShaderTexture);
 		glDeleteShader(fShaderTexture);
 
@@ -402,6 +424,7 @@ void Rendr::init(GLFWwindow* w) {
 
 	//vao setup
 	{
+		//create VAOs
 		glGenVertexArrays(1, &m_textureVAO);
 		glGenVertexArrays(1, &m_colorVAO);
 
@@ -409,6 +432,7 @@ void Rendr::init(GLFWwindow* w) {
 		{
 			glBindVertexArray(m_textureVAO);
 
+			//indices buffer
 			unsigned int ebo;
 			glGenBuffers(1, &m_textureVBO);
 			glGenBuffers(1, &ebo);
@@ -431,9 +455,11 @@ void Rendr::init(GLFWwindow* w) {
 		{
 			glBindVertexArray(m_colorVAO);
 
+			//index buffer
 			unsigned int index;
 			glGenBuffers(1, &m_colorVBO);
 			glGenBuffers(1, &index);
+
 			glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
 
@@ -442,7 +468,6 @@ void Rendr::init(GLFWwindow* w) {
 			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
-
 
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -464,7 +489,6 @@ void Rendr::init(GLFWwindow* w) {
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-
 		for (unsigned char c = 0; c < 128; c++)
 		{
 			// Load character glyph 
@@ -473,18 +497,18 @@ void Rendr::init(GLFWwindow* w) {
 				std::cout << "ERROR::FREETYTPE: Failed to load Glyph:" << c << std::endl;
 
 			}
-			// Generate texture
-			GLuint texture;
+			// generate texture
+			unsigned int texture;
 			glGenTextures(1, &texture);
 			glBindTexture(GL_TEXTURE_2D, texture);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, m_font->glyph->bitmap.width, m_font->glyph->bitmap.rows,
 				0, GL_RED, GL_UNSIGNED_BYTE, m_font->glyph->bitmap.buffer);
-			// Set texture options
+			// set texture parameters
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			// Now store character for later use
+			// store Character data for later use
 			Character character = {
 				texture,
 				(float)m_font->glyph->bitmap_left,
@@ -501,7 +525,6 @@ void Rendr::init(GLFWwindow* w) {
 
 
 	}
-
 	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 

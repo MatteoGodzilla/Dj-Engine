@@ -2,6 +2,7 @@
 
 MenuNavigator::MenuNavigator()
 {
+	//create menu tree
 	MenuNode play("play!",1);
 	MenuNode options("options",2);
 
@@ -29,6 +30,13 @@ void MenuNavigator::init(GLFWwindow* w)
 void MenuNavigator::input(int key, int action)
 {
 	if (m_active) {
+		
+		/*
+		activeNode is the selected node
+		m_selection contains all selected node indices
+		the last item in m_selection is the 'cursor position' moved by player
+		*/
+
 		MenuNode activeNode = m_root;
 		for (size_t i = 0; i < m_selection.size() - 1; i++) {
 			if (activeNode.getChildCount() > 0) {
@@ -38,21 +46,25 @@ void MenuNavigator::input(int key, int action)
 
 		if (action == GLFW_PRESS)
 		{
+			//go up a node
 			if (key == UP_CODE) {
 				m_selection.back()--;
 				if (m_selection.back() < 0) {
 					m_selection.back() = activeNode.getChildCount() - 1;
 				}
 			}
+			//go down a node
 			else if (key == DOWN_CODE) {
 				m_selection.back()++;
 				if (m_selection.back() > activeNode.getChildCount() - 1) {
 					m_selection.back() = 0;
 				}
 			}
+			//activate selected node
 			else if (key == SELECT_CODE) {
 				if (activeNode.getChildCount() > 0)
 				{
+					//do something based on the node id
 					activate(activeNode.getChildrens().at(m_selection.back()));
 					m_selection.push_back(0);
 				}
@@ -60,6 +72,7 @@ void MenuNavigator::input(int key, int action)
 					std::cout << "Reached End of Tree" << std::endl;
 				}
 			}
+			//go back
 			else if (key == BACK_CODE) {
 				if (m_selection.size() > 1) m_selection.pop_back();
 			}
@@ -102,6 +115,7 @@ bool MenuNavigator::getActive()
 
 void MenuNavigator::activate(MenuNode& menu)
 {
+	//every case represents a function called on activate
 	switch (menu.getId()) {
 	case 1:
 		m_active = false;

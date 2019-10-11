@@ -11,11 +11,13 @@ void Game::init(GLFWwindow* w) {
 
 void Game::render() {
 	if (m_active){
+		//each function is responsible for rendering a single 'object' on screen
 		m_render.highway(m_global_time);
 		m_render.bpmTicks(m_global_time, m_bpm_arr);
+		m_render.meters();
+
 		m_render.events(m_global_time, m_event_arr);
 		m_render.clicker();
-		m_render.meters();
 		m_render.lanes(m_global_time, m_event_arr);
 		m_render.notes(m_global_time, m_note_arr);
 	}
@@ -23,17 +25,21 @@ void Game::render() {
 
 void Game::tick() {
 	if (m_active) {
-		
+		//update notes and read chart (text or .fsgmub)
 		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
 		m_gen.textParser(m_note_arr, m_event_arr);
 		m_gen.binaryParser(m_note_arr, m_event_arr);
 		m_gen.bpm(m_global_time, m_bpm_arr);
+
+		//update player (combo + multiplier)
 		m_player.pollState(m_gen);
 		m_player.tick(m_global_time);
+
 		m_render.pollState(m_global_time, m_player, m_gen);
 		m_audio.buffer();
 		if(m_global_time >= 0.0)m_audio.play();
 
+		//add delta time to m_global_time
 		double nowTime = glfwGetTime();
 		m_global_time += nowTime - m_pastTime;
 		m_pastTime = nowTime;

@@ -6,11 +6,13 @@ MenuNode::MenuNode(const char* text,int id)
 	m_id = id;
 }
 
+//push children in current node
 void MenuNode::push(MenuNode n)
 {
 	m_childrens.push_back(n);
 }
 
+//utility functions to return variables
 std::string MenuNode::getText()
 {
 	return m_text;

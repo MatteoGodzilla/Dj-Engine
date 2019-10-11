@@ -22,7 +22,7 @@ public:
 	std::vector<Note> m_event_arr;
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
-
+	
 private:
 	double m_pastTime = 0.0;
 	bool firstRun = true;
