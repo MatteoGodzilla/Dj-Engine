@@ -10,31 +10,32 @@ enum note {TAP_G,TAP_R,TAP_B,
 
 class Note {
 public:
-	Note(double milli, int ty, bool ev = false, float extra = 0.0);
+	Note(double milli, int ty, double length, bool ev = false);
     virtual ~Note();
 	void click(double time);
     void tick(double time);
     double getMilli();
+	double getLength();
     int getType();
-    bool getRender();
     bool getHit();
     bool getTouched();
     bool getDead();
     bool getIsEvent();
     int getLanMod();
     void setLanMod(int i);
-	float getExtra();
+
+	double hitWindow = 0.15;
 protected:
 
 private:
+    double m_milli;
+	double m_length;
+
     double m_hit_window;
-    bool m_is_event;
-    bool m_render = true;
+    bool m_isEvent;
     bool m_hittable = false;
     bool m_touched = false;
     bool m_dead = false;
-    double m_milli;
     int m_type;
     int m_lan_mod = -1;
-	float m_extraData = 0.0;
 };

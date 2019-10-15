@@ -176,7 +176,9 @@ void GameRender::notes(double time, std::vector<Note>& v)
 
 	//loop for every note inside vector
 	for (size_t i = 0; i < v.size(); i++) {
-		if (v.at(i).getRender()) {
+		double milli = v.at(i).getMilli();
+		double hitWindow = v.at(i).hitWindow;
+		if (time+m_noteVisibleTime >= milli && time <= milli+hitWindow) {
 			//if the note is inside the visible highway
 
 			//calculate 'height' of note
@@ -429,7 +431,6 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 
 	*/
 
-
 	//loop for the start section
 	for (size_t i = 0; i < ev.size(); i++) {
 		if (ev.at(i).getMilli() <= time) {
@@ -501,7 +502,7 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 				start = 2;
 				break;
 			}
-			else {
+			else if(ev.at(i).getType() == CROSS_C){
 				//change color if euphoria is active
 				if (m_renderEuActive) {
 					r = 1.0;
@@ -542,7 +543,9 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 
 	//loop for the middle section
 	for (size_t i = 0; i < ev.size(); i++) {
-		if (ev.at(i).getRender()){
+		double milli = ev.at(i).getMilli();
+		double hitWindow = ev.at(i).hitWindow;
+		if (time + m_noteVisibleTime >= milli && time <= milli + hitWindow){
 			//if the event is inside the highway
 
 			double dt = ev.at(i).getMilli() - time;
@@ -682,7 +685,7 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 				}
 				middle = 2;
 			}
-			else {
+			else if(ev.at(i).getType() == CROSS_C){
 				//crossfade center event
 				float z = 3.75f - 3.75f * (float)dt;
 
@@ -760,7 +763,7 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 			else if (ev.at(i).getType() == CROSS_B) {
 				end = 2;
 			}
-			else {
+			else if (ev.at(i).getType() == CROSS_C){
 				end = 1;
 			}
 		}
@@ -923,39 +926,36 @@ void GameRender::events(double time, std::vector<Note>& ev)
 	std::vector<unsigned int> eventsIndices = {};
 	unsigned int eventsVertexCount = 0;
 
-	//loop for every note inside event vector
+	//loop for every event inside event vector
 	for (size_t i = 0; i < ev.size(); i++) {
-		int type = ev.at(i).getType();
-		double dt = ev.at(i).getMilli() - time;
-		if (type == SCR_G_START) {
-			double dt_end = -1;
-			//loops again to find the scratch end
-			for (size_t j = i; j < ev.size(); j++) {
-				if (ev.at(j).getType() == SCR_G_END) {
-					dt_end = ev.at(j).getMilli() - time;
-					break;
-				}
-			}
-			//if there is a scratch end
-			if (dt_end != -1) {
-				double ev_time = ev.at(i).getMilli();
-				bool start_drawn = false;
-				//when the start is in the middle of the highway
+		double milli = ev.at(i).getMilli();
+		double hitWindow = ev.at(i).hitWindow;
+
+		if (time + m_noteVisibleTime >= milli && time <= milli + hitWindow) {
+			int type = ev.at(i).getType();
+			double dt = ev.at(i).getMilli() - time;
+
+			/*
+			if (type == SCR_G_START) {
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				double endDt = endTime - time;
+				bool startDrawing = false;
+
 				if (dt >= 0.0 && dt < 1.0) {
 					float z = 3.75f - (3.75f * (float)dt);
-					if (m_renderCross == 0) {
-						pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+					if (ev.at(i).getLanMod() == 0) {
+						pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 					}
-					start_drawn = true;
+					startDrawing = true;
 				}
 				//when the start has already passed the clickers
 				else if (dt < 0.0) {
-					if (m_renderCross == 0) {
+					if (ev.at(i).getLanMod() == 0) {
 						pushVertexColor(eventsVector, -0.85f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 						pushVertexColor(eventsVector, -0.55f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 					}
@@ -963,26 +963,25 @@ void GameRender::events(double time, std::vector<Note>& ev)
 						pushVertexColor(eventsVector, -0.5f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 						pushVertexColor(eventsVector, -0.2f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
 					}
-					start_drawn = true;
+					startDrawing = true;
 				}
-				//if the render successfully added the start
-				if (start_drawn) {
+				if (startDrawing) {
 					//when the end is in the middle of the highway
-					if (dt_end > 0.0 && dt_end <= 1.0) {
-						float z = 3.75f - (3.75f * (float)dt_end);
-						if (m_renderCross == 0) {
-							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+					if (endDt > 0.0 && endDt <= 1.0) {
+						float z = 3.75f - (3.75f * (float)endDt);
+						if (ev.at(i).getLanMod() == 0) {
+							pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 					//when the end is beyond what is visible
-					else if (dt_end > 1.0) {
-						if (m_renderCross == 0) {
+					else if (endDt > 1.0) {
+						if (ev.at(i).getLanMod() == 0) {
 							pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 							pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 						}
@@ -993,37 +992,29 @@ void GameRender::events(double time, std::vector<Note>& ev)
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
+
 			}
-		}
-		else if (type == SCR_B_START) {
-			double dt_end = -1;
-			//loops again to find the scratch end
-			for (size_t j = i; j < ev.size(); j++) {
-				if (ev.at(j).getType() == SCR_B_END) {
-					dt_end = ev.at(j).getMilli() - time;
-					break;
-				}
-			}
-			//if there is a scratch end
-			if (dt_end != -1) {
-				double ev_time = ev.at(i).getMilli();
-				bool start_drawn = false;
-				//when the start is in the middle of the highway
+			else if (type == SCR_B_START) {
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				double endDt = endTime - time;
+				bool startDrawing = false;
+
+				//when the end is in the middle of the highway
 				if (dt >= 0.0 && dt < 1.0) {
 					float z = 3.75f - (3.75f * (float)dt);
-					if (m_renderCross == 2) {
-						pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+					if (ev.at(i).getLanMod() == 2) {
+						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
 					}
-					start_drawn = true;
+					startDrawing = true;
 				}
 				//when the start has already passed the clickers
 				else if (dt < 0.0) {
-					if (m_renderCross == 2) {
+					if (ev.at(i).getLanMod() == 2) {
 						pushVertexColor(eventsVector, 0.55f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 						pushVertexColor(eventsVector, 0.85f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 					}
@@ -1031,26 +1022,26 @@ void GameRender::events(double time, std::vector<Note>& ev)
 						pushVertexColor(eventsVector, 0.2f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 						pushVertexColor(eventsVector, 0.5f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
 					}
-					start_drawn = true;
+					startDrawing = true;
 				}
 				//if the render successfully added the start
-				if (start_drawn) {
+				if (startDrawing) {
 					//when the end is in the middle of the highway
-					if (dt_end > 0.0 && dt_end <= 1.0) {
-						float z = 3.75f - (3.75f * (float)dt_end);
-						if (m_renderCross == 2) {
-							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+					if (endDt > 0.0 && endDt <= 1.0) {
+						float z = 3.75f - (3.75f * (float)endDt);
+						if (ev.at(i).getLanMod() == 2) {
+							pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
 						}
 						else {
-							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
 						}
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 					//when the end is beyond what is visible
-					else if (dt_end > 1.0) {
-						if (m_renderCross == 2) {
+					else if (endDt > 1.0) {
+						if (ev.at(i).getLanMod() == 2) {
 							pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 							pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 						}
@@ -1061,20 +1052,11 @@ void GameRender::events(double time, std::vector<Note>& ev)
 						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
+				
 			}
-		}
-		else if (type == EU_START) {
-			double dt_end = -1;
-			//loops again to find euphoria end
-			for (size_t j = i; j < ev.size(); j++) {
-				if (ev.at(j).getType() == EU_END) {
-					dt_end = ev.at(j).getMilli() - time;
-					break;
-				}
-			}
-			//if there is an end
-			if (dt_end != -1) {
-				double ev_time = ev.at(i).getMilli();
+			else if (type == EU_START) {
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				double endDt = endTime - time;
 				bool start_eu = false;
 				//if euphoria start is in the middle of the highway
 				if (dt >= 0.0 && dt < 1.0) {
@@ -1085,17 +1067,17 @@ void GameRender::events(double time, std::vector<Note>& ev)
 				}
 				//if euphoria start has already passed the clicker
 				else if (dt < 0.0) {
-					if (m_renderEuZone) {
+					//if (m_renderEuZone) {
 						pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
 						pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
 						start_eu = true;
-					}
+					//}
 				}
 				//if the render has successfully added the start
 				if (start_eu) {
 					//if euphoria end is in the middle of the highway
-					if (dt_end >= 0.0 && dt_end < 1.0) {
-						float z = 3.75f - (3.75f * (float)dt_end);
+					if (endDt >= 0.0 && endDt < 1.0) {
+						float z = 3.75f - (3.75f * (float)endDt);
 						pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 						pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 
@@ -1107,7 +1089,10 @@ void GameRender::events(double time, std::vector<Note>& ev)
 					}
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-			}
+			}*/
+		}
+		else {
+			ev.at(i).setLanMod(m_renderCross);
 		}
 	}
 	usePersProj();
@@ -1281,6 +1266,27 @@ void GameRender::meters()
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
 	drawText(scoreDisplay.c_str(), 940.0f, 230.0f, 0.05f);
+}
+
+void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
+	/*
+	std::string text = "Notes:";
+	for (size_t i = 0; i < note_arr.size(); i++) {
+		int t = note_arr.at(i).getType();
+		text.append(std::to_string(t));
+		text.append(",");
+	}
+	drawText(text.c_str(), 0, 40, 0.05);
+	*/
+	std::string t2 = "Events:";
+	for (size_t i = 0; i < ev.size()/10; i++) {
+		int t = ev.at(i).getType();
+		t2.append(std::to_string(t));
+		t2.append(",");
+	}
+	drawText(t2.c_str(), 0, 40, 0.05);
+	//std::cout << t2 << std::endl;
+	
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {

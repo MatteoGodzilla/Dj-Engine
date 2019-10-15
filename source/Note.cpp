@@ -1,43 +1,36 @@
 #include "Note.h"
 
-double hitWindow = 0.15;
-double highwayTimeVisible = 1.0;
 
-Note::Note(double milli,int ty,bool ev, float extra){
+
+Note::Note(double milli,int ty, double length, bool ev){
     //set hit time
     m_hit_window = hitWindow;
     m_milli = milli;
     m_type = ty;
-    m_is_event = ev;
-	m_extraData = extra;
+    m_isEvent = ev;
+	m_length = length;
 }
 
 //when the player clicks the corrisponding button
 void Note::click(double time) {
     if(m_hittable){
-        std::cout << "Hit :" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
+        std::cout << "Hit :" << m_isEvent << "\\"<< m_type << " at " << time << std::endl;
         m_touched = true;
     }else {
-        std::cout << "Miss:" << m_is_event << "\\"<< m_type << " at " << time << std::endl;
+        std::cout << "Miss:" << m_isEvent << "\\"<< m_type << " at " << time << std::endl;
     }
-    if(!m_is_event){
+    if(!m_isEvent){
         m_dead = true;
     }
 }
 
 //updating note every frame
 void Note::tick(double time){
-    if(time + highwayTimeVisible >= m_milli && time <= m_milli+m_hit_window){
-        m_render = true;
-    }else{
-        m_render = false;
-    }
-
     if(m_milli-time <= m_hit_window && time-m_milli <= m_hit_window){
         m_hittable = true;
     }else m_hittable = false;
 
-    if(time > m_milli+m_hit_window && !m_is_event){
+    if(time > m_milli+m_hit_window && !m_isEvent){
         m_dead = true;
     }
 }
@@ -47,12 +40,13 @@ double Note::getMilli() {
     return m_milli;
 }
 
-int Note::getType() {
-    return m_type;
+double Note::getLength()
+{
+	return m_length;
 }
 
-bool Note::getRender() {
-    return m_render;
+int Note::getType() {
+    return m_type;
 }
 
 bool Note::getHit(){
@@ -63,7 +57,7 @@ bool Note::getTouched(){
 }
 
 bool Note::getIsEvent(){
-    return m_is_event;
+    return m_isEvent;
 }
 bool Note::getDead(){
     return m_dead;
@@ -76,10 +70,7 @@ void Note::setLanMod(int i){
     m_lan_mod = i;
 }
 
-float Note::getExtra()
-{
-	return m_extraData;
-}
+
 
 Note::~Note() {
 }

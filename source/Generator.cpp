@@ -21,7 +21,7 @@ void readToFloat(std::ifstream& stream, float* f) {
 }
 
 Generator::Generator() {
-	pushEvent(-2.0, CROSS_C);//Do not remove
+	pushEvent(-2.0, CROSS_C, 0.0);//Do not remove
 	m_chart.open("res/chart.txt");
 	if (m_chart.is_open()) {
 		//write chart data to console
@@ -55,30 +55,39 @@ Generator::Generator() {
 //update notes/events every frame
 void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	m_combo_reset = false;
-	m_eu_start = false;
 	m_eu_check = false;
 	size_t note_s = m_note_times.size();
 
 	//note generation from 'cache' (m_note_times)
 	for (size_t i = 0; i < note_s; ++i) {
-		Note temp(m_note_times.at(0), m_note_types.at(0));
+		double time = m_note_times.at(0);
+		int type = m_note_types.at(0);
+		double length = m_note_length.at(0);
+
+
+		Note temp(time,type,length,false);
 		v.push_back(temp);
 		m_note_times.erase(m_note_times.begin());
 		m_note_types.erase(m_note_types.begin());
+		m_note_length.erase(m_note_length.begin());
 	}
 	size_t event_s = m_event_times.size();
 
 	//event generation from ''cache (m_event_times)
 	for (size_t i = 0; i < event_s; ++i) {
-		Note e(m_event_times.at(0), m_event_types.at(0), true);
+		double time = m_event_times.at(0);
+		int type = m_event_types.at(0);
+		double length = m_event_length.at(0);
+		Note e(time,type,length,true);
 		ev.push_back(e);
 		m_event_times.erase(m_event_times.begin());
 		m_event_types.erase(m_event_types.begin());
+		m_event_length.erase(m_event_length.begin());
 	}
 	if (!v.empty()) {
 		for (size_t i = v.size(); i-- > 0;) {
-			//remove if outside hit area
 			v.at(i).tick(time);
+			//remove if outside hit area
 			if (v.at(i).getDead()) {
 				//if the player hasn't clicked the note
 				if (v.at(i).getTouched() == false) {
@@ -104,32 +113,20 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			*/
 
 			if (type == SCR_G_START) {
-				int e = -1;
-				//find the corrisponding event end
-				for (size_t j = ev.size(); j-- > 0;) {
-					if (i != j && ev.at(j).getType() == SCR_G_END && time > ev.at(j).getMilli() + 0.2)e = j;
-				}
-				//if the end has already crossed, remove both start and end
-				if (e != -1) {
-					ev.erase(ev.begin() + e);
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				if (endTime < time) {
 					ev.erase(ev.begin() + i);
 				}
 			}
 
 			if (type == SCR_B_START) {
-				int e = -1;
-				//find the corrisponding event end
-				for (size_t j = ev.size(); j-- > 0;) {
-					if (i != j && ev.at(j).getType() == SCR_B_END && time >= ev.at(j).getMilli() + 0.2)e = j;
-				}
-				//if the end has already crossed, remove both startand end
-				if (e != -1) {
-					ev.erase(ev.begin() + e);
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				if (endTime < time) {
 					ev.erase(ev.begin() + i);
 				}
 			}
 			if (type == CROSS_G || type == CROSS_C || type == CROSS_B) {
-				for (size_t j = ev.size(); j-- > i;) {
+				for (size_t j = 0; j < ev.size(); j++) {
 					int next_type = ev.at(j).getType();
 					double next_time = ev.at(j).getMilli();
 					//find the first cross in the events
@@ -145,18 +142,13 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 				}
 			}
 			if (type == EU_START) {
-				if (ev.at(i).getHit()) {
-					m_eu_start = true;
-				}
-				int e = -1;
-				//find the corrisponding end
-				for (size_t j = i; j < ev.size(); j++) {
-					if (i != j && ev.at(j).getType() == EU_END && time >= ev.at(j).getMilli())e = j;
-				}
-				//if the end has crossed the clickers
-				if (e != -1) {
+				m_eu_start = true;
+				
+
+				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				if (endTime < time) {
 					m_eu_check = true;
-					ev.erase(ev.begin() + e);
+					m_eu_start = false;
 					ev.erase(ev.begin() + i);
 				}
 			}
@@ -195,17 +187,17 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			if (token == "R" || token == "r") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushNote(t, TAP_R);
+				pushNote(t, TAP_R,0.0);
 			}
 			else if (token == "G" || token == "g") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushNote(t, TAP_G);
+				pushNote(t, TAP_G, 0.0);
 			}
 			else if (token == "B" || token == "b") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushNote(t, TAP_B);
+				pushNote(t, TAP_B, 0.0);
 			}
 			else {
 				std::cerr << "error parsing token:T " << token << std::endl;
@@ -216,17 +208,17 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			if (token == "G" || token == "g") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushEvent(t, CROSS_G);
+				pushEvent(t, CROSS_G, 0.0);
 			}
 			else if (token == "B" || token == "b") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushEvent(t, CROSS_B);
+				pushEvent(t, CROSS_B, 0.0);
 			}
 			else if (token == "C" || token == "c") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushEvent(t, CROSS_C);
+				pushEvent(t, CROSS_C, 0.0);
 			}
 			else {
 				std::cerr << "error parsing token:C " << token << std::endl;
@@ -239,27 +231,25 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 				if (token == "U" || token == "u") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_G_UP);
+					pushNote(t, SCR_G_UP, 0.0);
 				}
 				else if (token == "D" || token == "d") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_G_DOWN);
+					pushNote(t, SCR_G_DOWN, 0.0);
 				}
 				else if (token == "A" || token == "a") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_G_ANY);
+					pushNote(t, SCR_G_ANY, 0.0);
 				}
 				else if (token == "S" || token == "s") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushEvent(t, SCR_G_START);
-				}
-				else if (token == "E" || token == "e") {
+					double length = 0.0;
 					m_chart >> token;
-					t = std::stod(token);
-					pushEvent(t, SCR_G_END);
+					length = std::stod(token);
+					pushEvent(t, SCR_G_START, length);
 				}
 				else {
 					std::cerr << "error parsing token:S G " << token << std::endl;
@@ -270,27 +260,25 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 				if (token == "U" || token == "u") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_B_UP);
+					pushNote(t, SCR_B_UP, 0.0);
 				}
 				else if (token == "D" || token == "d") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_B_DOWN);
+					pushNote(t, SCR_B_DOWN, 0.0);
 				}
 				else if (token == "A" || token == "a") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushNote(t, SCR_B_ANY);
+					pushNote(t, SCR_B_ANY, 0.0);
 				}
 				else if (token == "S" || token == "s") {
 					m_chart >> token;
 					t = std::stod(token);
-					pushEvent(t, SCR_B_START);
-				}
-				else if (token == "E" || token == "e") {
+					double length = 0.0;
 					m_chart >> token;
-					t = std::stod(token);
-					pushEvent(t, SCR_B_END);
+					length = std::stod(token);
+					pushEvent(t, SCR_B_START, length);
 				}
 				else {
 					std::cerr << "error parsing token:S B " << token << std::endl;
@@ -305,12 +293,10 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			if (token == "S" || token == "s") {
 				m_chart >> token;
 				t = std::stod(token);
-				pushEvent(t, EU_START);
-			}
-			else if (token == "E" || token == "e") {
+				double length = 0.0;
 				m_chart >> token;
-				t = std::stod(token);
-				pushEvent(t, EU_END);
+				length = std::stod(token);
+				pushEvent(t, EU_START, length);
 			}
 			else {
 				std::cerr << "error parsing token:E " << token << std::endl;
@@ -352,7 +338,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 	while (!m_chart.eof() && v.size() < 100 && ev.size() < 100 && !m_isTimeRelative) {
 		float time;
 		int type;
-		float length;
+		float length = 0.0;
 		float extra;
 
 		//read entry from file
@@ -361,41 +347,65 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		readToFloat(m_chart, &length);
 		readToFloat(m_chart, &extra);
 
-		int factor;
-		if (m_bpmChangeValue != -1 && m_bpmChangeTime != -1 && time >= m_bpmChangeTime) {
-			factor = (60*4)/m_bpmChangeValue;
-		}
-		else {
-			factor = (60*4)/m_bpm ;
-		}
+		double factor = 240 / m_bpm;
 		
-		time = time * factor;
-		length = length * factor;
+		time *= factor;
+		length *= factor;
 		
+		//std::cout << time << "\t" << type << "\t" << length << "\t" << extra << std::endl;
+
 		//decode type from entry
-		if (type == 0)pushNote((double)time, TAP_G);
-		else if (type == 1)pushNote((double)time, TAP_B);
-		else if (type == 2)pushNote((double)time, TAP_R);
-		else if (type == 3)pushNote((double)time, SCR_G_UP);
-		else if (type == 4)pushNote((double)time, SCR_B_UP);
-		else if (type == 5)pushNote((double)time, SCR_G_DOWN);
-		else if (type == 6)pushNote((double)time, SCR_B_DOWN);
-		else if (type == 7)pushNote((double)time, SCR_G_ANY);
-		else if (type == 8)pushNote((double)time, SCR_B_ANY);
-		else if (type == 9)pushEvent((double)time, CROSS_B);
-		else if (type == 10)pushEvent((double)time, CROSS_C);
-		else if (type == 11)pushEvent((double)time, CROSS_G);
+		if (type == 0)pushNote((double)time, TAP_G, 0.0);
+		else if (type == 1)pushNote((double)time, TAP_B, 0.0);
+		else if (type == 2)pushNote((double)time, TAP_R, 0.0);
+		else if (type == 3)pushNote((double)time, SCR_G_UP, 0.0);
+		else if (type == 4)pushNote((double)time, SCR_B_UP, 0.0);
+		else if (type == 5)pushNote((double)time, SCR_G_DOWN, 0.0);
+		else if (type == 6)pushNote((double)time, SCR_B_DOWN, 0.0);
+		else if (type == 7)pushNote((double)time, SCR_G_ANY, 0.0);
+		else if (type == 8)pushNote((double)time, SCR_B_ANY, 0.0);
+		else if (type == 9)pushEvent((double)time, CROSS_B, 0.0);
+		else if (type == 10)pushEvent((double)time, CROSS_C, 0.0);
+		else if (type == 11)pushEvent((double)time, CROSS_G, 0.0);
 		else if (type == 15) {
+			pushEvent((double)time, EU_START, (double)length);
+
+			/*
 			pushEvent((double)time, EU_START);
 			pushEvent((double)time + (double)length, EU_END);
+			*/
 		}
 		else if (type == 20) {
+			pushEvent((double)time, SCR_G_START, (double)length);
+
+			/*
 			pushEvent((double)time, SCR_G_START);
 			pushEvent((double)time + (double)length, SCR_G_END);
+			*/
 		}
-		else if (type == 20) {
+		else if (type == 21) {
+			pushEvent((double)time, SCR_B_START, (double)length);
+
+			/*
 			pushEvent((double)time, SCR_B_START);
 			pushEvent((double)time + (double)length, SCR_B_END);
+			*/
+		}
+		else if (type == 48) {
+			pushEvent((double)time, SCR_G_START, (double)length);
+
+			/*
+			pushEvent((double)time, SCR_G_START);
+			pushEvent((double)time + (double)length, SCR_G_END);
+			*/
+		}
+		else if (type == 49) {
+			pushEvent((double)time, SCR_B_START, (double)length);
+
+			/*
+			pushEvent((double)time, SCR_B_START);
+			pushEvent((double)time + (double)length, SCR_B_END);
+			*/
 		}
 		else if (type == 0x0B000001) {
 			//bpm marker
@@ -408,7 +418,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		else if (type == 0xFFFFFFFF) {
 			//chart start
 		}
-		else std::cerr << "error parsing entry" << std::endl;
+		//else std::cerr << "error parsing entry: " << time << "\t"<< type << "\t"<< length << "\t"<< extra<<std::endl;
 	}
 }
 
@@ -430,18 +440,20 @@ void Generator::bpm(double time, std::vector<double>& arr)
 }
 
 //utility functions 
-void Generator::pushNote(double time, int type) {
+void Generator::pushNote(double time, int type, double length) {
 	if (m_isTimeRelative) m_time += time;
 	else m_time = time;
 	m_note_times.push_back(m_time);
 	m_note_types.push_back(type);
+	m_note_length.push_back(length);
 }
 
-void Generator::pushEvent(double time, int type) {
+void Generator::pushEvent(double time, int type, double length) {
 	if (m_isTimeRelative) m_time += time;
 	else m_time = time;
 	m_event_times.push_back(m_time);
 	m_event_types.push_back(type);
+	m_event_length.push_back(length);
 }
 
 Generator::~Generator() {

@@ -23,9 +23,12 @@ public:
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void meters();
     void pollState(double time,Player& p,Generator &g);
+	void debug(std::vector<Note>& note, std::vector<Note>& ev);
     virtual ~GameRender();
 	
 private:
+	double m_noteVisibleTime = 1.0;
+
 	bool m_red = false, m_green = false, m_blue = false;
     int m_playerCross = 1;
 	int m_playerCombo = 0;
