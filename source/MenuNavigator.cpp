@@ -1,7 +1,6 @@
 #include "MenuNavigator.h"
 
-MenuNavigator::MenuNavigator()
-{
+MenuNavigator::MenuNavigator(){
 	//create menu tree
 	MenuNode play("play!",1);
 	MenuNode options("options",2);
@@ -21,14 +20,12 @@ MenuNavigator::MenuNavigator()
 	m_activeNode = m_root;
 }
 
-void MenuNavigator::init(GLFWwindow* w) 
-{
+void MenuNavigator::init(GLFWwindow* w) {
 	m_render.init(w);
 	render();
 }
 
-void MenuNavigator::input(int key, int action)
-{
+void MenuNavigator::input(int key, int action) {
 	if (m_active) {
 		
 		/*
@@ -103,18 +100,15 @@ void MenuNavigator::render() {
 	}
 }
 
-void MenuNavigator::setActive(bool active)
-{
+void MenuNavigator::setActive(bool active) {
 	m_active = active;
 }
 
-bool MenuNavigator::getActive()
-{
+bool MenuNavigator::getActive() {
 	return m_active;
 }
 
-void MenuNavigator::activate(MenuNode& menu)
-{
+void MenuNavigator::activate(MenuNode& menu) {
 	//every case represents a function called on activate
 	switch (menu.getId()) {
 	case 1:

@@ -1,7 +1,5 @@
 #include "Note.h"
 
-
-
 Note::Note(double milli,int ty, double length, bool ev){
     //set hit time
     m_hit_window = hitWindow;
@@ -69,8 +67,6 @@ int Note::getLanMod(){
 void Note::setLanMod(int i){
     m_lan_mod = i;
 }
-
-
 
 Note::~Note() {
 }

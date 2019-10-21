@@ -1,25 +1,21 @@
 #include "MenuNode.h"
 
-MenuNode::MenuNode(const char* text,int id)
-{
+MenuNode::MenuNode(const char* text,int id) {
 	m_text = std::string(text);
 	m_id = id;
 }
 
 //push children in current node
-void MenuNode::push(MenuNode n)
-{
+void MenuNode::push(MenuNode n) {
 	m_childrens.push_back(n);
 }
 
 //utility functions to return variables
-std::string MenuNode::getText()
-{
+std::string MenuNode::getText() {
 	return m_text;
 }
 
-int MenuNode::getId()
-{
+int MenuNode::getId() {
 	return m_id;
 }
 
@@ -31,7 +27,6 @@ size_t MenuNode::getChildCount() {
 	return m_childrens.size();
 }
 
-MenuNode::~MenuNode()
-{
+MenuNode::~MenuNode() {
 	m_childrens.erase(m_childrens.begin(), m_childrens.end());
 }

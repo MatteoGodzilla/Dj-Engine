@@ -18,8 +18,8 @@ public:
 	void highway(double time);
     void clicker();
     void notes(double time,std::vector<Note> &v);
-    void events(double time,std::vector<Note>&ev);
-    void lanes(double time, std::vector<Note>&ev);
+    void events(double time, std::vector<Note>&ev);
+    void lanes(double time, std::vector<Note> &v,std::vector<Note>&ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void meters();
     void pollState(double time,Player& p,Generator &g);

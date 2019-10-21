@@ -4,8 +4,7 @@ MenuRender::MenuRender()
 {
 }
 
-void MenuRender::init(GLFWwindow* w)
-{
+void MenuRender::init(GLFWwindow* w) {
 	Rendr::init(w);
 
 	m_window = w;
@@ -18,8 +17,7 @@ void MenuRender::init(GLFWwindow* w)
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 }
 
-void MenuRender::render(MenuNode menu,int selected)
-{
+void MenuRender::render(MenuNode menu,int selected) {
 	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;

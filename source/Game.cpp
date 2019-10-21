@@ -18,11 +18,11 @@ void Game::render() {
 
 		m_render.events(m_global_time, m_event_arr);
 		m_render.clicker();
-		m_render.lanes(m_global_time, m_event_arr);
+		m_render.lanes(m_global_time, m_note_arr, m_event_arr);
 		m_render.notes(m_global_time, m_note_arr);
 
 		//debug
-		m_render.debug(m_note_arr, m_event_arr);
+		//m_render.debug(m_note_arr, m_event_arr);
 	}
 }
 

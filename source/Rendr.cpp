@@ -176,8 +176,7 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 	glBindVertexArray(0);
 }
 
-void Rendr::drawText(const char* text, float x, float y, float scl)
-{
+void Rendr::drawText(const char* text, float x, float y, float scl) {
 	int i = 0;
 	char c = text[i];
 	//loop for every character in text (until null char)
@@ -213,8 +212,7 @@ void Rendr::drawText(const char* text, float x, float y, float scl)
 	}
 }
 
-float Rendr::getTextWidth(const char* text,float scale)
-{
+float Rendr::getTextWidth(const char* text,float scale) {
 	float x = 0.0f; // return variable
 	int i = 0;
 	char c = text[i];

@@ -49,6 +49,27 @@ Generator::Generator() {
 
 			std::cout << "version: " << version << std::endl;
 		}
+		else {
+			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
+			m_chart.open("res/chart.xmk", std::ios::binary);
+			if (m_chart.is_open()) {
+				//write chart data to console
+				m_isTimeRelative = false;
+				std::cout << "loaded xmk chart" << std::endl;
+
+				int version = 0;
+				int dummy = 0;
+				readToInt(m_chart, &version);
+				readToInt(m_chart, &dummy);
+				readToInt(m_chart, &dummy);
+				readToInt(m_chart, &dummy);
+
+				std::cout << "version: " << version << std::endl;
+			}
+			else {
+				std::cerr << "Generator Error: could not load chart file" << std::endl;
+			}
+		}
 	}
 }
 
@@ -112,14 +133,14 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			before the corrisponding scratch end
 			*/
 
-			if (type == SCR_G_START) {
+			if (type == SCR_G_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				if (endTime < time) {
 					ev.erase(ev.begin() + i);
 				}
 			}
 
-			if (type == SCR_B_START) {
+			if (type == SCR_B_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				if (endTime < time) {
 					ev.erase(ev.begin() + i);
@@ -141,7 +162,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 					}
 				}
 			}
-			if (type == EU_START) {
+			if (type == EU_ZONE) {
 				m_eu_start = true;
 				
 
@@ -249,7 +270,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 					double length = 0.0;
 					m_chart >> token;
 					length = std::stod(token);
-					pushEvent(t, SCR_G_START, length);
+					pushEvent(t, SCR_G_ZONE, length);
 				}
 				else {
 					std::cerr << "error parsing token:S G " << token << std::endl;
@@ -278,7 +299,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 					double length = 0.0;
 					m_chart >> token;
 					length = std::stod(token);
-					pushEvent(t, SCR_B_START, length);
+					pushEvent(t, SCR_B_ZONE, length);
 				}
 				else {
 					std::cerr << "error parsing token:S B " << token << std::endl;
@@ -296,7 +317,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 				double length = 0.0;
 				m_chart >> token;
 				length = std::stod(token);
-				pushEvent(t, EU_START, length);
+				pushEvent(t, EU_ZONE, length);
 			}
 			else {
 				std::cerr << "error parsing token:E " << token << std::endl;
@@ -347,72 +368,79 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		readToFloat(m_chart, &length);
 		readToFloat(m_chart, &extra);
 
-		double factor = 240 / m_bpm;
-		
+		double factor = 240.0 / m_bpm;
+
 		time *= factor;
 		length *= factor;
-		
+
 		//std::cout << time << "\t" << type << "\t" << length << "\t" << extra << std::endl;
 
 		//decode type from entry
-		if (type == 0)pushNote((double)time, TAP_G, 0.0);
-		else if (type == 1)pushNote((double)time, TAP_B, 0.0);
-		else if (type == 2)pushNote((double)time, TAP_R, 0.0);
-		else if (type == 3)pushNote((double)time, SCR_G_UP, 0.0);
-		else if (type == 4)pushNote((double)time, SCR_B_UP, 0.0);
-		else if (type == 5)pushNote((double)time, SCR_G_DOWN, 0.0);
-		else if (type == 6)pushNote((double)time, SCR_B_DOWN, 0.0);
-		else if (type == 7)pushNote((double)time, SCR_G_ANY, 0.0);
-		else if (type == 8)pushNote((double)time, SCR_B_ANY, 0.0);
-		else if (type == 9)pushEvent((double)time, CROSS_B, 0.0);
-		else if (type == 10)pushEvent((double)time, CROSS_C, 0.0);
-		else if (type == 11)pushEvent((double)time, CROSS_G, 0.0);
+		if (type == 0) {
+			pushNote((double)time, TAP_G, 0.0);
+		}
+		else if (type == 1) {
+			pushNote((double)time, TAP_B, 0.0);
+		}
+		else if (type == 2) {
+			pushNote((double)time, TAP_R, 0.0);
+		}
+		else if (type == 3) {
+			pushNote((double)time, SCR_G_UP, 0.0);
+		}
+		else if (type == 4) {
+			pushNote((double)time, SCR_B_UP, 0.0);
+		}
+		else if (type == 5) {
+			pushNote((double)time, SCR_G_DOWN, 0.0);
+		}
+		else if (type == 6) {
+			pushNote((double)time, SCR_B_DOWN, 0.0);
+		}
+		else if (type == 7) {
+			pushNote((double)time, SCR_G_ANY, 0.0);
+		}
+		else if (type == 8) {
+			pushNote((double)time, SCR_B_ANY, 0.0);
+		}
+		else if (type == 9) {
+			pushEvent((double)time, CROSS_B, 0.0);
+		}
+		else if (type == 10) {
+			pushEvent((double)time, CROSS_C, 0.0);
+		}
+		else if (type == 11) {
+			pushEvent((double)time, CROSS_G, 0.0);
+		}
 		else if (type == 15) {
-			pushEvent((double)time, EU_START, (double)length);
-
-			/*
-			pushEvent((double)time, EU_START);
-			pushEvent((double)time + (double)length, EU_END);
-			*/
+			pushEvent((double)time, EU_ZONE, (double)length);
 		}
 		else if (type == 20) {
-			pushEvent((double)time, SCR_G_START, (double)length);
-
-			/*
-			pushEvent((double)time, SCR_G_START);
-			pushEvent((double)time + (double)length, SCR_G_END);
-			*/
+			pushEvent((double)time, SCR_G_ZONE, (double)length);
 		}
 		else if (type == 21) {
-			pushEvent((double)time, SCR_B_START, (double)length);
-
-			/*
-			pushEvent((double)time, SCR_B_START);
-			pushEvent((double)time + (double)length, SCR_B_END);
-			*/
+			pushEvent((double)time, SCR_B_ZONE, (double)length);
+		}
+		else if (type == 27) {
+			pushNote((double)time, CF_SPIKE_G, 0.0);
+		}
+		else if (type == 28) {
+			pushNote((double)time, CF_SPIKE_B, 0.0);
+		}
+		else if (type == 29) {
+			pushNote((double)time, CF_SPIKE_C, 0.0);
 		}
 		else if (type == 48) {
-			pushEvent((double)time, SCR_G_START, (double)length);
-
-			/*
-			pushEvent((double)time, SCR_G_START);
-			pushEvent((double)time + (double)length, SCR_G_END);
-			*/
+			pushEvent((double)time, SCR_G_ZONE, (double)length);
 		}
 		else if (type == 49) {
-			pushEvent((double)time, SCR_B_START, (double)length);
-
-			/*
-			pushEvent((double)time, SCR_B_START);
-			pushEvent((double)time + (double)length, SCR_B_END);
-			*/
+			pushEvent((double)time, SCR_B_ZONE, (double)length);
 		}
 		else if (type == 0x0B000001) {
 			//bpm marker
 		}
 		else if (type == 0x0B000002) {
-			m_bpmChangeTime = (double)time;
-			m_bpmChangeValue = (int)extra;
+			m_bpm = extra;
 		}
 		else if (type == 0x0AFFFFFF) {}
 		else if (type == 0xFFFFFFFF) {
@@ -422,8 +450,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 	}
 }
 
-void Generator::bpm(double time, std::vector<double>& arr)
-{
+void Generator::bpm(double time, std::vector<double>& arr){
 	//update bpm tick array
 
 	for (size_t i = 0; i < arr.size(); i++) {

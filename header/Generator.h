@@ -17,7 +17,7 @@ public:
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
-	int m_bpm = 117;
+	int m_bpm = 118;
 protected:
 
 private:

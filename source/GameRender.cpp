@@ -45,8 +45,7 @@ void GameRender::highway(double time) {
 	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
 }
 
-void GameRender::clicker()
-{
+void GameRender::clicker(){
 	//difference in size between pressed and not
 	float clickedOffset = 0.03f;
 
@@ -165,8 +164,7 @@ void GameRender::clicker()
 	renderTexture(clickerVector, clickerIndices, m_objTexture);
 }
 
-void GameRender::notes(double time, std::vector<Note>& v)
-{
+void GameRender::notes(double time, std::vector<Note>& v){
 	float plane = 0.0;
 
 	//vertices data
@@ -374,6 +372,7 @@ void GameRender::notes(double time, std::vector<Note>& v)
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
+			
 		}
 		else {
 			//if the note is outside the visible area, update lane position
@@ -384,7 +383,7 @@ void GameRender::notes(double time, std::vector<Note>& v)
 	renderTexture(noteVector, noteIndices, m_objTexture);
 }
 
-void GameRender::lanes(double time, std::vector<Note>& ev)
+void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev)
 {
 	float plane = 0.0;
 
@@ -400,6 +399,11 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 	std::vector<float> redLaneVector = {};
 	std::vector<unsigned int>redLaneIndices = {};
 	unsigned int redLaneVertexCount = 0;
+
+	std::vector<float> spikesVector = {};
+	std::vector<unsigned int>spikesIndices = {};
+	unsigned int spikesVertexCount = 0;
+
 
 	float r, g, b;
 
@@ -870,14 +874,79 @@ void GameRender::lanes(double time, std::vector<Note>& ev)
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
+	for (size_t i = 0; i < v.size(); i++) {
+		double milli = v.at(i).getMilli();
+		double hitWindow = v.at(i).hitWindow;
+		if (time + m_noteVisibleTime >= milli && time <= milli + hitWindow) {
+			int type = v.at(i).getType();
+			double dt = v.at(i).getMilli() - time;
+			float z = 3.75f - (3.75f * (float)dt);
+
+			double s, t;
+
+			if (type == CF_SPIKE_G) {
+				if (v.at(i).getLanMod() == 1) {
+					s = 1200.0 / 1740.0;
+					t = 1460.0 / 1640.0;
+
+					pushVertexTexture(spikesVector, -0.7f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, -0.7f, plane, z + 0.1f, s, t);
+					pushVertexTexture(spikesVector, -0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(spikesVector, -0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushRectangleIndices(spikesIndices, spikesVertexCount);
+				}
+			}
+			else if (type == CF_SPIKE_B) {
+				if (v.at(i).getLanMod() == 1) {
+					s = 1200.0 / 1740.0;
+					t = 1280.0 / 1640.0;
+
+					pushVertexTexture(spikesVector, 0.35f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, 0.35f, plane, z + 0.1f, s, t);
+					pushVertexTexture(spikesVector, 0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(spikesVector, 0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushRectangleIndices(spikesIndices, spikesVertexCount);
+				}
+			}
+			else if (type == CF_SPIKE_C) {
+				if (v.at(i).getLanMod() == 0) {
+					s = 1200.0 / 1740.0;
+					t = 1460.0 / 1640.0;
+
+					pushVertexTexture(spikesVector, -0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(spikesVector, -0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, -0.35f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, -0.35f, plane, z - 0.1f, s, t);
+					pushRectangleIndices(spikesIndices, spikesVertexCount);
+
+					pushRectangleIndices(spikesIndices, spikesVertexCount);
+				}
+				else if (v.at(i).getLanMod() == 2) {
+					s = 1200.0 / 1740.0;
+					t = 1280.0 / 1640.0;
+
+					pushVertexTexture(spikesVector, 0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(spikesVector, 0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, 0.7f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(spikesVector, 0.7f, plane, z - 0.1f, s, t);
+					pushRectangleIndices(spikesIndices, spikesVertexCount);
+
+
+				}
+			}
+		}
+	}
+
+
 	usePersProj();
 	renderColor(redLaneVector, redLaneIndices);
 	renderColor(greenLaneVector, greenLaneIndices);
 	renderColor(blueLaneVector, blueLaneIndices);
+
+	renderTexture(spikesVector, spikesIndices, m_objTexture);
 }
 
-void GameRender::bpmTicks(double time, std::vector<double>& bpmArr)
-{
+void GameRender::bpmTicks(double time, std::vector<double>& bpmArr){
 	//vertices data
 	std::vector<float> bpmVector;
 	std::vector<unsigned int> bpmIndices;
@@ -916,8 +985,7 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr)
 	renderColor(bpmVector, bpmIndices);
 }
 
-void GameRender::events(double time, std::vector<Note>& ev) 
-{
+void GameRender::events(double time, std::vector<Note>& ev) {
 	float plane = 0.0;
 	float transparency = 0.5; // euphoria transparency
 
@@ -935,8 +1003,7 @@ void GameRender::events(double time, std::vector<Note>& ev)
 			int type = ev.at(i).getType();
 			double dt = ev.at(i).getMilli() - time;
 
-			/*
-			if (type == SCR_G_START) {
+			if (type == SCR_G_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				double endDt = endTime - time;
 				bool startDrawing = false;
@@ -994,7 +1061,7 @@ void GameRender::events(double time, std::vector<Note>& ev)
 				}
 
 			}
-			else if (type == SCR_B_START) {
+			else if (type == SCR_B_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				double endDt = endTime - time;
 				bool startDrawing = false;
@@ -1054,7 +1121,7 @@ void GameRender::events(double time, std::vector<Note>& ev)
 				}
 				
 			}
-			else if (type == EU_START) {
+			else if (type == EU_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				double endDt = endTime - time;
 				bool start_eu = false;
@@ -1089,7 +1156,7 @@ void GameRender::events(double time, std::vector<Note>& ev)
 					}
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-			}*/
+			}
 		}
 		else {
 			ev.at(i).setLanMod(m_renderCross);
@@ -1099,8 +1166,7 @@ void GameRender::events(double time, std::vector<Note>& ev)
 	renderColor(eventsVector, eventsIndices);
 }
 
-void GameRender::meters()
-{
+void GameRender::meters(){
 	float yPlane = 0.1f;
 
 	//vertices data
@@ -1268,16 +1334,16 @@ void GameRender::meters()
 	drawText(scoreDisplay.c_str(), 940.0f, 230.0f, 0.05f);
 }
 
-void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
-	/*
+void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {	
 	std::string text = "Notes:";
-	for (size_t i = 0; i < note_arr.size(); i++) {
+	for (size_t i = 0; i < note_arr.size()/10; i++) {
 		int t = note_arr.at(i).getType();
 		text.append(std::to_string(t));
 		text.append(",");
 	}
 	drawText(text.c_str(), 0, 40, 0.05);
-	*/
+	
+	/*
 	std::string t2 = "Events:";
 	for (size_t i = 0; i < ev.size()/10; i++) {
 		int t = ev.at(i).getType();
@@ -1285,6 +1351,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
 		t2.append(",");
 	}
 	drawText(t2.c_str(), 0, 40, 0.05);
+	*/
 	//std::cout << t2 << std::endl;
 	
 }

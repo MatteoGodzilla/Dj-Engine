@@ -24,7 +24,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			//loop for every event
 			for (size_t j = 0; j < ev.size(); ++j) {
-				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_G_START) {
+				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_G_ZONE) {
 					found = true;
 					break;
 				}
@@ -36,7 +36,6 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			m_green = true;
 		}
-
 		if (key == RED_CODE) {
 			bool found = false;
 			//loop for every note 
@@ -78,7 +77,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			}
 			//loop for every event 
 			for (size_t j = 0; j < ev.size(); ++j) {
-				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_B_START) {
+				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_B_ZONE) {
 					found = true;
 					break;
 				}
@@ -97,12 +96,24 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				//loop for every event
 				for (size_t i = 0; i < ev.size(); ++i) {
 					//if there is a note in the clicker, add score
-					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_G) {
-						found = true;
-						ev.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
+					int type = ev.at(i).getType();
+					if (ev.at(i).getHit()) {
+						if (type == CROSS_G) {
+							ev.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							found = true;
+							break;
+						}
+					}
+				}
+				for (size_t i = 0; i < v.size(); i++) {
+					int type = v.at(i).getType();
+					if (v.at(i).getHit()) {
+						if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+							found = true;
+							break;
+						}
 					}
 				}
 				//if there isn't a note in the clicker, break combo
@@ -114,20 +125,34 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			m_cross = 0;
 			
 		}
-		if (key== CROSS_R_CODE) {
+		if (key == CROSS_R_CODE) {
 			if (m_cross != 2) {
 				bool found = false;
 				//loop for every event
 				for (size_t i = 0; i < ev.size(); ++i) {
 					//if there is a note in the clicker, add score
-					if (ev.at(i).getHit() && ev.at(i).getType() == CROSS_B) {
-						found = true;
-						ev.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
+					int type = ev.at(i).getType();
+					if (ev.at(i).getHit()) {
+						if (type == CROSS_B) {
+							found = true;
+							ev.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							break;
+						}
 					}
 				}
+				
+				for (size_t i = 0; i < v.size(); i++) {
+					int type = v.at(i).getType();
+					if (v.at(i).getHit()) {
+						if (type == CF_SPIKE_B || type ==CF_SPIKE_C) {
+							found = true;
+							break;
+						}
+					}
+				}
+
 				//if there isn't a note in the clicker, break combo
 				if (!found) {
 					m_combo = 0;
@@ -259,121 +284,121 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		}
 	}
 	else if (action == GLFW_REPEAT) {
-	if (key == SCRATCH_UP) {
-		bool found = false;
-		//if the green button is already pressed
-		if (m_green) {
-			//loop for every note
-			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
-					int type = v.at(i).getType();
-					//if there is a scratch up inside the clicker
-					if (type == SCR_G_UP) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
-					}
-					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_G_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
+		if (key == SCRATCH_UP) {
+			bool found = false;
+			//if the green button is already pressed
+			if (m_green) {
+				//loop for every note
+				for (size_t i = 0; i < v.size(); ++i) {
+					if (v.at(i).getHit()) {
+						int type = v.at(i).getType();
+						//if there is a scratch up inside the clicker
+						if (type == SCR_G_UP) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							break;
+						}
+						//if there is a scratch anydir inside the clicker
+						else if (type == SCR_G_ANY) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}
 					}
 				}
+
+			}
+			//if the blue button is already pressed
+			if (m_blue) {
+				//loop for every note
+				for (size_t i = 0; i < v.size(); ++i) {
+					if (v.at(i).getHit()) {
+						int type = v.at(i).getType();
+						//if there is a scratch up inside the clicker
+						if (type == SCR_B_UP) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							break;
+						}
+						//if there is a scratch anydir inside the clicker
+						else if (type == SCR_B_ANY) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}
+					}
+				}
+			}
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+		}
+		if (key == SCRATCH_DOWN) {
+			bool found = false;
+			//if the green button is already pressed
+			if (m_green) {
+				//loop for every note
+				for (size_t i = 0; i < v.size(); ++i) {
+					if (v.at(i).getHit()) {
+						int type = v.at(i).getType();
+						//if there is a scratch down inside the clicker
+						if (type == SCR_G_DOWN) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							break;
+						}
+						//if there is a scratch anydir inside the clicker
+						else if (type == SCR_G_ANY) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}
+					}
+				}
+			}
+			//if the blue button is already pressed
+			if (m_blue) {
+				//loop for every note
+				for (size_t i = 0; i < v.size(); ++i) {
+					if (v.at(i).getHit()) {
+						int type = v.at(i).getType();
+						//if there is a scratch down inside the clicker
+						if (type == SCR_B_DOWN) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 100 * m_mult;
+							m_combo++;
+							break;
+						}
+						//if there is a scratch anydir inside the clicker
+						else if (type == SCR_B_ANY) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}
+					}
+				}
+			}
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
 			}
 
 		}
-		//if the blue button is already pressed
-		if (m_blue) {
-			//loop for every note
-			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
-					int type = v.at(i).getType();
-					//if there is a scratch up inside the clicker
-					if (type == SCR_B_UP) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
-					}
-					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_B_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
-					}
-				}
-			}
-		}
-		//if there isn't a note in the clicker, break combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
-		}
 	}
-	if (key == SCRATCH_DOWN) {
-		bool found = false;
-		//if the green button is already pressed
-		if (m_green) {
-			//loop for every note
-			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
-					int type = v.at(i).getType();
-					//if there is a scratch down inside the clicker
-					if (type == SCR_G_DOWN) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
-					}
-					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_G_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
-					}
-				}
-			}
-		}
-		//if the blue button is already pressed
-		if (m_blue) {
-			//loop for every note
-			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
-					int type = v.at(i).getType();
-					//if there is a scratch down inside the clicker
-					if (type == SCR_B_DOWN) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 100 * m_mult;
-						m_combo++;
-						break;
-					}
-					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_B_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
-					}
-				}
-			}
-		}
-		//if there isn't a note in the clicker, break combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
-		}
-
-	}
-}
 	else if (action == GLFW_RELEASE) {
 		if (key== CROSS_L_CODE && m_cross == 0) {
 			bool found = false;
@@ -381,25 +406,37 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			for (size_t i = 0; i < ev.size(); ++i) {
 				int type = ev.at(i).getType();
 				if (ev.at(i).getHit()) {
-					
-					if (type == CROSS_C || type == CROSS_B) {
-						if (type == CROSS_C) {
-							ev.at(i).click(time);
-							m_score += 100 * m_mult;
-							m_combo++;
-						}
+					if (type == CROSS_C) {
+						ev.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						found = true;
+						break;
+					}
+					if (type == CROSS_B) {
 						found = true;
 						break;
 					}
 				}
 			}
+			
+			//loop for every note
+			for (size_t i = 0; i < v.size(); i++) {
+				int type = v.at(i).getType();
+				if (v.at(i).getHit()) {
+					if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+						found = true;
+						break;
+					}
+				}
+			}
+			
 			//if there isn't an event in the clicker, break combo
 			if (!found) {
 				m_combo = 0;
 				m_eu_zone_active = false;
 			}
 			m_cross = 1;
-			
 		}
 		if (key== CROSS_R_CODE && m_cross == 2) {
 			bool found = false;
@@ -407,17 +444,31 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			for (size_t i = 0; i < ev.size(); ++i) {
 				int type = ev.at(i).getType();
 				if (ev.at(i).getHit()) {
-					if (type == CROSS_C || type == CROSS_G) {
-						if (type == CROSS_C) {
-							ev.at(i).click(time);
-							m_score += 100 * m_mult;
-							m_combo++;
-						}
+					if (type == CROSS_C) {
+						ev.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						found = true;
+						break;
+					}
+					if (type == CROSS_G) {
 						found = true;
 						break;
 					}
 				}
 			}
+
+			//loop for every note
+			for (size_t i = 0; i < v.size(); i++) {
+				int type = v.at(i).getType();
+				if (v.at(i).getHit()) {
+					if (type == CF_SPIKE_B || type == CF_SPIKE_C) {
+						found = true;
+						break;
+					}
+				}
+			}
+			
 			//if there isn't an event in the clicker, break combo
 			if (!found) {
 				m_combo = 0;
