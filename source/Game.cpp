@@ -22,7 +22,7 @@ void Game::render() {
 		m_render.notes(m_global_time, m_note_arr);
 
 		//debug
-		//m_render.debug(m_note_arr, m_event_arr);
+		m_render.debug(m_note_arr, m_event_arr);
 	}
 }
 

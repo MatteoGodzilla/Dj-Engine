@@ -76,15 +76,13 @@ Generator::Generator() {
 //update notes/events every frame
 void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	m_combo_reset = false;
-	m_eu_check = false;
 	size_t note_s = m_note_times.size();
 
 	//note generation from 'cache' (m_note_times)
-	for (size_t i = 0; i < note_s; ++i) {
+	for (size_t i = 0; i < note_s; i++) {
 		double time = m_note_times.at(0);
 		int type = m_note_types.at(0);
 		double length = m_note_length.at(0);
-
 
 		Note temp(time,type,length,false);
 		v.push_back(temp);
@@ -95,7 +93,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	size_t event_s = m_event_times.size();
 
 	//event generation from ''cache (m_event_times)
-	for (size_t i = 0; i < event_s; ++i) {
+	for (size_t i = 0; i < event_s; i++) {
 		double time = m_event_times.at(0);
 		int type = m_event_types.at(0);
 		double length = m_event_length.at(0);
@@ -163,14 +161,23 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 				}
 			}
 			if (type == EU_ZONE) {
-				m_eu_start = true;
+				//start eu zone check when the event is on the clicker
+				if (ev.at(i).getHit() && !ev.at(i).getTouched()) {
+					m_eu_start = true;
+					ev.at(i).click(time);
+				}
 				
-
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				//set signal for player
 				if (endTime < time) {
 					m_eu_check = true;
-					m_eu_start = false;
 					ev.erase(ev.begin() + i);
+				}
+				else if (m_combo_reset) {
+					//remove event if misclick
+					if (ev.at(i).getMilli() + ev.at(i).hitWindow < time) {
+						ev.erase(ev.begin() + i);
+					}
 				}
 			}
 		}
@@ -407,7 +414,9 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			pushEvent((double)time, CROSS_B, 0.0);
 		}
 		else if (type == 10) {
-			pushEvent((double)time, CROSS_C, 0.0);
+			if (time > 0.0) {
+				pushEvent((double)time, CROSS_C, 0.0);
+			}
 		}
 		else if (type == 11) {
 			pushEvent((double)time, CROSS_G, 0.0);

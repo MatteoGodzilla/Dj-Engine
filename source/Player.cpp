@@ -111,6 +111,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 					int type = v.at(i).getType();
 					if (v.at(i).getHit()) {
 						if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+							v.at(i).click(time);
 							found = true;
 							break;
 						}
@@ -123,7 +124,6 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				}
 			}
 			m_cross = 0;
-			
 		}
 		if (key == CROSS_R_CODE) {
 			if (m_cross != 2) {
@@ -147,6 +147,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 					int type = v.at(i).getType();
 					if (v.at(i).getHit()) {
 						if (type == CF_SPIKE_B || type ==CF_SPIKE_C) {
+							v.at(i).click(time);
 							found = true;
 							break;
 						}
@@ -425,6 +426,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				int type = v.at(i).getType();
 				if (v.at(i).getHit()) {
 					if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+						v.at(i).click(time);
 						found = true;
 						break;
 					}
@@ -463,6 +465,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				int type = v.at(i).getType();
 				if (v.at(i).getHit()) {
 					if (type == CF_SPIKE_B || type == CF_SPIKE_C) {
+						v.at(i).click(time);
 						found = true;
 						break;
 					}

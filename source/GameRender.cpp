@@ -998,167 +998,166 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 	for (size_t i = 0; i < ev.size(); i++) {
 		double milli = ev.at(i).getMilli();
 		double hitWindow = ev.at(i).hitWindow;
+		int type = ev.at(i).getType();
+		double dt = ev.at(i).getMilli() - time;
 
-		if (time + m_noteVisibleTime >= milli && time <= milli + hitWindow) {
-			int type = ev.at(i).getType();
-			double dt = ev.at(i).getMilli() - time;
+		if (type == SCR_G_ZONE) {
 
-			if (type == SCR_G_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-				double endDt = endTime - time;
-				bool startDrawing = false;
+			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+			double endDt = endTime - time;
+			bool startDrawing = false;
 
-				if (dt >= 0.0 && dt < 1.0) {
-					float z = 3.75f - (3.75f * (float)dt);
-					if (ev.at(i).getLanMod() == 0) {
-						pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-					}
-					else {
-						pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-					}
-					startDrawing = true;
+			if (dt >= 0.0 && dt < 1.0) {
+				float z = 3.75f - (3.75f * (float)dt);
+				if (ev.at(i).getLanMod() == 0) {
+					pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 				}
-				//when the start has already passed the clickers
-				else if (dt < 0.0) {
-					if (ev.at(i).getLanMod() == 0) {
-						pushVertexColor(eventsVector, -0.85f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.55f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-					}
-					else {
-						pushVertexColor(eventsVector, -0.5f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.2f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-					}
-					startDrawing = true;
+				else {
+					pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
 				}
-				if (startDrawing) {
-					//when the end is in the middle of the highway
-					if (endDt > 0.0 && endDt <= 1.0) {
-						float z = 3.75f - (3.75f * (float)endDt);
-						if (ev.at(i).getLanMod() == 0) {
-							pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-						}
-						else {
-							pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-						}
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-					//when the end is beyond what is visible
-					else if (endDt > 1.0) {
-						if (ev.at(i).getLanMod() == 0) {
-							pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-						}
-						else {
-							pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-						}
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-				}
-
+				startDrawing = true;
 			}
-			else if (type == SCR_B_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-				double endDt = endTime - time;
-				bool startDrawing = false;
-
+			//when the start has already passed the clickers
+			else if (dt < 0.0) {
+				if (ev.at(i).getLanMod() == 0) {
+					pushVertexColor(eventsVector, -0.85f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.55f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+				}
+				else {
+					pushVertexColor(eventsVector, -0.5f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.2f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+				}
+				startDrawing = true;
+			}
+			if (startDrawing) {
 				//when the end is in the middle of the highway
-				if (dt >= 0.0 && dt < 1.0) {
-					float z = 3.75f - (3.75f * (float)dt);
-					if (ev.at(i).getLanMod() == 2) {
-						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+				if (endDt > 0.0 && endDt <= 1.0) {
+					float z = 3.75f - (3.75f * (float)endDt);
+					if (ev.at(i).getLanMod() == 0) {
+						pushVertexColor(eventsVector, -0.55f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.85f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, -0.2f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
 					}
-					startDrawing = true;
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				//when the start has already passed the clickers
-				else if (dt < 0.0) {
-					if (ev.at(i).getLanMod() == 2) {
-						pushVertexColor(eventsVector, 0.55f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.85f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				//when the end is beyond what is visible
+				else if (endDt > 1.0) {
+					if (ev.at(i).getLanMod() == 0) {
+						pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.2f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.5f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-					}
-					startDrawing = true;
-				}
-				//if the render successfully added the start
-				if (startDrawing) {
-					//when the end is in the middle of the highway
-					if (endDt > 0.0 && endDt <= 1.0) {
-						float z = 3.75f - (3.75f * (float)endDt);
-						if (ev.at(i).getLanMod() == 2) {
-							pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						}
-						else {
-							pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						}
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-					//when the end is beyond what is visible
-					else if (endDt > 1.0) {
-						if (ev.at(i).getLanMod() == 2) {
-							pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-						}
-						else {
-							pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-						}
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-				}
-				
-			}
-			else if (type == EU_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-				double endDt = endTime - time;
-				bool start_eu = false;
-				//if euphoria start is in the middle of the highway
-				if (dt >= 0.0 && dt < 1.0) {
-					float z = 3.75f - (3.75f * (float)dt);
-					pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
-					pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
-					start_eu = true;
-				}
-				//if euphoria start has already passed the clicker
-				else if (dt < 0.0) {
-					//if (m_renderEuZone) {
-						pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
-						pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
-						start_eu = true;
-					//}
-				}
-				//if the render has successfully added the start
-				if (start_eu) {
-					//if euphoria end is in the middle of the highway
-					if (endDt >= 0.0 && endDt < 1.0) {
-						float z = 3.75f - (3.75f * (float)endDt);
-						pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
-						pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
-
-					}
-					//if euphoria end is beyond the visible highway
-					else {
-						pushVertexColor(eventsVector, 1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
-						pushVertexColor(eventsVector, -1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
+						pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					}
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
 			}
+
 		}
-		else {
+		if (type == SCR_B_ZONE) {
+			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+			double endDt = endTime - time;
+			bool startDrawing = false;
+
+			//when the end is in the middle of the highway
+			if (dt >= 0.0 && dt < 1.0) {
+				float z = 3.75f - (3.75f * (float)dt);
+				if (ev.at(i).getLanMod() == 2) {
+					pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+				}
+				else {
+					pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+				}
+				startDrawing = true;
+			}
+			//when the start has already passed the clickers
+			else if (dt < 0.0) {
+				if (ev.at(i).getLanMod() == 2) {
+					pushVertexColor(eventsVector, 0.55f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.85f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				}
+				else {
+					pushVertexColor(eventsVector, 0.2f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.5f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+				}
+				startDrawing = true;
+			}
+			//if the render successfully added the start
+			if (startDrawing) {
+				//when the end is in the middle of the highway
+				if (endDt > 0.0 && endDt <= 1.0) {
+					float z = 3.75f - (3.75f * (float)endDt);
+					if (ev.at(i).getLanMod() == 2) {
+						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					}
+					else {
+						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					}
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+				//when the end is beyond what is visible
+				else if (endDt > 1.0) {
+					if (ev.at(i).getLanMod() == 2) {
+						pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					}
+					else {
+						pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					}
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+			}
+
+		}
+		else if (type == EU_ZONE) {
+			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+			double endDt = endTime - time;
+			bool start_eu = false;
+			//if euphoria start is in the middle of the highway
+			if (dt >= 0.0 && dt < 1.0) {
+				float z = 3.75f - (3.75f * (float)dt);
+				pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
+				pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
+				start_eu = true;
+			}
+			//if euphoria start has already passed the clicker
+			else if (dt < 0.0) {
+				//if (m_renderEuZone) {
+				pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
+				pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
+				start_eu = true;
+				//}
+			}
+			//if the render has successfully added the start
+			if (start_eu) {
+				//if euphoria end is in the middle of the highway
+				if (endDt >= 0.0 && endDt < 1.0) {
+					float z = 3.75f - (3.75f * (float)endDt);
+					pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
+					pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
+
+				}
+				//if euphoria end is beyond the visible highway
+				else {
+					pushVertexColor(eventsVector, 1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
+					pushVertexColor(eventsVector, -1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
+				}
+				pushRectangleIndices(eventsIndices, eventsVertexCount);
+			}
+		}
+
+		if(milli > time + m_noteVisibleTime){
 			ev.at(i).setLanMod(m_renderCross);
 		}
 	}
@@ -1335,6 +1334,7 @@ void GameRender::meters(){
 }
 
 void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {	
+	/*
 	std::string text = "Notes:";
 	for (size_t i = 0; i < note_arr.size()/10; i++) {
 		int t = note_arr.at(i).getType();
@@ -1342,6 +1342,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
 		text.append(",");
 	}
 	drawText(text.c_str(), 0, 40, 0.05);
+	*/
 	
 	/*
 	std::string t2 = "Events:";
