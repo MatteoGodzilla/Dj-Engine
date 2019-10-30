@@ -8,8 +8,8 @@
 
 class Generator {
 public:
-    Generator();
-    virtual ~Generator();
+	Generator();
+	void init(std::string& path);
     void tick(double time,std::vector<Note> &v,std::vector<Note>&ev);
 	void textParser(std::vector<Note>& v, std::vector<Note>& ev);
 	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev);
@@ -18,6 +18,7 @@ public:
 	bool m_eu_start = false;
 	bool m_eu_check = false;
 	int m_bpm = 118;
+    ~Generator();
 protected:
 
 private:

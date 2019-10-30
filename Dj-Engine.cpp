@@ -43,7 +43,7 @@ int main() {
 	//initialize menu and game
 	menu.init(window);
 	menu.setActive(true);
-	game.init(window);
+	//game.init(window);
 	game.setActive(false);
 
 	if (!window) {

@@ -21,6 +21,9 @@ void readToFloat(std::ifstream& stream, float* f) {
 }
 
 Generator::Generator() {
+}
+
+void Generator::init(std::string& path){
 	pushEvent(-2.0, CROSS_C, 0.0);//Do not remove
 	m_chart.open("res/chart.txt");
 	if (m_chart.is_open()) {
@@ -34,7 +37,7 @@ Generator::Generator() {
 	}
 	else {
 		std::cout << "text chart not found, opening fgsmub" << std::endl;
-		m_chart.open("res/chart.fsgmub",std::ios::binary);
+		m_chart.open("res/chart.fsgmub", std::ios::binary);
 		if (m_chart.is_open()) {
 			//write chart data to console
 			m_isTimeRelative = false;

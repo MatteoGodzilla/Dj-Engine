@@ -23,6 +23,7 @@ MenuNavigator::MenuNavigator(){
 void MenuNavigator::init(GLFWwindow* w) {
 	m_render.init(w);
 	render();
+	scan();
 }
 
 void MenuNavigator::input(int key, int action) {
@@ -112,11 +113,31 @@ void MenuNavigator::activate(MenuNode& menu) {
 	//every case represents a function called on activate
 	switch (menu.getId()) {
 	case 1:
-		m_active = false;
+		//m_active = false;
 		break;
 	default:
 		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
 		break;
+	}
+}
+
+void MenuNavigator::scan() {
+	SongScanner::load("./songs", m_songList);
+	for (const SongEntry& entry: m_songList) {
+		std::string text;
+		if (!entry.s2.empty()) {
+			text = entry.s1 + " vs " + entry.s2;
+		}
+		else {
+			text = entry.s1;
+		}
+
+		MenuNode song(text, 255);
+		std::cout << "Before" << m_root.getChildrens().at(0).getChildCount() << std::endl;
+		std::vector<MenuNode> list = m_root.getChildrens();
+		list.at(0).push(song);
+		m_root.updateChildrens(list);
+		std::cout << "After" << m_root.getChildrens().at(0).getChildCount() << std::endl;
 	}
 }
 
