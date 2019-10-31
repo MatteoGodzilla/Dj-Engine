@@ -6,12 +6,13 @@
 #include "Audio.h"
 #include <vector>
 #include <iostream>
+#include <string>
 
 class Game
 {
 public:
 	Game();
-	void init(GLFWwindow* w);
+	void init(GLFWwindow* w,std::string path);
 	void render();
 	void tick();
 	void input(int key, int action);

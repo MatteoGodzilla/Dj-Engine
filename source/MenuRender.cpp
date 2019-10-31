@@ -61,6 +61,11 @@ void MenuRender::list(std::vector<SongEntry>& list, MenuNode& node,int offset)
 {	
 }
 
+GLFWwindow* MenuRender::getWindowPtr()
+{
+	return m_window;
+}
+
 MenuRender::~MenuRender()
 {
 }

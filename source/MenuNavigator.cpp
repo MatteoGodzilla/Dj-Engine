@@ -1,5 +1,12 @@
 #include "MenuNavigator.h"
 
+size_t findIndex(MenuNode& element, MenuNode& parent) {
+	std::vector<MenuNode>list = parent.getChildrens();
+	for (size_t i = 0; i < list.size(); i++) {
+		if (list.at(i).getText() == element.getText()) return i;
+	}
+}
+
 MenuNavigator::MenuNavigator(){
 	//create menu tree
 	MenuNode play("play!",1);
@@ -20,7 +27,8 @@ MenuNavigator::MenuNavigator(){
 	m_activeNode = m_root;
 }
 
-void MenuNavigator::init(GLFWwindow* w) {
+void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
+	m_game = gameptr;
 	m_render.init(w);
 	render();
 	scan();
@@ -63,7 +71,7 @@ void MenuNavigator::input(int key, int action) {
 				if (activeNode.getChildCount() > 0)
 				{
 					//do something based on the node id
-					activate(activeNode.getChildrens().at(m_selection.back()));
+					activate(activeNode.getChildrens().at(m_selection.back()),activeNode);
 					m_selection.push_back(0);
 				}
 				else {
@@ -109,11 +117,14 @@ bool MenuNavigator::getActive() {
 	return m_active;
 }
 
-void MenuNavigator::activate(MenuNode& menu) {
+void MenuNavigator::activate(MenuNode& menu,MenuNode& parent) {
 	//every case represents a function called on activate
+	size_t index = 0;
 	switch (menu.getId()) {
-	case 1:
-		//m_active = false;
+	case 255:
+		index = findIndex(menu, parent);
+		m_active = false;
+		m_game->init(m_render.getWindowPtr(),m_songList.at(index).path);
 		break;
 	default:
 		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
@@ -133,11 +144,9 @@ void MenuNavigator::scan() {
 		}
 
 		MenuNode song(text, 255);
-		std::cout << "Before" << m_root.getChildrens().at(0).getChildCount() << std::endl;
 		std::vector<MenuNode> list = m_root.getChildrens();
 		list.at(0).push(song);
 		m_root.updateChildrens(list);
-		std::cout << "After" << m_root.getChildrens().at(0).getChildCount() << std::endl;
 	}
 }
 

@@ -25,23 +25,25 @@ Generator::Generator() {
 
 void Generator::init(std::string& path){
 	pushEvent(-2.0, CROSS_C, 0.0);//Do not remove
-	m_chart.open("res/chart.txt");
+	std::string textPath = path + std::string("/chart.txt");
+	m_chart.open(path);
 	if (m_chart.is_open()) {
 		//write chart data to console
 		m_isTimeRelative = true;
-		std::cout << "loaded text chart" << std::endl;
+		std::cout << "Generator msg: loaded text chart" << std::endl;
 		std::string version;
 		m_chart >> version;
-		std::cout << "Chart Version: " << version << std::endl;
+		std::cout << "Generator msg: Chart Version: " << version << std::endl;
 		m_isTimeRelative = true;
 	}
 	else {
-		std::cout << "text chart not found, opening fgsmub" << std::endl;
-		m_chart.open("res/chart.fsgmub", std::ios::binary);
+		std::cout << "Generator msg: text chart not found, opening fgsmub" << std::endl;
+		std::string chartPath = path + std::string("/chart.fsgmub");
+		m_chart.open(chartPath, std::ios::binary);
 		if (m_chart.is_open()) {
 			//write chart data to console
 			m_isTimeRelative = false;
-			std::cout << "loaded fgsmub chart" << std::endl;
+			std::cout << "Generator msg: loaded fgsmub chart" << std::endl;
 
 			int version = 0;
 			int dummy = 0;
@@ -54,7 +56,8 @@ void Generator::init(std::string& path){
 		}
 		else {
 			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
-			m_chart.open("res/chart.xmk", std::ios::binary);
+			std::string chartPath = path + std::string("/chart.xmk");
+			m_chart.open(chartPath, std::ios::binary);
 			if (m_chart.is_open()) {
 				//write chart data to console
 				m_isTimeRelative = false;

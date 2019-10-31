@@ -6,7 +6,7 @@ class MenuNode
 {
 public:
 	MenuNode(std::string text,int id);
-	void push(MenuNode n);
+	void push(MenuNode& n);
 	std::vector<MenuNode> getChildrens();
 	size_t getChildCount();
 	void updateChildrens(std::vector<MenuNode>list);

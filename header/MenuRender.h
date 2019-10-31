@@ -15,6 +15,8 @@ public:
 	void init(GLFWwindow* w);
 	void render(MenuNode node,int selected);
 	void list(std::vector<SongEntry>& list, MenuNode& node,int offset);
+
+	GLFWwindow* getWindowPtr();
 	~MenuRender();
 private:
 };

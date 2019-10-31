@@ -6,7 +6,7 @@ MenuNode::MenuNode(std::string text,int id) {
 }
 
 //push children in current node
-void MenuNode::push(MenuNode n) {
+void MenuNode::push(MenuNode& n) {
 	m_childrens.push_back(n);
 }
 

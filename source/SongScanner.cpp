@@ -26,7 +26,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			int dTap;
 			int dCrossfade;
 			int dScratch;
-
+			
 			std::getline(fileData, s1);
 			std::getline(fileData, s2);
 			std::getline(fileData, a1);
@@ -68,6 +68,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			}
 
 			SongEntry t = {
+				p.generic_string(),
 				s1, s2,
 				a1, a2,
 				charter, mixer,

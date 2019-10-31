@@ -5,6 +5,7 @@
 #include <string>
 
 struct SongEntry {
+	std::string path;
 	std::string s1;
 	std::string s2;
 	std::string a1;

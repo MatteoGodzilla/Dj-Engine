@@ -40,10 +40,9 @@ int main() {
 	glfwSetKeyCallback(window, check_events);
 	glfwSetWindowSizeCallback(window, resizeCallback);
 
-	//initialize menu and game
-	menu.init(window);
+	//setting up menu and game
+	menu.init(window,&game);
 	menu.setActive(true);
-	//game.init(window);
 	game.setActive(false);
 
 	if (!window) {

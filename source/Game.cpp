@@ -4,9 +4,12 @@ Game::Game()
 {
 }
 
-void Game::init(GLFWwindow* w) {
+void Game::init(GLFWwindow* w,std::string path) {
 	m_render.init(w);
-	m_audio.load("res/song.ogg");
+	std::string audioPath = path + std::string("/song.ogg");
+	m_audio.load(audioPath.c_str());
+
+	m_gen.init(path);
 }
 
 void Game::render() {
