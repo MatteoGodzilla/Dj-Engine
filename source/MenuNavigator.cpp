@@ -109,14 +109,6 @@ void MenuNavigator::render() {
 	}
 }
 
-void MenuNavigator::setActive(bool active) {
-	m_active = active;
-}
-
-bool MenuNavigator::getActive() {
-	return m_active;
-}
-
 void MenuNavigator::activate(MenuNode& menu,MenuNode& parent) {
 	//every case represents a function called on activate
 	size_t index = 0;
@@ -125,6 +117,8 @@ void MenuNavigator::activate(MenuNode& menu,MenuNode& parent) {
 		index = findIndex(menu, parent);
 		m_active = false;
 		m_game->init(m_render.getWindowPtr(),m_songList.at(index).path);
+		m_game->start();
+		m_selection.erase(m_selection.begin(), m_selection.end());
 		break;
 	default:
 		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
@@ -148,6 +142,15 @@ void MenuNavigator::scan() {
 		list.at(0).push(song);
 		m_root.updateChildrens(list);
 	}
+}
+
+
+void MenuNavigator::setActive(bool active) {
+	m_active = active;
+}
+
+bool MenuNavigator::getActive() {
+	return m_active;
 }
 
 MenuNavigator::~MenuNavigator()

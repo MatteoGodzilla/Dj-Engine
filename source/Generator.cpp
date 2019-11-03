@@ -114,13 +114,16 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			v.at(i).tick(time);
 			//remove if outside hit area
 			if (v.at(i).getDead()) {
-				//if the player hasn't clicked the note
-				if (v.at(i).getTouched() == false) {
+				if (v.at(i).getTouched()) {
+					m_notesHit++;
+				}
+				else {
 					m_combo_reset = true;
 					v.at(i).click(time);
 				}
 				//actual remove
 				v.erase(v.begin() + i);
+				m_notesTotal++;
 				break;
 			}
 		}
@@ -158,9 +161,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 					if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
 						//if the following crossfader has crossed the clickers
 						if (j > i && next_time + 0.15 <= time) {
-							if (!ev.at(i).getTouched()) {
+							if (ev.at(i).getTouched()) {
+								m_notesHit++;
+							}else{
 								m_combo_reset = true;
 							}
+							m_notesTotal++;
 							ev.erase(ev.begin() + i);
 						}
 					}
@@ -189,11 +195,13 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 		}
 	}
 
+	/*
 	if (m_bpmChangeTime != -1 && m_bpmChangeValue != -1 && time + 1.0 >= m_bpmChangeTime) {
 		m_bpm = m_bpmChangeValue;
 		m_bpmChangeValue = -1;
 		m_bpmChangeTime = -1;
 	}
+	*/
 }
 
 void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
@@ -479,6 +487,14 @@ void Generator::bpm(double time, std::vector<double>& arr){
 		m_lastBpmTick = nextTick;
 		nextTick = m_lastBpmTick + ((float)60 / m_bpm);
 	}
+}
+
+int Generator::getNotesTotal(){
+	return m_notesTotal;
+}
+
+int Generator::getNotesHit() {
+	return m_notesHit;
 }
 
 //utility functions 

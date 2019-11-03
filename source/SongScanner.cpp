@@ -11,10 +11,13 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			checkFolder(entry.path(), list);
 		}
 		//if it's not a directory, check for info.txt
-		std::string file = p.generic_string() + std::string("/info.txt");
+		std::string file = p.generic_string() + std::string("/info.ini");
 		fs::path filePath(file);
 		if (fs::exists(filePath)) {
 			std::ifstream fileData(file);
+
+			CSimpleIniA ini;
+			ini.LoadFile(file.c_str());
 
 			std::string s1;
 			std::string s2;
@@ -27,37 +30,29 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			int dCrossfade;
 			int dScratch;
 			
-			std::getline(fileData, s1);
-			std::getline(fileData, s2);
-			std::getline(fileData, a1);
-			std::getline(fileData, a2);
-			std::getline(fileData, charter);
-			std::getline(fileData, mixer);
+			s1 = ini.GetValue("song", "name", "NULL");
+			s2 = ini.GetValue("song", "name2", "NULL");
+			a1 = ini.GetValue("song", "artist", "NULL");
+			a2 = ini.GetValue("song", "artist2", "NULL");
+			charter = ini.GetValue("song", "charter", "NULL");
+			mixer = ini.GetValue("song", "dj", "NULL");
 
-			std::string token;
-			fileData >> token;
-			dTrack = std::stoi(token);
+			dTrack = ini.GetLongValue("song", "track_complexity", 0);
+			dTap = ini.GetLongValue("song", "tap_complexity", 0);
+			dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
+			dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
 
-			fileData >> token;
-			dTap = std::stoi(token);
+			dTrack = min(dTrack, 100);
+			dTrack = max(dTrack, 0);
 
-			fileData >> token;
-			dCrossfade = std::stoi(token);
+			dTap = min(dTap, 100);
+			dTap = max(dTap, 0);
 
-			fileData >> token;
-			dScratch = std::stoi(token);
+			dCrossfade = min(dCrossfade, 100);
+			dCrossfade = max(dCrossfade, 0);
 
-			dTrack = std::min(dTrack, 100);
-			dTrack = std::max(dTrack, 0);
-
-			dTap = std::min(dTap, 100);
-			dTap = std::max(dTap, 0);
-
-			dCrossfade = std::min(dCrossfade, 100);
-			dCrossfade = std::max(dCrossfade, 0);
-
-			dScratch = std::min(dScratch, 100);
-			dScratch = std::max(dScratch, 0);
+			dScratch = min(dScratch, 100);
+			dScratch = max(dScratch, 0);
 
 			if (s2 == std::string("NULL")) {
 				s2.clear();

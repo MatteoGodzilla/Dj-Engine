@@ -57,15 +57,18 @@ int main() {
 		glfwPollEvents();
 		
 		//changes scene if menu gets deactivated
-		if (!menu.getActive()) {
-			scene = 1;
-			game.start();
+		if (scene == 0) {
+			if (!menu.getActive()) {
+				scene = 1;
+				game.setActive(true);
+			}
 		}
-		else {
-			scene = 0;
-			game.setActive(false);
+		else if (scene == 1) {
+			if (!game.getActive()) {
+				scene = 0;
+				menu.setActive(true);
+			}
 		}
-
 
 		if (scene == 0) {
 			//render menu

@@ -1,8 +1,10 @@
 #pragma once
+#include "SimpleINI/SimpleIni.h"
 #include <iostream>
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <list>
 
 struct SongEntry {
 	std::string path;

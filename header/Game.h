@@ -16,6 +16,7 @@ public:
 	void render();
 	void tick();
 	void input(int key, int action);
+	bool getActive();
 	void setActive(bool active);
 	void start();
 	~Game();
@@ -31,6 +32,7 @@ private:
 	Generator m_gen;
 	Player m_player;
 	Audio m_audio;
-	int m_active = false;
+	bool m_active = false;
+	int m_mode = 0;
 };
 

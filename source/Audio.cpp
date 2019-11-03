@@ -31,6 +31,7 @@ void Audio::load(const char* filename) {
 
 	info = ov_info(&m_oggFile, -1);
 	m_frequency = info->rate;
+	m_songLength = ov_time_total(&m_oggFile, -1);
 
 	int buffers = 0;
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
@@ -83,6 +84,10 @@ void Audio::play() {
 
 void Audio::stop() {
 	alSourceStop(m_source);
+}
+
+bool Audio::isActive(double time) {
+	return time < m_songLength ? true : false;
 }
 
 Audio::~Audio() {
