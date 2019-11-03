@@ -15,6 +15,7 @@ public:
 	void load(const char* filename);
 	void stop();
 	void buffer();
+	bool isActive(double time);
 private:
 	ALCdevice* m_device;
 	ALCcontext* m_context;
@@ -25,5 +26,6 @@ private:
 	OggVorbis_File m_oggFile;
 	int m_frequency = 0;
 	int m_currentSection = 0;
+	double m_songLength = 0;
 };
 

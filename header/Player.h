@@ -26,6 +26,7 @@ public:
 	int getCross();
     int getScore();
     int getCombo();
+	int getHighCombo();
     int getMult();
 	double getEuValue();
 	bool getEuActive();
@@ -52,4 +53,6 @@ private:
 	bool m_double_mult = false;
 	double m_lastTime = 0.0;
 	int m_genBpm = 0;
+
+	int m_highestCombo = 0;
 };

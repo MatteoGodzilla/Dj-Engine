@@ -4,77 +4,94 @@ Game::Game()
 {
 }
 
-void Game::init(GLFWwindow* w) {
+void Game::init(GLFWwindow* w,std::string path) {
 	m_render.init(w);
-	m_audio.load("res/song.ogg");
+	std::string audioPath = path + std::string("/song.ogg");
+	m_audio.load(audioPath.c_str());
+
+	m_gen.init(path);
 }
 
 void Game::render() {
 	if (m_active){
-		//each function is responsible for rendering a single 'object' on screen
-		m_render.highway(m_global_time);
-		m_render.bpmTicks(m_global_time, m_bpm_arr);
-		m_render.meters();
+		if (m_mode == 0) {
+			//each function is responsible for rendering a single 'object' on screen
+			m_render.highway(m_global_time);
+			m_render.bpmTicks(m_global_time, m_bpm_arr);
+			m_render.meters();
 
-		m_render.events(m_global_time, m_event_arr);
-		m_render.clicker();
-		m_render.lanes(m_global_time, m_note_arr, m_event_arr);
-		m_render.notes(m_global_time, m_note_arr);
+			m_render.events(m_global_time, m_event_arr);
+			m_render.clicker();
+			m_render.lanes(m_global_time, m_note_arr, m_event_arr);
+			m_render.notes(m_global_time, m_note_arr);
 
-		//debug
-		m_render.debug(m_note_arr, m_event_arr);
+			//debug
+			//m_render.debug(m_note_arr, m_event_arr);
+		}
+		else if (m_mode == 1) {
+			m_render.result(m_player,m_gen);
+		}
 	}
 }
 
 void Game::tick() {
 	if (m_active) {
-		//update notes and read chart (text or .fsgmub)
-		m_gen.tick(m_global_time, m_note_arr, m_event_arr);
-		m_gen.textParser(m_note_arr, m_event_arr);
-		m_gen.binaryParser(m_note_arr, m_event_arr);
-		m_gen.bpm(m_global_time, m_bpm_arr);
+		if (m_mode == 0) {
+			//update notes and read chart (text or .fsgmub)
+			m_gen.tick(m_global_time, m_note_arr, m_event_arr);
+			m_gen.textParser(m_note_arr, m_event_arr);
+			m_gen.binaryParser(m_note_arr, m_event_arr);
+			m_gen.bpm(m_global_time, m_bpm_arr);
 
-		//update player (combo + multiplier)
-		m_player.pollState(m_gen);
-		m_player.tick(m_global_time);
+			//update player (combo + multiplier)
+			m_player.pollState(m_gen);
+			m_player.tick(m_global_time);
 
-		m_render.pollState(m_global_time, m_player, m_gen);
-		m_audio.buffer();
-		if(m_global_time >= 0.0)m_audio.play();
+			m_render.pollState(m_global_time, m_player, m_gen);
+			m_audio.buffer();
+			if (m_global_time >= 0.0)m_audio.play();
 
-		//add delta time to m_global_time
-		double nowTime = glfwGetTime();
-		m_global_time += nowTime - m_pastTime;
-		m_pastTime = nowTime;
-
-	}
-	else {
-		m_audio.stop();
+			//add delta time to m_global_time
+			double nowTime = glfwGetTime();
+			m_global_time += nowTime - m_pastTime;
+			m_pastTime = nowTime;
+		}
+		if (!m_audio.isActive(m_global_time)) {
+			m_mode = 1;
+			m_audio.stop();
+		}
 	}
 }
 
 void Game::input(int key, int action) {
 	if(m_active)
 	{
-		m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
-		if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
+		if (m_mode == 0) {
+			m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
+			if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
+		}
+		else {
+			if (action == GLFW_PRESS && key == GREEN_CODE)m_active = false;
+		}
 	}
 }
 
-void Game::setActive(bool active)
-{
+bool Game::getActive() {
+	return m_active;
+}
+
+void Game::setActive(bool active){
 	m_active = active;
 }
 
 void Game::start() {
-	if (!m_active) {
-		std::cout << "Game msg: started game" << std::endl;
-		glfwSetTime(0.0);
-		m_pastTime = glfwGetTime();
-		m_global_time = -2.0f;
-		
-		m_active = true;
-	}
+	std::cout << "Game msg: started game" << std::endl;
+	glfwSetTime(0.0);
+	m_pastTime = glfwGetTime();
+	m_global_time = -2.0f;
+	
+	m_active = true;
+	m_mode = 0;
 }
 
 Game::~Game() {

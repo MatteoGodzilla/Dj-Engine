@@ -21,24 +21,29 @@ void readToFloat(std::ifstream& stream, float* f) {
 }
 
 Generator::Generator() {
+}
+
+void Generator::init(std::string& path){
 	pushEvent(-2.0, CROSS_C, 0.0);//Do not remove
-	m_chart.open("res/chart.txt");
+	std::string textPath = path + std::string("/chart.txt");
+	m_chart.open(path);
 	if (m_chart.is_open()) {
 		//write chart data to console
 		m_isTimeRelative = true;
-		std::cout << "loaded text chart" << std::endl;
+		std::cout << "Generator msg: loaded text chart" << std::endl;
 		std::string version;
 		m_chart >> version;
-		std::cout << "Chart Version: " << version << std::endl;
+		std::cout << "Generator msg: Chart Version: " << version << std::endl;
 		m_isTimeRelative = true;
 	}
 	else {
-		std::cout << "text chart not found, opening fgsmub" << std::endl;
-		m_chart.open("res/chart.fsgmub",std::ios::binary);
+		std::cout << "Generator msg: text chart not found, opening fgsmub" << std::endl;
+		std::string chartPath = path + std::string("/chart.fsgmub");
+		m_chart.open(chartPath, std::ios::binary);
 		if (m_chart.is_open()) {
 			//write chart data to console
 			m_isTimeRelative = false;
-			std::cout << "loaded fgsmub chart" << std::endl;
+			std::cout << "Generator msg: loaded fgsmub chart" << std::endl;
 
 			int version = 0;
 			int dummy = 0;
@@ -51,7 +56,8 @@ Generator::Generator() {
 		}
 		else {
 			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
-			m_chart.open("res/chart.xmk", std::ios::binary);
+			std::string chartPath = path + std::string("/chart.xmk");
+			m_chart.open(chartPath, std::ios::binary);
 			if (m_chart.is_open()) {
 				//write chart data to console
 				m_isTimeRelative = false;
@@ -108,13 +114,16 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 			v.at(i).tick(time);
 			//remove if outside hit area
 			if (v.at(i).getDead()) {
-				//if the player hasn't clicked the note
-				if (v.at(i).getTouched() == false) {
+				if (v.at(i).getTouched()) {
+					m_notesHit++;
+				}
+				else {
 					m_combo_reset = true;
 					v.at(i).click(time);
 				}
 				//actual remove
 				v.erase(v.begin() + i);
+				m_notesTotal++;
 				break;
 			}
 		}
@@ -152,9 +161,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 					if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
 						//if the following crossfader has crossed the clickers
 						if (j > i && next_time + 0.15 <= time) {
-							if (!ev.at(i).getTouched()) {
+							if (ev.at(i).getTouched()) {
+								m_notesHit++;
+							}else{
 								m_combo_reset = true;
 							}
+							m_notesTotal++;
 							ev.erase(ev.begin() + i);
 						}
 					}
@@ -183,11 +195,13 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 		}
 	}
 
+	/*
 	if (m_bpmChangeTime != -1 && m_bpmChangeValue != -1 && time + 1.0 >= m_bpmChangeTime) {
 		m_bpm = m_bpmChangeValue;
 		m_bpmChangeValue = -1;
 		m_bpmChangeTime = -1;
 	}
+	*/
 }
 
 void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
@@ -473,6 +487,14 @@ void Generator::bpm(double time, std::vector<double>& arr){
 		m_lastBpmTick = nextTick;
 		nextTick = m_lastBpmTick + ((float)60 / m_bpm);
 	}
+}
+
+int Generator::getNotesTotal(){
+	return m_notesTotal;
+}
+
+int Generator::getNotesHit() {
+	return m_notesHit;
 }
 
 //utility functions 

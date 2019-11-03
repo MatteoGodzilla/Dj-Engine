@@ -3,6 +3,7 @@
 
 #include "Graphics.h"
 #include "MenuNode.h"
+#include "SongScanner.h"
 
 #include "GLFW/glfw3.h"
 #include <iostream>
@@ -13,6 +14,9 @@ public:
 	MenuRender();
 	void init(GLFWwindow* w);
 	void render(MenuNode node,int selected);
+	void list(std::vector<SongEntry>& list, MenuNode& node,int offset);
+
+	GLFWwindow* getWindowPtr();
 	~MenuRender();
 private:
 };

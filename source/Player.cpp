@@ -532,6 +532,8 @@ void Player::tick(double time) {
 
 	if (m_double_mult)m_mult *= 2;
 	m_lastTime = time;
+
+	if (m_combo > m_highestCombo)m_highestCombo = m_combo;
 }
 
 //poll reset signals from generator 
@@ -556,6 +558,10 @@ int Player::getScore(){
 
 int Player::getCombo(){
     return m_combo;
+}
+
+int Player::getHighCombo() {
+	return m_highestCombo;
 }
 
 int Player::getMult(){

@@ -1,6 +1,8 @@
 #pragma once
 #include "MenuRender.h"
 #include "MenuNode.h"
+#include "SongScanner.h"
+#include "Game.h"
 #include "GLFW/glfw3.h"
 #include <iostream>
 
@@ -14,12 +16,13 @@ enum Keys {
 class MenuNavigator {
 public:
 	MenuNavigator();
-	void init(GLFWwindow* w);
+	void init(GLFWwindow* w,Game* gameptr);
 	void input(int key, int action);
 	void render();
 	void setActive(bool active);
 	bool getActive();
-	void activate(MenuNode& menu);
+	void activate(MenuNode& menu, MenuNode& parent);
+	void scan();
 	~MenuNavigator();
 private:
 	bool m_active = false;
@@ -28,5 +31,6 @@ private:
 	MenuRender m_render;
 	std::vector<int> m_selection;
 
-
+	std::vector<SongEntry> m_songList = {};
+	Game* m_game = nullptr;
 };

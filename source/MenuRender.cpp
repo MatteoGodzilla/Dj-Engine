@@ -57,6 +57,15 @@ void MenuRender::render(MenuNode menu,int selected) {
 	drawText(menu.getText().c_str(), 10.0f, 100.0f, 0.05f);
 }
 
+void MenuRender::list(std::vector<SongEntry>& list, MenuNode& node,int offset)
+{	
+}
+
+GLFWwindow* MenuRender::getWindowPtr()
+{
+	return m_window;
+}
+
 MenuRender::~MenuRender()
 {
 }

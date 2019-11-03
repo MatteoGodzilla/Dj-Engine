@@ -882,12 +882,12 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev)
 			double dt = v.at(i).getMilli() - time;
 			float z = 3.75f - (3.75f * (float)dt);
 
-			double s, t;
+			float s, t;
 
 			if (type == CF_SPIKE_G) {
 				if (v.at(i).getLanMod() == 1) {
-					s = 1200.0 / 1740.0;
-					t = 1460.0 / 1640.0;
+					s = 1200.0f / 1740.0f;
+					t = 1460.0f / 1640.0f;
 
 					pushVertexTexture(spikesVector, -0.7f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
 					pushVertexTexture(spikesVector, -0.7f, plane, z + 0.1f, s, t);
@@ -898,8 +898,8 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev)
 			}
 			else if (type == CF_SPIKE_B) {
 				if (v.at(i).getLanMod() == 1) {
-					s = 1200.0 / 1740.0;
-					t = 1280.0 / 1640.0;
+					s = 1200.0f / 1740.0f;
+					t = 1280.0f / 1640.0f;
 
 					pushVertexTexture(spikesVector, 0.35f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
 					pushVertexTexture(spikesVector, 0.35f, plane, z + 0.1f, s, t);
@@ -910,8 +910,8 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev)
 			}
 			else if (type == CF_SPIKE_C) {
 				if (v.at(i).getLanMod() == 0) {
-					s = 1200.0 / 1740.0;
-					t = 1460.0 / 1640.0;
+					s = 1200.0f / 1740.0f;
+					t = 1460.0f / 1640.0f;
 
 					pushVertexTexture(spikesVector, -0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
 					pushVertexTexture(spikesVector, -0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
@@ -922,8 +922,8 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev)
 					pushRectangleIndices(spikesIndices, spikesVertexCount);
 				}
 				else if (v.at(i).getLanMod() == 2) {
-					s = 1200.0 / 1740.0;
-					t = 1280.0 / 1640.0;
+					s = 1200.0f / 1740.0f;
+					t = 1280.0f / 1640.0f;
 
 					pushVertexTexture(spikesVector, 0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
 					pushVertexTexture(spikesVector, 0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
@@ -1010,12 +1010,12 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 			if (dt >= 0.0 && dt < 1.0) {
 				float z = 3.75f - (3.75f * (float)dt);
 				if (ev.at(i).getLanMod() == 0) {
-					pushVertexColor(eventsVector, -0.85f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.55f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.85f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.55f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
 				}
 				else {
-					pushVertexColor(eventsVector, -0.5f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.2f, plane, z + 0.3, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.5f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.2f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
 				}
 				startDrawing = true;
 			}
@@ -1036,12 +1036,12 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 				if (endDt > 0.0 && endDt <= 1.0) {
 					float z = 3.75f - (3.75f * (float)endDt);
 					if (ev.at(i).getLanMod() == 0) {
-						pushVertexColor(eventsVector, -0.55f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.85f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.55f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.85f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, -0.2f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.5f, plane, z - 0.3, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.2f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
+						pushVertexColor(eventsVector, -0.5f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
 					}
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
@@ -1069,12 +1069,12 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 			if (dt >= 0.0 && dt < 1.0) {
 				float z = 3.75f - (3.75f * (float)dt);
 				if (ev.at(i).getLanMod() == 2) {
-					pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.55f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.85f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
 				}
 				else {
-					pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.2f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.5f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
 				}
 				startDrawing = true;
 			}
@@ -1096,12 +1096,12 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 				if (endDt > 0.0 && endDt <= 1.0) {
 					float z = 3.75f - (3.75f * (float)endDt);
 					if (ev.at(i).getLanMod() == 2) {
-						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
 					}
 					else {
-						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
 					}
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
@@ -1331,6 +1331,38 @@ void GameRender::meters(){
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
 	drawText(scoreDisplay.c_str(), 940.0f, 230.0f, 0.05f);
+
+	//combo meter
+	if (m_playerCombo >= 15) {
+		std::string c = std::to_string(m_playerCombo);
+		drawText(c.c_str(), 940.0f, 260.0f, 0.03f);
+	}
+}
+
+void GameRender::result(Player& player,Generator& generator) {
+	useOrthoProj();
+	drawText("Result:", 0.0f, 50.0f, 0.05f);
+
+	int all = generator.getNotesTotal();
+	int hit = generator.getNotesHit();
+	int score = player.getScore();
+	int combo = player.getHighCombo();
+
+	std::string hitString = std::string("Number of notes hit:") + std::to_string(hit);
+	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
+	std::string scoreString = std::string("Score:") + std::to_string(score);
+	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
+
+
+	drawText(hitString.c_str(), 0.0f, 100.0f, 0.05f);
+	drawText(totalString.c_str(), 0.0f, 150.0f, 0.05f);
+	drawText(scoreString.c_str(), 0.0f, 200.0f, 0.05f);
+	drawText(comboString.c_str(), 0.0f, 250.0f, 0.05f);
+
+
+	if (combo == all) {
+		drawText("Wow! a Full Combo", 200.0f, 50.0f, 0.05f);
+	}
 }
 
 void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {	

@@ -5,10 +5,11 @@
 class MenuNode
 {
 public:
-	MenuNode(const char* text,int id);
-	void push(MenuNode n);
+	MenuNode(std::string text,int id);
+	void push(MenuNode& n);
 	std::vector<MenuNode> getChildrens();
 	size_t getChildCount();
+	void updateChildrens(std::vector<MenuNode>list);
 	std::string getText();
 	int getId();
 	~MenuNode();

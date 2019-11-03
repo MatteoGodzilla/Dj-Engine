@@ -40,10 +40,9 @@ int main() {
 	glfwSetKeyCallback(window, check_events);
 	glfwSetWindowSizeCallback(window, resizeCallback);
 
-	//initialize menu and game
-	menu.init(window);
+	//setting up menu and game
+	menu.init(window,&game);
 	menu.setActive(true);
-	game.init(window);
 	game.setActive(false);
 
 	if (!window) {
@@ -58,15 +57,18 @@ int main() {
 		glfwPollEvents();
 		
 		//changes scene if menu gets deactivated
-		if (!menu.getActive()) {
-			scene = 1;
-			game.start();
+		if (scene == 0) {
+			if (!menu.getActive()) {
+				scene = 1;
+				game.setActive(true);
+			}
 		}
-		else {
-			scene = 0;
-			game.setActive(false);
+		else if (scene == 1) {
+			if (!game.getActive()) {
+				scene = 0;
+				menu.setActive(true);
+			}
 		}
-
 
 		if (scene == 0) {
 			//render menu
