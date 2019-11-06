@@ -19,12 +19,11 @@ public:
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
-	int m_bpm = 118;
+	int m_bpm = 60;
     ~Generator();
 protected:
 
 private:
-    double m_time = 0.0;
     void pushNote(double time, int type, double length);
     void pushEvent(double time, int type, double length);
     std::vector<double> m_note_times;
@@ -36,7 +35,7 @@ private:
 	std::vector<double> m_event_length;
     std::vector<int> m_event_types;
 	std::ifstream m_chart;
-	bool m_isTimeRelative = true;
+	bool m_isChartBinary = false;
 	double m_bpmChangeTime = -1;
 	int m_bpmChangeValue = -1;
 	double m_lastBpmTick = 0.0;

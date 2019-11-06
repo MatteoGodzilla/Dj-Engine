@@ -56,6 +56,8 @@ int main() {
 		
 		glfwPollEvents();
 		
+		
+
 		//changes scene if menu gets deactivated
 		if (scene == 0) {
 			if (!menu.getActive()) {
@@ -69,6 +71,8 @@ int main() {
 				menu.setActive(true);
 			}
 		}
+
+		
 
 		if (scene == 0) {
 			//render menu
@@ -85,6 +89,10 @@ int main() {
 		}
 		
 		glfwSwapBuffers(window);
+		if (menu.getShouldClose()) {
+			glfwSetWindowShouldClose(window, true);
+		}
+
 	}
 	glfwTerminate();
 }

@@ -1378,13 +1378,19 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
 	
 	/*
 	std::string t2 = "Events:";
-	for (size_t i = 0; i < ev.size()/10; i++) {
+	for (size_t i = 0; i < ev.size(); i++) {
 		int t = ev.at(i).getType();
-		t2.append(std::to_string(t));
+		std::string text = std::to_string(t);
+
+		t2.append(text);
 		t2.append(",");
+
+		float x = getTextWidth(t2.c_str(), 0.05f);
+		if (x > 960.0f)break;
 	}
-	drawText(t2.c_str(), 0, 40, 0.05);
+	//drawText(t2.c_str(), 0.0f, 40.0f, 0.05f);
 	*/
+	
 	//std::cout << t2 << std::endl;
 	
 }

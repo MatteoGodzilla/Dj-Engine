@@ -13,10 +13,11 @@ class MenuRender : public Rendr{
 public:
 	MenuRender();
 	void init(GLFWwindow* w);
-	void render(MenuNode node,int selected);
-	void list(std::vector<SongEntry>& list, MenuNode& node,int offset);
+	void render(MenuNode node,int selected,int vOffset);
 
+	const int VISIBLE_ENTRIES = 4;
 	GLFWwindow* getWindowPtr();
 	~MenuRender();
 private:
+	
 };
