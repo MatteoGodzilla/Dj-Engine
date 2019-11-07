@@ -176,11 +176,19 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 	glBindVertexArray(0);
 }
 
-void Rendr::drawText(const char* text, float x, float y, float scl) {
-	int i = 0;
-	char c = text[i];
-	//loop for every character in text (until null char)
-	while (c != '\0') {
+void Rendr::drawText(const std::string& s, float x, float y, float scl) {
+	//loop for every char in string
+	float maxBearing = 0.0f;
+	for (char c : s) {
+		Character temp = ChMap[c];
+		temp.by *= scl;
+		if (temp.by > maxBearing) {
+			maxBearing = temp.by;
+		}
+	}
+	y += maxBearing;
+
+	for (char c: s) {
 		if (c < 128) {
 			Character temp = ChMap[c];
 			std::vector<float> textVector;
@@ -205,33 +213,50 @@ void Rendr::drawText(const char* text, float x, float y, float scl) {
 			x += temp.advance / 64;
 		}
 		else {
-			std::cerr << "ERROR:Char not supported" << std::endl;
+			std::cerr << "RENDR ERROR:Char not supported: " << c << std::endl;
 		}
-		i++;
-		c = text[i];
 	}
+
 }
 
-float Rendr::getTextWidth(const char* text,float scale) {
+float Rendr::getTextWidth(const std::string& s,float scale) {
 	float x = 0.0f; // return variable
-	int i = 0;
-	char c = text[i];
-	//loop for every character
-	while (c != '\0') {
+	for (char c:s) {
 		Character temp = ChMap[c];
 		temp.advance *= scale;
 		x += temp.advance / 64;
-		i++;
-		c = text[i];
 	}
 	return x;
 }
 
-void Rendr::loadTexture(const char* path, unsigned int* destination) {
+float Rendr::getTextHeight(const std::string& s, float scale) {
+	float maxBearing = 0;
+	float y = 0.0f;
+	for (char c : s) {
+		Character temp = ChMap[c];
+		temp.by *= scale;
+		if (temp.by > maxBearing) {
+			maxBearing = temp.by;
+		}
+	}
+	//std::cout << maxBearing << std::endl;
+	for (char c : s) {
+		Character temp = ChMap[c];
+		temp.height *= scale;
+		temp.by *= scale;
+		float bottom = maxBearing - temp.by + temp.height;
+		if (bottom > y) {
+			y = bottom;
+		}
+	}
+	return y;
+}
+
+void Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 	int width, height, channels;
 
 	//using stb_image to actually load textures
-	unsigned char* data = stbi_load(path, &width, &height, &channels, 0);
+	unsigned char* data = stbi_load(s.c_str(), &width, &height, &channels, 0);
 
 	if (data != nullptr) {
 		//create texture object on graphics card
@@ -245,10 +270,10 @@ void Rendr::loadTexture(const char* path, unsigned int* destination) {
 		if (channels == 4)
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		else glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		std::cout << "Rendr Msg: successfully loaded texture at " << path << std::endl;
+		std::cout << "Rendr Msg: successfully loaded texture at " << s << std::endl;
 	}
 	else {
-		std::cerr << "Rendr Err: cannot load texture. Does the file at " << path << " exist?" << std::endl;
+		std::cerr << "Rendr Err: cannot load texture. Does the file at " << s << " exist?" << std::endl;
 	}
 
 }
@@ -492,8 +517,7 @@ void Rendr::init(GLFWwindow* w) {
 			// Load character glyph 
 			if (FT_Load_Char(m_font, c, FT_LOAD_RENDER))
 			{
-				std::cout << "ERROR::FREETYTPE: Failed to load Glyph:" << c << std::endl;
-
+				std::cout << "RENDR ERROR::FREETYTPE: Failed to load Glyph:" << c << std::endl;
 			}
 			// generate texture
 			unsigned int texture;
@@ -509,6 +533,7 @@ void Rendr::init(GLFWwindow* w) {
 			// store Character data for later use
 			Character character = {
 				texture,
+				
 				(float)m_font->glyph->bitmap_left,
 				(float)m_font->glyph->bitmap_top,
 				(float)m_font->glyph->bitmap.width,
@@ -520,8 +545,6 @@ void Rendr::init(GLFWwindow* w) {
 		}
 		FT_Done_Face(m_font);
 		FT_Done_FreeType(m_FTLibrary);
-
-
 	}
 	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }

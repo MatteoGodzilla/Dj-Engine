@@ -32,45 +32,48 @@ void MenuRender::render(MenuNode menu,int selected, int vOffset) {
 	float b = 0.24f;
 
 	float right = 0.0f;
+
+	std::vector<MenuNode> list = menu.getChildrens();
 	if (menu.getChildCount() > 0) {
-		MenuNode m = menu.getChildrens().at(selected);
+		MenuNode m = list.at(selected);
 		right = getTextWidth(m.getText().c_str(), scale);
 	}
 		
-	int height = selected - vOffset;
+	int heightIndex = selected - vOffset;
+	float selHeight = getTextHeight(list.at(selected).getText(),scale);
 
 	useOrthoProj();
 
 	//selection rectangle
-	pushVertexColor(selVector, 10.0f, 100.0f * height + 175.0f, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f, 100.0f * height + 275.0f, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f + right, 100.0f * height + 275.0f, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f + right, 100.0f * height + 175.0f, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f + right, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f + right, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
 	pushRectangleIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
 	if (menu.getChildCount() > 0) {
 		//draw every child from node
-		std::vector<MenuNode> list = menu.getChildrens();
+		
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
 			for (int i = 0; i < menu.getChildCount(); i++) {
-				drawText(list.at(i).getText().c_str(), 10.0f, 100.0f * i + 250.0f, scale);
+				drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 		else {
 			for (int i = 0; i < VISIBLE_ENTRIES; i++) {
-				drawText(list.at(i + vOffset).getText().c_str(), 10.0f, 100.0f * i + 250.0f, scale);
+				drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 	}
-	drawText(menu.getText().c_str(), 10.0f, 100.0f, 0.05f);
+	drawText(menu.getText(), 10.0f, 100.0f, 0.05f);
 
 	if (menu.getChildCount() > VISIBLE_ENTRIES) {
 		if (vOffset > 0) {
-			drawText("^", 10.0f, 200.0f, scale);
+			drawText("^", 10.0f, 150.0f, scale);
 		}
 		if (vOffset < menu.getChildCount() - VISIBLE_ENTRIES) {
-			drawText("v", 10.0f, 632.0f, scale);
+			drawText("v", 10.0f, 602.0f, scale);
 		}
 	}
 }

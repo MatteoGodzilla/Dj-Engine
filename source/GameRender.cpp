@@ -1330,12 +1330,12 @@ void GameRender::meters(){
 	std::string scoreDisplay("00000000");
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
-	drawText(scoreDisplay.c_str(), 940.0f, 230.0f, 0.05f);
+	drawText(scoreDisplay, 940.0f, 230.0f, 0.05f);
 
 	//combo meter
 	if (m_playerCombo >= 15) {
 		std::string c = std::to_string(m_playerCombo);
-		drawText(c.c_str(), 940.0f, 260.0f, 0.03f);
+		drawText(c, 940.0f, 260.0f, 0.03f);
 	}
 }
 
@@ -1354,10 +1354,10 @@ void GameRender::result(Player& player,Generator& generator) {
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
 
 
-	drawText(hitString.c_str(), 0.0f, 100.0f, 0.05f);
-	drawText(totalString.c_str(), 0.0f, 150.0f, 0.05f);
-	drawText(scoreString.c_str(), 0.0f, 200.0f, 0.05f);
-	drawText(comboString.c_str(), 0.0f, 250.0f, 0.05f);
+	drawText(hitString, 0.0f, 100.0f, 0.05f);
+	drawText(totalString, 0.0f, 150.0f, 0.05f);
+	drawText(scoreString, 0.0f, 200.0f, 0.05f);
+	drawText(comboString, 0.0f, 250.0f, 0.05f);
 
 
 	if (combo == all) {
@@ -1373,7 +1373,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
 		text.append(std::to_string(t));
 		text.append(",");
 	}
-	drawText(text.c_str(), 0, 40, 0.05);
+	drawText(text, 0, 40, 0.05);
 	*/
 	
 	/*
@@ -1388,7 +1388,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev) {
 		float x = getTextWidth(t2.c_str(), 0.05f);
 		if (x > 960.0f)break;
 	}
-	//drawText(t2.c_str(), 0.0f, 40.0f, 0.05f);
+	//drawText(t2, 0.0f, 40.0f, 0.05f);
 	*/
 	
 	//std::cout << t2 << std::endl;
