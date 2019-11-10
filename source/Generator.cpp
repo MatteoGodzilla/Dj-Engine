@@ -24,7 +24,7 @@ Generator::Generator() {
 }
 
 void Generator::init(std::string& path){
-	pushEvent(-2.0, CROSS_C, 0.0);//Do not remove
+	pushCross(-2.0, CROSS_C, 0.0);//Do not remove
 	std::string textPath = path + std::string("/chart.txt");
 	m_chart.open(path);
 	if (m_chart.is_open()) {
@@ -79,8 +79,9 @@ void Generator::init(std::string& path){
 }
 
 //update notes/events every frame
-void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
+void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	m_combo_reset = false;
+	m_eu_check = false;
 	size_t note_s = m_note_times.size();
 
 	//note generation from 'cache' (m_note_times)
@@ -97,7 +98,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	}
 	size_t event_s = m_event_times.size();
 
-	//event generation from ''cache (m_event_times)
+	//event generation from 'cache' (m_event_times)
 	for (size_t i = 0; i < event_s; i++) {
 		double time = m_event_times.at(0);
 		int type = m_event_types.at(0);
@@ -108,6 +109,20 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 		m_event_types.erase(m_event_types.begin());
 		m_event_length.erase(m_event_length.begin());
 	}
+
+	size_t cross_s = m_cross_times.size();
+	//crossfade generation from 'cache' (m_cross_times)
+	for (size_t i = 0; i < cross_s; i++) {
+		double time = m_cross_times.at(0);
+		int type = m_cross_types.at(0);
+		double length = m_cross_length.at(0);
+		Note c(time, type, length, true);
+		cross.push_back(c);
+		m_cross_times.erase(m_cross_times.begin());
+		m_cross_types.erase(m_cross_types.begin());
+		m_cross_length.erase(m_cross_length.begin());
+	}
+
 	if (!v.empty()) {
 		for (size_t i = v.size(); i-- > 0;) {
 			v.at(i).tick(time);
@@ -152,32 +167,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 					ev.erase(ev.begin() + i);
 				}
 			}
-			if (type == CROSS_G || type == CROSS_C || type == CROSS_B) {
-				for (size_t j = 0; j < ev.size(); j++) {
-					int next_type = ev.at(j).getType();
-					double next_time = ev.at(j).getMilli();
-					//find the first cross in the events
-					if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
-						//if the following crossfader has crossed the clickers
-						if (j > i && next_time + 0.15 <= time) {
-							if (ev.at(i).getTouched()) {
-								m_notesHit++;
-							}else{
-								m_combo_reset = true;
-							}
-							m_notesTotal++;
-							ev.erase(ev.begin() + i);
-						}
-					}
-				}
-			}
 			if (type == EU_ZONE) {
 				//start eu zone check when the event is on the clicker
 				if (ev.at(i).getHit() && !ev.at(i).getTouched()) {
 					m_eu_start = true;
 					ev.at(i).click(time);
 				}
-				
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				//set signal for player
 				if (endTime < time) {
@@ -194,6 +189,29 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 		}
 	}
 
+	if (!cross.empty()) {
+		for (size_t i = 0; i < cross.size(); i++) {
+			for (size_t j = i; j < cross.size(); j++) {
+				int next_type = cross.at(j).getType();
+				double next_time = cross.at(j).getMilli();
+				//find the first cross in the crossents
+				if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
+					//if the following crossfader has crossed the clickers
+					if (j > i && next_time + 0.15 <= time) {
+						if (cross.at(i).getTouched()) {
+							m_notesHit++;
+						}
+						else {
+							m_combo_reset = true;
+						}
+						m_notesTotal++;
+						cross.erase(cross.begin() + i);
+					}
+				}
+			}
+		}
+	}
+
 	/*
 	if (m_bpmChangeTime != -1 && m_bpmChangeValue != -1 && time + 1.0 >= m_bpmChangeTime) {
 		m_bpm = m_bpmChangeValue;
@@ -203,8 +221,8 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev) {
 	*/
 }
 
+/*
 void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
-	/*
 	read the chart IF there are less than 100 notes
 	and less than 100 events on screen.
 
@@ -212,7 +230,6 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 	Mostly it's there to use less amount of ram on the pc
 
 	(but really, 100 notes present on screen is ridiculous)
-	*/
 
 	if (!m_isChartBinary) {
 		size_t noteBufferSize = v.size() + m_note_times.size();
@@ -225,7 +242,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 
 			/*
 			depending by the tokens, add note/event to 'cache'
-			*/
+			
 
 			if (token == "T" || token == "t") {
 				m_chart >> token;
@@ -372,8 +389,9 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 		}
 	}
 }
+*/
 
-void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
+void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	/*
 	read the chart IF there are less than 100 notes
 	and less than 100 events on screen.
@@ -435,15 +453,15 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev) {
 				pushNote((double)time, SCR_B_ANY, 0.0);
 			}
 			else if (type == 9) {
-				pushEvent((double)time, CROSS_B, 0.0);
+				pushCross((double)time, CROSS_B, 0.0);
 			}
 			else if (type == 10) {
 				if (time > 0.0) {
-					pushEvent((double)time, CROSS_C, 0.0);
+					pushCross((double)time, CROSS_C, 0.0);
 				}
 			}
 			else if (type == 11) {
-				pushEvent((double)time, CROSS_G, 0.0);
+				pushCross((double)time, CROSS_G, 0.0);
 			}
 			else if (type == 15) {
 				pushEvent((double)time, EU_ZONE, (double)length);
@@ -523,6 +541,13 @@ void Generator::pushEvent(double time, int type, double length) {
 	m_event_types.push_back(type);
 	m_event_length.push_back(length);
 }
+
+void Generator::pushCross(double time, int type, double length) {
+	m_cross_times.push_back(time);
+	m_cross_types.push_back(type);
+	m_cross_length.push_back(length);
+}
+
 
 Generator::~Generator() {
 	m_note_times.clear();

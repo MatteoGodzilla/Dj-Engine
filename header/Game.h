@@ -22,6 +22,8 @@ public:
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
+	std::vector<Note> m_cross_arr;
+
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
 	

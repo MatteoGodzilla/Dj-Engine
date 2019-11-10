@@ -10,9 +10,9 @@ class Generator {
 public:
 	Generator();
 	void init(std::string& path);
-    void tick(double time,std::vector<Note> &v,std::vector<Note>&ev);
-	void textParser(std::vector<Note>& v, std::vector<Note>& ev);
-	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev);
+    void tick(double time,std::vector<Note> &v,std::vector<Note>&ev, std::vector<Note>& c);
+	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
+	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void bpm(double time, std::vector<double>& arr);
 	int getNotesTotal();
 	int getNotesHit();
@@ -26,6 +26,7 @@ protected:
 private:
     void pushNote(double time, int type, double length);
     void pushEvent(double time, int type, double length);
+	void pushCross(double time, int type, double length);
     std::vector<double> m_note_times;
 	std::vector<double> m_note_length;
     std::vector<int> m_note_types;
@@ -34,6 +35,12 @@ private:
     std::vector<double> m_event_times;
 	std::vector<double> m_event_length;
     std::vector<int> m_event_types;
+
+	std::vector<double> m_cross_times;
+	std::vector<double> m_cross_length;
+	std::vector<int> m_cross_types;
+
+
 	std::ifstream m_chart;
 	bool m_isChartBinary = false;
 	double m_bpmChangeTime = -1;

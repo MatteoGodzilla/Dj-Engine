@@ -17,14 +17,14 @@ public:
 	void init(GLFWwindow* w);
 	void highway(double time);
     void clicker();
-    void notes(double time,std::vector<Note> &v);
+    void notes(double time,std::vector<Note> &v, std::vector<Note>& cross);
     void events(double time, std::vector<Note>&ev);
     void lanes(double time, std::vector<Note> &v,std::vector<Note>&ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void result(Player& player,Generator& generator);
 	void meters();
     void pollState(double time,Player& p,Generator &g);
-	void debug(std::vector<Note>& note, std::vector<Note>& ev);
+	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
     virtual ~GameRender();
 	
 private:
