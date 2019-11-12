@@ -26,14 +26,14 @@ public:
 	bool getShouldClose();
 	~MenuNavigator();
 private:
-	int m_viewOffset = 0;
+	unsigned int m_viewOffset = 0;
 	bool m_shouldClose = false;
 
 	bool m_active = false;
 	MenuNode m_root = MenuNode("Main Menu",0);
 	MenuNode m_activeNode = m_root;
 	MenuRender m_render;
-	std::vector<int> m_selection;
+	std::vector<unsigned int> m_selection;
 
 	std::vector<SongEntry> m_songList = {};
 	Game* m_game = nullptr;

@@ -594,7 +594,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double hitWindow = cross.at(i).hitWindow;
 		if (time + m_noteVisibleTime >= t && time <= t + hitWindow) {
 			double dt = cross.at(i).getMilli() - time;
-			if (cross.at(i).getType() == CROSS_G) {
+			if (cross.at(i).getType() == CROSS_G && middle != CROSS_G) {
 				middle = CROSS_G;
 				float z = 3.75f - 3.75f * (float)dt;
 
@@ -659,7 +659,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, r, g, b);
 				}
 			}
-			else if (cross.at(i).getType() == CROSS_B) {
+			else if (cross.at(i).getType() == CROSS_B && middle != CROSS_B) {
 				middle = CROSS_B;
 				float z = 3.75f - 3.75f * (float)dt;
 
@@ -722,7 +722,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
 				}
 			}
-			else if (cross.at(i).getType() == CROSS_C) {
+			else if (cross.at(i).getType() == CROSS_C && middle != CROSS_C) {
 			middle = CROSS_C;
 				//crossfade center event
 				float z = 3.75f - 3.75f * (float)dt;
@@ -884,13 +884,14 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
 			pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 		}
-		//finally, render each lane 
-		pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-		pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
+		
 
 		break;
 		}
 	}
+	//finally, render each lane 
+	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
+	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
 	usePersProj();
 	renderColor(redLaneVector, redLaneIndices);
@@ -938,9 +939,9 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr){
 	renderColor(bpmVector, bpmIndices);
 }
 
-void GameRender::events(double time, std::vector<Note>& ev) {
+void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cross) {
 	float plane = 0.0;
-	float transparency = 0.5; // euphoria transparency
+	float transparency = 0.35f; // euphoria transparency
 
 	//vertices data
 	std::vector<float> eventsVector = {};
@@ -955,121 +956,172 @@ void GameRender::events(double time, std::vector<Note>& ev) {
 		double dt = ev.at(i).getMilli() - time;
 
 		if (type == SCR_G_ZONE) {
-
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 			double endDt = endTime - time;
-			bool startDrawing = false;
 
-			if (dt >= 0.0 && dt < 1.0) {
-				float z = 3.75f - (3.75f * (float)dt);
-				if (ev.at(i).getLanMod() == 0) {
-					pushVertexColor(eventsVector, -0.85f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.55f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
+			float z = 3.75f - (3.75f * (float)dt);
+			int lastChange = 0;
+
+			//start
+			if (ev.at(i).getLanMod() == 0) {
+				if (dt <= m_noteVisibleTime) {
+					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+					lastChange = CROSS_G;
 				}
-				else {
-					pushVertexColor(eventsVector, -0.5f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.2f, plane, z + 0.3f, 0.0f, 1.0f, 0.0f);
-				}
-				startDrawing = true;
 			}
-			//when the start has already passed the clickers
-			else if (dt < 0.0) {
-				if (ev.at(i).getLanMod() == 0) {
-					pushVertexColor(eventsVector, -0.85f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.55f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
+			else {
+				if (dt <= m_noteVisibleTime) {
+					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+					lastChange = CROSS_C;
 				}
-				else {
-					pushVertexColor(eventsVector, -0.5f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.2f, plane, 3.75f, 0.0f, 1.0f, 0.0f);
-				}
-				startDrawing = true;
 			}
-			if (startDrawing) {
-				//when the end is in the middle of the highway
-				if (endDt > 0.0 && endDt <= 1.0) {
-					float z = 3.75f - (3.75f * (float)endDt);
-					if (ev.at(i).getLanMod() == 0) {
-						pushVertexColor(eventsVector, -0.55f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.85f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
+
+			//middle
+			for (size_t i = 0; i < cross.size(); i++) {
+				double crossMilli = cross.at(i).getMilli();
+				double crossDt = crossMilli - time;
+				z = 3.75f - (3.75f * (float)crossDt);
+				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
+					if (crossMilli >= milli && crossMilli <= endTime) {
+						int crossType = cross.at(i).getType();
+						if (crossType == CROSS_G && lastChange == CROSS_C) {
+							lastChange = CROSS_G;
+							//end center part
+							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushRectangleIndices(eventsIndices, eventsVertexCount);
+							//start left part
+							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+						}
+						else if (crossType == CROSS_C && lastChange == CROSS_G) {
+							lastChange = CROSS_C;
+							//end left part
+							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+							//start center part
+							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+						}
 					}
-					else {
-						pushVertexColor(eventsVector, -0.2f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.5f, plane, z - 0.3f, 0.0f, 1.0f, 0.0f);
-					}
+				}
+			}
+
+			//end
+			z = 3.75f - (3.75f * (float)endDt);
+			if (lastChange == CROSS_C) {
+				if (endDt <= m_noteVisibleTime && endDt > 0) {
+					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				//when the end is beyond what is visible
-				else if (endDt > 1.0) {
-					if (ev.at(i).getLanMod() == 0) {
-						pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					}
-					else {
-						pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-						pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					}
+				else {
+					pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
+			}
+			else if (lastChange == CROSS_G) {
+				if (endDt <= m_noteVisibleTime && endDt > 0) {
+					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+				else {
+					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+				
 			}
 
 		}
-		if (type == SCR_B_ZONE) {
+		else if (type == SCR_B_ZONE) {
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 			double endDt = endTime - time;
-			bool startDrawing = false;
 
-			//when the end is in the middle of the highway
-			if (dt >= 0.0 && dt < 1.0) {
-				float z = 3.75f - (3.75f * (float)dt);
-				if (ev.at(i).getLanMod() == 2) {
-					pushVertexColor(eventsVector, 0.55f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.85f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+			float z = 3.75f - (3.75f * (float)dt);
+			int lastChange = 0;
+
+			//start
+			if (ev.at(i).getLanMod() == 2) {
+				if (dt <= m_noteVisibleTime) {
+					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+					lastChange = CROSS_B;
 				}
-				else {
-					pushVertexColor(eventsVector, 0.2f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.5f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-				}
-				startDrawing = true;
 			}
-			//when the start has already passed the clickers
-			else if (dt < 0.0) {
-				if (ev.at(i).getLanMod() == 2) {
-					pushVertexColor(eventsVector, 0.55f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.85f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
+			else {
+				if (dt <= m_noteVisibleTime) {
+					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+					lastChange = CROSS_C;
 				}
-				else {
-					pushVertexColor(eventsVector, 0.2f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.5f, plane, 3.75f, 0.0f, 0.0f, 1.0f);
-				}
-				startDrawing = true;
 			}
-			//if the render successfully added the start
-			if (startDrawing) {
-				//when the end is in the middle of the highway
-				if (endDt > 0.0 && endDt <= 1.0) {
-					float z = 3.75f - (3.75f * (float)endDt);
-					if (ev.at(i).getLanMod() == 2) {
-						pushVertexColor(eventsVector, 0.85f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.55f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
+
+			//middle
+			for (size_t i = 0; i < cross.size(); i++) {
+				double crossMilli = cross.at(i).getMilli();
+				double crossDt = crossMilli - time;
+				z = 3.75f - (3.75f * (float)crossDt);
+				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
+					if (crossMilli >= milli && crossMilli <= endTime) {
+						int crossType = cross.at(i).getType();
+						if (crossType == CROSS_B && lastChange == CROSS_C) {
+							lastChange = CROSS_B;
+							//end center part
+							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushRectangleIndices(eventsIndices, eventsVertexCount);
+							//start right part
+							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+						}
+						else if (crossType == CROSS_C && lastChange == CROSS_B) {
+							lastChange = CROSS_C;
+							//end right part
+							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+							//start center part
+							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+						}
 					}
-					else {
-						pushVertexColor(eventsVector, 0.5f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.2f, plane, z + 0.3f, 0.0f, 0.0f, 1.0f);
-					}
+				}
+			}
+
+			//end
+			z = 3.75f - (3.75f * (float)endDt);
+			if (lastChange == CROSS_C) {
+				if (endDt <= m_noteVisibleTime && endDt > 0) {
+					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				//when the end is beyond what is visible
-				else if (endDt > 1.0) {
-					if (ev.at(i).getLanMod() == 2) {
-						pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					}
-					else {
-						pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-						pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					}
+				else {
+					pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
+			}
+			else if (lastChange == CROSS_B) {
+				if (endDt <= m_noteVisibleTime && endDt > 0) {
+					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+				else {
+					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+				}
+
 			}
 
 		}
@@ -1344,7 +1396,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 	//drawText(t2, 0.0f, 40.0f, 0.05f);
 	*/
 	std::string cs = "Cross:";
-	for (int i = 0; i < c.size(); i++) {
+	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
 		int t = c.at(i).getType();
 		std::string text = std::to_string(t);

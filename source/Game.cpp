@@ -10,6 +10,7 @@ void Game::init(GLFWwindow* w,std::string path) {
 	m_audio.load(audioPath.c_str());
 
 	m_gen.init(path);
+	m_bpm_arr.push_back(0.0);
 }
 
 void Game::render() {
@@ -20,7 +21,7 @@ void Game::render() {
 			m_render.bpmTicks(m_global_time, m_bpm_arr);
 			m_render.meters();
 
-			m_render.events(m_global_time, m_event_arr);
+			m_render.events(m_global_time, m_event_arr,m_cross_arr);
 			m_render.clicker();
 			m_render.lanes(m_global_time, m_note_arr, m_cross_arr);
 			m_render.notes(m_global_time, m_note_arr,m_cross_arr);
@@ -67,7 +68,7 @@ void Game::input(int key, int action) {
 	if(m_active)
 	{
 		if (m_mode == 0) {
-			m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr);
+			m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
 			if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
 			if (action == GLFW_PRESS && key == GLFW_KEY_BACKSPACE)m_mode = 1;
 		}

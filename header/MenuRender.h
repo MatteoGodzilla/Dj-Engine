@@ -13,9 +13,9 @@ class MenuRender : public Rendr{
 public:
 	MenuRender();
 	void init(GLFWwindow* w);
-	void render(MenuNode node,int selected,int vOffset);
+	void render(MenuNode node,int selected,unsigned int vOffset);
 
-	const int VISIBLE_ENTRIES = 4;
+	const size_t VISIBLE_ENTRIES = 4;
 	GLFWwindow* getWindowPtr();
 	~MenuRender();
 private:

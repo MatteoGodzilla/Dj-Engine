@@ -5,6 +5,7 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 	for (size_t i = 0; i < list.size(); i++) {
 		if (list.at(i).getText() == element.getText()) return i;
 	}
+	return 0xffffffff;
 }
 
 MenuNavigator::MenuNavigator(){

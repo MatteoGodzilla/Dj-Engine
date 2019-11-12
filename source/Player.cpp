@@ -4,7 +4,7 @@
 Player::Player() {
 }
 
-void Player::keyCallback(int key, int action, double time, std::vector<Note>& v, std::vector<Note>& ev) {
+void Player::keyCallback(int key, int action, double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	if (action == GLFW_PRESS) {
 		if (key == GREEN_CODE) {
 			bool found = false;
@@ -94,12 +94,12 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			if (m_cross != 0) {
 				bool found = false;
 				//loop for every event
-				for (size_t i = 0; i < ev.size(); ++i) {
+				for (size_t i = 0; i < cross.size(); ++i) {
 					//if there is a note in the clicker, add score
-					int type = ev.at(i).getType();
-					if (ev.at(i).getHit()) {
+					int type = cross.at(i).getType();
+					if (cross.at(i).getHit()) {
 						if (type == CROSS_G) {
-							ev.at(i).click(time);
+							cross.at(i).click(time);
 							m_score += 100 * m_mult;
 							m_combo++;
 							found = true;
@@ -129,13 +129,13 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			if (m_cross != 2) {
 				bool found = false;
 				//loop for every event
-				for (size_t i = 0; i < ev.size(); ++i) {
+				for (size_t i = 0; i < cross.size(); ++i) {
 					//if there is a note in the clicker, add score
-					int type = ev.at(i).getType();
-					if (ev.at(i).getHit()) {
+					int type = cross.at(i).getType();
+					if (cross.at(i).getHit()) {
 						if (type == CROSS_B) {
 							found = true;
-							ev.at(i).click(time);
+							cross.at(i).click(time);
 							m_score += 100 * m_mult;
 							m_combo++;
 							break;
@@ -404,11 +404,11 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		if (key== CROSS_L_CODE && m_cross == 0) {
 			bool found = false;
 			//loop for every event
-			for (size_t i = 0; i < ev.size(); ++i) {
-				int type = ev.at(i).getType();
-				if (ev.at(i).getHit()) {
+			for (size_t i = 0; i < cross.size(); ++i) {
+				int type = cross.at(i).getType();
+				if (cross.at(i).getHit()) {
 					if (type == CROSS_C) {
-						ev.at(i).click(time);
+						cross.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
 						found = true;
@@ -443,11 +443,11 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 		if (key== CROSS_R_CODE && m_cross == 2) {
 			bool found = false;
 			//loop for every event
-			for (size_t i = 0; i < ev.size(); ++i) {
-				int type = ev.at(i).getType();
-				if (ev.at(i).getHit()) {
+			for (size_t i = 0; i < cross.size(); ++i) {
+				int type = cross.at(i).getType();
+				if (cross.at(i).getHit()) {
 					if (type == CROSS_C) {
-						ev.at(i).click(time);
+						cross.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
 						found = true;

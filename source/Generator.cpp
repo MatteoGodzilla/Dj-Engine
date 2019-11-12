@@ -190,26 +190,23 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	}
 
 	if (!cross.empty()) {
-		for (size_t i = 0; i < cross.size(); i++) {
-			for (size_t j = i; j < cross.size(); j++) {
-				int next_type = cross.at(j).getType();
-				double next_time = cross.at(j).getMilli();
-				//find the first cross in the crossents
-				if (next_type == CROSS_G || next_type == CROSS_C || next_type == CROSS_B) {
-					//if the following crossfader has crossed the clickers
-					if (j > i && next_time + 0.15 <= time) {
-						if (cross.at(i).getTouched()) {
-							m_notesHit++;
-						}
-						else {
-							m_combo_reset = true;
-						}
-						m_notesTotal++;
-						cross.erase(cross.begin() + i);
-					}
+		for (size_t i = 0; i < cross.size()-1; i++) {
+			cross.at(i).tick(time);
+
+			double next_time = cross.at(i+1).getMilli();
+			//if the next crossfader has crossed the clickers
+			if (next_time + 0.15 <= time) {
+				if (cross.at(i).getTouched()) {
+					m_notesHit++;
 				}
+				else {
+					m_combo_reset = true;
+				}
+				m_notesTotal++;
+				cross.erase(cross.begin() + i);
 			}
 		}
+		cross.at(cross.size() - 1).tick(time);
 	}
 
 	/*
@@ -404,8 +401,9 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 	if (m_isChartBinary) {
 		size_t noteBufferSize = v.size() + m_note_times.size();
 		size_t eventBufferSize = ev.size() + m_event_times.size();
+		size_t crossBufferSize = cross.size() + m_cross_times.size();
 
-		while (!m_chart.eof() && noteBufferSize < 100 && eventBufferSize < 100) {
+		while (!m_chart.eof() && noteBufferSize < 100 && eventBufferSize < 100 && crossBufferSize < 100) {
 			float time;
 			int type;
 			float length = 0.0;

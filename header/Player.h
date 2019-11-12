@@ -17,8 +17,8 @@ enum K {
 class Player {
 public:
     Player();
-	void keyCallback(int key, int action, 
-		double time, std::vector<Note>& v, std::vector<Note>& ev);
+	void keyCallback(int key, int action, double time,
+		std::vector<Note>& v, std::vector<Note>& ev,std::vector<Note>& cross);
     virtual ~Player();
 	bool getRedClicker();
 	bool getGreenClicker();

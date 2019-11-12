@@ -17,7 +17,7 @@ void MenuRender::init(GLFWwindow* w) {
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 }
 
-void MenuRender::render(MenuNode menu,int selected, int vOffset) {
+void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;
@@ -56,12 +56,12 @@ void MenuRender::render(MenuNode menu,int selected, int vOffset) {
 		//draw every child from node
 		
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
-			for (int i = 0; i < menu.getChildCount(); i++) {
+			for (size_t i = 0; i < menu.getChildCount(); i++) {
 				drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 		else {
-			for (int i = 0; i < VISIBLE_ENTRIES; i++) {
+			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
 				drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}

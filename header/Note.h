@@ -26,7 +26,7 @@ public:
     int getLanMod();
     void setLanMod(int i);
 
-	double hitWindow = 0.15;
+	double hitWindow = 0.20;
 protected:
 
 private:
