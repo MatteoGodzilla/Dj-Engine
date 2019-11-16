@@ -373,7 +373,7 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
 			if (type == CF_SPIKE_G) {
-				if (v.at(i).getLanMod() == 1) {
+				if (v.at(i).getLanMod() >= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1460.0f / 1640.0f;
 
@@ -382,10 +382,20 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 					pushVertexTexture(noteVector, -0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
 					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
 					pushRectangleIndices(noteIndices, noteVertexCount);
+				}if (v.at(i).getLanMod() == 2) {
+					s = 1200.0f / 1740.0f;
+					t = 1280.0f / 1640.0f;
+
+					pushVertexTexture(noteVector, 0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.7f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s, t);
+					pushRectangleIndices(noteIndices, noteVertexCount);
+
 				}
 			}
 			else if (type == CF_SPIKE_B) {
-				if (v.at(i).getLanMod() == 1) {
+				if (v.at(i).getLanMod() <= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1280.0f / 1640.0f;
 
@@ -393,6 +403,16 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 					pushVertexTexture(noteVector, 0.35f, plane, z + 0.1f, s, t);
 					pushVertexTexture(noteVector, 0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
 					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushRectangleIndices(noteIndices, noteVertexCount);
+				}
+				if (v.at(i).getLanMod() == 0) {
+					s = 1200.0f / 1740.0f;
+					t = 1460.0f / 1640.0f;
+
+					pushVertexTexture(noteVector, -0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, -0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.35f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
+					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s, t);
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
@@ -407,7 +427,6 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s, t);
 					pushRectangleIndices(noteIndices, noteVertexCount);
 
-					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 				else if (v.at(i).getLanMod() == 2) {
 					s = 1200.0f / 1740.0f;
@@ -419,12 +438,11 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s, t);
 					pushRectangleIndices(noteIndices, noteVertexCount);
 
-
 				}
 			}
 			
 		}
-		else {
+		else if(milli > time + m_noteVisibleTime){
 			//if the note is outside the visible area, update lane position
 			v.at(i).setLanMod(m_renderCross);
 		}
@@ -889,6 +907,38 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		break;
 		}
 	}
+	if (greenLaneVector.size() == 2 * 7) {
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 1.0;
+			b = 0.0;
+		}
+		//end green center lane
+		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
+	}
+	if (blueLaneVector.size() == 2 * 7) {
+		//change color if euphoria is active
+		if (m_renderEuActive) {
+			r = 1.0;
+			g = 1.0;
+			b = 1.0;
+		}
+		else {
+			r = 0.0;
+			g = 0.0;
+			b = 1.0;
+		}
+		//end blue center lane
+		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
+		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
+	}
+
 	//finally, render each lane 
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);

@@ -12,26 +12,19 @@ MenuNavigator::MenuNavigator(){
 	//create menu tree
 	MenuNode play("Play!",1);
 	MenuNode options("Options",2);
-	MenuNode exit("Exit", 3);
+	MenuNode credits("Credits", 3);
+	MenuNode exit("Exit", -1);
 
 	for (int i = 0; i < 10; i++) {
 		std::string text("option");
 		text += std::to_string(i);
-		MenuNode t(text, 4 + i);
+		MenuNode t(text, 10 + i);
 		options.push(t);
 	}
-	/*
-	MenuNode op1("Option 1",4);
-	MenuNode op2("Option 2",5);
-	MenuNode op3("Option 3",6);
-
-	options.push(op1);
-	options.push(op2);
-	options.push(op3);
-	*/
 
 	m_root.push(play);
 	m_root.push(options);
+	m_root.push(credits);
 	m_root.push(exit);
 
 	m_selection.push_back(0);
@@ -47,117 +40,135 @@ void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
 
 void MenuNavigator::input(int key, int action) {
 	if (m_active) {
-		
-		/*
-		activeNode is the selected node
-		m_selection contains all selected node indices
-		the last item in m_selection is the 'cursor position' moved by player
-		*/
+		if (m_scene == 0) {
+			/*
+			activeNode is the selected node
+			m_selection contains all selected node indices
+			the last item in m_selection is the 'cursor position' moved by player
+			*/
 
-		MenuNode activeNode = m_root;
-		for (size_t i = 0; i < m_selection.size() - 1; i++) {
-			if (activeNode.getChildCount() > 0) {
-				activeNode = activeNode.getChildrens().at(m_selection.at(i));
-			}
-		}
-
-		if (action == GLFW_PRESS)
-		{
-			//go up a node
-			if (key == UP_CODE) {
-				m_selection.back()--;
-				if (m_selection.back() < 0) {
-					m_selection.back() = activeNode.getChildCount() - 1;
-					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-						m_viewOffset = activeNode.getChildCount() - m_render.VISIBLE_ENTRIES;
-					}
-				}
-				if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-					if (m_selection.back() < m_viewOffset) {
-						m_viewOffset--;
-					}
+			MenuNode activeNode = m_root;
+			for (size_t i = 0; i < m_selection.size() - 1; i++) {
+				if (activeNode.getChildCount() > 0) {
+					activeNode = activeNode.getChildrens().at(m_selection.at(i));
 				}
 			}
-			//go down a node
-			else if (key == DOWN_CODE) {
-				m_selection.back()++;
-				if (m_selection.back() > activeNode.getChildCount() - 1) {
-					m_selection.back() = 0;
+
+			if (action == GLFW_PRESS)
+			{
+				//go up a node
+				if (key == UP_CODE) {
+					if (m_selection.back() > 0) {
+						m_selection.back()--;
+					}
+					else if (m_selection.back() == 0) {
+						m_selection.back() = activeNode.getChildCount() - 1;
+						if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+							m_viewOffset = activeNode.getChildCount() - m_render.VISIBLE_ENTRIES;
+						}
+					}
 					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+						if (m_selection.back() < m_viewOffset) {
+							m_viewOffset--;
+						}
+					}
+				}
+				//go down a node
+				else if (key == DOWN_CODE) {
+					if (m_selection.back() < activeNode.getChildCount() + 1) {
+						m_selection.back()++;
+					}
+					if (m_selection.back() == activeNode.getChildCount()) {
+						m_selection.back() = 0;
+						if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+							m_viewOffset = 0;
+						}
+					}
+					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+						if (m_selection.back() > m_viewOffset + m_render.VISIBLE_ENTRIES - 1) {
+							m_viewOffset++;
+						}
+					}
+				}
+				//activate selected node
+				else if (key == SELECT_CODE) {
+					if (activeNode.getChildCount() > 0)
+					{
+						//do something based on the node id
+						activate(activeNode.getChildrens().at(m_selection.back()), activeNode);
+						m_selection.push_back(0);
 						m_viewOffset = 0;
 					}
-				}
-				if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-					if (m_selection.back() > m_viewOffset + m_render.VISIBLE_ENTRIES - 1) {
-						m_viewOffset++;
+					else {
+						std::cout << "Reached End of Tree" << std::endl;
 					}
 				}
-			}
-			//activate selected node
-			else if (key == SELECT_CODE) {
-				if (activeNode.getChildCount() > 0)
-				{
-					//do something based on the node id
-					activate(activeNode.getChildrens().at(m_selection.back()),activeNode);
-					m_selection.push_back(0);
-					m_viewOffset = 0;
-				}
-				else {
-					std::cout << "Reached End of Tree" << std::endl;
-				}
-			}
-			//go back
-			else if (key == BACK_CODE) {
-				if (m_selection.size() > 1) {
-					m_selection.pop_back();
-					m_viewOffset = 0;
-				}
+				//go back
+				else if (key == BACK_CODE) {
+					if (m_selection.size() > 1) {
+						m_selection.pop_back();
+						m_viewOffset = 0;
+					}
 
+				}
+			}
+
+			else if (action == GLFW_RELEASE)
+			{
+				if (key == UP_CODE) {
+
+				}
+				else if (key == DOWN_CODE) {
+
+				}
+				else if (key == SELECT_CODE) {
+
+				}
+				else if (key == BACK_CODE) {
+
+				}
+			}
+			m_activeNode = activeNode;
+		}
+		else if (m_scene == 2) {
+			if (action == GLFW_PRESS) {
+				m_scene = 0;
+				resetMenu();
 			}
 		}
-
-		else if (action == GLFW_RELEASE)
-		{
-			if (key == UP_CODE) {
-
-			}
-			else if (key == DOWN_CODE) {
-
-			}
-			else if (key == SELECT_CODE) {
-
-			}
-			else if (key == BACK_CODE) {
-
-			}
-		}
-		m_activeNode = activeNode;
 	}
 }
 
 void MenuNavigator::render() {
 	if (m_active) {
-		m_render.render(m_activeNode,m_selection.back(),m_viewOffset);
+		if (m_scene == 0) {
+			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
+		}
+		else if (m_scene == 2) {
+			m_render.credits();
+		}
 	}
 }
 
-void MenuNavigator::activate(MenuNode& menu,MenuNode& parent) {
+void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	//every case represents a function called on activate
 	size_t index = 0;
-	switch (menu.getId()) {
-	case 3:
+	int id = menu.getId();
+	if (id == -1) {
 		m_shouldClose = true;
-		break;
-	case 255:
+	}
+	else if (id == 3) {
+		m_scene = 2;
+	}
+	else if (id == 255) {
 		index = findIndex(menu, parent);
 		m_active = false;
-		m_game->init(m_render.getWindowPtr(),m_songList.at(index).path);
+		m_game->init(m_render.getWindowPtr(), m_songList.at(index).path);
 		m_game->start();
-		m_selection.erase(m_selection.begin(), m_selection.end());
-		break;
-	default:
+		resetMenu();
+	}
+	else {
 		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
-		break;
 	}
 }
 
@@ -184,6 +195,10 @@ bool MenuNavigator::getShouldClose()
 	return m_shouldClose;
 }
 
+void MenuNavigator::resetMenu() {
+	m_selection.erase(m_selection.begin(), m_selection.end());
+	m_selection.push_back(0);
+}
 
 void MenuNavigator::setActive(bool active) {
 	m_active = active;
@@ -196,3 +211,4 @@ bool MenuNavigator::getActive() {
 MenuNavigator::~MenuNavigator()
 {
 }
+
