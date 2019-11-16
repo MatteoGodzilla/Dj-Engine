@@ -26,6 +26,9 @@ public:
 	bool getShouldClose();
 	~MenuNavigator();
 private:
+	void resetMenu();
+
+	int m_scene = 0;
 	unsigned int m_viewOffset = 0;
 	bool m_shouldClose = false;
 

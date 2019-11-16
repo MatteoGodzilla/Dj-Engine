@@ -32,15 +32,18 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 	float b = 0.24f;
 
 	float right = 0.0f;
+	int heightIndex = 0;
+	float selHeight = 0.0f;
 
 	std::vector<MenuNode> list = menu.getChildrens();
 	if (menu.getChildCount() > 0) {
 		MenuNode m = list.at(selected);
 		right = getTextWidth(m.getText().c_str(), scale);
+		heightIndex = selected - vOffset;
+		selHeight = getTextHeight(list.at(selected).getText(), scale);
 	}
 		
-	int heightIndex = selected - vOffset;
-	float selHeight = getTextHeight(list.at(selected).getText(),scale);
+	
 
 	useOrthoProj();
 
@@ -76,6 +79,13 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 			drawText("v", 10.0f, 602.0f, scale);
 		}
 	}
+}
+
+void MenuRender::credits()
+{
+	drawText("Credits scene", 0.0f, 0.0f, 0.1f);
+	drawText("Nothing to see here", 0.0f, 100.0f, 0.1f);
+	drawText(":)", 0.0f, 200.0f, 0.1f);
 }
 
 GLFWwindow* MenuRender::getWindowPtr()

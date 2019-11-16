@@ -110,7 +110,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				for (size_t i = 0; i < v.size(); i++) {
 					int type = v.at(i).getType();
 					if (v.at(i).getHit()) {
-						if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+						if (type == CF_SPIKE_G) {
 							v.at(i).click(time);
 							found = true;
 							break;
@@ -146,7 +146,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 				for (size_t i = 0; i < v.size(); i++) {
 					int type = v.at(i).getType();
 					if (v.at(i).getHit()) {
-						if (type == CF_SPIKE_B || type ==CF_SPIKE_C) {
+						if (type == CF_SPIKE_B) {
 							v.at(i).click(time);
 							found = true;
 							break;
@@ -425,7 +425,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			for (size_t i = 0; i < v.size(); i++) {
 				int type = v.at(i).getType();
 				if (v.at(i).getHit()) {
-					if (type == CF_SPIKE_G || type == CF_SPIKE_C) {
+					if (type == CF_SPIKE_C) {
 						v.at(i).click(time);
 						found = true;
 						break;
@@ -464,7 +464,7 @@ void Player::keyCallback(int key, int action, double time, std::vector<Note>& v,
 			for (size_t i = 0; i < v.size(); i++) {
 				int type = v.at(i).getType();
 				if (v.at(i).getHit()) {
-					if (type == CF_SPIKE_B || type == CF_SPIKE_C) {
+					if (type == CF_SPIKE_C) {
 						v.at(i).click(time);
 						found = true;
 						break;
