@@ -1,8 +1,6 @@
 #include "Game.h"
 
-Game::Game() 
-{
-}
+Game::Game() {}
 
 void Game::init(GLFWwindow* w,std::string path) {
 	m_render.init(w);
@@ -64,6 +62,10 @@ void Game::tick() {
 	}
 }
 
+void Game::pollInput() {
+	
+}
+
 void Game::input(int key, int action) {
 	if(m_active)
 	{
@@ -73,7 +75,7 @@ void Game::input(int key, int action) {
 			if (action == GLFW_PRESS && key == GLFW_KEY_BACKSPACE)m_mode = 1;
 		}
 		else {
-			if (action == GLFW_PRESS && key == GREEN_CODE)m_active = false;
+			if (action == GLFW_PRESS && key == m_player.GREEN_CODE)m_active = false;
 		}
 	}
 }

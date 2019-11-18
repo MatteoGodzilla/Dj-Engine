@@ -6,18 +6,12 @@
 #include "GLFW/glfw3.h"
 #include <iostream>
 
-enum Keys {
-	UP_CODE = GLFW_KEY_W,
-	DOWN_CODE = GLFW_KEY_S,
-	SELECT_CODE = GLFW_KEY_J,
-	BACK_CODE = GLFW_KEY_K,
-};
-
 class MenuNavigator {
 public:
 	MenuNavigator();
 	void init(GLFWwindow* w,Game* gameptr);
-	void input(int key, int action);
+	void pollInput();
+	void update();
 	void render();
 	void setActive(bool active);
 	bool getActive();
@@ -25,7 +19,24 @@ public:
 	void scan();
 	bool getShouldClose();
 	~MenuNavigator();
+
+	int UP_CODE = GLFW_KEY_W;
+	int DOWN_CODE = GLFW_KEY_S;
+	int SELECT_CODE = GLFW_KEY_J;
+	int BACK_CODE = GLFW_KEY_K;
+
+	bool m_isUpPressed = false;
+	bool m_isDownPressed = false;
+	bool m_isSelectPressed = false;
+	bool m_isBackPressed = false;
+
+	bool m_wasUpPressed = false;
+	bool m_wasDownPressed = false;
+	bool m_wasSelectPressed = false;
+	bool m_wasBackPressed = false;
+
 private:
+
 	void resetMenu();
 
 	int m_scene = 0;

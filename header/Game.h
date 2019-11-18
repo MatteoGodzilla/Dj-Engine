@@ -15,6 +15,7 @@ public:
 	void init(GLFWwindow* w,std::string path);
 	void render();
 	void tick();
+	void pollInput();
 	void input(int key, int action);
 	bool getActive();
 	void setActive(bool active);

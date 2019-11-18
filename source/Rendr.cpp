@@ -549,6 +549,11 @@ void Rendr::init(GLFWwindow* w) {
 	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
+GLFWwindow* Rendr::getWindowPtr()
+{
+	return m_window;
+}
+
 Rendr::~Rendr() {
 	//dtor
 }

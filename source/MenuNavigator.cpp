@@ -38,7 +38,19 @@ void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
 	scan();
 }
 
-void MenuNavigator::input(int key, int action) {
+void MenuNavigator::pollInput(){
+	m_wasUpPressed = m_isUpPressed;
+	m_wasDownPressed = m_isDownPressed;
+	m_wasSelectPressed = m_isSelectPressed;
+	m_wasBackPressed = m_isBackPressed;
+
+	m_isUpPressed= glfwGetKey(m_render.getWindowPtr(), UP_CODE);
+	m_isDownPressed = glfwGetKey(m_render.getWindowPtr(), DOWN_CODE);
+	m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), SELECT_CODE);
+	m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), BACK_CODE);
+}
+
+void MenuNavigator::update() {
 	if (m_active) {
 		if (m_scene == 0) {
 			/*
@@ -54,84 +66,60 @@ void MenuNavigator::input(int key, int action) {
 				}
 			}
 
-			if (action == GLFW_PRESS)
-			{
-				//go up a node
-				if (key == UP_CODE) {
-					if (m_selection.back() > 0) {
-						m_selection.back()--;
-					}
-					else if (m_selection.back() == 0) {
-						m_selection.back() = activeNode.getChildCount() - 1;
-						if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-							m_viewOffset = activeNode.getChildCount() - m_render.VISIBLE_ENTRIES;
-						}
-					}
+			if (m_isUpPressed && !m_wasUpPressed) {
+				if (m_selection.back() > 0) {
+					m_selection.back()--;
+				}
+				else if (m_selection.back() == 0) {
+					m_selection.back() = activeNode.getChildCount() - 1;
 					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-						if (m_selection.back() < m_viewOffset) {
-							m_viewOffset--;
-						}
+						m_viewOffset = activeNode.getChildCount() - m_render.VISIBLE_ENTRIES;
 					}
 				}
-				//go down a node
-				else if (key == DOWN_CODE) {
-					if (m_selection.back() < activeNode.getChildCount() + 1) {
-						m_selection.back()++;
+				if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+					if (m_selection.back() < m_viewOffset) {
+						m_viewOffset--;
 					}
-					if (m_selection.back() == activeNode.getChildCount()) {
-						m_selection.back() = 0;
-						if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-							m_viewOffset = 0;
-						}
-					}
-					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-						if (m_selection.back() > m_viewOffset + m_render.VISIBLE_ENTRIES - 1) {
-							m_viewOffset++;
-						}
-					}
-				}
-				//activate selected node
-				else if (key == SELECT_CODE) {
-					if (activeNode.getChildCount() > 0)
-					{
-						//do something based on the node id
-						activate(activeNode.getChildrens().at(m_selection.back()), activeNode);
-						m_selection.push_back(0);
-						m_viewOffset = 0;
-					}
-					else {
-						std::cout << "Reached End of Tree" << std::endl;
-					}
-				}
-				//go back
-				else if (key == BACK_CODE) {
-					if (m_selection.size() > 1) {
-						m_selection.pop_back();
-						m_viewOffset = 0;
-					}
-
 				}
 			}
-
-			else if (action == GLFW_RELEASE)
-			{
-				if (key == UP_CODE) {
-
+			if (m_isDownPressed && !m_wasDownPressed) {
+				if (m_selection.back() < activeNode.getChildCount() + 1) {
+					m_selection.back()++;
 				}
-				else if (key == DOWN_CODE) {
-
+				if (m_selection.back() == activeNode.getChildCount()) {
+					m_selection.back() = 0;
+					if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+						m_viewOffset = 0;
+					}
 				}
-				else if (key == SELECT_CODE) {
-
+				if (activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+					if (m_selection.back() > m_viewOffset + m_render.VISIBLE_ENTRIES - 1) {
+						m_viewOffset++;
+					}
 				}
-				else if (key == BACK_CODE) {
-
+			}
+			if (m_isSelectPressed && !m_wasSelectPressed) {
+				if (activeNode.getChildCount() > 0)
+				{
+					//do something based on the node id
+					activate(activeNode.getChildrens().at(m_selection.back()), activeNode);
+					m_selection.push_back(0);
+					m_viewOffset = 0;
+				}
+				else {
+					std::cout << "Reached End of Tree" << std::endl;
+				}
+			}
+			if (m_isBackPressed && !m_wasBackPressed) {
+				if (m_selection.size() > 1) {
+					m_selection.pop_back();
+					m_viewOffset = 0;
 				}
 			}
 			m_activeNode = activeNode;
 		}
 		else if (m_scene == 2) {
-			if (action == GLFW_PRESS) {
+			if (m_isSelectPressed && !m_wasSelectPressed) {
 				m_scene = 0;
 				resetMenu();
 			}

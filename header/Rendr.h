@@ -12,6 +12,7 @@ class Rendr {
 public:
 	Rendr();
 	void init(GLFWwindow* w);
+	GLFWwindow* getWindowPtr();
 	virtual ~Rendr();
 
 protected:

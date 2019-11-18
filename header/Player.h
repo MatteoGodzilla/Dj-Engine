@@ -3,17 +3,6 @@
 #include <vector>
 #include "Generator.h"
 
-enum K {
-    GREEN_CODE = GLFW_KEY_J,
-    RED_CODE = GLFW_KEY_K,
-    BLUE_CODE = GLFW_KEY_L,
-    CROSS_L_CODE = GLFW_KEY_A,
-    CROSS_R_CODE = GLFW_KEY_D,
-    SCRATCH_UP = GLFW_KEY_W,
-    SCRATCH_DOWN = GLFW_KEY_S,
-	EUPHORIA = GLFW_KEY_E
-};
-
 class Player {
 public:
     Player();
@@ -33,6 +22,16 @@ public:
 	bool getEuZoneActive();
     void pollState(Generator &g);
 	void tick(double time);
+
+	int GREEN_CODE = GLFW_KEY_J;
+	int RED_CODE = GLFW_KEY_K;
+	int BLUE_CODE = GLFW_KEY_L;
+	int CROSS_L_CODE = GLFW_KEY_A;
+	int CROSS_R_CODE = GLFW_KEY_D;
+	int SCRATCH_UP = GLFW_KEY_W;
+	int SCRATCH_DOWN = GLFW_KEY_S;
+	int EUPHORIA = GLFW_KEY_E;
+
 protected:
 
 private:
