@@ -88,10 +88,10 @@ int main() {
 		}
 
 		glfwSwapBuffers(window);
+		if (glfwGetKey(window, GLFW_KEY_ESCAPE))glfwSetWindowShouldClose(window, true);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);
 		}
-
 	}
 	glfwTerminate();
 }

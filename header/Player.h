@@ -6,8 +6,10 @@
 class Player {
 public:
     Player();
-	void keyCallback(int key, int action, double time,
-		std::vector<Note>& v, std::vector<Note>& ev,std::vector<Note>& cross);
+
+	void pollInput(GLFWwindow* window);
+	void hit(double time,std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
+
     virtual ~Player();
 	bool getRedClicker();
 	bool getGreenClicker();
@@ -35,12 +37,25 @@ public:
 protected:
 
 private:
-	bool m_red = false;
-	bool m_green = false;
-	bool m_blue = false;
+	bool m_isRedPressed = false;
+	bool m_isGreenPressed = false;
+	bool m_isBluePressed = false;
+    bool m_isUpPressed = false;
+    bool m_isDownPressed = false;
+	bool m_isCfLeftPressed = false;
+	bool m_isCfRightPressed = false;
+	bool m_isEuPressed = false;
+
+	bool m_wasRedPressed = false;
+	bool m_wasGreenPressed = false;
+	bool m_wasBluePressed = false;
+	bool m_wasUpPressed = false;
+	bool m_wasDownPressed = false;
+	bool m_wasCfLeftPressed = false;
+	bool m_wasCfRightPressed = false;
+
 	int m_cross = 1;
-    bool m_scr_up = false;
-    bool m_scr_down = false;
+
     int m_score = 0;
     int m_mult = 1;
     int m_combo = 0;

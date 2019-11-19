@@ -63,19 +63,17 @@ void Game::tick() {
 }
 
 void Game::pollInput() {
-	
-}
-
-void Game::input(int key, int action) {
 	if(m_active)
 	{
 		if (m_mode == 0) {
-			m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
-			if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
-			if (action == GLFW_PRESS && key == GLFW_KEY_BACKSPACE)m_mode = 1;
+			m_player.pollInput(m_render.getWindowPtr());
+			m_player.hit(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
+			//m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
+			if (glfwGetKey(m_render.getWindowPtr(),GLFW_KEY_T))std::cout << m_global_time << std::endl;
+			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_BACKSPACE))m_mode = 1;
 		}
 		else {
-			if (action == GLFW_PRESS && key == m_player.GREEN_CODE)m_active = false;
+			if (glfwGetKey(m_render.getWindowPtr(),m_player.GREEN_CODE))m_active = false;
 		}
 	}
 }
