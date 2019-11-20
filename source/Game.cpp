@@ -86,6 +86,11 @@ void Game::setActive(bool active){
 	m_active = active;
 }
 
+Player* Game::getPlayer()
+{
+	return &m_player;
+}
+
 void Game::start() {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);

@@ -18,6 +18,7 @@ public:
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
+	Player* getPlayer();
 	void start();
 	~Game();
 	std::vector<Note> m_note_arr;

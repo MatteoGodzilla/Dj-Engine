@@ -34,6 +34,20 @@ public:
 	int SCRATCH_DOWN = GLFW_KEY_S;
 	int EUPHORIA = GLFW_KEY_E;
 
+	int GREEN_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
+	int RED_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
+	int BLUE_GAMEPAD = GLFW_GAMEPAD_BUTTON_X;
+	int EU_GAMEPAD = GLFW_GAMEPAD_BUTTON_Y;
+	int CF_GAMEPAD_AXIS = GLFW_GAMEPAD_AXIS_RIGHT_Y;
+	int SCR_GAMEPAD_AXIS = GLFW_GAMEPAD_AXIS_LEFT_Y;
+
+	float m_cfDeadZone = 0.5f;
+	float m_scrDeadZone = 0.2f;
+	float m_pastScrValue = 0.0f;
+	float m_scratchSensitivity = 1000.0f;
+
+	bool m_useKeyboardInput = true;
+
 protected:
 
 private:

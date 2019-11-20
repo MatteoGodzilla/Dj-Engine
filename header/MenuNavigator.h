@@ -20,10 +20,17 @@ public:
 	bool getShouldClose();
 	~MenuNavigator();
 
+	bool m_useKeyboardInput = true;
+
 	int UP_CODE = GLFW_KEY_W;
 	int DOWN_CODE = GLFW_KEY_S;
 	int SELECT_CODE = GLFW_KEY_J;
 	int BACK_CODE = GLFW_KEY_K;
+
+	int UP_GAMEPAD = 10;
+	int DOWN_GAMEPAD = 12;
+	int SELECT_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
+	int BACK_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
 
 	bool m_isUpPressed = false;
 	bool m_isDownPressed = false;
@@ -36,7 +43,7 @@ public:
 	bool m_wasBackPressed = false;
 
 private:
-
+	void updateMenuNode();
 	void resetMenu();
 
 	int m_scene = 0;

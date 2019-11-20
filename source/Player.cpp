@@ -13,14 +13,63 @@ void Player::pollInput(GLFWwindow* window){
 	m_wasCfLeftPressed = m_isCfLeftPressed;
 	m_wasCfRightPressed = m_isCfRightPressed;
 
-	m_isRedPressed = glfwGetKey(window, RED_CODE);
-	m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
-	m_isBluePressed = glfwGetKey(window, BLUE_CODE);
-	m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
-	m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
-	m_isCfLeftPressed = glfwGetKey(window, CROSS_L_CODE);
-	m_isCfRightPressed = glfwGetKey(window, CROSS_R_CODE);
-	m_isEuPressed = glfwGetKey(window, EUPHORIA);
+	if (m_useKeyboardInput) {
+		m_isRedPressed = glfwGetKey(window, RED_CODE);
+		m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
+		m_isBluePressed = glfwGetKey(window, BLUE_CODE);
+		m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
+		m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
+		m_isCfLeftPressed = glfwGetKey(window, CROSS_L_CODE);
+		m_isCfRightPressed = glfwGetKey(window, CROSS_R_CODE);
+		m_isEuPressed = glfwGetKey(window, EUPHORIA);
+	}
+	else {
+		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+			int buttonCount;
+			int axesCount;
+			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
+			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+
+			m_isGreenPressed = buttons[GREEN_GAMEPAD];
+			m_isRedPressed = buttons[RED_GAMEPAD];
+			m_isBluePressed = buttons[BLUE_GAMEPAD];
+			m_isEuPressed = buttons[EU_GAMEPAD];
+
+			if (axes[CF_GAMEPAD_AXIS] > m_cfDeadZone) {
+				m_isCfLeftPressed = true;
+				m_isCfRightPressed = false;
+			}
+			else if (axes[CF_GAMEPAD_AXIS] < -m_cfDeadZone) {
+				m_isCfLeftPressed = false;
+				m_isCfRightPressed = true;
+			}
+			else {
+				m_isCfLeftPressed = false;
+				m_isCfRightPressed = false;
+			}
+
+			float scrAxisVal = axes[SCR_GAMEPAD_AXIS] * m_scratchSensitivity;
+			if (scrAxisVal < -m_scrDeadZone) {
+				m_isUpPressed = true;
+				m_isDownPressed = false;
+			}
+			else if (scrAxisVal > m_scrDeadZone) {
+				m_isUpPressed = false;
+				m_isDownPressed = true;
+			}
+			else {
+				m_isUpPressed = false;
+				m_isDownPressed = false;
+			}
+
+			/*
+			for (int i = 0; i < axesCount; i++) {
+				std::cout << axes[i] << "|";
+			}
+			std::cout << std::endl;
+			*/
+		}
+	}
 
 	if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
 		m_cross = 0;
@@ -214,7 +263,11 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					}
 				}
 			}
-
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
 		}
 		//if the blue button is already pressed
 		if (m_isBluePressed) {
@@ -240,12 +293,13 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				}
 			}
 
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
 		}
-		//if there isn't a note in the clicker, break combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
-		}
+		
 	}
 	//down pressed
 	if (m_isDownPressed && !m_wasDownPressed) {
