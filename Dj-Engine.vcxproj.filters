@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="File di origine\imgui">
+      <UniqueIdentifier>{19ebba0a-4f14-4b63-9e8e-07a3d12ee85f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Dj-Engine.cpp">
@@ -53,6 +56,24 @@
     </ClCompile>
     <ClCompile Include="source\SongScanner.cpp">
       <Filter>File di origine</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui_demo.cpp">
+      <Filter>File di origine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui.cpp">
+      <Filter>File di origine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui_draw.cpp">
+      <Filter>File di origine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui_widgets.cpp">
+      <Filter>File di origine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui_impl_glfw.cpp">
+      <Filter>File di origine\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\include\IMGUI\imgui_impl_opengl3.cpp">
+      <Filter>File di origine\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

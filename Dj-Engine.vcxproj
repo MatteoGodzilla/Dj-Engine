@@ -167,6 +167,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dj-Engine.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="lib\include\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="source\Audio.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />

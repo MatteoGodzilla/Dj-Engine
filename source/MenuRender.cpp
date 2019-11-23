@@ -42,9 +42,6 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 		heightIndex = selected - vOffset;
 		selHeight = getTextHeight(list.at(selected).getText(), scale);
 	}
-		
-	
-
 	useOrthoProj();
 
 	//selection rectangle
@@ -81,6 +78,17 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 	}
 }
 
+void MenuRender::remapping() {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::ShowTestWindow();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
 void MenuRender::credits()
 {
 	drawText("Credits scene", 0.0f, 0.0f, 0.1f);
@@ -93,6 +101,6 @@ GLFWwindow* MenuRender::getWindowPtr()
 	return m_window;
 }
 
-MenuRender::~MenuRender()
-{
+MenuRender::~MenuRender(){
+	
 }

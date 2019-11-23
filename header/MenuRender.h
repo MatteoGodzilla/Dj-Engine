@@ -14,6 +14,8 @@ public:
 	MenuRender();
 	void init(GLFWwindow* w);
 	void render(MenuNode node,int selected,unsigned int vOffset);
+	void remapping();
+	void shutdown();
 	void credits();
 
 	const size_t VISIBLE_ENTRIES = 4;

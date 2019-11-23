@@ -39,6 +39,7 @@ void MenuNavigator::pollInput(){
 	m_wasDownPressed = m_isDownPressed;
 	m_wasSelectPressed = m_isSelectPressed;
 	m_wasBackPressed = m_isBackPressed;
+	m_wasEscapePressed = m_isEscapePressed;
 
 	if (m_useKeyboardInput) {
 		m_isUpPressed = glfwGetKey(m_render.getWindowPtr(), UP_CODE);
@@ -60,6 +61,22 @@ void MenuNavigator::pollInput(){
 			m_isBackPressed = buttons[BACK_GAMEPAD];
 		}
 	}
+
+	m_isEscapePressed = glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_ESCAPE);
+
+	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
+		remap();
+	}
+
+	if (m_wasEscapePressed && !m_isEscapePressed) {
+		if (m_scene == 1) {
+			m_scene = 0;
+		}
+		else {
+			m_shouldClose = true;
+		}
+	}
+	
 	
 }
 
@@ -132,7 +149,7 @@ void MenuNavigator::update() {
 			std::cout << std::endl;
 			*/
 		}
-		else if (m_scene == 2) {
+		else if (m_scene == 3) {
 			if (m_isSelectPressed && !m_wasSelectPressed) {
 				m_scene = 0;
 				resetMenu();
@@ -146,6 +163,9 @@ void MenuNavigator::render() {
 		if (m_scene == 0) {
 			updateMenuNode();
 			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
+		}
+		else if (m_scene == 1) {
+			m_render.remapping();
 		}
 		else if (m_scene == 2) {
 			m_render.credits();
@@ -161,7 +181,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_shouldClose = true;
 	}
 	else if (id == 3) {
-		m_scene = 2;
+		m_scene = 3;
 	}
 	else if (id == 4) {
 		bool userinput = m_game->getPlayer()->m_useKeyboardInput;
@@ -180,6 +200,10 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	else if(menu.getChildCount() == 0){
 		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
 	}
+}
+
+void MenuNavigator::remap() {
+	m_scene = 1;
 }
 
 void MenuNavigator::scan() {
@@ -229,7 +253,7 @@ bool MenuNavigator::getActive() {
 	return m_active;
 }
 
-MenuNavigator::~MenuNavigator()
-{
+MenuNavigator::~MenuNavigator(){
+	m_render.~MenuRender();
 }
 

@@ -17,42 +17,48 @@ int scene = 0;
 
 GLFWwindow* window;
 
-/*
-//callback function for keyboard input
-void check_events(GLFWwindow* w,int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)glfwSetWindowShouldClose(window, true);
-	if (scene == 0)menu.input(key, action);
-	else game.input(key, action);
-}
-*/
-
 //utility function to handle resizing
 void resizeCallback(GLFWwindow* w,int width,int height) {
 	glViewport(0, 0, width, height);
 }
 
 int main() {
-	if (!glfwInit()) {
-		std::cout << "GLFW INIT ERROR" << std::endl;
+	std::cout << "Dj-Engine version 0.8" << std::endl;
+	if (glfwInit() == GLFW_FALSE) {
+		const char* description;
+		int errorCode = glfwGetError(&description);
+		std::cout << "Engine Error:GLFW INIT ERROR" << std::endl;
+		std::cout << "Error code:" << errorCode << std::endl;
+		std::cout << "Error Message:" << description << std::endl;
 		return -1;
 	}
+	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
 
 	//GLFW init functions (window and callbacks)
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
 	glfwSetWindowSizeCallback(window, resizeCallback);
-	//glfwSetKeyCallback(window, check_events);
+
+	if (!window) {
+		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	//imgui init
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGui::StyleColorsDark();
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 130");
 
 	//setting up menu and game
 	menu.init(window,&game);
 	menu.setActive(true);
 	game.setActive(false);
 
-	if (!window) {
-		std::cout << "GLFW WINDOW CREATION ERROR" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
+	
 
 	while (!glfwWindowShouldClose(window)) {
 		
@@ -88,10 +94,14 @@ int main() {
 		}
 
 		glfwSwapBuffers(window);
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE))glfwSetWindowShouldClose(window, true);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);
 		}
 	}
+	//imgui shutdown
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+
 	glfwTerminate();
 }

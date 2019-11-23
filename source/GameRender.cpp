@@ -1478,5 +1478,5 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 
 
 GameRender::~GameRender() {
-	//dtor
+	
 }

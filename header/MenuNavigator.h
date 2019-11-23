@@ -4,6 +4,7 @@
 #include "SongScanner.h"
 #include "Game.h"
 #include "GLFW/glfw3.h"
+
 #include <iostream>
 
 class MenuNavigator {
@@ -42,11 +43,15 @@ public:
 	bool m_wasSelectPressed = false;
 	bool m_wasBackPressed = false;
 
+	bool m_isEscapePressed = false;
+	bool m_wasEscapePressed = false;
+
+	int m_scene = 0;
 private:
+	void remap();
 	void updateMenuNode();
 	void resetMenu();
 
-	int m_scene = 0;
 	unsigned int m_viewOffset = 0;
 	bool m_shouldClose = false;
 
