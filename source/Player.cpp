@@ -2,6 +2,22 @@
 #include <iostream>
 
 Player::Player() {
+
+	for (int i = 0; i < 8;++i) {
+		m_gpDead.push_back(0.5f);
+		m_gpMult.push_back(1.0f);
+		m_gpInvertDead.push_back(false);
+	}
+
+	
+	m_gpDead.at(CF_RIGHT_INDEX) = 0.5;
+	m_gpDead.at(CF_LEFT_INDEX) = 0.5;
+	m_gpDead.at(SCR_UP_INDEX) = 0.2;
+	m_gpDead.at(SCR_DOWN_INDEX) = 0.2;
+	
+	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
+	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
+	
 }
 
 void Player::pollInput(GLFWwindow* window){
@@ -25,49 +41,138 @@ void Player::pollInput(GLFWwindow* window){
 	}
 	else {
 		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
-			int buttonCount;
-			int axesCount;
-			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
-			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			
+			updateGamepadState();
 
-			m_isGreenPressed = buttons[GREEN_GAMEPAD];
-			m_isRedPressed = buttons[RED_GAMEPAD];
-			m_isBluePressed = buttons[BLUE_GAMEPAD];
-			m_isEuPressed = buttons[EU_GAMEPAD];
+			if (m_gpState.size() > 0) {
+				if (!m_gpInvertDead.at(GREEN_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+						m_isGreenPressed = true;
+					}
+					else m_isGreenPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) <= m_gpDead.at(GREEN_INDEX)) {
+						m_isGreenPressed = true;
+					}
+					else m_isGreenPressed = false;
+				}
+				
+				if (!m_gpInvertDead.at(RED_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+						m_isRedPressed = true;
+					}
+					else m_isRedPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) <= m_gpDead.at(RED_INDEX)) {
+						m_isRedPressed = true;
+					}
+					else m_isRedPressed = false;
+				}
 
-			if (axes[CF_GAMEPAD_AXIS] > m_cfDeadZone) {
-				m_isCfLeftPressed = true;
-				m_isCfRightPressed = false;
-			}
-			else if (axes[CF_GAMEPAD_AXIS] < -m_cfDeadZone) {
-				m_isCfLeftPressed = false;
-				m_isCfRightPressed = true;
-			}
-			else {
-				m_isCfLeftPressed = false;
-				m_isCfRightPressed = false;
-			}
+				if (!m_gpInvertDead.at(BLUE_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+						m_isBluePressed = true;
+					}
+					else m_isBluePressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) <= m_gpDead.at(BLUE_INDEX)) {
+						m_isBluePressed = true;
+					}
+					else m_isBluePressed = false;
+				}
 
-			float scrAxisVal = axes[SCR_GAMEPAD_AXIS] * m_scratchSensitivity;
-			if (scrAxisVal < -m_scrDeadZone) {
-				m_isUpPressed = true;
-				m_isDownPressed = false;
-			}
-			else if (scrAxisVal > m_scrDeadZone) {
-				m_isUpPressed = false;
-				m_isDownPressed = true;
-			}
-			else {
-				m_isUpPressed = false;
-				m_isDownPressed = false;
-			}
+				if (!m_gpInvertDead.at(EU_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
+						m_isEuPressed = true;
+					}
+					else m_isEuPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) <= m_gpDead.at(EU_INDEX)) {
+						m_isEuPressed = true;
+					}
+					else m_isEuPressed = false;
+				}
 
-			/*
-			for (int i = 0; i < axesCount; i++) {
-				std::cout << axes[i] << "|";
+				if (!m_gpInvertDead.at(CF_LEFT_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
+						m_isCfLeftPressed = true;
+						m_isCfRightPressed = false;
+					}
+					else m_isCfLeftPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) <= m_gpDead.at(CF_LEFT_INDEX)) {
+						m_isCfLeftPressed = true;
+						m_isCfRightPressed = false;
+					}
+					else m_isCfLeftPressed = false;
+				}
+
+				if (!m_gpInvertDead.at(CF_RIGHT_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
+						m_isCfRightPressed = true;
+						m_isCfLeftPressed = false;
+					}
+					else m_isCfRightPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) <= m_gpDead.at(CF_RIGHT_INDEX)) {
+						m_isCfRightPressed = true;
+						m_isCfLeftPressed = false;
+					}
+					else m_isCfRightPressed = false;
+				}
+
+				if (!m_gpInvertDead.at(SCR_UP_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
+						m_isUpPressed = true;
+						m_isDownPressed = false;
+					}
+					else m_isUpPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) <= m_gpDead.at(SCR_UP_INDEX)) {
+						m_isUpPressed = true;
+						m_isDownPressed = false;
+					}
+					else m_isUpPressed = false;
+				}
+
+				if (!m_gpInvertDead.at(SCR_DOWN_INDEX)) {
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
+						m_isDownPressed = true;
+						m_isUpPressed = false;
+					}
+					else m_isDownPressed = false;
+				}
+				else {
+					//value * sensitivity <= deadzone
+					if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) <= m_gpDead.at(SCR_DOWN_INDEX)) {
+						m_isDownPressed = true;
+						m_isUpPressed = false;
+					}
+					else m_isDownPressed = false;
+				}
 			}
-			std::cout << std::endl;
-			*/
 		}
 	}
 
@@ -446,6 +551,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 //update combo/multiplier for every frame
 void Player::tick(double time) {
+
 	if (m_combo >= 24)m_mult = 4;
 	else if (m_combo >= 16 && m_combo < 24) m_mult = 3;
 	else if (m_combo >= 8 && m_combo < 16) m_mult = 2;
@@ -476,6 +582,70 @@ void Player::tick(double time) {
 	if (m_combo > m_highestCombo)m_highestCombo = m_combo;
 }
 
+void Player::updateGamepadState(){
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		int count;
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+
+		std::vector<float>localGamepadState;
+
+		for (int i = 0; i < count; ++i) {
+			if (buttons[i] == '\0') {
+				localGamepadState.push_back(0.0f);
+			}
+			else {
+				localGamepadState.push_back(1.0f);
+			}
+
+		}
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+
+		for (int i = 0; i < count; ++i) {
+			localGamepadState.push_back(axes[i]);
+		}
+
+		if (count > 0) {
+			m_gpState.clear();
+			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
+			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
+			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
+			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
+
+			if (m_useSingleCfAxis) {
+				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
+				m_gpState.push_back(value);
+				m_gpState.push_back(-value);
+			}
+			else {
+				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
+				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
+			}
+
+			if (m_useSingleScrAxis) {
+				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
+				m_gpState.push_back(-value);
+				m_gpState.push_back(value);
+			}
+			else {
+				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
+				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
+			}
+
+			//debug
+			/*
+			std::cout << m_gpState.at(GREEN_GAMEPAD) * m_gpMult.at(GREEN_GAMEPAD) << "|";
+			std::cout << m_gpState.at(RED_GAMEPAD) * m_gpMult.at(RED_GAMEPAD) << "|";
+			std::cout << m_gpState.at(BLUE_GAMEPAD) * m_gpMult.at(BLUE_GAMEPAD) << "|";
+			std::cout << m_gpState.at(EU_GAMEPAD) * m_gpMult.at(EU_GAMEPAD) << "|";
+			std::cout << m_gpState.at(CF_LEFT_GAMEPAD) * m_gpMult.at(CF_LEFT_GAMEPAD) << "|";
+			std::cout << m_gpState.at(CF_RIGHT_GAMEPAD-1) * m_gpMult.at(CF_RIGHT_GAMEPAD) << "|";
+			std::cout << m_gpState.at(SCR_UP_GAMEPAD) * m_gpMult.at(SCR_UP_GAMEPAD) << "|";
+			std::cout << m_gpState.at(SCR_DOWN_GAMEPAD-1) * m_gpMult.at(SCR_DOWN_GAMEPAD) << std::endl;
+			*/
+		}
+	}
+}
+
 //poll reset signals from generator 
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){
@@ -492,6 +662,29 @@ void Player::pollState(Generator &g){
 }
 
 //utility functions
+std::vector<float> Player::getGamepadValues() {
+	std::vector<float>localGamepadState;
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		int count;
+
+		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+		for (int i = 0; i < count; ++i) {
+			if (buttons[i] == '\0') {
+				localGamepadState.push_back(0.0f);
+			}
+			else {
+				localGamepadState.push_back(1.0f);
+			}
+
+		}
+		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+		for (int i = 0; i < count; ++i) {
+			localGamepadState.push_back(axes[i]);
+		}
+	}
+	return localGamepadState;
+}
+
 int Player::getScore(){
     return m_score;
 }

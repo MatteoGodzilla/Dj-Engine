@@ -2,7 +2,6 @@
 #include "MenuRender.h"
 #include "MenuNode.h"
 #include "SongScanner.h"
-#include "Game.h"
 #include "GLFW/glfw3.h"
 
 #include <iostream>
@@ -21,18 +20,33 @@ public:
 	bool getShouldClose();
 	~MenuNavigator();
 
+	//switch between keyboard and gamepad
 	bool m_useKeyboardInput = true;
 
+	//default key codes for keyboard
 	int UP_CODE = GLFW_KEY_W;
 	int DOWN_CODE = GLFW_KEY_S;
 	int SELECT_CODE = GLFW_KEY_J;
 	int BACK_CODE = GLFW_KEY_K;
 
+	//default gamepad bindings for xbox 360 turntable
 	int UP_GAMEPAD = 10;
 	int DOWN_GAMEPAD = 12;
 	int SELECT_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
 	int BACK_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
 
+	int m_scene = 0;
+private:
+	void remap();
+	void updateGamepadState();
+	void updateMenuNode();
+	void resetMenu();
+
+	//gamepad status
+	std::vector<float> m_gpState;
+	std::vector<float> m_gpDead;
+
+	//variables used to detect press event
 	bool m_isUpPressed = false;
 	bool m_isDownPressed = false;
 	bool m_isSelectPressed = false;
@@ -46,21 +60,19 @@ public:
 	bool m_isEscapePressed = false;
 	bool m_wasEscapePressed = false;
 
-	int m_scene = 0;
-private:
-	void remap();
-	void updateMenuNode();
-	void resetMenu();
-
 	unsigned int m_viewOffset = 0;
 	bool m_shouldClose = false;
-
 	bool m_active = false;
+
+	//menu structure
 	MenuNode m_root = MenuNode("Main Menu",0);
 	MenuNode m_activeNode = m_root;
-	MenuRender m_render;
 	std::vector<unsigned int> m_selection;
+	
+	MenuRender m_render;
 
 	std::vector<SongEntry> m_songList = {};
 	Game* m_game = nullptr;
+
+	std::vector<float> m_pastGamepadValues;
 };

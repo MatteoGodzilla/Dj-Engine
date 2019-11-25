@@ -25,9 +25,15 @@ MenuNavigator::MenuNavigator(){
 
 	m_selection.push_back(0);
 	m_activeNode = m_root;
+
+	m_gpDead.clear();
+	for (int i = 0; i < 15+6; ++i) {
+		m_gpDead.push_back(0.5);
+	}
 }
 
 void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
+	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
 	m_game = gameptr;
 	m_render.init(w);
 	render();
@@ -49,16 +55,37 @@ void MenuNavigator::pollInput(){
 	}
 	else {
 		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
-			int buttonCount;
-			int axesCount;
 
-			const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &buttonCount);
-			const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &axesCount);
+			updateGamepadState();
 
-			m_isUpPressed = buttons[UP_GAMEPAD];
-			m_isDownPressed = buttons[DOWN_GAMEPAD];
-			m_isSelectPressed = buttons[SELECT_GAMEPAD];
-			m_isBackPressed = buttons[BACK_GAMEPAD];
+			/*
+			for (size_t i = 0; i < m_gpState.size(); ++i) {
+				std::cout << m_gpState.at(i) << "|";
+			}
+			std::cout << std::endl;
+			*/
+			
+			if (m_gpState.size() > 0) {
+				if (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD)) {
+					m_isUpPressed = true;
+				}
+				else m_isUpPressed = false;
+
+				if (m_gpState.at(DOWN_GAMEPAD) >= m_gpDead.at(DOWN_GAMEPAD)) {
+					m_isDownPressed = true;
+				}
+				else m_isDownPressed = false;
+
+				if (m_gpState.at(SELECT_GAMEPAD) >= m_gpDead.at(SELECT_GAMEPAD)) {
+					m_isSelectPressed = true;
+				}
+				else m_isSelectPressed = false;
+
+				if (m_gpState.at(BACK_GAMEPAD) >= m_gpDead.at(BACK_GAMEPAD)) {
+					m_isBackPressed = true;
+				}
+				else m_isBackPressed = false;
+			}
 		}
 	}
 
@@ -69,12 +96,13 @@ void MenuNavigator::pollInput(){
 	}
 
 	if (m_wasEscapePressed && !m_isEscapePressed) {
-		if (m_scene == 1) {
-			m_scene = 0;
-		}
-		else {
+		if (m_scene != 1) {
 			m_shouldClose = true;
 		}
+	}
+
+	if (m_render.m_shouldClose) {
+		m_scene = 0;
 	}
 	
 	
@@ -149,12 +177,52 @@ void MenuNavigator::update() {
 			std::cout << std::endl;
 			*/
 		}
+		else if (m_scene == 1) {
+			if (m_render.m_editingAxis) {
+				int* changing = &(m_game->getPlayer()->GREEN_GAMEPAD);
+				if (m_render.m_actionToChange == RED_INDEX) {
+					changing = &(m_game->getPlayer()->RED_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == BLUE_INDEX) {
+					changing = &(m_game->getPlayer()->BLUE_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == EU_INDEX) {
+					changing = &(m_game->getPlayer()->EU_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == CF_LEFT_INDEX) {
+					changing = &(m_game->getPlayer()->CF_LEFT_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == CF_RIGHT_INDEX) {
+					changing = &(m_game->getPlayer()->CF_RIGHT_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == SCR_UP_INDEX) {
+					changing = &(m_game->getPlayer()->SCR_UP_GAMEPAD);
+				}
+				else if (m_render.m_actionToChange == SCR_DOWN_INDEX) {
+					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
+				}
+
+				bool different = false;
+				float deadzone = 0.2;
+				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
+				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
+					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
+					if (diff > deadzone) {
+						different = true;
+						*changing = i;
+						m_render.doneEditing();
+						break;
+					}
+				}
+			}
+		}
 		else if (m_scene == 3) {
 			if (m_isSelectPressed && !m_wasSelectPressed) {
 				m_scene = 0;
 				resetMenu();
 			}
 		}
+		m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();
 	}
 }
 
@@ -165,7 +233,7 @@ void MenuNavigator::render() {
 			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
 		}
 		else if (m_scene == 1) {
-			m_render.remapping();
+			m_render.remapping(m_game);
 		}
 		else if (m_scene == 2) {
 			m_render.credits();
@@ -224,11 +292,6 @@ void MenuNavigator::scan() {
 	}
 }
 
-bool MenuNavigator::getShouldClose()
-{
-	return m_shouldClose;
-}
-
 void MenuNavigator::resetMenu() {
 	m_selection.erase(m_selection.begin(), m_selection.end());
 	m_selection.push_back(0);
@@ -245,8 +308,34 @@ void MenuNavigator::updateMenuNode() {
 	m_activeNode = activeNode;
 }
 
+void MenuNavigator::updateGamepadState() {
+	int count;
+	const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+
+	m_gpState.clear();
+	for (int i = 0; i < count; ++i) {
+		if (buttons[i] == '\0') {
+			m_gpState.push_back(0.0f);
+		}
+		else {
+			m_gpState.push_back(1.0f);
+		}
+		
+	}
+	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+
+	for (int i = 0; i < count; ++i) {
+		m_gpState.push_back(axes[i]);
+	}
+}
+
 void MenuNavigator::setActive(bool active) {
 	m_active = active;
+}
+
+bool MenuNavigator::getShouldClose()
+{
+	return m_shouldClose;
 }
 
 bool MenuNavigator::getActive() {
