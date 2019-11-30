@@ -1,5 +1,9 @@
 #include "MenuNavigator.h"
 
+void MenuNavigator::callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	glfwSetKeyCallback(window, nullptr);
+}
+
 size_t findIndex(MenuNode& element, MenuNode& parent) {
 	std::vector<MenuNode>list = parent.getChildrens();
 	for (size_t i = 0; i < list.size(); i++) {
@@ -58,13 +62,6 @@ void MenuNavigator::pollInput(){
 
 			updateGamepadState();
 
-			/*
-			for (size_t i = 0; i < m_gpState.size(); ++i) {
-				std::cout << m_gpState.at(i) << "|";
-			}
-			std::cout << std::endl;
-			*/
-			
 			if (m_gpState.size() > 0) {
 				if (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD)) {
 					m_isUpPressed = true;
@@ -95,7 +92,7 @@ void MenuNavigator::pollInput(){
 		remap();
 	}
 
-	if (m_wasEscapePressed && !m_isEscapePressed) {
+	if (m_wasEscapePressed && !m_isEscapePressed && m_activeNode.getId() == m_root.getId()) {
 		if (m_scene != 1) {
 			m_shouldClose = true;
 		}
@@ -104,8 +101,6 @@ void MenuNavigator::pollInput(){
 	if (m_render.m_shouldClose) {
 		m_scene = 0;
 	}
-	
-	
 }
 
 void MenuNavigator::update() {
@@ -118,7 +113,7 @@ void MenuNavigator::update() {
 			*/
 
 			updateMenuNode();
-			if (m_isUpPressed && !m_wasUpPressed) {
+			if (m_wasUpPressed && !m_isUpPressed) {
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
 				}
@@ -134,7 +129,7 @@ void MenuNavigator::update() {
 					}
 				}
 			}
-			if (m_isDownPressed && !m_wasDownPressed) {
+			if (m_wasDownPressed && !m_isDownPressed) {
 				if (m_selection.back() < m_activeNode.getChildCount() + 1) {
 					m_selection.back()++;
 				}
@@ -150,7 +145,7 @@ void MenuNavigator::update() {
 					}
 				}
 			}
-			if (m_isSelectPressed && !m_wasSelectPressed) {
+			if (m_wasSelectPressed && !m_isSelectPressed) {
 				MenuNode childNode = m_activeNode.getChildrens().at(m_selection.back());
 				if (childNode.getChildCount() == 0)
 				{
@@ -162,7 +157,7 @@ void MenuNavigator::update() {
 					m_viewOffset = 0;
 				}
 			}
-			if (m_isBackPressed && !m_wasBackPressed) {
+			if (m_wasBackPressed && !m_isBackPressed) {
 				if (m_selection.size() > 1) {
 					m_selection.pop_back();
 					m_viewOffset = 0;
@@ -201,19 +196,62 @@ void MenuNavigator::update() {
 				else if (m_render.m_actionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				}
+				else if (m_render.m_actionToChange == MENU_UP) {
+					changing = &UP_GAMEPAD;
+				}
+				else if (m_render.m_actionToChange == MENU_DOWN) {
+					changing = &DOWN_GAMEPAD;
+				}
+				else if (m_render.m_actionToChange == MENU_SELECT) {
+					changing = &SELECT_GAMEPAD;
+				}
+				else if (m_render.m_actionToChange == MENU_BACK) {
+					changing = &BACK_GAMEPAD;
+				}
 
-				bool different = false;
 				float deadzone = 0.2;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
 					if (diff > deadzone) {
-						different = true;
 						*changing = i;
 						m_render.doneEditing();
 						break;
 					}
 				}
+			}
+			else if (m_render.m_editingKey) {
+				int* changing = &(m_game->getPlayer()->GREEN_CODE);
+				if (m_render.m_actionToChange == RED_INDEX) {
+					changing = &(m_game->getPlayer()->RED_CODE);
+				}
+				else if (m_render.m_actionToChange == BLUE_INDEX) {
+					changing = &(m_game->getPlayer()->BLUE_CODE);
+				}
+				else if (m_render.m_actionToChange == EU_INDEX) {
+					changing = &(m_game->getPlayer()->EUPHORIA);
+				}
+				else if (m_render.m_actionToChange == CF_LEFT_INDEX) {
+					changing = &(m_game->getPlayer()->CROSS_L_CODE);
+				}
+				else if (m_render.m_actionToChange == CF_RIGHT_INDEX) {
+					changing = &(m_game->getPlayer()->CROSS_R_CODE);
+				}
+				else if (m_render.m_actionToChange == SCR_UP_INDEX) {
+					changing = &(m_game->getPlayer()->SCRATCH_UP);
+				}
+				else if (m_render.m_actionToChange == SCR_DOWN_INDEX) {
+					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
+				}
+				
+				for (int i = 0; i < 256; ++i) {
+					if (glfwGetKey(m_render.getWindowPtr(), i)) {
+						*changing = i;
+						m_render.doneEditing();
+						break;
+					}
+				}
+				//glfwSetKeyCallback(m_render.getWindowPtr(), callback);
 			}
 		}
 		else if (m_scene == 3) {

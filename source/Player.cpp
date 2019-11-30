@@ -2,14 +2,12 @@
 #include <iostream>
 
 Player::Player() {
-
 	for (int i = 0; i < 8;++i) {
 		m_gpDead.push_back(0.5f);
 		m_gpMult.push_back(1.0f);
 		m_gpInvertDead.push_back(false);
 	}
 
-	
 	m_gpDead.at(CF_RIGHT_INDEX) = 0.5;
 	m_gpDead.at(CF_LEFT_INDEX) = 0.5;
 	m_gpDead.at(SCR_UP_INDEX) = 0.2;

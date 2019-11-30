@@ -15,6 +15,7 @@ public:
 	void render();
 	void setActive(bool active);
 	bool getActive();
+	void callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void activate(MenuNode& menu, MenuNode& parent);
 	void scan();
 	bool getShouldClose();
@@ -24,10 +25,10 @@ public:
 	bool m_useKeyboardInput = true;
 
 	//default key codes for keyboard
-	int UP_CODE = GLFW_KEY_W;
-	int DOWN_CODE = GLFW_KEY_S;
-	int SELECT_CODE = GLFW_KEY_J;
-	int BACK_CODE = GLFW_KEY_K;
+	int UP_CODE = GLFW_KEY_UP;
+	int DOWN_CODE = GLFW_KEY_DOWN;
+	int SELECT_CODE = GLFW_KEY_ENTER;
+	int BACK_CODE = GLFW_KEY_ESCAPE;
 
 	//default gamepad bindings for xbox 360 turntable
 	int UP_GAMEPAD = 10;
@@ -36,6 +37,8 @@ public:
 	int BACK_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
 
 	int m_scene = 0;
+
+	//static int testx;
 private:
 	void remap();
 	void updateGamepadState();
@@ -75,4 +78,5 @@ private:
 	Game* m_game = nullptr;
 
 	std::vector<float> m_pastGamepadValues;
+	std::vector<char> m_keyboardState;
 };

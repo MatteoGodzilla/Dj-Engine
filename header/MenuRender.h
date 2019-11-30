@@ -23,10 +23,12 @@ public:
 
 	const size_t VISIBLE_ENTRIES = 4;
 	bool m_editingAxis = false;
+	bool m_editingKey = false;
 	int m_actionToChange = -1;
 
 	bool m_shouldClose = false;
 	~MenuRender();
 private:
 	void editingAxis(int axis);
+	void editingKey(int axis);
 };
