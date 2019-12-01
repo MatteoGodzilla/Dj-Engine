@@ -15,7 +15,6 @@ public:
 	void render();
 	void setActive(bool active);
 	bool getActive();
-	void callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 	void activate(MenuNode& menu, MenuNode& parent);
 	void scan();
 	bool getShouldClose();
@@ -62,6 +61,8 @@ private:
 
 	bool m_isEscapePressed = false;
 	bool m_wasEscapePressed = false;
+	bool m_wasTabPressed = false;
+	bool m_isTabPressed = false;
 
 	unsigned int m_viewOffset = 0;
 	bool m_shouldClose = false;

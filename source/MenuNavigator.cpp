@@ -1,9 +1,5 @@
 #include "MenuNavigator.h"
 
-void MenuNavigator::callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	glfwSetKeyCallback(window, nullptr);
-}
-
 size_t findIndex(MenuNode& element, MenuNode& parent) {
 	std::vector<MenuNode>list = parent.getChildrens();
 	for (size_t i = 0; i < list.size(); i++) {
@@ -50,6 +46,7 @@ void MenuNavigator::pollInput(){
 	m_wasSelectPressed = m_isSelectPressed;
 	m_wasBackPressed = m_isBackPressed;
 	m_wasEscapePressed = m_isEscapePressed;
+	m_wasTabPressed = m_isTabPressed;
 
 	if (m_useKeyboardInput) {
 		m_isUpPressed = glfwGetKey(m_render.getWindowPtr(), UP_CODE);
@@ -87,9 +84,20 @@ void MenuNavigator::pollInput(){
 	}
 
 	m_isEscapePressed = glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_ESCAPE);
+	m_isTabPressed = glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_TAB);
 
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
 		remap();
+	}
+	if (m_wasTabPressed && !m_isTabPressed) {
+		if (m_useKeyboardInput) {
+			m_game->getPlayer()->m_useKeyboardInput = false;
+			std::cout << "Menu Message: Changed Input to Controller" << std::endl;
+		}else {
+			m_game->getPlayer()->m_useKeyboardInput = true;
+			std::cout << "Menu Message: Changed Input to Keyboard" << std::endl;
+		}
+		m_useKeyboardInput = !m_useKeyboardInput;
 	}
 
 	if (m_wasEscapePressed && !m_isEscapePressed && m_activeNode.getId() == m_root.getId()) {
@@ -216,6 +224,7 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
+						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
@@ -244,14 +253,14 @@ void MenuNavigator::update() {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
 				
-				for (int i = 0; i < 256; ++i) {
+				for (int i = 0; i < 512; ++i) {
 					if (glfwGetKey(m_render.getWindowPtr(), i)) {
 						*changing = i;
 						m_render.doneEditing();
+						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
-				//glfwSetKeyCallback(m_render.getWindowPtr(), callback);
 			}
 		}
 		else if (m_scene == 3) {

@@ -18,6 +18,9 @@ void MenuRender::init(GLFWwindow* w) {
 }
 
 void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
+	//enable exit from remapping menu
+	m_shouldClose = false;
+
 	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;

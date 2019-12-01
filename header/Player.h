@@ -1,6 +1,7 @@
 #pragma once
 #include "GLFW/glfw3.h"
 #include <vector>
+#include <fstream>
 #include "Generator.h"
 
 enum indices {
@@ -30,6 +31,8 @@ public:
 	bool getEuActive();
 	bool getEuZoneActive();
     void pollState(Generator &g);
+	void readMappingFile();
+	void writeMappingFile();
 	void updateGamepadState();
 	std::vector<float> getGamepadValues();
 	void tick(double time);
@@ -82,6 +85,7 @@ public:
 protected:
 
 private:
+	
 	int m_cross = 1;
 
     int m_score = 0;
