@@ -43,6 +43,7 @@ private:
 
 	std::ifstream m_chart;
 	bool m_isChartBinary = false;
+	bool m_placedFinalCF = false;
 	double m_bpmChangeTime = -1;
 	int m_bpmChangeValue = -1;
 	double m_lastBpmTick = 0.0;
