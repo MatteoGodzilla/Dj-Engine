@@ -15,9 +15,10 @@ public:
 	void init(GLFWwindow* w,std::string path);
 	void render();
 	void tick();
-	void input(int key, int action);
+	void pollInput();
 	bool getActive();
 	void setActive(bool active);
+	Player* getPlayer();
 	void start();
 	~Game();
 	std::vector<Note> m_note_arr;

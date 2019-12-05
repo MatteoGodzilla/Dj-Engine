@@ -1,24 +1,23 @@
 #pragma once
 #include "GLFW/glfw3.h"
 #include <vector>
+#include <fstream>
 #include "Generator.h"
 
-enum K {
-    GREEN_CODE = GLFW_KEY_J,
-    RED_CODE = GLFW_KEY_K,
-    BLUE_CODE = GLFW_KEY_L,
-    CROSS_L_CODE = GLFW_KEY_A,
-    CROSS_R_CODE = GLFW_KEY_D,
-    SCRATCH_UP = GLFW_KEY_W,
-    SCRATCH_DOWN = GLFW_KEY_S,
-	EUPHORIA = GLFW_KEY_E
+enum indices {
+	GREEN_INDEX,RED_INDEX,BLUE_INDEX,EU_INDEX,
+	CF_LEFT_INDEX,CF_RIGHT_INDEX,
+	SCR_UP_INDEX,SCR_DOWN_INDEX,
+	MENU_UP,MENU_DOWN,MENU_SELECT,MENU_BACK
 };
 
 class Player {
 public:
     Player();
-	void keyCallback(int key, int action, double time,
-		std::vector<Note>& v, std::vector<Note>& ev,std::vector<Note>& cross);
+
+	void pollInput(GLFWwindow* window);
+	void hit(double time,std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
+
     virtual ~Player();
 	bool getRedClicker();
 	bool getGreenClicker();
@@ -32,16 +31,63 @@ public:
 	bool getEuActive();
 	bool getEuZoneActive();
     void pollState(Generator &g);
+	void readMappingFile();
+	void writeMappingFile();
+	void updateGamepadState();
+	std::vector<float> getGamepadValues();
 	void tick(double time);
+
+	int GREEN_CODE = GLFW_KEY_J;
+	int RED_CODE = GLFW_KEY_K;
+	int BLUE_CODE = GLFW_KEY_L;
+	int CROSS_L_CODE = GLFW_KEY_A;
+	int CROSS_R_CODE = GLFW_KEY_D;
+	int SCRATCH_UP = GLFW_KEY_W;
+	int SCRATCH_DOWN = GLFW_KEY_S;
+	int EUPHORIA = GLFW_KEY_E;
+
+	int GREEN_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
+	int RED_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
+	int BLUE_GAMEPAD = GLFW_GAMEPAD_BUTTON_X;
+	int EU_GAMEPAD = GLFW_GAMEPAD_BUTTON_Y;
+
+	int CF_LEFT_GAMEPAD = GLFW_GAMEPAD_AXIS_RIGHT_Y + GLFW_GAMEPAD_BUTTON_LAST;
+	int CF_RIGHT_GAMEPAD = GLFW_GAMEPAD_AXIS_RIGHT_Y + GLFW_GAMEPAD_BUTTON_LAST + 1;
+	int SCR_DOWN_GAMEPAD = GLFW_GAMEPAD_AXIS_LEFT_Y + GLFW_GAMEPAD_BUTTON_LAST;
+	int SCR_UP_GAMEPAD = GLFW_GAMEPAD_AXIS_LEFT_Y + GLFW_GAMEPAD_BUTTON_LAST + 1;
+
+	bool m_useSingleCfAxis = true;
+	bool m_useSingleScrAxis = true;
+
+	bool m_useKeyboardInput = true;
+
+	std::vector<float> m_gpState;
+	std::vector<float> m_gpMult;
+	std::vector<float> m_gpDead;
+	std::vector<bool> m_gpInvertDead;
+
+	bool m_isRedPressed = false;
+	bool m_isGreenPressed = false;
+	bool m_isBluePressed = false;
+	bool m_isUpPressed = false;
+	bool m_isDownPressed = false;
+	bool m_isCfLeftPressed = false;
+	bool m_isCfRightPressed = false;
+	bool m_isEuPressed = false;
+
+	bool m_wasRedPressed = false;
+	bool m_wasGreenPressed = false;
+	bool m_wasBluePressed = false;
+	bool m_wasUpPressed = false;
+	bool m_wasDownPressed = false;
+	bool m_wasCfLeftPressed = false;
+	bool m_wasCfRightPressed = false;
 protected:
 
 private:
-	bool m_red = false;
-	bool m_green = false;
-	bool m_blue = false;
+	
 	int m_cross = 1;
-    bool m_scr_up = false;
-    bool m_scr_down = false;
+
     int m_score = 0;
     int m_mult = 1;
     int m_combo = 0;

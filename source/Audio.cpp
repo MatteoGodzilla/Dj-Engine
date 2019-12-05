@@ -19,37 +19,40 @@ Audio::Audio() {
 void Audio::load(const char* filename) {
 	if (ov_fopen(filename, &m_oggFile) == 0 && firstRun) {
 		std::cout << "Audio msg: successfully loaded 'song.ogg'" << std::endl;
-	}
 
-	//initial song load to kickstart the streaming
+		//initial song load to kickstart the streaming
 
-	unsigned int b = 0; //pointer never used
-	int processed = 0;
-	char bufferData[4096];
-	int bytesRead = 0;
-	vorbis_info* info;
+		unsigned int b = 0; //pointer never used
+		int processed = 0;
+		char bufferData[4096];
+		int bytesRead = 0;
+		vorbis_info* info;
 
-	info = ov_info(&m_oggFile, -1);
-	m_frequency = info->rate;
-	m_songLength = ov_time_total(&m_oggFile, -1);
+		info = ov_info(&m_oggFile, -1);
+		m_frequency = info->rate;
+		m_songLength = ov_time_total(&m_oggFile, -1);
 
-	int buffers = 0;
-	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
-	while (buffers < 50) {
-		//temporary buffer
-		alGenBuffers(1, &b);
-
-		//read and upload
-		bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
-		alBufferData(b, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
-		alSourceQueueBuffers(m_source, 1, &b);
-
-		//remove temporary buffer
-		alDeleteBuffers(1, &b);
-
+		int buffers = 0;
 		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+		while (buffers < 50) {
+			//temporary buffer
+			alGenBuffers(1, &b);
+
+			//read and upload
+			bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
+			alBufferData(b, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
+			alSourceQueueBuffers(m_source, 1, &b);
+
+			//remove temporary buffer
+			alDeleteBuffers(1, &b);
+
+			alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+		}
+		buffer();
 	}
-	buffer();
+	else {
+		std::cerr << "Audio Error: Cannot load 'song.ogg'" << std::endl;
+	}
 }
 
 void Audio::buffer() {

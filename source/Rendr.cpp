@@ -546,9 +546,12 @@ void Rendr::init(GLFWwindow* w) {
 		FT_Done_Face(m_font);
 		FT_Done_FreeType(m_FTLibrary);
 	}
-	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);	
+}
+
+GLFWwindow* Rendr::getWindowPtr(){
+	return m_window;
 }
 
 Rendr::~Rendr() {
-	//dtor
 }

@@ -500,6 +500,14 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 			noteBufferSize = v.size() + m_note_times.size();
 			eventBufferSize = ev.size() + m_event_times.size();
 		}
+		if (m_chart.eof() && !m_placedFinalCF) {
+			m_placedFinalCF = true;
+
+			//place a crossfade center at the 100 hour mark
+			//seems impossible to reach it for me 
+			//but then, there is always someone that does the impossible
+			pushCross(360000.0f, CROSS_C, 0.0f);
+		}
 	}
 }
 

@@ -1,8 +1,6 @@
 #include "Game.h"
 
-Game::Game() 
-{
-}
+Game::Game() {}
 
 void Game::init(GLFWwindow* w,std::string path) {
 	m_render.init(w);
@@ -64,16 +62,17 @@ void Game::tick() {
 	}
 }
 
-void Game::input(int key, int action) {
-	if(m_active)
-	{
+void Game::pollInput() {
+	if(m_active){
+		m_player.pollInput(m_render.getWindowPtr());
 		if (m_mode == 0) {
-			m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
-			if (action == GLFW_PRESS && key == GLFW_KEY_T)std::cout << m_global_time << std::endl;
-			if (action == GLFW_PRESS && key == GLFW_KEY_BACKSPACE)m_mode = 1;
+			m_player.hit(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
+			//m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
+			if (glfwGetKey(m_render.getWindowPtr(),GLFW_KEY_T))std::cout << m_global_time << std::endl;
+			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_BACKSPACE))m_mode = 1;
 		}
 		else {
-			if (action == GLFW_PRESS && key == GREEN_CODE)m_active = false;
+			if(m_player.m_wasGreenPressed && !m_player.m_isGreenPressed)m_active = false;
 		}
 	}
 }
@@ -84,6 +83,11 @@ bool Game::getActive() {
 
 void Game::setActive(bool active){
 	m_active = active;
+}
+
+Player* Game::getPlayer()
+{
+	return &m_player;
 }
 
 void Game::start() {
