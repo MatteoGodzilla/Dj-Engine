@@ -34,7 +34,7 @@ private:
 	GameRender m_render;
 	Generator m_gen;
 	Player m_player;
-	Audio m_audio;
+	//Audio m_audio;
 	bool m_active = false;
 	int m_mode = 0;
 };
