@@ -1,7 +1,9 @@
 #pragma once
 #include "SimpleINI/SimpleIni.h"
 #include <iostream>
-#include <filesystem>
+//remove visual studio warning
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
 #include <fstream>
 #include <string>
 #include <list>

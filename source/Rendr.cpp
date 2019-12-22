@@ -213,7 +213,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 			x += temp.advance / 64;
 		}
 		else {
-			std::cerr << "RENDR ERROR:Char not supported: " << c << std::endl;
+			std::cerr << "Rendr error:Char not supported: " << c << std::endl;
 		}
 	}
 
@@ -302,7 +302,7 @@ void Rendr::init(GLFWwindow* w) {
 	{
 		//shaders source files
 		const char* vTextureSource = "\n"
-			"#version 330 core\n"
+			"#version 330\n"
 			"layout(location = 0) in vec4 aPos;\n"
 			"layout(location = 1) in vec2 tCoords;\n"
 			"uniform mat4 u_proj;\n"
@@ -315,7 +315,7 @@ void Rendr::init(GLFWwindow* w) {
 			"}";
 
 		const char* fTextureSource = "\n"
-			"#version 330 core\n"
+			"#version 330\n"
 			"out vec4 FragColor;\n"
 			"in vec2 tex_coords;\n"
 			"uniform sampler2D u_t;\n"
@@ -327,7 +327,7 @@ void Rendr::init(GLFWwindow* w) {
 
 
 		const char* vColorSource = "\n"
-			"#version 330 core\n"
+			"#version 330\n"
 			"layout(location = 0) in vec4 aPos;\n"
 			"layout(location = 1) in vec4 c;\n"
 			"uniform mat4 u_proj;\n"
@@ -340,7 +340,7 @@ void Rendr::init(GLFWwindow* w) {
 			"}";
 
 		const char* fColorSource = "\n"
-			"#version 330 core\n"
+			"#version 330\n"
 			"out vec4 FragColor;\n"
 			"in vec4 color;\n"
 			"\n"
@@ -350,7 +350,7 @@ void Rendr::init(GLFWwindow* w) {
 			"}\n";
 
 		const char* fTextSource = "\n"
-			"#version 330 core\n"
+			"#version 330\n"
 			"out vec4 FragColor;\n"
 			"in vec2 tex_coords;\n"
 			"\n"
@@ -392,12 +392,31 @@ void Rendr::init(GLFWwindow* w) {
 		//example compile status check
 		int success;
 		char infolog[512];
+		glGetShaderiv(vShaderTexture, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vShaderTexture, 512, NULL, infolog);
+			std::cerr << "error compiling vertex texture shader:" << infolog << std::endl;
+		}
+		glGetShaderiv(fShaderTexture, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(fShaderTexture, 512, NULL, infolog);
+			std::cerr << "error compiling fragment texture shader:" << infolog << std::endl;
+		}
+		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(vShaderColor, 512, NULL, infolog);
+			std::cerr << "error compiling vertex color shader:" << infolog << std::endl;
+		}
+		glGetShaderiv(fShaderColor, GL_COMPILE_STATUS, &success);
+		if (!success) {
+			glGetShaderInfoLog(fShaderColor, 512, NULL, infolog);
+			std::cerr << "error compiling fragment color shader:" << infolog << std::endl;
+		}
 		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fShaderText, 512, NULL, infolog);
-			std::cerr << "error compiling shader" << infolog << std::endl;
+			std::cerr << "error compiling fragment text shader:" << infolog << std::endl;
 		}
-
 		//create shader programs
 		m_textureProgram = glCreateProgram();
 		glAttachShader(m_textureProgram, vShaderTexture);
@@ -503,10 +522,10 @@ void Rendr::init(GLFWwindow* w) {
 	//freetype init
 	{
 		if (FT_Init_FreeType(&m_FTLibrary)) {
-			std::cerr << "error opening freetype" << std::endl;
+			std::cerr << "Rendr error:error opening freetype" << std::endl;
 		}
 		if (FT_New_Face(m_FTLibrary, "res/NotoSans-Regular.ttf", 0, &m_font)) {
-			std::cerr << "error loading font" << std::endl;
+			std::cerr << "Rendr error:error loading font" << std::endl;
 		}
 		FT_Set_Pixel_Sizes(m_font, 0, 1024);
 
@@ -517,7 +536,7 @@ void Rendr::init(GLFWwindow* w) {
 			// Load character glyph 
 			if (FT_Load_Char(m_font, c, FT_LOAD_RENDER))
 			{
-				std::cout << "RENDR ERROR::FREETYTPE: Failed to load Glyph:" << c << std::endl;
+				std::cout << "Rendr error::FREETYTPE: Failed to load Glyph:" << c << std::endl;
 			}
 			// generate texture
 			unsigned int texture;

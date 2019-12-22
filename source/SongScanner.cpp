@@ -1,7 +1,7 @@
 #include "SongScanner.h"
 
 //alias to make code shorter (and easier to read)
-namespace fs = std::filesystem;
+namespace fs = std::experimental::filesystem;
 
 //recursive scan inside folders to find songs 
 void checkFolder(fs::path p, std::vector<SongEntry>&list) {
@@ -42,17 +42,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
 			dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
 
-			dTrack = min(dTrack, 100);
-			dTrack = max(dTrack, 0);
+			dTrack = (dTrack < 100 ? dTrack : 100);//min(dTrack, 100);
+			dTrack = (dTrack > 0 ? dTrack : 0);//max(dTrack, 0);
 
-			dTap = min(dTap, 100);
-			dTap = max(dTap, 0);
+			dTap = (dTap < 100 ? dTap : 100);//min(dTap, 100);
+			dTap = (dTap > 0 ? dTap : 0);//max(dTap, 0);
 
-			dCrossfade = min(dCrossfade, 100);
-			dCrossfade = max(dCrossfade, 0);
+			dCrossfade = (dCrossfade < 100 ? dCrossfade : 100);//min(dCrossfade, 100);
+			dCrossfade = (dCrossfade > 0 ? dCrossfade: 0);//max(dCrossfade, 0);
 
-			dScratch = min(dScratch, 100);
-			dScratch = max(dScratch, 0);
+			dScratch = (dScratch < 100 ? dScratch: 100);//min(dScratch, 100);
+			dScratch = (dScratch > 0 ? dScratch : 0);//max(dScratch, 0);
 
 			if (s2 == std::string("NULL")) {
 				s2.clear();

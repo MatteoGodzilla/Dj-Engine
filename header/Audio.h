@@ -1,8 +1,8 @@
 #pragma once
 
-#include "AL/al.h"
-#include "AL/alc.h"
-#include "vorbis/vorbisfile.h"
+#include "openal-soft/include/AL/al.h"
+#include "openal-soft/include/AL/alc.h"
+#include "vorbis/include/vorbis/vorbisfile.h"
 #include <iostream>
 #include <vector>
 

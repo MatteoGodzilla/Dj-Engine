@@ -217,7 +217,7 @@ void MenuNavigator::update() {
 					changing = &BACK_GAMEPAD;
 				}
 
-				float deadzone = 0.1;
+				float deadzone = 0.1f;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
