@@ -5,7 +5,7 @@ Game::Game() {}
 void Game::init(GLFWwindow* w,std::string path) {
 	m_render.init(w);
 	std::string audioPath = path + std::string("/song.ogg");
-	m_audio.load(audioPath.c_str());
+	//m_audio.load(audioPath.c_str());
 
 	m_gen.init(path);
 	m_bpm_arr.push_back(0.0);
@@ -47,18 +47,21 @@ void Game::tick() {
 			m_player.tick(m_global_time);
 
 			m_render.pollState(m_global_time, m_player, m_gen);
-			m_audio.buffer();
-			if (m_global_time >= 0.0)m_audio.play();
+			//m_audio.buffer();
+			//if (m_global_time >= 0.0)m_audio.play();
 
 			//add delta time to m_global_time
 			double nowTime = glfwGetTime();
 			m_global_time += nowTime - m_pastTime;
 			m_pastTime = nowTime;
 		}
+
+		/*
 		if (!m_audio.isActive(m_global_time)) {
 			m_mode = 1;
 			m_audio.stop();
 		}
+		*/
 	}
 }
 

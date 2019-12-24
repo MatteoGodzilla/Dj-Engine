@@ -1,0 +1,297 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "bin/visualinfo.exe"
+		},
+		{
+			"path" : "bin/visualinfo.pdb"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"install",
+			"target_link_libraries",
+			"include_directories",
+			"add_definitions"
+		],
+		"files" : 
+		[
+			"lib/include/GLEW/build/cmake/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 179,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 185,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 180,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 5,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 7,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 9,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 11,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 13,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 1,
+				"line" : 17,
+				"parent" : 4
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 86,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od   "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 13,
+					"define" : "GLEW_NO_GLU"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 5,
+					"path" : "C:/Users/caten/Dj-Engine/header"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "C:/Users/caten/Dj-Engine/lib"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/IMGUI"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/ogg/include"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "C:/Users/caten/Dj-Engine/lib/freetype/include/freetype"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/build/cmake/../../include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-DWIN32 -D_DEBUG  "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 13,
+					"define" : "GLEW_NO_GLU"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 5,
+					"path" : "C:/Users/caten/Dj-Engine/header"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "C:/Users/caten/Dj-Engine/lib"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/IMGUI"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/include"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/ogg/include"
+				},
+				{
+					"backtrace" : 11,
+					"path" : "C:/Users/caten/Dj-Engine/lib/freetype/include/freetype"
+				},
+				{
+					"backtrace" : 12,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/build/cmake/../../include"
+				}
+			],
+			"language" : "RC",
+			"sourceIndexes" : 
+			[
+				1
+			]
+		}
+	],
+	"dependencies" : 
+	[
+		{
+			"backtrace" : 3,
+			"id" : "glew::@083f76c08a3705b34b1b"
+		}
+	],
+	"id" : "visualinfo::@083f76c08a3705b34b1b",
+	"install" : 
+	{
+		"destinations" : 
+		[
+			{
+				"backtrace" : 2,
+				"path" : "bin"
+			}
+		],
+		"prefix" : 
+		{
+			"path" : "C:/Users/caten/Dj-engine/out/install/x86-Debug"
+		}
+	},
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/machine:X86 /debug /INCREMENTAL /subsystem:console",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "..\\..\\..\\..\\glew32d.lib opengl32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "C"
+	},
+	"name" : "visualinfo",
+	"nameOnDisk" : "visualinfo.exe",
+	"paths" : 
+	{
+		"build" : "lib/include/GLEW/build/cmake",
+		"source" : "lib/include/GLEW/build/cmake"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/include/GLEW/src/visualinfo.c",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "lib/include/GLEW/build/visualinfo.rc",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

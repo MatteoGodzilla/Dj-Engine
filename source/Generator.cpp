@@ -417,8 +417,8 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 
 			double factor = 240.0 / m_bpm;
 
-			time *= factor;
-			length *= factor;
+			time *= (float)factor;
+			length *= (float)factor;
 
 			//std::cout << time << "\t" << type << "\t" << length << "\t" << extra << std::endl;
 
@@ -489,7 +489,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 				//bpm marker
 			}
 			else if (type == 0x0B000002) {
-				m_bpm = extra;
+				m_bpm = (int)extra;
 			}
 			else if (type == 0x0AFFFFFF) {}
 			else if (type == 0xFFFFFFFF) {

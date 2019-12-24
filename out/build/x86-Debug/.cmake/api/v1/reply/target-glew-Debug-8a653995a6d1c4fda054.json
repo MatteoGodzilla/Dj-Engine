@@ -1,0 +1,321 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "bin/glew32d.dll"
+		},
+		{
+			"path" : "lib/glew32d.lib"
+		},
+		{
+			"path" : "bin/glew32d.pdb"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_library",
+			"include_directories",
+			"set_target_properties",
+			"add_definitions",
+			"target_compile_definitions"
+		],
+		"files" : 
+		[
+			"lib/include/GLEW/build/cmake/CMakeLists.txt",
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 95,
+				"parent" : 0
+			},
+			{
+				"file" : 1
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 5,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 7,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 9,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 11,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 13,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 15,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 1,
+				"line" : 17,
+				"parent" : 2
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 86,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 96,
+				"parent" : 0
+			},
+			{
+				"command" : 3,
+				"file" : 0,
+				"line" : 57,
+				"parent" : 0
+			},
+			{
+				"command" : 4,
+				"file" : 0,
+				"line" : 104,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "/DWIN32 /D_WINDOWS /W3 /MDd /Zi /Ob0 /Od    -GS-"
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 11,
+					"define" : "GLEW_BUILD"
+				},
+				{
+					"backtrace" : 12,
+					"define" : "GLEW_NO_GLU"
+				},
+				{
+					"backtrace" : 13,
+					"define" : "VC_EXTRALEAN"
+				},
+				{
+					"define" : "glew_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/caten/Dj-Engine/header"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "C:/Users/caten/Dj-Engine/lib"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/IMGUI"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/ogg/include"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/Users/caten/Dj-Engine/lib/freetype/include/freetype"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/build/cmake/../../include"
+				}
+			],
+			"language" : "C",
+			"sourceIndexes" : 
+			[
+				3
+			]
+		},
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : "-DWIN32 -D_DEBUG  "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 11,
+					"define" : "GLEW_BUILD"
+				},
+				{
+					"backtrace" : 12,
+					"define" : "GLEW_NO_GLU"
+				},
+				{
+					"backtrace" : 13,
+					"define" : "VC_EXTRALEAN"
+				},
+				{
+					"define" : "glew_EXPORTS"
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "C:/Users/caten/Dj-Engine/header"
+				},
+				{
+					"backtrace" : 4,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include"
+				},
+				{
+					"backtrace" : 5,
+					"path" : "C:/Users/caten/Dj-Engine/lib"
+				},
+				{
+					"backtrace" : 6,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/IMGUI"
+				},
+				{
+					"backtrace" : 7,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/include"
+				},
+				{
+					"backtrace" : 8,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/ogg/include"
+				},
+				{
+					"backtrace" : 9,
+					"path" : "C:/Users/caten/Dj-Engine/lib/freetype/include/freetype"
+				},
+				{
+					"backtrace" : 10,
+					"path" : "C:/Users/caten/Dj-Engine/lib/include/GLEW/build/cmake/../../include"
+				}
+			],
+			"language" : "RC",
+			"sourceIndexes" : 
+			[
+				4
+			]
+		}
+	],
+	"id" : "glew::@083f76c08a3705b34b1b",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "/machine:X86 /debug /INCREMENTAL",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "-BASE:0x62AA0000 -nodefaultlib -noentry opengl32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib",
+				"role" : "libraries"
+			}
+		],
+		"language" : "C"
+	},
+	"name" : "glew",
+	"nameOnDisk" : "glew32d.dll",
+	"paths" : 
+	{
+		"build" : "lib/include/GLEW/build/cmake",
+		"source" : "lib/include/GLEW/build/cmake"
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
+				0,
+				1,
+				2
+			]
+		},
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				3,
+				4
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"path" : "lib/include/GLEW/include/GL/wglew.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/include/GLEW/include/GL/glew.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "lib/include/GLEW/include/GL/glxew.h",
+			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "lib/include/GLEW/src/glew.c",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 1,
+			"path" : "lib/include/GLEW/build/glew.rc",
+			"sourceGroupIndex" : 1
+		}
+	],
+	"type" : "SHARED_LIBRARY"
+}

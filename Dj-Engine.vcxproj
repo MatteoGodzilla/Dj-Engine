@@ -91,7 +91,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\include;$(SolutionDir)header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\;$(SolutionDir)header;$(SolutionDir)lib\GLEW\include;$(SolutionDir)lib\GLFW\include;$(SolutionDir)lib\freetype\include;$(SolutionDir)lib\IMGUI;$(SolutionDir)lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;GLEW_STATIC;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)lib\include;$(SolutionDir)header;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)lib\;$(SolutionDir)header;$(SolutionDir)lib\GLEW\include;$(SolutionDir)lib\GLFW\include;$(SolutionDir)lib\freetype\include;$(SolutionDir)lib\IMGUI;$(SolutionDir)lib\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
@@ -167,12 +167,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Dj-Engine.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui_demo.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui_draw.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui_impl_glfw.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="lib\include\IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui_demo.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui_draw.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui_impl_glfw.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="lib\IMGUI\imgui_widgets.cpp" />
     <ClCompile Include="source\Audio.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />
