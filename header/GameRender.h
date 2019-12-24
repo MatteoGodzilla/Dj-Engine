@@ -2,6 +2,7 @@
 
 #include "Graphics.h"
 #include "Rendr.h"
+#include "AnimationManager.h"
 
 #include "Note.h"
 #include "Player.h"
@@ -24,6 +25,7 @@ public:
 	void result(Player& player,Generator& generator);
 	void meters();
     void pollState(double time,Player& p,Generator &g);
+	void updateAnimations(double time);
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
     virtual ~GameRender();
 	
@@ -60,5 +62,6 @@ private:
 	FT_Library m_FTLibrary;
 	FT_Face m_font;
 	
+	AnimationManager m_animManager;
 };
 

@@ -4,6 +4,7 @@
 #include "Generator.h"
 #include "Player.h"
 #include "Audio.h"
+#include "Animation.h"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -34,7 +35,7 @@ private:
 	GameRender m_render;
 	Generator m_gen;
 	Player m_player;
-	//Audio m_audio;
+	Audio m_audio;
 	bool m_active = false;
 	int m_mode = 0;
 };

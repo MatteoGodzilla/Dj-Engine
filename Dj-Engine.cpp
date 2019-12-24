@@ -23,7 +23,7 @@ void resizeCallback(GLFWwindow* w,int width,int height) {
 }
 
 int main() {
-	std::cout << "Dj-Engine version 0.8" << std::endl;
+	std::cout << "Dj-Engine version 0.9" << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);

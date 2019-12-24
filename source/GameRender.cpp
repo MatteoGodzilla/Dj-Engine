@@ -6,6 +6,7 @@ GameRender::GameRender() {
 
 void GameRender::init(GLFWwindow* w) {
 	Rendr::init(w);
+	m_animManager.init(-1000.0);
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -89,74 +90,192 @@ void GameRender::clicker(){
 
 	if (m_green) {
 		//green clicker is pressed
+
+		//default clicker position
+		float left = -0.5f;
+		float right = -0.2f;
+		float back = 3.6f;
+		float front = 3.9f;
+
 		if (m_playerCross >= 1) {
+			//green clicker is on the left
+			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+			if (crossGreen.isEnabled()) {
+				left = -0.85f;
+				right = -0.55f;
+
+				float d = crossGreen.getPercent() * 0.35;
+				left += d;
+				right += d;
+			}
 			//green clicker is on the center
-			pushVertexTexture(clickerVector, -0.5f + clickedOffset, plane, 3.6f + clickedOffset, 0.0, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.5f + clickedOffset, plane, 3.9f - clickedOffset, 0.0, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.2f - clickedOffset, plane, 3.9f - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.2f - clickedOffset, plane, 3.6f + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, back + clickedOffset, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, front - clickedOffset, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, front - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, back + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
+			left = -0.85f;
+			right = -0.55f;
+
 			//green clicker is on the left
-			pushVertexTexture(clickerVector, -0.85f + clickedOffset, plane, 3.6f + clickedOffset, 0.0, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.85f + clickedOffset, plane, 3.9f - clickedOffset, 0.0, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.55f - clickedOffset, plane, 3.9f - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.55f - clickedOffset, plane, 3.6f + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+			if (crossGreen.isEnabled()) {
+				left = -0.5;
+				right = -0.2;
+				float d = crossGreen.getPercent() * 0.35;
+
+				left -= d;
+				right -= d;
+			}
+
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, back + clickedOffset, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, front - clickedOffset, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, front - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, back + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 	else {
-		//green clicker is not pressed
+		//default clicker position
+		float left = -0.5f;
+		float right = -0.2f;
+		float back = 3.6f;
+		float front = 3.9f;
+
 		if (m_playerCross >= 1) {
+			//green clicker is on the left
+			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+			if (crossGreen.isEnabled()) {
+				left = -0.85f;
+				right = -0.55f;
+
+				float d = crossGreen.getPercent() * 0.35;
+				left += d;
+				right += d;
+			}
 			//green clicker is on the center
-			pushVertexTexture(clickerVector, -0.5f, plane, 3.6f, 0.0, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.5f, plane, 3.9f, 0.0, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.2f, plane, 3.9f, 440.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.2f, plane, 3.6f, 440.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left, plane, back, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left, plane, front, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, front, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, back, 440.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
+			left = -0.85f;
+			right = -0.55f;
+
 			//green clicker is on the left
-			pushVertexTexture(clickerVector, -0.85f, plane, 3.6f, 0.0, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.85f, plane, 3.9f, 0.0, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.55f, plane, 3.9f, 440.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, -0.55f, plane, 3.6f, 440.0f / 1760.0f, 840.0f / 1640.0f);
+			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+			if (crossGreen.isEnabled()) {
+				left = -0.5;
+				right = -0.2;
+				float d = crossGreen.getPercent() * 0.35;
+
+				left -= d;
+				right -= d;
+			}
+
+			pushVertexTexture(clickerVector, left, plane, back, 0.0, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left, plane, front, 0.0, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, front, 440.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, back, 440.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
 	if (m_blue) {
 		//blue clicker is pressed
+
+		float left = 0.2;
+		float right = 0.5;
+		float front = 3.9;
+		float back = 3.6;
+
 		if (m_playerCross <= 1) {
 			//blue clicker is on the center
-			pushVertexTexture(clickerVector, 0.5f - clickedOffset, plane, 3.6f + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.5f - clickedOffset, plane, 3.9f - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.2f + clickedOffset, plane, 3.9f - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.2f + clickedOffset, plane, 3.6f + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+
+			if (crossBlue.isEnabled()) {
+				left = 0.55;
+				right = 0.85;
+
+				float d = crossBlue.getPercent() * 0.35;
+				left -= d;
+				right -= d;
+			}
+
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, back + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, front - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, front - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, back + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
+			left = 0.55;
+			right = 0.85;
+
+			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+
+			if (crossBlue.isEnabled()) {
+				left = 0.2;
+				right = 0.5;
+
+				float d = crossBlue.getPercent() * 0.35;
+				left += d;
+				right += d;
+			}
+
 			//blue clicker is on the right
-			pushVertexTexture(clickerVector, 0.85f - clickedOffset, plane, 3.6f + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.85f - clickedOffset, plane, 3.9f - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.55f + clickedOffset, plane, 3.9f - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.55f + clickedOffset, plane, 3.6f + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, back + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left + clickedOffset, plane, front - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, front - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right - clickedOffset, plane, back + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 	else {
-		//blue clicker is not pressed
+		float left = 0.2;
+		float right = 0.5;
+		float front = 3.9;
+		float back = 3.6;
+
 		if (m_playerCross <= 1) {
 			//blue clicker is on the center
-			pushVertexTexture(clickerVector, 0.5f, plane, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.5f, plane, 3.9f, 880.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.2f, plane, 3.9f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.2f, plane, 3.6f, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+
+			if (crossBlue.isEnabled()) {
+				left = 0.55;
+				right = 0.85;
+
+				float d = crossBlue.getPercent() * 0.35;
+				left -= d;
+				right -= d;
+			}
+
+			pushVertexTexture(clickerVector, left, plane, back, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left, plane, front, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, front, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, back, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
-			//blue clicker is on the left
-			pushVertexTexture(clickerVector, 0.85f, plane, 3.6f, 880.0f / 1760.0f, 840.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.85f, plane, 3.9f, 880.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.55f, plane, 3.9f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-			pushVertexTexture(clickerVector, 0.55f, plane, 3.6f, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+			left = 0.55;
+			right = 0.85;
+
+			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+
+			if (crossBlue.isEnabled()) {
+				left = 0.2;
+				right = 0.5;
+
+				float d = crossBlue.getPercent() * 0.35;
+				left += d;
+				right += d;
+			}
+
+			//blue clicker is on the right
+			pushVertexTexture(clickerVector, left, plane, back, 880.0f / 1760.0f, 840.0f / 1640.0f);
+			pushVertexTexture(clickerVector, left, plane, front, 880.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, front, 1320.0f / 1760.0f, 400.0f / 1640.0f);
+			pushVertexTexture(clickerVector, right, plane, back, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
@@ -1474,8 +1593,44 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	m_renderEuValue = p.getEuValue();
 	m_renderEuActive = p.getEuActive();
 	m_renderEuZone = p.getEuZoneActive();
+	
+	if (!p.m_wasCfLeftPressed && p.m_isCfLeftPressed) {
+		Animation temp = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+		temp.enable(time);
+		m_animManager.updateAnimation(AN_CROSS_GREEN_TO_LEFT, temp);
+		if (p.m_isCfRightPressed) {
+			Animation temp2 = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+			temp2.enable(time);
+			m_animManager.updateAnimation(AN_CROSS_BLUE_TO_CENTER, temp2);
+		}
+	}
+	else if (!p.m_isCfLeftPressed && p.m_wasCfLeftPressed && m_playerCross != 2) {
+		Animation temp = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+		temp.enable(time);
+		m_animManager.updateAnimation(AN_CROSS_GREEN_TO_CENTER, temp);
+	}
+	if (!p.m_wasCfRightPressed && p.m_isCfRightPressed) {
+		Animation temp = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+		temp.enable(time);
+		m_animManager.updateAnimation(AN_CROSS_BLUE_TO_RIGHT, temp);
+		if (p.m_isCfLeftPressed) {
+			Animation temp2 = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+			temp2.enable(time);
+			m_animManager.updateAnimation(AN_CROSS_GREEN_TO_CENTER, temp2);
+
+		}
+	}
+	else if (!p.m_isCfRightPressed && p.m_wasCfRightPressed && m_playerCross != 0) {
+		Animation temp = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+		temp.enable(time);
+		m_animManager.updateAnimation(AN_CROSS_BLUE_TO_CENTER, temp);
+	}
+	std::cout << m_playerCross << std::endl;
 }
 
+void GameRender::updateAnimations(double time) {
+	m_animManager.tick(time);
+}
 
 GameRender::~GameRender() {
 	
