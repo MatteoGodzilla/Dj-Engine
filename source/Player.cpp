@@ -198,6 +198,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (v.at(i).getHit() && v.at(i).getType() == TAP_G) {
 				found = true;
 				m_score += 100 * m_mult;
+				//check for chords (i.e multiple taps in the same time)
 				if (v.at(i).getMilli() != m_past_tap) {
 					m_combo++;
 					m_past_tap = v.at(i).getMilli();
@@ -217,6 +218,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		if (!found) {
 			m_combo = 0;
 			m_eu_zone_active = false;
+		}
+		else {
+			m_greenAnimation = true; //start animation
 		}
 	}
 	//red pressed
@@ -240,6 +244,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		if (!found) {
 			m_combo = 0;
 			m_eu_zone_active = false;
+		}
+		else {
+			m_redAnimation = true; //start animation
 		}
 	}
 	//blue pressed
@@ -271,6 +278,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			m_combo = 0;
 			m_eu_zone_active = false;
 		}
+		else {
+			m_blueAnimation = true;// start animation
+		}
 	}
 	//cross left pressed/moved
 	if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
@@ -295,6 +305,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					found = true;
+					m_greenAnimation = true;//start animation
 					break;
 				}
 			}
@@ -329,6 +340,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					found = true;
+					m_blueAnimation = true;//start animation
 					break;
 				}
 			}
@@ -342,9 +354,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 	}
 	//up pressed
 	if (m_isUpPressed && !m_wasUpPressed) {
-		bool found = false;
 		//if the green button is already pressed
 		if (m_isGreenPressed) {
+			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
 				if (v.at(i).getHit()) {
@@ -371,9 +383,13 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				m_combo = 0;
 				m_eu_zone_active = false;
 			}
+			else {
+				m_greenAnimation = true;
+			}
 		}
 		//if the blue button is already pressed
 		if (m_isBluePressed) {
+			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
 				if (v.at(i).getHit()) {
@@ -401,14 +417,17 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				m_combo = 0;
 				m_eu_zone_active = false;
 			}
+			else {
+				m_blueAnimation = true;
+			}
 		}
 		
 	}
 	//down pressed
 	if (m_isDownPressed && !m_wasDownPressed) {
-		bool found = false;
 		//if the green button is already pressed
 		if (m_isGreenPressed) {
+			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
 				if (v.at(i).getHit()) {
@@ -430,9 +449,18 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					}
 				}
 			}
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+			else {
+				m_greenAnimation = true;
+			}
 		}
 		//if the blue button is already pressed
 		if (m_isBluePressed) {
+			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
 				if (v.at(i).getHit()) {
@@ -454,11 +482,14 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					}
 				}
 			}
-		}
-		//if there isn't a note in the clicker, break combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+			else {
+				m_blueAnimation = true;
+			}
 		}
 	}
 	if (m_isEuPressed) {
@@ -496,6 +527,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
+					m_greenAnimation = true;
 					break;
 				}
 			}
@@ -534,6 +566,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
+					m_blueAnimation = true;
 					break;
 				}
 			}

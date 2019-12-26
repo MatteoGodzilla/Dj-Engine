@@ -10,11 +10,18 @@ void AnimationManager::init(double time) {
 	Animation anim3(AN_CROSS_BLUE_TO_RIGHT, 0.100);
 	Animation anim4(AN_CROSS_BLUE_TO_CENTER, 0.100);
 
+	Animation anim5(AN_GREEN_CLICKER, 0.200);
+	Animation anim6(AN_RED_CLICKER, 0.200);
+	Animation anim7(AN_BLUE_CLICKER, 0.200);
+
 
 	m_animLisit.push_back(anim1);
 	m_animLisit.push_back(anim2);
 	m_animLisit.push_back(anim3);
 	m_animLisit.push_back(anim4);
+	m_animLisit.push_back(anim5);
+	m_animLisit.push_back(anim6);
+	m_animLisit.push_back(anim7);
 }
 
 void AnimationManager::tick(double time) {
@@ -42,6 +49,15 @@ void AnimationManager::updateAnimation(int id, Animation a){
 		if (m_animLisit.at(i).getId() == id) {
 			m_animLisit.at(i) = a;
 			break;
+		}
+	}
+}
+
+void AnimationManager::triggerAnimation(int id, double time) {
+	for (size_t i = 0; i < m_animLisit.size(); ++i) {
+		if (m_animLisit.at(i).getId() == id) {
+			m_animLisit.at(i).enable(time);
+			m_animLisit.at(i).reset();
 		}
 	}
 }

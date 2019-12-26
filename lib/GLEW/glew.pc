@@ -1,6 +1,6 @@
-prefix=C:/Users/caten/Dj-engine/out/install/x86-Debug
+prefix=C:/Users/caten/Dj-Engine/out/install/x86-Debug
 exec_prefix=${prefix}
-libdir=C:/Users/caten/Dj-engine/out/install/x86-Debug/lib
+libdir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/lib
 includedir=${prefix}/include
 
 Name: glew

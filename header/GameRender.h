@@ -22,6 +22,7 @@ public:
     void events(double time, std::vector<Note>&ev, std::vector<Note>& cross);
     void lanes(double time, std::vector<Note> &v,std::vector<Note>&ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
+	void clickerAnimation();
 	void result(Player& player,Generator& generator);
 	void meters();
     void pollState(double time,Player& p,Generator &g);
@@ -51,7 +52,7 @@ private:
 	unsigned int m_highwayTexture = 0;
 	unsigned int m_objTexture = 0;
 	unsigned int m_metersTexture = 0;
-	unsigned int m_splashTexture = 0;
+	unsigned int m_clickerAnimation = 0;
 	unsigned int m_fontTexture = 0;
 	unsigned int m_textureVAO = 0;
 	unsigned int m_textureVBO = 0;
@@ -63,5 +64,17 @@ private:
 	FT_Face m_font;
 	
 	AnimationManager m_animManager;
+
+	//default green clicker position
+	float m_greenLeft = 0.0f;
+	float m_greenRight = 0.0f;
+	float m_greenBack = 0.0f;
+	float m_greenFront = 0.0f;
+
+	//default blue clicker position
+	float m_blueLeft = 0.0f;
+	float m_blueRight = 0.0f;
+	float m_blueBack = 0.0f;
+	float m_blueFront = 0.0f;
 };
 

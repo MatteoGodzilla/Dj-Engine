@@ -82,6 +82,10 @@ public:
 	bool m_wasDownPressed = false;
 	bool m_wasCfLeftPressed = false;
 	bool m_wasCfRightPressed = false;
+
+	bool m_greenAnimation = false;
+	bool m_redAnimation = false;
+	bool m_blueAnimation = false;
 protected:
 
 private:

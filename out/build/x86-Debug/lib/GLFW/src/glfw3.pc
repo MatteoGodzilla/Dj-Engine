@@ -1,0 +1,13 @@
+prefix=C:/Users/caten/Dj-Engine/out/install/x86-Debug
+exec_prefix=${prefix}
+includedir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/include
+libdir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/lib
+
+Name: GLFW
+Description: A multi-platform library for OpenGL, window and input
+Version: 3.3.0
+URL: https://www.glfw.org/
+Requires.private: 
+Libs: -L${libdir} -lglfw3
+Libs.private:  -lgdi32
+Cflags: -I${includedir}
