@@ -2,13 +2,8 @@
 
 Game::Game() {}
 
-void Game::init(GLFWwindow* w,std::string path) {
+void Game::init(GLFWwindow* w) {
 	m_render.init(w);
-	std::string audioPath = path + std::string("/song.ogg");
-	m_audio.load(audioPath.c_str());
-
-	m_gen.init(path);
-	m_bpm_arr.push_back(0.0);
 }
 
 void Game::pollInput() {
@@ -21,7 +16,10 @@ void Game::pollInput() {
 			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_BACKSPACE))m_mode = 1;
 		}
 		else {
-			if (m_player.m_wasGreenPressed && !m_player.m_isGreenPressed)m_active = false;
+			if (m_player.m_wasGreenPressed && !m_player.m_isGreenPressed) {
+				m_active = false;
+				reset();
+			}
 		}
 	}
 }
@@ -74,12 +72,29 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			//m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+			m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
 		}
 		else if (m_mode == 1) {
 			m_render.result(m_player,m_gen);
 		}
 	}
+}
+
+void Game::reset() {
+	m_note_arr.clear();
+	m_event_arr.clear();
+	m_cross_arr.clear();
+	m_bpm_arr.clear();
+
+	m_global_time = -2.0f;
+	m_active = false;
+	firstRun = true;
+	m_mode = 0;
+
+	m_render.reset();
+	m_gen.reset();
+	m_player.reset();
+	m_audio.reset();
 }
 
 bool Game::getActive() {
@@ -94,12 +109,18 @@ Player* Game::getPlayer(){
 	return &m_player;
 }
 
-void Game::start() {
+void Game::start(std::string path) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
 	
+	std::string audioPath = path + std::string("/song.ogg");
+	m_audio.load(audioPath.c_str());
+
+	m_gen.init(path);
+	m_bpm_arr.push_back(0.0);
+
 	m_active = true;
 	m_mode = 0;
 }

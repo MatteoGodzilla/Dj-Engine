@@ -19,7 +19,6 @@ Audio::Audio() {
 void Audio::load(const char* filename) {
 	if (ov_fopen(filename, &m_oggFile) == 0 && firstRun) {
 		std::cout << "Audio msg: successfully loaded 'song.ogg'" << std::endl;
-
 		//initial song load to kickstart the streaming
 
 		unsigned int b = 0; //pointer never used
@@ -31,10 +30,13 @@ void Audio::load(const char* filename) {
 		info = ov_info(&m_oggFile, -1);
 		m_frequency = info->rate;
 		m_songLength = ov_time_total(&m_oggFile, -1);
-
+		
 		int buffers = 0;
 		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+		std::cout << "first:" << buffers << std::endl;
 		while (buffers < 50) {
+			std::cout << "loading:" << buffers << std::endl;
+
 			//temporary buffer
 			alGenBuffers(1, &b);
 
@@ -56,7 +58,7 @@ void Audio::load(const char* filename) {
 }
 
 void Audio::buffer() {
-	unsigned int bufferRemoved = 0; //pointer never used
+	unsigned int bufferRemoved = 0;
 	int processed = 0;
 	char bufferData[4096];
 	int bytesRead = 0;
@@ -76,6 +78,19 @@ void Audio::buffer() {
 
 		processed--;
 	}
+}
+
+void Audio::reset() {
+	stop();
+	firstRun = true;
+	m_frequency = 0;
+	m_currentSection = 0;
+	m_songLength = 0.0;
+
+	//reset audio source
+	alDeleteSources(1, &m_source);
+	alGenSources(1, &m_source);
+	alSource3f(m_source, AL_POSITION, 0.0, 0.0, 0.0);
 }
 
 void Audio::play() {

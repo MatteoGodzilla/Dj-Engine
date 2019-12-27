@@ -16,6 +16,7 @@ public:
 	void bpm(double time, std::vector<double>& arr);
 	int getNotesTotal();
 	int getNotesHit();
+	void reset();
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
@@ -31,7 +32,6 @@ private:
 	std::vector<double> m_note_length;
     std::vector<int> m_note_types;
 
-
     std::vector<double> m_event_times;
 	std::vector<double> m_event_length;
     std::vector<int> m_event_types;
@@ -39,7 +39,6 @@ private:
 	std::vector<double> m_cross_times;
 	std::vector<double> m_cross_length;
 	std::vector<int> m_cross_types;
-
 
 	std::ifstream m_chart;
 	bool m_isChartBinary = false;
@@ -50,6 +49,8 @@ private:
 
 	int m_notesHit = 0;
 	int m_notesTotal = 0;
+
+	double m_initialCrossfade = -2.0;
 };
 
 #endif // GENERATOR_H

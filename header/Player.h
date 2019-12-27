@@ -36,6 +36,7 @@ public:
 	void updateGamepadState();
 	std::vector<float> getGamepadValues();
 	void tick(double time);
+	void reset();
 
 	int GREEN_CODE = GLFW_KEY_J;
 	int RED_CODE = GLFW_KEY_K;
@@ -86,12 +87,12 @@ public:
 	bool m_greenAnimation = false;
 	bool m_redAnimation = false;
 	bool m_blueAnimation = false;
+
+	int m_cross = 1;
+	int m_pastCross = 1;
 protected:
 
 private:
-	
-	int m_cross = 1;
-
     int m_score = 0;
     int m_mult = 1;
     int m_combo = 0;
@@ -101,7 +102,8 @@ private:
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
 	bool m_double_mult = false;
-	double m_lastTime = 0.0;
+	double m_lastTapTime = 0.0;
+	double m_lastCrossTime = 0.0;
 	int m_genBpm = 0;
 
 	int m_highestCombo = 0;

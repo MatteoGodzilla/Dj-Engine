@@ -28,6 +28,7 @@ public:
     void pollState(double time,Player& p,Generator &g);
 	void updateAnimations(double time);
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
+	void reset();
     virtual ~GameRender();
 	
 private:

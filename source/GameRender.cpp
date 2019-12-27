@@ -1558,7 +1558,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 	std::string cs = "Cross:";
 	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
-		int t = c.at(i).getType();
+		int t = (int)c.at(i).getMilli();
 		std::string text = std::to_string(t);
 
 		cs.append(text);
@@ -1588,25 +1588,20 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool redAnimEnabled = p.m_redAnimation;
 	bool blueAnimEnabled = p.m_blueAnimation;
 	
-	if (!p.m_wasCfLeftPressed && p.m_isCfLeftPressed) {
+	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
-		if (p.m_isCfRightPressed) {
-			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER,time);
-		}
+		if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
 	}
-	else if (!p.m_isCfLeftPressed && p.m_wasCfLeftPressed && m_playerCross != 2) {
-		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-	}
-	if (!p.m_wasCfRightPressed && p.m_isCfRightPressed) {
+	else if (p.m_pastCross <= 1 && p.m_cross == 2) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
-		if (p.m_isCfLeftPressed) {
-			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-		}
-	}
-	else if (!p.m_isCfRightPressed && p.m_wasCfRightPressed && m_playerCross != 0) {
-		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		if (p.m_pastCross == 0) m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
 	}
 
+	if (p.m_cross == 1) {
+		if (p.m_pastCross == 0)m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		else if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+	}
+	
 	if (greenAnimEnabled) {
 		m_animManager.triggerAnimation(AN_GREEN_CLICKER, time);
 		p.m_greenAnimation = false;
@@ -1674,6 +1669,21 @@ void GameRender::clickerAnimation() {
 
 	usePersProj();
 	renderTexture(clickerVector, clickerIndices, m_clickerAnimation);
+}
+
+void GameRender::reset() {
+	m_noteVisibleTime = 1.0;
+	m_red = false; 
+	m_green = false;
+	m_blue = false;
+	m_playerCross = 1;
+	m_playerCombo = 0;
+	m_playerMult = 0;
+	m_playerScore = 0;
+	m_renderCross = 1;
+	m_renderEuValue = 0.0;
+	m_renderEuActive = false;
+	m_renderEuZone = false;
 }
 
 void GameRender::updateAnimations(double time) {

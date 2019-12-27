@@ -27,6 +27,8 @@ void Player::pollInput(GLFWwindow* window){
 	m_wasCfLeftPressed = m_isCfLeftPressed;
 	m_wasCfRightPressed = m_isCfRightPressed;
 
+	m_pastCross = m_cross;
+
 	if (m_useKeyboardInput) {
 		m_isRedPressed = glfwGetKey(window, RED_CODE);
 		m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
@@ -174,17 +176,19 @@ void Player::pollInput(GLFWwindow* window){
 		}
 	}
 
-	if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
-		m_cross = 0;
-	}
-	else if (m_isCfRightPressed && !m_wasCfRightPressed) {
-		m_cross = 2;
-	}
-	else if (m_wasCfLeftPressed && !m_isCfLeftPressed && !m_isCfRightPressed) {
-		m_cross = 1;
-	}
-	else if (m_wasCfRightPressed && !m_isCfRightPressed && !m_isCfLeftPressed) {
-		m_cross = 1;
+	if (!m_euphoria_active) {
+		if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
+			m_cross = 0;
+		}
+		else if (m_isCfRightPressed && !m_wasCfRightPressed) {
+			m_cross = 2;
+		}
+		else if (m_wasCfLeftPressed && !m_isCfLeftPressed && !m_isCfRightPressed) {
+			m_cross = 1;
+		}
+		else if (m_wasCfRightPressed && !m_isCfRightPressed && !m_isCfLeftPressed) {
+			m_cross = 1;
+		}
 	}
 }
 
@@ -289,14 +293,20 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		for (size_t i = 0; i < cross.size(); ++i) {
 			//if there is a note in the clicker, add score
 			int type = cross.at(i).getType();
-			if (cross.at(i).getHit()) {
-				if (type == CROSS_G) {
-					cross.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					found = true;
-					break;
+			if (!cross.at(i).getTouched()) {
+				if (cross.at(i).getHit()) {
+					if (type == CROSS_G) {
+						cross.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						found = true;
+						break;
+					}
 				}
+			}
+			else if (m_euphoria_active) {
+				found = true;
+				break;
 			}
 		}
 		for (size_t i = 0; i < v.size(); i++) {
@@ -323,14 +333,21 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		for (size_t i = 0; i < cross.size(); ++i) {
 			//if there is a note in the clicker, add score
 			int type = cross.at(i).getType();
-			if (cross.at(i).getHit()) {
-				if (type == CROSS_B) {
-					found = true;
-					cross.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					break;
+
+			if (!cross.at(i).getTouched()) {
+				if (cross.at(i).getHit()) {
+					if (type == CROSS_B) {
+						found = true;
+						cross.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						break;
+					}
 				}
+			}
+			else if (m_euphoria_active) {
+				found = true;
+				break;
 			}
 		}
 
@@ -505,18 +522,24 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
 			int type = cross.at(i).getType();
-			if (cross.at(i).getHit()) {
-				if (type == CROSS_C) {
-					cross.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					found = true;
-					break;
+			if (!cross.at(i).getTouched()) {
+				if (cross.at(i).getHit()) {
+					if (type == CROSS_C) {
+						cross.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						found = true;
+						break;
+					}
+					if (type == CROSS_B) {
+						found = true;
+						break;
+					}
 				}
-				if (type == CROSS_B) {
-					found = true;
-					break;
-				}
+			}
+			else if (m_euphoria_active) {
+				found = true;
+				break;
 			}
 		}
 
@@ -544,18 +567,24 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
 			int type = cross.at(i).getType();
-			if (cross.at(i).getHit()) {
-				if (type == CROSS_C) {
-					cross.at(i).click(time);
-					m_score += 100 * m_mult;
-					m_combo++;
-					found = true;
-					break;
+			if (!cross.at(i).getTouched()) {
+				if (cross.at(i).getHit()) {
+					if (type == CROSS_C) {
+						cross.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+						found = true;
+						break;
+					}
+					if (type == CROSS_G) {
+						found = true;
+						break;
+					}
 				}
-				if (type == CROSS_G) {
-					found = true;
-					break;
-				}
+			}
+			else if (m_euphoria_active) {
+				found = true;
+				break;
 			}
 		}
 
@@ -578,6 +607,59 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			m_eu_zone_active = false;
 		}
 	}
+	if (m_euphoria_active) {
+		for (size_t i = 0; i < v.size(); ++i) {
+			int type = v.at(i).getType();
+			if (v.at(i).getHit() && !v.at(i).getTouched()) {
+				if (type == CF_SPIKE_G) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					break;
+				}else if(type == CF_SPIKE_B) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_C) {
+					v.at(i).click(time);
+					if (m_cross == 0)m_greenAnimation = true;
+					else if(m_cross == 2)m_blueAnimation = true;
+					break;
+				}
+			}
+		}
+
+		for (size_t i = 0; i < cross.size(); ++i) {
+			int type = cross.at(i).getType();
+			if (cross.at(i).getHit() && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
+				if (type == CROSS_G) {
+					m_cross = 0;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_C) {
+					m_cross = 1;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_B) {
+					m_cross = 2;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+			}
+		}
+	}
+
 }
 
 //update combo/multiplier for every frame
@@ -598,7 +680,7 @@ void Player::tick(double time) {
 		if (m_eu_value < 0.0)m_euphoria_active = false;
 		else {
 			m_double_mult = true;
-			double dt = time - m_lastTime;
+			double dt = time - m_lastTapTime;
 			double de = (dt * m_genBpm) / 960;
 			m_eu_value -= de;
 		}
@@ -608,7 +690,7 @@ void Player::tick(double time) {
 	}
 
 	if (m_double_mult)m_mult *= 2;
-	m_lastTime = time;
+	m_lastTapTime = time;
 
 	if (m_combo > m_highestCombo)m_highestCombo = m_combo;
 }
@@ -774,6 +856,51 @@ void Player::updateGamepadState(){
 			*/
 		}
 	}
+}
+
+void Player::reset() {
+	m_isRedPressed = false;
+	m_isGreenPressed = false;
+	m_isBluePressed = false;
+	m_isUpPressed = false;
+	m_isDownPressed = false;
+	m_isCfLeftPressed = false;
+	m_isCfRightPressed = false;
+	m_isEuPressed = false;
+
+	m_wasRedPressed = false;
+	m_wasGreenPressed = false;
+	m_wasBluePressed = false;
+	m_wasUpPressed = false;
+	m_wasDownPressed = false;
+	m_wasCfLeftPressed = false;
+	m_wasCfRightPressed = false;
+
+	m_greenAnimation = false;
+	m_redAnimation = false;
+	m_blueAnimation = false;
+
+	m_cross = 1;
+	m_pastCross = 1;
+
+	m_score = 0;
+	m_mult = 1;
+	m_combo = 0;
+	m_scr_tick = 0;
+	m_past_tap = -1;
+	m_eu_value = 0;
+	m_eu_zone_active = false;
+	m_euphoria_active = false;
+	m_double_mult = false;
+	m_lastTapTime = 0.0;
+	m_lastCrossTime = 0.0;
+	m_genBpm = 0;
+	m_highestCombo = 0;
+
+	m_gpState.clear();
+	m_gpMult.clear();
+	m_gpDead.clear();
+	m_gpInvertDead.clear();
 }
 
 //poll reset signals from generator 

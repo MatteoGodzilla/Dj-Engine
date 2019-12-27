@@ -24,7 +24,7 @@ Generator::Generator() {
 }
 
 void Generator::init(std::string& path){
-	pushCross(-2.0, CROSS_C, 0.0);//Do not remove
+	pushCross(m_initialCrossfade, CROSS_C, 0.0);//Do not remove
 	std::string textPath = path + std::string("/chart.txt");
 	m_chart.open(path);
 	if (m_chart.is_open()) {
@@ -204,6 +204,9 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 				}
 				m_notesTotal++;
 				cross.erase(cross.begin() + i);
+			}
+			if (cross.at(i).getMilli() == m_initialCrossfade) {
+				cross.at(i).setTouched(true);
 			}
 		}
 		cross.at(cross.size() - 1).tick(time);
@@ -525,6 +528,21 @@ void Generator::bpm(double time, std::vector<double>& arr){
 		m_lastBpmTick = nextTick;
 		nextTick = m_lastBpmTick + ((float)60 / m_bpm);
 	}
+}
+
+void Generator::reset() {
+	m_chart.close();
+	m_isChartBinary = false;
+	m_placedFinalCF = false;
+	m_bpmChangeTime = -1;
+	m_bpmChangeValue = -1;
+	m_lastBpmTick = 0.0;
+	m_notesHit = 0;
+	m_notesTotal = 0;
+
+	m_combo_reset = false;
+	m_eu_start = false;
+	m_eu_check = false;
 }
 
 int Generator::getNotesTotal(){

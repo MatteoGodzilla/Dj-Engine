@@ -6,8 +6,8 @@
 
 #include "GLFW/include/GLFW/glfw3.h"
 
-unsigned int WIDTH = 1024;
-unsigned int HEIGHT = 600;
+unsigned int WIDTH = 1280;
+unsigned int HEIGHT = 720;
 
 Game game;
 MenuNavigator menu;
@@ -54,11 +54,10 @@ int main() {
 	ImGui_ImplOpenGL3_Init("#version 130");
 
 	//setting up menu and game
+	game.init(window);
 	menu.init(window,&game);
-	menu.setActive(true);
 	game.setActive(false);
-
-	
+	menu.setActive(true);
 
 	while (!glfwWindowShouldClose(window)) {
 		

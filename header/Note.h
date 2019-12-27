@@ -21,6 +21,7 @@ public:
     int getType();
     bool getHit();
     bool getTouched();
+	void setTouched(bool value);
     bool getDead();
     bool getIsEvent();
     int getLanMod();
