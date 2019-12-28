@@ -15,6 +15,8 @@ void MenuRender::init(GLFWwindow* w) {
 	}
 	setTextColor(0.9f, 0.9f, 0.9f, 1.0f);
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
+	loadTexture("res/buttons.png", &m_buttonTexture);
+	loadTexture("res/splashArt.png", &m_splashTexture);
 }
 
 void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
@@ -81,7 +83,7 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 	}
 }
 
-void MenuRender::remapping(Game* game) {
+void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, int dg, int sg, int bg) {
 	game->getPlayer()->pollInput(m_window);
 	if (game->getPlayer()->m_gpState.size() > 0 && !game->getPlayer()->m_useKeyboardInput) {
 		ImGui_ImplOpenGL3_NewFrame();
@@ -123,7 +125,7 @@ void MenuRender::remapping(Game* game) {
 		std::string id = std::string("Remap") + std::string("##01");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(GREEN_INDEX);
+			editingGameAxis(GREEN_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Green Button' ");
@@ -151,7 +153,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##02");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(RED_INDEX);
+			editingGameAxis(RED_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Red Button' ");
@@ -179,7 +181,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##03");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(BLUE_INDEX);
+			editingGameAxis(BLUE_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Blue Button' ");
@@ -207,7 +209,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##04");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(EU_INDEX);
+			editingGameAxis(EU_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Euphoria Button' ");
@@ -239,7 +241,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##05");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(CF_LEFT_INDEX);
+			editingGameAxis(CF_LEFT_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Crossfade Left' ");
@@ -267,7 +269,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##06");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(CF_RIGHT_INDEX);
+			editingGameAxis(CF_RIGHT_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Crossfade Right' ");
@@ -299,7 +301,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##07");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(SCR_UP_INDEX);
+			editingGameAxis(SCR_UP_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Scratch Up' ");
@@ -327,7 +329,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##08");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingAxis(SCR_DOWN_INDEX);
+			editingGameAxis(SCR_DOWN_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button / move an axis for 'Scratch Down' ");
@@ -350,6 +352,109 @@ void MenuRender::remapping(Game* game) {
 		ImGui::SliderFloat("##81", &(game->getPlayer()->m_gpDead.at(SCR_DOWN_INDEX)), -1.0, 1.0);
 		ImGui::NextColumn();
 
+		ImGui::Text("Menu up:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##09");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuAxis(MENU_UP);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button / move an axis for 'Menu Up' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingAxis) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(ug).c_str());
+		ImGui::NextColumn();
+		value = game->getPlayer()->getGamepadValues().at(ug);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+
+		ImGui::Text("Menu down:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##091");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuAxis(MENU_DOWN);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button / move an axis for 'Menu Down' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingAxis) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(dg).c_str());
+		ImGui::NextColumn();
+		value = game->getPlayer()->getGamepadValues().at(dg);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+		
+		ImGui::Text("Menu Select:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##092");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuAxis(MENU_SELECT);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button / move an axis for 'Menu Select' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingAxis) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(sg).c_str());
+		ImGui::NextColumn();
+		value = game->getPlayer()->getGamepadValues().at(sg);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+
+		ImGui::Text("Menu Back:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##093");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuAxis(MENU_BACK);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button / move an axis for 'Menu Back' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingAxis) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(bg).c_str());
+		ImGui::NextColumn();
+		value = game->getPlayer()->getGamepadValues().at(bg);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+		ImGui::NextColumn();
+		ImGui::NextColumn();
 
 		ImGui::Columns();
 
@@ -395,7 +500,7 @@ void MenuRender::remapping(Game* game) {
 		std::string id = std::string("Remap") + std::string("##101");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(GREEN_INDEX);
+			editingGameKey(GREEN_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Green Button' ");
@@ -423,7 +528,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##102");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(RED_INDEX);
+			editingGameKey(RED_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Red Button' ");
@@ -451,7 +556,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##103");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(BLUE_INDEX);
+			editingGameKey(BLUE_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Blue Button' ");
@@ -479,7 +584,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##104");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(EU_INDEX);
+			editingGameKey(EU_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Euphoria Button' ");
@@ -507,7 +612,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##105");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(CF_LEFT_INDEX);
+			editingGameKey(CF_LEFT_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Crossfade Left' ");
@@ -535,7 +640,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##106");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(CF_RIGHT_INDEX);
+			editingGameKey(CF_RIGHT_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Crossfade Right' ");
@@ -563,7 +668,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##107");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(SCR_UP_INDEX);
+			editingGameKey(SCR_UP_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Scratch Up' ");
@@ -591,7 +696,7 @@ void MenuRender::remapping(Game* game) {
 		id = std::string("Remap") + std::string("##108");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
-			editingKey(SCR_DOWN_INDEX);
+			editingGameKey(SCR_DOWN_INDEX);
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
 			ImGui::Text("Push a button for 'Scratch Down' ");
@@ -613,7 +718,103 @@ void MenuRender::remapping(Game* game) {
 		value = game->getPlayer()->m_isDownPressed ? 1.0f : 0.0f;
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
+
+		ImGui::Text("Menu Up:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##109");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuKey(MENU_UP);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button for 'Menu Up' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingKey) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(uk).c_str());
+		ImGui::NextColumn();
+		value = glfwGetKey(m_window, uk);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+
+		ImGui::Text("Menu Down:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##1091");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuKey(MENU_DOWN);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button for 'Menu Down' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingKey) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(dk).c_str());
+		ImGui::NextColumn();
+		value = glfwGetKey(m_window, dk);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+
+		ImGui::Text("Menu Select:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##1092");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuKey(MENU_SELECT);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button for 'Menu Select' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingKey) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(sk).c_str());
+		ImGui::NextColumn();
+		value = glfwGetKey(m_window, sk);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
 		
+		ImGui::Text("Menu Back:");
+		ImGui::NextColumn();
+		id = std::string("Remap") + std::string("##1093");
+		if (ImGui::Button(id.c_str())) {
+			ImGui::OpenPopup(id.c_str());
+			editingMenuKey(MENU_BACK);
+		}
+		if (ImGui::BeginPopupModal(id.c_str())) {
+			ImGui::Text("Push a button for 'Menu Back' ");
+			ImGui::Separator();
+
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (!m_editingKey) {
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		ImGui::SameLine();
+		ImGui::Text(std::to_string(bk).c_str());
+		ImGui::NextColumn();
+		value = glfwGetKey(m_window, bk);
+		ImGui::ProgressBar(value);
+		ImGui::NextColumn();
+
 		ImGui::Separator();
 		if (ImGui::Button("Go Back to menu")) {
 			m_shouldClose = true;
@@ -627,30 +828,98 @@ void MenuRender::remapping(Game* game) {
 }
 
 void MenuRender::credits(){
-	drawText("Credits scene", 0.0f, 0.0f, 0.1f);
-	drawText("Nothing to see here", 0.0f, 100.0f, 0.1f);
-	drawText(":)", 0.0f, 200.0f, 0.1f);
+	float fontsize = 48.0f;
+	float y = 0.0;
+	float x = 10.0f;
+
+	drawText("Thanks to MexicanPB for the Logo", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+	y += fontsize;//new line
+
+	drawText("Thanks to everyone in the Dj Hero Fan Server ", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line	
+
+	drawText("for supporting me and this game", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+	y += fontsize;//new line
+
+	drawText("A thank you to every programming youtuber", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+
+	drawText("for giving me the passion to create games", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+	y += fontsize;//new line
+
+	drawText("And finally a thank you to you, player", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+	drawText("You are the reason why I'm doing this", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+	y += fontsize;//new line
+	y += fontsize;//new line
+
+	drawText("MatteoGodzilla <3", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+
+	drawText("(now that you read the credits, DM me", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
+
+	drawText("on twitter (@MatteoGodzilla) with '#truedj')", x, y, fontsize / 1000.0f);
+	y += fontsize;//new line
 }
 
-void MenuRender::editingAxis(int axis) {
+void MenuRender::splashArt() {
+	std::vector<float> vector;
+	std::vector<unsigned int> indices;
+	unsigned int indexCount = 0;
+
+	float scale = 1.2f;
+
+	float x = 1280.0f / 2.0f;
+	float y = 360.0f - 200.0f * scale / 2;
+	pushVertexTexture(vector, x, y, 0.0, 0.0, 1.0);
+	pushVertexTexture(vector, x, y + 200.0 * scale, 0.0, 0.0, 0.0);
+	pushVertexTexture(vector, x + 500.0 * scale, y + 200.0 * scale, 0.0, 1.0, 0.0);
+	pushVertexTexture(vector, x + 500.0 * scale, y, 0.0, 1.0, 1.0);
+	pushRectangleIndices(indices, indexCount);
+
+	useOrthoProj();
+	renderTexture(vector, indices, m_splashTexture);
+}
+
+void MenuRender::editingGameAxis(int action) {
 	m_editingKey = false;
 	m_editingAxis = true;
-	m_actionToChange = axis;
+	m_gameActionToChange = action;
+	m_menuActionToChange = -1;
 }
 
-void MenuRender::editingKey(int axis)
-{
+void MenuRender::editingGameKey(int action){
 	m_editingKey = true;
 	m_editingAxis = false;
-	m_actionToChange = axis;
+	m_gameActionToChange = action;
+	m_menuActionToChange = -1;
 }
 
 void MenuRender::doneEditing() {
 	m_editingKey = false;
 	m_editingAxis = false;
-	m_actionToChange = -1;
+	m_gameActionToChange = -1;
+	m_menuActionToChange = -1;
 }
 
+void MenuRender::editingMenuKey(int action) {
+	m_editingKey = true;
+	m_editingAxis = false;
+	m_gameActionToChange = -1;
+	m_menuActionToChange = action;
+}
+
+void MenuRender::editingMenuAxis(int action) {
+	m_editingKey = false;
+	m_editingAxis = true;
+	m_gameActionToChange = -1;
+	m_menuActionToChange = action;
+}
 
 GLFWwindow* MenuRender::getWindowPtr()
 {

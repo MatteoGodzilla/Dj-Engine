@@ -765,7 +765,7 @@ void Player::writeMappingFile(){
 		output << CROSS_R_CODE << "\n";
 		output << SCRATCH_UP << "\n";
 		output << SCRATCH_DOWN << "\n";
-
+		
 		output << GREEN_GAMEPAD << "\n";
 		output << RED_GAMEPAD << "\n";
 		output << BLUE_GAMEPAD << "\n";
