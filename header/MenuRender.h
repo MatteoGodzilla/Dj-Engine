@@ -29,8 +29,10 @@ public:
 	int m_menuActionToChange = -1;
 
 	bool m_shouldClose = false;
+	bool m_input = true;
 	~MenuRender();
 private:
+	std::string m_inputSelection = "Keyboard";
 	unsigned int m_buttonTexture = 0;
 	unsigned int m_splashTexture = 0;
 

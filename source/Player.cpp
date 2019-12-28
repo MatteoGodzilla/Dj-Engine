@@ -40,7 +40,7 @@ void Player::pollInput(GLFWwindow* window){
 		m_isEuPressed = glfwGetKey(window, EUPHORIA);
 	}
 	else {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		if (glfwJoystickPresent(m_gamepadId)) {
 			
 			updateGamepadState();
 
@@ -760,16 +760,16 @@ void Player::writeMappingFile(){
 		output << GREEN_CODE << "\n";
 		output << RED_CODE << "\n";
 		output << BLUE_CODE<< "\n";
-		output << EUPHORIA << "\n\n";
+		output << EUPHORIA << "\n";
 		output << CROSS_L_CODE << "\n";
 		output << CROSS_R_CODE << "\n";
 		output << SCRATCH_UP << "\n";
-		output << SCRATCH_DOWN << "\n";
+		output << SCRATCH_DOWN << "\n\n";
 		
 		output << GREEN_GAMEPAD << "\n";
 		output << RED_GAMEPAD << "\n";
 		output << BLUE_GAMEPAD << "\n";
-		output << EU_GAMEPAD << "\n\n";
+		output << EU_GAMEPAD << "\n";
 		output << m_useSingleCfAxis << "\n";
 		output << CF_LEFT_GAMEPAD << "\n";
 		output << CF_RIGHT_GAMEPAD << "\n";
@@ -795,9 +795,9 @@ void Player::writeMappingFile(){
 }
 
 void Player::updateGamepadState(){
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+	if (glfwJoystickPresent(m_gamepadId)) {
 		int count;
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+		const unsigned char* buttons = glfwGetJoystickButtons(m_gamepadId, &count);
 
 		std::vector<float>localGamepadState;
 
@@ -810,7 +810,7 @@ void Player::updateGamepadState(){
 			}
 
 		}
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+		const float* axes = glfwGetJoystickAxes(m_gamepadId, &count);
 
 		for (int i = 0; i < count; ++i) {
 			localGamepadState.push_back(axes[i]);
@@ -920,11 +920,11 @@ void Player::pollState(Generator &g){
 
 //utility functions
 std::vector<float> Player::getGamepadValues() {
-	std::vector<float>localGamepadState;
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+	std::vector<float>localGamepadState = {};
+	if (glfwJoystickPresent(m_gamepadId)) {
 		int count;
 
-		const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+		const unsigned char* buttons = glfwGetJoystickButtons(m_gamepadId, &count);
 		for (int i = 0; i < count; ++i) {
 			if (buttons[i] == '\0') {
 				localGamepadState.push_back(0.0f);
@@ -934,7 +934,7 @@ std::vector<float> Player::getGamepadValues() {
 			}
 
 		}
-		const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+		const float* axes = glfwGetJoystickAxes(m_gamepadId, &count);
 		for (int i = 0; i < count; ++i) {
 			localGamepadState.push_back(axes[i]);
 		}

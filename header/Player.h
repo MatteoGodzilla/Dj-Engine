@@ -62,6 +62,8 @@ public:
 
 	bool m_useKeyboardInput = true;
 
+	int m_gamepadId = 1;
+
 	std::vector<float> m_gpState;
 	std::vector<float> m_gpMult;
 	std::vector<float> m_gpDead;
@@ -107,4 +109,5 @@ private:
 	int m_genBpm = 0;
 
 	int m_highestCombo = 0;
+
 };

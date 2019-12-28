@@ -33,10 +33,7 @@ void Audio::load(const char* filename) {
 		
 		int buffers = 0;
 		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
-		std::cout << "first:" << buffers << std::endl;
 		while (buffers < 50) {
-			std::cout << "loading:" << buffers << std::endl;
-
 			//temporary buffer
 			alGenBuffers(1, &b);
 

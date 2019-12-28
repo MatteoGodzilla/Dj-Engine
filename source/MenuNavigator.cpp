@@ -8,6 +8,48 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 	return 0xffffffff;
 }
 
+void MenuNavigator::writeConfigFile() {
+	std::ofstream output("config-menu.txt");
+	
+	output << UP_CODE << "\n";
+	output << DOWN_CODE << "\n";
+	output << SELECT_CODE << "\n";
+	output << BACK_CODE << "\n\n";
+
+	output << UP_GAMEPAD << "\n";
+	output << DOWN_GAMEPAD << "\n";
+	output << SELECT_GAMEPAD << "\n";
+	output << BACK_GAMEPAD << "\n\n";
+	output.close();
+}
+
+void MenuNavigator::readConfigFile() {
+	std::ifstream input("config-menu.txt");
+	if (input.is_open()) {
+		std::cout << "MenuNavigator Message: loading config from file" << std::endl;
+		std::string token;
+		input >> token;
+		UP_CODE = std::stoi(token);
+		input >> token;
+		DOWN_CODE = std::stoi(token);
+		input >> token;
+		SELECT_CODE = std::stoi(token);
+		input >> token;
+		BACK_CODE = std::stoi(token);
+		input >> token;
+		UP_GAMEPAD = std::stoi(token);
+		input >> token;
+		DOWN_GAMEPAD = std::stoi(token);
+		input >> token;
+		SELECT_GAMEPAD = std::stoi(token);
+		input >> token;
+		BACK_GAMEPAD = std::stoi(token);
+	}
+	else {
+		std::cerr << "MenuNavigator Error: Cannot open config file" << std::endl;
+	}
+}
+
 MenuNavigator::MenuNavigator(){
 	//create menu tree
 	MenuNode play("Play!",1);
@@ -30,6 +72,7 @@ MenuNavigator::MenuNavigator(){
 	for (int i = 0; i < 15+6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
+	readConfigFile();
 }
 
 void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
@@ -55,7 +98,7 @@ void MenuNavigator::pollInput(){
 		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), BACK_CODE);
 	}
 	else {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		if (glfwJoystickPresent(m_game->getPlayer()->m_gamepadId)) {
 
 			updateGamepadState();
 
@@ -89,6 +132,7 @@ void MenuNavigator::pollInput(){
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
 		remap();
 	}
+	/*
 	if (m_wasTabPressed && !m_isTabPressed) {
 		if (m_useKeyboardInput) {
 			m_game->getPlayer()->m_useKeyboardInput = false;
@@ -99,6 +143,8 @@ void MenuNavigator::pollInput(){
 		}
 		m_useKeyboardInput = !m_useKeyboardInput;
 	}
+	*/
+	
 
 	if (m_wasEscapePressed && !m_isEscapePressed) {
 		if (m_scene == 0 && m_activeNode.getId() == m_root.getId()) {
@@ -110,8 +156,14 @@ void MenuNavigator::pollInput(){
 	}
 
 	if (m_render.m_shouldClose) {
+		writeConfigFile();
 		m_scene = 0;
 	}
+
+	if (m_render.m_input != m_useKeyboardInput) {
+		m_useKeyboardInput = m_render.m_input;
+	}
+
 }
 
 void MenuNavigator::update() {
@@ -410,7 +462,7 @@ void MenuNavigator::updateMenuNode() {
 
 void MenuNavigator::updateGamepadState() {
 	int count;
-	const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+	const unsigned char* buttons = glfwGetJoystickButtons(m_game->getPlayer()->m_gamepadId, &count);
 
 	m_gpState.clear();
 	for (int i = 0; i < count; ++i) {
@@ -422,7 +474,7 @@ void MenuNavigator::updateGamepadState() {
 		}
 		
 	}
-	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+	const float* axes = glfwGetJoystickAxes(m_game->getPlayer()->m_gamepadId, &count);
 
 	for (int i = 0; i < count; ++i) {
 		m_gpState.push_back(axes[i]);
