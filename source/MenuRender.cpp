@@ -897,6 +897,10 @@ void MenuRender::splashArt() {
 
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
+
+	drawText("*This is pre-release v0.9. There are some bugs and you WILL see them*", 10.0, 10.0, 0.02f);
+	drawText("*Remember this when playing*", 10.0, 30.0, 0.02f);
+	drawText("*Have Fun! :)*", 10.0, 50.0, 0.02f);
 }
 
 void MenuRender::editingGameAxis(int action) {

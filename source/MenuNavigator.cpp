@@ -57,8 +57,12 @@ MenuNavigator::MenuNavigator(){
 	MenuNode credits("Credits", 3);
 	MenuNode exit("Exit", -1);
 
-	MenuNode ChangeInput("Change Input", 4);
-	options.push(ChangeInput);
+	MenuNode option1("Change Input", 4);
+	MenuNode option2("Change Input", 4);
+	MenuNode option3("Change Input", 4);
+	options.push(option1);
+	options.push(option2);
+	options.push(option3);
 	
 	m_root.push(play);
 	m_root.push(options);

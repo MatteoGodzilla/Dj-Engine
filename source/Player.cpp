@@ -896,11 +896,6 @@ void Player::reset() {
 	m_lastCrossTime = 0.0;
 	m_genBpm = 0;
 	m_highestCombo = 0;
-
-	m_gpState.clear();
-	m_gpMult.clear();
-	m_gpDead.clear();
-	m_gpInvertDead.clear();
 }
 
 //poll reset signals from generator 
