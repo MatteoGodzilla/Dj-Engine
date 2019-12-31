@@ -4,6 +4,7 @@
 #include "Generator.h"
 #include "Player.h"
 #include "Audio.h"
+#include "Animation.h"
 #include <vector>
 #include <iostream>
 #include <string>
@@ -12,14 +13,15 @@ class Game
 {
 public:
 	Game();
-	void init(GLFWwindow* w,std::string path);
+	void init(GLFWwindow* w);
 	void render();
 	void tick();
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
+	void reset();
 	Player* getPlayer();
-	void start();
+	void start(std::string path);
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;

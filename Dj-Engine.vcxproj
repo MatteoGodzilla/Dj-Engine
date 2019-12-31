@@ -173,6 +173,8 @@
     <ClCompile Include="lib\IMGUI\imgui_impl_glfw.cpp" />
     <ClCompile Include="lib\IMGUI\imgui_impl_opengl3.cpp" />
     <ClCompile Include="lib\IMGUI\imgui_widgets.cpp" />
+    <ClCompile Include="source\Animation.cpp" />
+    <ClCompile Include="source\AnimationManager.cpp" />
     <ClCompile Include="source\Audio.cpp" />
     <ClCompile Include="source\Game.cpp" />
     <ClCompile Include="source\Generator.cpp" />
@@ -187,6 +189,8 @@
     <ClCompile Include="source\SongScanner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="header\Animation.h" />
+    <ClInclude Include="header\AnimationManager.h" />
     <ClInclude Include="header\Audio.h" />
     <ClInclude Include="header\Game.h" />
     <ClInclude Include="header\Generator.h" />

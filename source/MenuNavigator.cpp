@@ -8,6 +8,48 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 	return 0xffffffff;
 }
 
+void MenuNavigator::writeConfigFile() {
+	std::ofstream output("config-menu.txt");
+	
+	output << UP_CODE << "\n";
+	output << DOWN_CODE << "\n";
+	output << SELECT_CODE << "\n";
+	output << BACK_CODE << "\n\n";
+
+	output << UP_GAMEPAD << "\n";
+	output << DOWN_GAMEPAD << "\n";
+	output << SELECT_GAMEPAD << "\n";
+	output << BACK_GAMEPAD << "\n\n";
+	output.close();
+}
+
+void MenuNavigator::readConfigFile() {
+	std::ifstream input("config-menu.txt");
+	if (input.is_open()) {
+		std::cout << "MenuNavigator Message: loading config from file" << std::endl;
+		std::string token;
+		input >> token;
+		UP_CODE = std::stoi(token);
+		input >> token;
+		DOWN_CODE = std::stoi(token);
+		input >> token;
+		SELECT_CODE = std::stoi(token);
+		input >> token;
+		BACK_CODE = std::stoi(token);
+		input >> token;
+		UP_GAMEPAD = std::stoi(token);
+		input >> token;
+		DOWN_GAMEPAD = std::stoi(token);
+		input >> token;
+		SELECT_GAMEPAD = std::stoi(token);
+		input >> token;
+		BACK_GAMEPAD = std::stoi(token);
+	}
+	else {
+		std::cerr << "MenuNavigator Error: Cannot open config file" << std::endl;
+	}
+}
+
 MenuNavigator::MenuNavigator(){
 	//create menu tree
 	MenuNode play("Play!",1);
@@ -15,8 +57,12 @@ MenuNavigator::MenuNavigator(){
 	MenuNode credits("Credits", 3);
 	MenuNode exit("Exit", -1);
 
-	MenuNode ChangeInput("Change Input", 4);
-	options.push(ChangeInput);
+	MenuNode option1("Change Input", 4);
+	MenuNode option2("Change Input", 4);
+	MenuNode option3("Change Input", 4);
+	options.push(option1);
+	options.push(option2);
+	options.push(option3);
 	
 	m_root.push(play);
 	m_root.push(options);
@@ -30,6 +76,7 @@ MenuNavigator::MenuNavigator(){
 	for (int i = 0; i < 15+6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
+	readConfigFile();
 }
 
 void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
@@ -55,7 +102,7 @@ void MenuNavigator::pollInput(){
 		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), BACK_CODE);
 	}
 	else {
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		if (glfwJoystickPresent(m_game->getPlayer()->m_gamepadId)) {
 
 			updateGamepadState();
 
@@ -89,6 +136,7 @@ void MenuNavigator::pollInput(){
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
 		remap();
 	}
+	/*
 	if (m_wasTabPressed && !m_isTabPressed) {
 		if (m_useKeyboardInput) {
 			m_game->getPlayer()->m_useKeyboardInput = false;
@@ -99,21 +147,33 @@ void MenuNavigator::pollInput(){
 		}
 		m_useKeyboardInput = !m_useKeyboardInput;
 	}
+	*/
+	
 
-	if (m_wasEscapePressed && !m_isEscapePressed && m_activeNode.getId() == m_root.getId()) {
-		if (m_scene != 1) {
-			m_shouldClose = true;
+	if (m_wasEscapePressed && !m_isEscapePressed) {
+		if (m_scene == 0 && m_activeNode.getId() == m_root.getId()) {
+			if (m_scene != 1) {
+				m_shouldClose = true;
+			}
 		}
+		else if (m_scene == 2)m_scene = 0;
 	}
 
 	if (m_render.m_shouldClose) {
+		writeConfigFile();
 		m_scene = 0;
 	}
+
+	if (m_render.m_input != m_useKeyboardInput) {
+		m_useKeyboardInput = m_render.m_input;
+	}
+
 }
 
 void MenuNavigator::update() {
 	if (m_active) {
 		if (m_scene == 0) {
+
 			/*
 			activeNode is the selected node
 			m_selection contains all selected node indices
@@ -181,39 +241,39 @@ void MenuNavigator::update() {
 			*/
 		}
 		else if (m_scene == 1) {
-			if (m_render.m_editingAxis) {
+			if (m_render.m_editingAxis && m_render.m_gameActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_GAMEPAD);
-				if (m_render.m_actionToChange == RED_INDEX) {
+				if (m_render.m_gameActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == BLUE_INDEX) {
+				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == EU_INDEX) {
+				else if (m_render.m_gameActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EU_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_LEFT_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_RIGHT_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_UP_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				}
-				else if (m_render.m_actionToChange == MENU_UP) {
+				else if (m_render.m_gameActionToChange == MENU_UP) {
 					changing = &UP_GAMEPAD;
 				}
-				else if (m_render.m_actionToChange == MENU_DOWN) {
+				else if (m_render.m_gameActionToChange == MENU_DOWN) {
 					changing = &DOWN_GAMEPAD;
 				}
-				else if (m_render.m_actionToChange == MENU_SELECT) {
+				else if (m_render.m_gameActionToChange == MENU_SELECT) {
 					changing = &SELECT_GAMEPAD;
 				}
-				else if (m_render.m_actionToChange == MENU_BACK) {
+				else if (m_render.m_gameActionToChange == MENU_BACK) {
 					changing = &BACK_GAMEPAD;
 				}
 
@@ -229,30 +289,75 @@ void MenuNavigator::update() {
 					}
 				}
 			}
-			else if (m_render.m_editingKey) {
+			else if (m_render.m_editingKey && m_render.m_gameActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_CODE);
-				if (m_render.m_actionToChange == RED_INDEX) {
+				if (m_render.m_gameActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_CODE);
 				}
-				else if (m_render.m_actionToChange == BLUE_INDEX) {
+				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_CODE);
 				}
-				else if (m_render.m_actionToChange == EU_INDEX) {
+				else if (m_render.m_gameActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EUPHORIA);
 				}
-				else if (m_render.m_actionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_L_CODE);
 				}
-				else if (m_render.m_actionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_R_CODE);
 				}
-				else if (m_render.m_actionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_UP);
 				}
-				else if (m_render.m_actionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
 				
+				for (int i = 0; i < 512; ++i) {
+					if (glfwGetKey(m_render.getWindowPtr(), i)) {
+						*changing = i;
+						m_render.doneEditing();
+						m_game->getPlayer()->writeMappingFile();
+						break;
+					}
+				}
+			}
+			else if (m_render.m_editingAxis && m_render.m_menuActionToChange != -1) {
+				int* changing = &UP_GAMEPAD;
+				if (m_render.m_menuActionToChange == MENU_DOWN) {
+					changing = &DOWN_GAMEPAD;
+				}
+				else if (m_render.m_menuActionToChange == MENU_SELECT) {
+					changing = &SELECT_GAMEPAD;
+				}
+				else if (m_render.m_menuActionToChange == MENU_BACK) {
+					changing = &BACK_GAMEPAD;
+				}
+
+				float deadzone = 0.1f;
+				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
+				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
+					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
+					if (diff > deadzone) {
+						*changing = i;
+						m_render.doneEditing();
+						m_game->getPlayer()->writeMappingFile();
+						break;
+					}
+				}
+
+			}else if (m_render.m_editingKey && m_render.m_menuActionToChange != -1) {
+				int* changing = &UP_CODE;
+				if (m_render.m_menuActionToChange == MENU_DOWN) {
+					changing = &DOWN_CODE;
+				}
+				else if (m_render.m_menuActionToChange == MENU_SELECT) {
+					changing = &SELECT_CODE;
+				}
+				else if (m_render.m_menuActionToChange == MENU_BACK) {
+					changing = &BACK_CODE;
+				}
+
 				for (int i = 0; i < 512; ++i) {
 					if (glfwGetKey(m_render.getWindowPtr(), i)) {
 						*changing = i;
@@ -278,9 +383,14 @@ void MenuNavigator::render() {
 		if (m_scene == 0) {
 			updateMenuNode();
 			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
+
+			if (m_activeNode.getId() == m_root.getId()) {
+				m_render.splashArt();
+			}
 		}
 		else if (m_scene == 1) {
-			m_render.remapping(m_game);
+			m_render.remapping(m_game, UP_CODE, DOWN_CODE, SELECT_CODE, BACK_CODE, 
+				UP_GAMEPAD, DOWN_GAMEPAD, SELECT_GAMEPAD, BACK_GAMEPAD);
 		}
 		else if (m_scene == 2) {
 			m_render.credits();
@@ -296,7 +406,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_shouldClose = true;
 	}
 	else if (id == 3) {
-		m_scene = 3;
+		m_scene = 2;
 	}
 	else if (id == 4) {
 		bool userinput = m_game->getPlayer()->m_useKeyboardInput;
@@ -308,8 +418,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	else if (id == 255) {
 		index = findIndex(menu, parent);
 		m_active = false;
-		m_game->init(m_render.getWindowPtr(), m_songList.at(index).path);
-		m_game->start();
+		m_game->start(m_songList.at(index).path);
 		resetMenu();
 	}
 	else if(menu.getChildCount() == 0){
@@ -357,7 +466,7 @@ void MenuNavigator::updateMenuNode() {
 
 void MenuNavigator::updateGamepadState() {
 	int count;
-	const unsigned char* buttons = glfwGetJoystickButtons(GLFW_JOYSTICK_1, &count);
+	const unsigned char* buttons = glfwGetJoystickButtons(m_game->getPlayer()->m_gamepadId, &count);
 
 	m_gpState.clear();
 	for (int i = 0; i < count; ++i) {
@@ -369,7 +478,7 @@ void MenuNavigator::updateGamepadState() {
 		}
 		
 	}
-	const float* axes = glfwGetJoystickAxes(GLFW_JOYSTICK_1, &count);
+	const float* axes = glfwGetJoystickAxes(m_game->getPlayer()->m_gamepadId, &count);
 
 	for (int i = 0; i < count; ++i) {
 		m_gpState.push_back(axes[i]);

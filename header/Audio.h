@@ -15,6 +15,7 @@ public:
 	void load(const char* filename);
 	void stop();
 	void buffer();
+	void reset();
 	bool isActive(double time);
 private:
 	ALCdevice* m_device;
@@ -22,10 +23,8 @@ private:
 	unsigned int m_source;
 	unsigned int m_buffer;
 	bool firstRun = true;
-	std::vector<unsigned int> m_buffersId;
 	OggVorbis_File m_oggFile;
 	int m_frequency = 0;
 	int m_currentSection = 0;
-	double m_songLength = 0;
+	double m_songLength = 0.0;
 };
-

@@ -5,6 +5,7 @@
 #include "GLFW/include/GLFW/glfw3.h"
 
 #include <iostream>
+#include <fstream>
 
 class MenuNavigator {
 public:
@@ -43,6 +44,8 @@ private:
 	void updateGamepadState();
 	void updateMenuNode();
 	void resetMenu();
+	void writeConfigFile();
+	void readConfigFile();
 
 	//gamepad status
 	std::vector<float> m_gpState;

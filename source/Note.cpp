@@ -54,6 +54,10 @@ bool Note::getTouched(){
     return m_touched;
 }
 
+void Note::setTouched(bool value){
+	m_touched = value;
+}
+
 bool Note::getIsEvent(){
     return m_isEvent;
 }

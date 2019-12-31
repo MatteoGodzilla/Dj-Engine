@@ -295,7 +295,7 @@ CMAKE_INSTALL_SYSCONFDIR:PATH=etc
 CMAKE_LINKER:FILEPATH=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.23.28105/bin/Hostx86/x86/link.exe
 
 //make program
-CMAKE_MAKE_PROGRAM:FILEPATH=C:/PROGRA~2/MICROS~3/2019/COMMUN~1/Common7/IDE/COMMON~1/MICROS~1/CMake/Ninja/ninja.exe
+CMAKE_MAKE_PROGRAM:FILEPATH=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe
 
 //Flags used by the linker during the creation of modules during
 // all build types.
@@ -480,7 +480,7 @@ GLEW_OSMESA:BOOL=OFF
 GLEW_REGAL:BOOL=OFF
 
 //Value Computed by CMake
-GLFW_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/GLFW
+GLFW_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/GLFW
 
 //Build the GLFW documentation
 GLFW_BUILD_DOCS:BOOL=ON
@@ -495,7 +495,8 @@ GLFW_BUILD_TESTS:BOOL=ON
 GLFW_INSTALL:BOOL=ON
 
 //Value Computed by CMake
-GLFW_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/GLFW
+
+GLFW_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/GLFW
 
 //Force use of high-performance GPU on hybrid systems
 GLFW_USE_HYBRID_HPG:BOOL=OFF
@@ -573,13 +574,13 @@ OSS_INCLUDE_DIR:PATH=OSS_INCLUDE_DIR-NOTFOUND
 OSS_LIBRARY:FILEPATH=OSS_LIBRARY-NOTFOUND
 
 //Value Computed by CMake
-OpenAL_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft
+OpenAL_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/openal-soft
 
 //Dependencies for the target
 OpenAL_LIB_DEPENDS:STATIC=general;common;general;C:/Program Files (x86)/Windows Kits/10/Lib/10.0.18362.0/um/x86/WinMM.Lib;
 
 //Value Computed by CMake
-OpenAL_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/openal-soft
+OpenAL_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/openal-soft
 
 //Path to a program.
 P4COMMAND:FILEPATH=P4COMMAND-NOTFOUND
@@ -647,28 +648,29 @@ ZLIB_LIBRARY_DEBUG:FILEPATH=ZLIB_LIBRARY_DEBUG-NOTFOUND
 ZLIB_LIBRARY_RELEASE:FILEPATH=ZLIB_LIBRARY_RELEASE-NOTFOUND
 
 //Value Computed by CMake
-alsoft-config_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft/utils/alsoft-config
+alsoft-config_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/openal-soft/utils/alsoft-config
 
 //Value Computed by CMake
-alsoft-config_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/openal-soft/utils/alsoft-config
+alsoft-config_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/openal-soft/utils/alsoft-config
 
 //Dependencies for the target
 ex-common_LIB_DEPENDS:STATIC=general;OpenAL;
 
 //Value Computed by CMake
-freetype_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/freetype
+freetype_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/freetype
 
 //Value Computed by CMake
-freetype_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/freetype
+freetype_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/freetype
 
 //Value Computed by CMake
-glew_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/GLEW/build/cmake
+glew_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/GLEW/build/cmake
+
 
 //Dependencies for the target
 glew_LIB_DEPENDS:STATIC=general;-BASE:0x62AA0000;general;-nodefaultlib;general;-noentry;general;opengl32;general;glu32;
 
 //Value Computed by CMake
-glew_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/GLEW/build/cmake
+glew_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/GLEW/build/cmake
 
 //Dependencies for the target
 glew_s_LIB_DEPENDS:STATIC=general;opengl32;general;glu32;
@@ -680,16 +682,20 @@ libogg_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/includ
 libogg_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/ogg
 
 //Value Computed by CMake
-vorbis_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/vorbis
+vorbis_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/vorbis
+
+//Dependencies for the target
+vorbis_LIB_DEPENDS:STATIC=general;OGG_LIBRARIES-NOTFOUND;
 
 //Value Computed by CMake
-vorbis_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/include/vorbis
+vorbis_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/vorbis
 
 //Dependencies for the target
-vorbisenc_LIB_DEPENDS:STATIC=general;vorbis;
+vorbisenc_LIB_DEPENDS:STATIC=general;OGG_LIBRARIES-NOTFOUND;general;vorbis;
 
 //Dependencies for the target
-vorbisfile_LIB_DEPENDS:STATIC=general;vorbis;
+vorbisfile_LIB_DEPENDS:STATIC=general;OGG_LIBRARIES-NOTFOUND;general;vorbis;
+
 
 
 ########################
@@ -830,7 +836,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=12
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=11
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_RC_COMPILER
