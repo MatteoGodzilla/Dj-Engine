@@ -108,6 +108,10 @@ private:
 	double m_lastCrossTime = 0.0;
 	int m_genBpm = 0;
 
+	bool m_isGreenTapEnabled = true;
+	bool m_isRedTapEnabled = true;
+	bool m_isBlueTapEnabled = true;
+
 	int m_highestCombo = 0;
 
 };

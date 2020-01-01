@@ -194,41 +194,69 @@ void Player::pollInput(GLFWwindow* window){
 
 void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross){
 	//green pressed
-	if (m_isGreenPressed && !m_wasGreenPressed) {
-		bool found = false;
-		//loop for every note 
-		for (size_t i = 0; i < v.size(); ++i) {
-			//if there is a note in the clicker, add score
-			if (v.at(i).getHit() && v.at(i).getType() == TAP_G) {
-				found = true;
-				m_score += 100 * m_mult;
-				//check for chords (i.e multiple taps in the same time)
-				if (v.at(i).getMilli() != m_past_tap) {
-					m_combo++;
-					m_past_tap = v.at(i).getMilli();
+	if (m_isGreenTapEnabled) {
+		if (m_isGreenPressed && !m_wasGreenPressed) {
+			bool found = false;
+			//loop for every note 
+			for (size_t i = 0; i < v.size(); ++i) {
+				//if there is a note in the clicker, add score
+				if (v.at(i).getHit() && v.at(i).getType() == TAP_G) {
+					found = true;
+					m_score += 100 * m_mult;
+					//check for chords (i.e multiple taps in the same time)
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					break;
 				}
-				v.at(i).click(time);
-				break;
+			}
+			//loop for every event
+			for (size_t j = 0; j < ev.size(); ++j) {
+				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_G_ZONE) {
+					found = true;
+					break;
+				}
+			}
+			//if there isn't a note in the clicker, break the combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+			else {
+				m_greenAnimation = true; //start animation
 			}
 		}
-		//loop for every event
-		for (size_t j = 0; j < ev.size(); ++j) {
-			if (ev.at(j).getHit() && ev.at(j).getType() == SCR_G_ZONE) {
-				found = true;
-				break;
+	}
+	else {
+		if (m_isGreenPressed && !m_wasGreenPressed) {
+			if (m_isUpPressed) {
+				//loop for every event
+				for (size_t i = 0; i < v.size(); ++i) {
+					int type = v.at(i).getType();
+					if ((type == SCR_G_UP || type == SCR_G_ANY) && v.at(i).getHit()) {
+						v.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+					}
+				}
 			}
-		}
-		//if there isn't a note in the clicker, break the combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
-		}
-		else {
-			m_greenAnimation = true; //start animation
+			else if (m_isDownPressed) {
+				//loop for every event
+				for (size_t i = 0; i < v.size(); ++i) {
+					int type = v.at(i).getType();
+					if ((type == SCR_G_DOWN || type == SCR_G_ANY) && v.at(i).getHit()) {
+						v.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+					}
+				}
+			}
 		}
 	}
 	//red pressed
-	if (m_isRedPressed && !m_wasRedPressed) {
+	if (m_isRedPressed && !m_wasRedPressed && m_isRedTapEnabled) {
 		bool found = false;
 		//loop for every note 
 		for (size_t i = 0; i < v.size(); ++i) {
@@ -254,38 +282,68 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 	}
 	//blue pressed
-	if (m_isBluePressed && !m_wasBluePressed) {
-		bool found = false;
-		//loop for every note 
-		for (size_t i = 0; i < v.size(); ++i) {
-			//if there is a note in the clicker, add score
-			if (v.at(i).getHit() && v.at(i).getType() == TAP_B) {
-				found = true;
-				m_score += 100 * m_mult;
-				if (v.at(i).getMilli() != m_past_tap) {
-					m_combo++;
-					m_past_tap = v.at(i).getMilli();
+	if (m_isBlueTapEnabled) {
+		if (m_isBluePressed && !m_wasBluePressed) {
+			bool found = false;
+			//loop for every note 
+			for (size_t i = 0; i < v.size(); ++i) {
+				//if there is a note in the clicker, add score
+				if (v.at(i).getHit() && v.at(i).getType() == TAP_B) {
+					found = true;
+					m_score += 100 * m_mult;
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					break;
 				}
-				v.at(i).click(time);
-				break;
 			}
-		}
-		//loop for every event 
-		for (size_t j = 0; j < ev.size(); ++j) {
-			if (ev.at(j).getHit() && ev.at(j).getType() == SCR_B_ZONE) {
-				found = true;
-				break;
+			//loop for every event 
+			for (size_t j = 0; j < ev.size(); ++j) {
+				if (ev.at(j).getHit() && ev.at(j).getType() == SCR_B_ZONE) {
+					found = true;
+					break;
+				}
 			}
-		}
-		//if there isn't a note in the clicker, break combo
-		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
-		}
-		else {
-			m_blueAnimation = true;// start animation
+			//if there isn't a note in the clicker, break combo
+			if (!found) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+			else {
+				m_blueAnimation = true;// start animation
+			}
 		}
 	}
+	else {
+		if (m_isBluePressed && !m_wasBluePressed) {
+			if (m_isUpPressed) {
+				//loop for every event
+				for (size_t i = 0; i < v.size(); ++i) {
+					int type = v.at(i).getType();
+					if ((type == SCR_B_UP || type == SCR_B_ANY) && v.at(i).getHit()) {
+						v.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+					}
+				}
+			}
+			else if (m_isDownPressed) {
+				//loop for every event
+				for (size_t i = 0; i < v.size(); ++i) {
+					int type = v.at(i).getType();
+					if ((type == SCR_B_DOWN || type == SCR_B_ANY) && v.at(i).getHit()) {
+						v.at(i).click(time);
+						m_score += 100 * m_mult;
+						m_combo++;
+					}
+				}
+			}
+		}
+	}
+
+	
 	//cross left pressed/moved
 	if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
 		bool found = false;
@@ -911,6 +969,10 @@ void Player::pollState(Generator &g){
 		if(m_eu_value < 3.0)m_eu_value += 1.0;
 	}
 	m_genBpm = g.m_bpm;
+
+	m_isGreenTapEnabled = g.m_isGreenTapEnabled;
+	m_isRedTapEnabled = g.m_isRedTapEnabled;
+	m_isBlueTapEnabled = g.m_isBlueTapEnabled;
 }
 
 //utility functions

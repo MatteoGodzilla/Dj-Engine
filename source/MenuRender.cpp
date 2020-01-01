@@ -903,6 +903,22 @@ void MenuRender::splashArt() {
 	drawText("*Have Fun! :)*", 10.0, 50.0, 0.02f);
 }
 
+void MenuRender::scratches(Player* player) {
+	useOrthoProj();
+	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
+
+	player->pollInput(m_window);
+	if (player->m_isUpPressed && !player->m_wasUpPressed) {
+		m_testBuffer.push_back('^');
+		if (m_testBuffer.size() > 16)m_testBuffer.erase(0, 1);
+	}
+	if (player->m_isDownPressed && !player->m_wasDownPressed) {
+		m_testBuffer.push_back('v');
+		if (m_testBuffer.size() > 16)m_testBuffer.erase(0, 1);
+	}
+	drawText(m_testBuffer, 20.0f, 310.0f, 0.1);
+}
+
 void MenuRender::editingGameAxis(int action) {
 	m_editingKey = false;
 	m_editingAxis = true;

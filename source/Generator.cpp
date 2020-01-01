@@ -156,15 +156,23 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 
 			if (type == SCR_G_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				if (ev.at(i).getMilli() < time || ev.at(i).getHit()) {
+					m_isGreenTapEnabled = false;
+				}
 				if (endTime < time) {
 					ev.erase(ev.begin() + i);
+					m_isGreenTapEnabled = true;
 				}
 			}
 
 			if (type == SCR_B_ZONE) {
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
+				if (ev.at(i).getMilli() < time || ev.at(i).getHit()) {
+					m_isBlueTapEnabled = false;
+				}
 				if (endTime < time) {
 					ev.erase(ev.begin() + i);
+					m_isBlueTapEnabled = true;
 				}
 			}
 			if (type == EU_ZONE) {

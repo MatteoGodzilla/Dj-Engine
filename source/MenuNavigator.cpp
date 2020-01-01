@@ -9,6 +9,7 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 }
 
 void MenuNavigator::writeConfigFile() {
+	std::cout << "MenuNavigator Message: wrote mapping file";
 	std::ofstream output("config-menu.txt");
 	
 	output << UP_CODE << "\n";
@@ -57,12 +58,8 @@ MenuNavigator::MenuNavigator(){
 	MenuNode credits("Credits", 3);
 	MenuNode exit("Exit", -1);
 
-	MenuNode option1("Change Input", 4);
-	MenuNode option2("Change Input", 4);
-	MenuNode option3("Change Input", 4);
+	MenuNode option1("Test Scratches", 4);
 	options.push(option1);
-	options.push(option2);
-	options.push(option3);
 	
 	m_root.push(play);
 	m_root.push(options);
@@ -161,6 +158,7 @@ void MenuNavigator::pollInput(){
 
 	if (m_render.m_shouldClose) {
 		writeConfigFile();
+		m_game->getPlayer()->writeMappingFile();
 		m_scene = 0;
 	}
 
@@ -277,7 +275,10 @@ void MenuNavigator::update() {
 					changing = &BACK_GAMEPAD;
 				}
 
-				float deadzone = 0.1f;
+				float deadzone = 0.05f;
+
+				if (m_render.m_gameActionToChange == SCR_UP_INDEX)deadzone = 0.0f;
+				if (m_render.m_gameActionToChange == SCR_DOWN_INDEX)deadzone = 0.0f;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
@@ -334,7 +335,7 @@ void MenuNavigator::update() {
 					changing = &BACK_GAMEPAD;
 				}
 
-				float deadzone = 0.1f;
+				float deadzone = 0.05f;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
@@ -395,6 +396,9 @@ void MenuNavigator::render() {
 		else if (m_scene == 2) {
 			m_render.credits();
 		}
+		else if (m_scene == 3) {
+			m_render.scratches(m_game->getPlayer());
+		}
 	}
 }
 
@@ -409,11 +413,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_scene = 2;
 	}
 	else if (id == 4) {
-		bool userinput = m_game->getPlayer()->m_useKeyboardInput;
-		m_game->getPlayer()->m_useKeyboardInput = !userinput;
-		m_useKeyboardInput = !userinput;
-		std::cout << "Changed input to " << (userinput ? "Controller" : "Keyboard") << std::endl;
-		resetMenu();
+		m_scene = 3;
 	}
 	else if (id == 255) {
 		index = findIndex(menu, parent);

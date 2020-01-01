@@ -17,10 +17,15 @@ public:
 	int getNotesTotal();
 	int getNotesHit();
 	void reset();
+
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
 	int m_bpm = 60;
+
+	bool m_isGreenTapEnabled = true;
+	bool m_isRedTapEnabled = true;
+	bool m_isBlueTapEnabled = true;
     ~Generator();
 protected:
 
