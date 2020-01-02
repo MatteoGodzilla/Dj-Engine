@@ -32,6 +32,8 @@ public:
     virtual ~GameRender();
 	
 private:
+	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
+
 	double m_noteVisibleTime = 1.0;
 
 	bool m_red = false, m_green = false, m_blue = false;

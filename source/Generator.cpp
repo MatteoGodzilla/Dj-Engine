@@ -151,7 +151,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			/*
 			every event has a different way to be removed
 			for example: a scratch start cannot be removed
-			before the corrisponding scratch end
+			if the corrisponding scratch end is before the clicker
 			*/
 
 			if (type == SCR_G_ZONE) {
@@ -435,13 +435,13 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 
 			//decode type from entry
 			if (type == 0) {
-				pushNote((double)time, TAP_G, 0.0);
+				pushNote((double)time, TAP_G, length);
 			}
 			else if (type == 1) {
-				pushNote((double)time, TAP_B, 0.0);
+				pushNote((double)time, TAP_B, length);
 			}
 			else if (type == 2) {
-				pushNote((double)time, TAP_R, 0.0);
+				pushNote((double)time, TAP_R, length);
 			}
 			else if (type == 3) {
 				pushNote((double)time, SCR_G_UP, 0.0);
@@ -456,10 +456,10 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 				pushNote((double)time, SCR_B_DOWN, 0.0);
 			}
 			else if (type == 7) {
-				pushNote((double)time, SCR_G_ANY, 0.0);
+				pushNote((double)time, SCR_G_ANY, length);
 			}
 			else if (type == 8) {
-				pushNote((double)time, SCR_B_ANY, 0.0);
+				pushNote((double)time, SCR_B_ANY, length);
 			}
 			else if (type == 9) {
 				pushCross((double)time, CROSS_B, 0.0);

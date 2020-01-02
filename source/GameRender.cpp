@@ -1116,174 +1116,114 @@ void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cr
 		double dt = ev.at(i).getMilli() - time;
 
 		if (type == SCR_G_ZONE) {
-			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
-
-			float z = 3.75f - (3.75f * (float)dt);
-			int lastChange = 0;
-
-			//start
-			if (ev.at(i).getLanMod() == 0) {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-					lastChange = CROSS_G;
-				}
-			}
-			else {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-					lastChange = CROSS_C;
-				}
-			}
-
-			//middle
-			for (size_t i = 0; i < cross.size(); i++) {
-				double crossMilli = cross.at(i).getMilli();
-				double crossDt = crossMilli - time;
-				z = 3.75f - (3.75f * (float)crossDt);
-				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
-					if (crossMilli >= milli && crossMilli <= endTime) {
-						int crossType = cross.at(i).getType();
-						if (crossType == CROSS_G && lastChange == CROSS_C) {
-							lastChange = CROSS_G;
-							//end center part
-							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-							//start left part
-							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-						}
-						else if (crossType == CROSS_C && lastChange == CROSS_G) {
-							lastChange = CROSS_C;
-							//end left part
+			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i),cross);
+			int num = 0;
+			int lastVisible = -1;
+			float z;
+			for (size_t i = 0; i < cfChanges.size(); ++i) {
+				double cfMilli = cfChanges.at(i).getMilli();
+				double cfDt = cfMilli - time;
+				int cfType = cfChanges.at(i).getType();
+				if (cfMilli <= time + m_noteVisibleTime) {
+					z = 3.75f - (3.75f * (float)cfDt);
+					if (cfType == CROSS_G) {
+						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
 							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-
-							//start center part
+							num += 2;
+						}
+						else {
+							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
+						}
+						lastVisible = CROSS_G;
+					}
+					else if (cfType == CROSS_C) {
+						if (num % 4 != 0) {
+							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
+						}
+						else {
 							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
 							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
 						}
+						lastVisible = CROSS_C;
+					}
+					if (num > 0 && num % 4 == 0) {
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
 			}
-
-			//end
-			z = 3.75f - (3.75f * (float)endDt);
-			if (lastChange == CROSS_C) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+			if (num % 4 != 0) {
+				if (lastVisible == CROSS_G) {
+					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				else {
+				else if (lastVisible == CROSS_C) {
 					pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
 			}
-			else if (lastChange == CROSS_G) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else {
-					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				
-			}
-
 		}
 		else if (type == SCR_B_ZONE) {
-			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
-
-			float z = 3.75f - (3.75f * (float)dt);
-			int lastChange = 0;
-
-			//start
-			if (ev.at(i).getLanMod() == 2) {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-					lastChange = CROSS_B;
-				}
-			}
-			else {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-					lastChange = CROSS_C;
-				}
-			}
-
-			//middle
-			for (size_t i = 0; i < cross.size(); i++) {
-				double crossMilli = cross.at(i).getMilli();
-				double crossDt = crossMilli - time;
-				z = 3.75f - (3.75f * (float)crossDt);
-				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
-					if (crossMilli >= milli && crossMilli <= endTime) {
-						int crossType = cross.at(i).getType();
-						if (crossType == CROSS_B && lastChange == CROSS_C) {
-							lastChange = CROSS_B;
-							//end center part
-							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-							//start right part
-							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-						}
-						else if (crossType == CROSS_C && lastChange == CROSS_B) {
-							lastChange = CROSS_C;
-							//end right part
+			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
+			int num = 0;
+			int lastVisible = -1;
+			float z;
+			for (size_t i = 0; i < cfChanges.size(); ++i) {
+				double cfMilli = cfChanges.at(i).getMilli();
+				double cfDt = cfMilli - time;
+				int cfType = cfChanges.at(i).getType();
+				if (cfMilli <= time + m_noteVisibleTime) {
+					z = 3.75f - (3.75f * (float)cfDt);
+					if (cfType == CROSS_B) {
+						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
 							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-
-							//start center part
+							num += 2;
+						}
+						else {
+							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
+						}
+						lastVisible = CROSS_B;
+					}
+					else if (cfType == CROSS_C) {
+						if (num % 4 != 0) {
+							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
+						}
+						else {
 							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
 							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
 						}
+						lastVisible = CROSS_C;
+					}
+					if (num > 0 && num % 4 == 0) {
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
 			}
-
-			//end
-			z = 3.75f - (3.75f * (float)endDt);
-			if (lastChange == CROSS_C) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+			if (num % 4 != 0) {
+				if (lastVisible == CROSS_B) {
+					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				else {
+				else if (lastVisible == CROSS_C) {
 					pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
 			}
-			else if (lastChange == CROSS_B) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else {
-					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-
-			}
-
 		}
 		else if (type == EU_ZONE) {
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
@@ -1689,6 +1629,43 @@ void GameRender::reset() {
 void GameRender::updateAnimations(double time) {
 	m_animManager.tick(time);
 }
+
+std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> cross) {
+	std::vector<Note> result = {};
+	double start = note.getMilli();
+	double end = start + note.getLength();
+	int lastChange = CROSS_C;
+
+	if (note.getLanMod() == 0)lastChange = CROSS_G;
+	else if (note.getLanMod() == 2)lastChange = CROSS_B;
+
+	result.push_back(Note(start, lastChange, 0.0f, true));
+	for (size_t i = 0; i < cross.size(); ++i) {
+		double crossMilli = cross.at(i).getMilli();
+		int crossType = cross.at(i).getType();
+		if (crossMilli <= end && crossMilli >= start) {
+			if (crossType == CROSS_G && lastChange != CROSS_G) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_G;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+			else if (crossType == CROSS_C && lastChange != CROSS_C) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_C;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+			else if (crossType == CROSS_B && lastChange != CROSS_B) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_B;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+		}
+	}
+	result.push_back(Note(end, lastChange, 0.0f, true));
+	return result;
+}
+
+
 
 GameRender::~GameRender() {
 }

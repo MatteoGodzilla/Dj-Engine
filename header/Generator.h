@@ -55,6 +55,8 @@ private:
 	int m_notesHit = 0;
 	int m_notesTotal = 0;
 
+	int scrTicksforBpm = 16;
+
 	double m_initialCrossfade = -2.0;
 };
 
