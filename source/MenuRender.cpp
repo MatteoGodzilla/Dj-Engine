@@ -643,7 +643,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(c);
 		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfLeftPressed ? 1.0f : 0.0f;
+		value = game->getPlayer()->m_isCfGreenPressed ? 1.0f : 0.0f;
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -671,7 +671,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(c);
 		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfRightPressed ? 1.0f : 0.0f;
+		value = game->getPlayer()->m_isCfBluePressed ? 1.0f : 0.0f;
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -910,13 +910,13 @@ void MenuRender::scratches(Player* player) {
 	player->pollInput(m_window);
 	if (player->m_isUpPressed && !player->m_wasUpPressed) {
 		m_testBuffer.push_back('^');
-		if (m_testBuffer.size() > 16)m_testBuffer.erase(0, 1);
 	}
 	if (player->m_isDownPressed && !player->m_wasDownPressed) {
 		m_testBuffer.push_back('v');
-		if (m_testBuffer.size() > 16)m_testBuffer.erase(0, 1);
 	}
+	if (m_testBuffer.size() > 20)m_testBuffer.erase(0, 1);
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1);
+	drawText("Press enter to exit", 20.0, 670.0f, 0.05f);
 }
 
 void MenuRender::editingGameAxis(int action) {

@@ -23,7 +23,7 @@ void readToFloat(std::ifstream& stream, float* f) {
 Generator::Generator() {
 }
 
-void Generator::init(std::string& path){
+void Generator::init(std::string& path) {
 	pushCross(m_initialCrossfade, CROSS_C, 0.0);//Do not remove
 	std::string textPath = path + std::string("/chart.txt");
 	m_chart.open(path);
@@ -90,7 +90,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 		int type = m_note_types.at(0);
 		double length = m_note_length.at(0);
 
-		Note temp(time,type,length,false);
+		Note temp(time, type, length, false);
 		v.push_back(temp);
 		m_note_times.erase(m_note_times.begin());
 		m_note_types.erase(m_note_types.begin());
@@ -103,7 +103,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 		double time = m_event_times.at(0);
 		int type = m_event_types.at(0);
 		double length = m_event_length.at(0);
-		Note e(time,type,length,true);
+		Note e(time, type, length, true);
 		ev.push_back(e);
 		m_event_times.erase(m_event_times.begin());
 		m_event_types.erase(m_event_types.begin());
@@ -126,19 +126,27 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	if (!v.empty()) {
 		for (size_t i = v.size(); i-- > 0;) {
 			v.at(i).tick(time);
+			int type = v.at(i).getType();
 			//remove if outside hit area
 			if (v.at(i).getDead()) {
 				if (v.at(i).getTouched()) {
 					m_notesHit++;
 				}
-				else {
+				else if(type != SCR_G_ANY && type != SCR_B_ANY){
 					m_combo_reset = true;
 					v.at(i).click(time);
 				}
-				//actual remove
-				v.erase(v.begin() + i);
-				m_notesTotal++;
-				break;
+				if (v.at(i).getLength() == 0) {
+					//actual remove
+					v.erase(v.begin() + i);
+					m_notesTotal++;
+					break;
+				}
+				else if (v.at(i).getMilli() + v.at(i).getLength() < time) {
+					v.erase(v.begin() + i);
+					m_notesTotal++;
+					break;
+				}
 			}
 		}
 	}
@@ -198,10 +206,10 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	}
 
 	if (!cross.empty()) {
-		for (size_t i = 0; i < cross.size()-1; i++) {
+		for (size_t i = 0; i < cross.size() - 1; i++) {
 			cross.at(i).tick(time);
 
-			double next_time = cross.at(i+1).getMilli();
+			double next_time = cross.at(i + 1).getMilli();
 			//if the next crossfader has crossed the clickers
 			if (next_time + 0.15 <= time) {
 				if (cross.at(i).getTouched()) {
@@ -250,7 +258,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 
 			/*
 			depending by the tokens, add note/event to 'cache'
-			
+
 
 			if (token == "T" || token == "t") {
 				m_chart >> token;
@@ -522,7 +530,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 	}
 }
 
-void Generator::bpm(double time, std::vector<double>& arr){
+void Generator::bpm(double time, std::vector<double>& arr) {
 	//update bpm tick array
 
 	for (size_t i = 0; i < arr.size(); i++) {
@@ -553,7 +561,7 @@ void Generator::reset() {
 	m_eu_check = false;
 }
 
-int Generator::getNotesTotal(){
+int Generator::getNotesTotal() {
 	return m_notesTotal;
 }
 

@@ -30,7 +30,8 @@ public:
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
     virtual ~GameRender();
-	
+
+	bool m_isButtonsRight = false;
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 
@@ -79,5 +80,7 @@ private:
 	float m_blueRight = 0.0f;
 	float m_blueBack = 0.0f;
 	float m_blueFront = 0.0f;
+
+	
 };
 

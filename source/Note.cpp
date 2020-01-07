@@ -11,15 +11,19 @@ Note::Note(double milli,int ty, double length, bool ev){
 
 //when the player clicks the corrisponding button
 void Note::click(double time) {
-    if(m_hittable){
-        std::cout << "Hit :" << m_isEvent << "\\"<< m_type << " at " << time << std::endl;
-        m_touched = true;
-    }else {
-        std::cout << "Miss:" << m_isEvent << "\\"<< m_type << " at " << time << std::endl;
-    }
-    if(!m_isEvent){
-        m_dead = true;
-    }
+	if (m_firstClick) {
+		if (m_hittable) {
+			std::cout << "Hit :" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
+			m_touched = true;
+		}
+		else {
+			std::cout << "Miss:" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
+		}
+		if (!m_isEvent) {
+			m_dead = true;
+		}
+		m_firstClick = false;
+	}
 }
 
 //updating note every frame

@@ -59,7 +59,9 @@ MenuNavigator::MenuNavigator(){
 	MenuNode exit("Exit", -1);
 
 	MenuNode option1("Test Scratches", 4);
+	MenuNode option2("Toggle Buttons Right/Left", 5);
 	options.push(option1);
+	options.push(option2);
 	
 	m_root.push(play);
 	m_root.push(options);
@@ -414,6 +416,16 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (id == 4) {
 		m_scene = 3;
+	}
+	else if (id == 5) {
+		if (m_game->getPlayer()->m_isButtonsRight) {
+			std::cout << "Game message: Changed Buttons to Right" << std::endl;
+			m_game->setButtonPos(false);
+		}
+		else {
+			std::cout << "Game message: Changed Buttons to Left" << std::endl;
+			m_game->setButtonPos(true);
+		}
 	}
 	else if (id == 255) {
 		index = findIndex(menu, parent);

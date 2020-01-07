@@ -74,8 +74,8 @@ public:
 	bool m_isBluePressed = false;
 	bool m_isUpPressed = false;
 	bool m_isDownPressed = false;
-	bool m_isCfLeftPressed = false;
-	bool m_isCfRightPressed = false;
+	bool m_isCfGreenPressed = false;
+	bool m_isCfBluePressed = false;
 	bool m_isEuPressed = false;
 
 	bool m_wasRedPressed = false;
@@ -83,8 +83,8 @@ public:
 	bool m_wasBluePressed = false;
 	bool m_wasUpPressed = false;
 	bool m_wasDownPressed = false;
-	bool m_wasCfLeftPressed = false;
-	bool m_wasCfRightPressed = false;
+	bool m_wasCfGreenPressed = false;
+	bool m_wasCfBluePressed = false;
 
 	bool m_greenAnimation = false;
 	bool m_redAnimation = false;
@@ -92,6 +92,8 @@ public:
 
 	int m_cross = 1;
 	int m_pastCross = 1;
+
+	bool m_isButtonsRight = false;
 protected:
 
 private:

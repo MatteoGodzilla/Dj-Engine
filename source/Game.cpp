@@ -109,6 +109,12 @@ Player* Game::getPlayer(){
 	return &m_player;
 }
 
+void Game::setButtonPos(bool value){
+	m_isButtonsRight = value;
+	m_render.m_isButtonsRight = value;
+	m_player.m_isButtonsRight = value;
+}
+
 void Game::start(std::string path) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);

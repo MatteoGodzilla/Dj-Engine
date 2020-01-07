@@ -24,8 +24,8 @@ void Player::pollInput(GLFWwindow* window){
 	m_wasBluePressed = m_isBluePressed;
 	m_wasUpPressed = m_isUpPressed;
 	m_wasDownPressed = m_isDownPressed;
-	m_wasCfLeftPressed = m_isCfLeftPressed;
-	m_wasCfRightPressed = m_isCfRightPressed;
+	m_wasCfGreenPressed = m_isCfGreenPressed;
+	m_wasCfBluePressed = m_isCfBluePressed;
 
 	m_pastCross = m_cross;
 
@@ -35,8 +35,8 @@ void Player::pollInput(GLFWwindow* window){
 		m_isBluePressed = glfwGetKey(window, BLUE_CODE);
 		m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
 		m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
-		m_isCfLeftPressed = glfwGetKey(window, CROSS_L_CODE);
-		m_isCfRightPressed = glfwGetKey(window, CROSS_R_CODE);
+		m_isCfGreenPressed = glfwGetKey(window, CROSS_L_CODE);
+		m_isCfBluePressed = glfwGetKey(window, CROSS_R_CODE);
 		m_isEuPressed = glfwGetKey(window, EUPHORIA);
 	}
 	else {
@@ -108,35 +108,35 @@ void Player::pollInput(GLFWwindow* window){
 				if (!m_gpInvertDead.at(CF_LEFT_INDEX)) {
 					//value * sensitivity >= deadzone
 					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
-						m_isCfLeftPressed = true;
-						m_isCfRightPressed = false;
+						m_isCfGreenPressed = true;
+						m_isCfBluePressed = false;
 					}
-					else m_isCfLeftPressed = false;
+					else m_isCfGreenPressed = false;
 				}
 				else {
 					//value * sensitivity <= deadzone
 					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) <= m_gpDead.at(CF_LEFT_INDEX)) {
-						m_isCfLeftPressed = true;
-						m_isCfRightPressed = false;
+						m_isCfGreenPressed = true;
+						m_isCfBluePressed = false;
 					}
-					else m_isCfLeftPressed = false;
+					else m_isCfGreenPressed = false;
 				}
 
 				if (!m_gpInvertDead.at(CF_RIGHT_INDEX)) {
 					//value * sensitivity >= deadzone
 					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
-						m_isCfRightPressed = true;
-						m_isCfLeftPressed = false;
+						m_isCfBluePressed = true;
+						m_isCfGreenPressed = false;
 					}
-					else m_isCfRightPressed = false;
+					else m_isCfBluePressed = false;
 				}
 				else {
 					//value * sensitivity <= deadzone
 					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) <= m_gpDead.at(CF_RIGHT_INDEX)) {
-						m_isCfRightPressed = true;
-						m_isCfLeftPressed = false;
+						m_isCfBluePressed = true;
+						m_isCfGreenPressed = false;
 					}
-					else m_isCfRightPressed = false;
+					else m_isCfBluePressed = false;
 				}
 
 				if (!m_gpInvertDead.at(SCR_UP_INDEX)) {
@@ -176,17 +176,23 @@ void Player::pollInput(GLFWwindow* window){
 		}
 	}
 
+	if (m_isButtonsRight) {
+		bool temp = m_isCfGreenPressed;
+		m_isCfGreenPressed = m_isCfBluePressed;
+		m_isCfBluePressed = temp;
+	}
+
 	if (!m_euphoria_active) {
-		if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
+		if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
 			m_cross = 0;
 		}
-		else if (m_isCfRightPressed && !m_wasCfRightPressed) {
+		else if (m_isCfBluePressed && !m_wasCfBluePressed) {
 			m_cross = 2;
 		}
-		else if (m_wasCfLeftPressed && !m_isCfLeftPressed && !m_isCfRightPressed) {
+		else if (m_wasCfGreenPressed && !m_isCfGreenPressed && !m_isCfBluePressed) {
 			m_cross = 1;
 		}
-		else if (m_wasCfRightPressed && !m_isCfRightPressed && !m_isCfLeftPressed) {
+		else if (m_wasCfBluePressed && !m_isCfBluePressed && !m_isCfGreenPressed) {
 			m_cross = 1;
 		}
 	}
@@ -345,7 +351,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 	
 	//cross left pressed/moved
-	if (m_isCfLeftPressed && !m_wasCfLeftPressed) {
+	if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
 		bool found = false;
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
@@ -385,7 +391,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 	}
 	//cross right pressed/moved
-	if (m_isCfRightPressed && !m_wasCfRightPressed) {
+	if (m_isCfBluePressed && !m_wasCfBluePressed) {
 		bool found = false;
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
@@ -575,7 +581,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 	}
 	//release section
 	//cross left released
-	if (m_wasCfLeftPressed && !m_isCfLeftPressed) {
+	if (m_wasCfGreenPressed && !m_isCfGreenPressed) {
 		bool found = false;
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
@@ -620,7 +626,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			m_eu_zone_active = false;
 		}
 	}
-	if (m_wasCfRightPressed && !m_isCfRightPressed) {
+	if (m_wasCfBluePressed && !m_isCfBluePressed) {
 		bool found = false;
 		//loop for every event
 		for (size_t i = 0; i < cross.size(); ++i) {
@@ -922,8 +928,8 @@ void Player::reset() {
 	m_isBluePressed = false;
 	m_isUpPressed = false;
 	m_isDownPressed = false;
-	m_isCfLeftPressed = false;
-	m_isCfRightPressed = false;
+	m_isCfGreenPressed = false;
+	m_isCfBluePressed = false;
 	m_isEuPressed = false;
 
 	m_wasRedPressed = false;
@@ -931,8 +937,8 @@ void Player::reset() {
 	m_wasBluePressed = false;
 	m_wasUpPressed = false;
 	m_wasDownPressed = false;
-	m_wasCfLeftPressed = false;
-	m_wasCfRightPressed = false;
+	m_wasCfGreenPressed = false;
+	m_wasCfBluePressed = false;
 
 	m_greenAnimation = false;
 	m_redAnimation = false;

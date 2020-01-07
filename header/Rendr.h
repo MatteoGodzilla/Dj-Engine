@@ -48,5 +48,7 @@ protected:
 	FT_Library m_FTLibrary;
 	FT_Face m_font;
 
+	bool rendr_InvertedX = false;
+
 };
 

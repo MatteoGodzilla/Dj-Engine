@@ -22,6 +22,7 @@ public:
 	void reset();
 	Player* getPlayer();
 	void start(std::string path);
+	void setButtonPos(bool value);
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
@@ -39,5 +40,6 @@ private:
 	Audio m_audio;
 	bool m_active = false;
 	int m_mode = 0;
+	bool m_isButtonsRight = false;
 };
 

@@ -39,6 +39,7 @@ private:
     bool m_hittable = false;
     bool m_touched = false;
     bool m_dead = false;
+	bool m_firstClick = true;
     int m_type;
     int m_lan_mod = -1;
 };
