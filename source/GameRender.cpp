@@ -299,7 +299,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			float s = 0.0;
 			float t = 0.0;
 
-			if (type == TAP_R) {
+			if (type == TAP_R && !v.at(i).getTouched()) {
 				if (!v.at(i).getDead()) {
 					//change texture if euphoria is active
 					if (m_renderEuActive) {
@@ -319,7 +319,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
-			else if (type == TAP_G) {
+			else if (type == TAP_G && !v.at(i).getTouched()) {
 				if (!v.at(i).getDead()) {
 					//change texture if euphoria is active
 					if (m_renderEuActive) {
@@ -346,7 +346,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
-			else if (type == SCR_G_UP) {
+			else if (type == SCR_G_UP && !v.at(i).getTouched()) {
 				s = 400.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -365,7 +365,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_G_DOWN) {
+			else if (type == SCR_G_DOWN && !v.at(i).getTouched()) {
 				s = 800.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -399,9 +399,9 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					Note end = changes.at(i * 2 + 1);
 
 					double startDt = start.getMilli() - time;
-					double startZ = 3.75f - (3.75f * (float)startDt);
+					double startZ = 3.75 - (3.75 * (float)startDt);
 					double endDt = end.getMilli() - time;
-					double endZ = 3.75f - (3.75f * (float)endDt);
+					double endZ = 3.75 - (3.75 * (float)endDt);
 
 					int numOfSprites = floor((startZ - endZ) / length);
 
@@ -425,7 +425,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					}
 				}
 			}
-			else if (type == TAP_B) {
+			else if (type == TAP_B && !v.at(i).getTouched()) {
 				if (!v.at(i).getDead()) {
 					//change texture if euphoria is active
 					if (m_renderEuActive) {
@@ -453,7 +453,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
-			else if (type == SCR_B_UP) {
+			else if (type == SCR_B_UP && !v.at(i).getTouched()) {
 				s = 400.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -472,7 +472,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_B_DOWN) {
+			else if (type == SCR_B_DOWN && !v.at(i).getTouched()) {
 				s = 800.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -532,7 +532,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					}
 				}
 			}
-			if (type == CF_SPIKE_G) {
+			if (type == CF_SPIKE_G && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() >= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1460.0f / 1640.0f;
@@ -554,7 +554,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 				}
 			}
-			else if (type == CF_SPIKE_B) {
+			else if (type == CF_SPIKE_B && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() <= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1280.0f / 1640.0f;
@@ -576,7 +576,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
-			else if (type == CF_SPIKE_C) {
+			else if (type == CF_SPIKE_C && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() == 0) {
 					s = 1200.0f / 1740.0f;
 					t = 1460.0f / 1640.0f;
@@ -1518,7 +1518,7 @@ void GameRender::meters() {
 
 void GameRender::result(Player& player, Generator& generator) {
 	useOrthoProj();
-	drawText("Result:", 0.0f, 50.0f, 0.05f);
+	drawText("Result:", 10.0f, 50.0f, 0.05f);
 
 	int all = generator.getNotesTotal();
 	int hit = generator.getNotesHit();
@@ -1529,16 +1529,21 @@ void GameRender::result(Player& player, Generator& generator) {
 	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
 	std::string scoreString = std::string("Score:") + std::to_string(score);
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
+	std::string percent = std::string("Percent:") + std::to_string((float)hit / (float)all * 100.0f) + std::string("%");
 
 
-	drawText(hitString, 0.0f, 100.0f, 0.05f);
-	drawText(totalString, 0.0f, 150.0f, 0.05f);
-	drawText(scoreString, 0.0f, 200.0f, 0.05f);
-	drawText(comboString, 0.0f, 250.0f, 0.05f);
+	drawText(hitString, 10.0f, 110.0f, 0.05f);
+	drawText(totalString, 10.0f, 160.0f, 0.05f);
+	drawText(scoreString, 10.0f, 210.0f, 0.05f);
+	drawText(comboString, 10.0f, 260.0f, 0.05f);
+	drawText(percent, 10.0f, 310.0f, 0.05f);
 
 
 	if (combo == all) {
 		drawText("Wow! a Full Combo", 200.0f, 50.0f, 0.05f);
+	}
+	else if (hit > all) {
+		drawText("Hold on a sec. How did you...", 200.0f, 50.0f, 0.05f);
 	}
 }
 

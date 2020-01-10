@@ -55,9 +55,10 @@ private:
 	int m_notesHit = 0;
 	int m_notesTotal = 0;
 
-	int scrTicksforBpm = 16;
-
+	int m_scr_tick = 0;
 	double m_initialCrossfade = -2.0;
+
+	const int TICKS_PER_BEAT = 4;
 };
 
 #endif // GENERATOR_H

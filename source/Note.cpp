@@ -13,14 +13,12 @@ Note::Note(double milli,int ty, double length, bool ev){
 void Note::click(double time) {
 	if (m_firstClick) {
 		if (m_hittable) {
-			std::cout << "Hit :" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
+			//std::cout << "Hit :" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
 			m_touched = true;
+			m_hittable = false;
 		}
 		else {
-			std::cout << "Miss:" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
-		}
-		if (!m_isEvent) {
-			m_dead = true;
+			//std::cout << "Miss:" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
 		}
 		m_firstClick = false;
 	}
@@ -32,7 +30,7 @@ void Note::tick(double time){
         m_hittable = true;
     }else m_hittable = false;
 
-    if(time > m_milli+m_hit_window && !m_isEvent){
+    if(time > m_milli+m_hit_window+m_length && !m_isEvent){
         m_dead = true;
     }
 }

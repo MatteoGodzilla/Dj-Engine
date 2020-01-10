@@ -206,7 +206,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			//loop for every note 
 			for (size_t i = 0; i < v.size(); ++i) {
 				//if there is a note in the clicker, add score
-				if (v.at(i).getHit() && v.at(i).getType() == TAP_G) {
+				if (v.at(i).getHit() && !v.at(i).getTouched() && v.at(i).getType() == TAP_G) {
 					found = true;
 					m_score += 100 * m_mult;
 					//check for chords (i.e multiple taps in the same time)
@@ -241,7 +241,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				//loop for every event
 				for (size_t i = 0; i < v.size(); ++i) {
 					int type = v.at(i).getType();
-					if ((type == SCR_G_UP || type == SCR_G_ANY) && v.at(i).getHit()) {
+					if ((type == SCR_G_UP || type == SCR_G_ANY) && v.at(i).getHit() && !v.at(i).getTouched()) {
 						v.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
@@ -252,7 +252,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				//loop for every event
 				for (size_t i = 0; i < v.size(); ++i) {
 					int type = v.at(i).getType();
-					if ((type == SCR_G_DOWN || type == SCR_G_ANY) && v.at(i).getHit()) {
+					if ((type == SCR_G_DOWN || type == SCR_G_ANY) && v.at(i).getHit() && !v.at(i).getTouched()) {
 						v.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
@@ -267,7 +267,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		//loop for every note 
 		for (size_t i = 0; i < v.size(); ++i) {
 			//if there is a note in the clicker, add score
-			if (v.at(i).getHit() && v.at(i).getType() == TAP_R) {
+			if (v.at(i).getHit() && !v.at(i).getTouched() && v.at(i).getType() == TAP_R) {
 				found = true;
 				m_score += 100 * m_mult;
 				if (v.at(i).getMilli() != m_past_tap) {
@@ -294,7 +294,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			//loop for every note 
 			for (size_t i = 0; i < v.size(); ++i) {
 				//if there is a note in the clicker, add score
-				if (v.at(i).getHit() && v.at(i).getType() == TAP_B) {
+				if (v.at(i).getHit() && !v.at(i).getTouched() && v.at(i).getType() == TAP_B) {
 					found = true;
 					m_score += 100 * m_mult;
 					if (v.at(i).getMilli() != m_past_tap) {
@@ -328,7 +328,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				//loop for every event
 				for (size_t i = 0; i < v.size(); ++i) {
 					int type = v.at(i).getType();
-					if ((type == SCR_B_UP || type == SCR_B_ANY) && v.at(i).getHit()) {
+					if ((type == SCR_B_UP || type == SCR_B_ANY) && v.at(i).getHit() && !v.at(i).getTouched()) {
 						v.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
@@ -339,7 +339,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				//loop for every event
 				for (size_t i = 0; i < v.size(); ++i) {
 					int type = v.at(i).getType();
-					if ((type == SCR_B_DOWN || type == SCR_B_ANY) && v.at(i).getHit()) {
+					if ((type == SCR_B_DOWN || type == SCR_B_ANY) && v.at(i).getHit() && !v.at(i).getTouched()) {
 						v.at(i).click(time);
 						m_score += 100 * m_mult;
 						m_combo++;
@@ -348,8 +348,6 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 		}
 	}
-
-	
 	//cross left pressed/moved
 	if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
 		bool found = false;
@@ -375,7 +373,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 		for (size_t i = 0; i < v.size(); i++) {
 			int type = v.at(i).getType();
-			if (v.at(i).getHit()) {
+			if (v.at(i).getHit() && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					found = true;
@@ -417,7 +415,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		for (size_t i = 0; i < v.size(); i++) {
 			int type = v.at(i).getType();
-			if (v.at(i).getHit()) {
+			if (v.at(i).getHit() && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					found = true;
@@ -440,7 +438,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
+				if (v.at(i).getHit() && !v.at(i).getTouched()) {
 					int type = v.at(i).getType();
 					//if there is a scratch up inside the clicker
 					if (type == SCR_G_UP) {
@@ -451,11 +449,13 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						break;
 					}
 					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_G_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
+					else if (type == SCR_G_ANY || type && SCR_G_TICK) {
+						if (!v.at(i).getTouched()) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}	
 					}
 				}
 			}
@@ -473,7 +473,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
+				if (v.at(i).getHit() && !v.at(i).getTouched() && !v.at(i).getTouched()) {
 					int type = v.at(i).getType();
 					//if there is a scratch up inside the clicker
 					if (type == SCR_B_UP) {
@@ -484,7 +484,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						break;
 					}
 					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_B_ANY) {
+					else if (type == SCR_B_ANY || type == SCR_B_TICK) {
 						found = true;
 						v.at(i).click(time);
 						m_score += 25 * m_mult;
@@ -511,7 +511,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
+				if (v.at(i).getHit() && !v.at(i).getTouched()) {
 					int type = v.at(i).getType();
 					//if there is a scratch down inside the clicker
 					if (type == SCR_G_DOWN) {
@@ -522,11 +522,13 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						break;
 					}
 					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_G_ANY) {
-						found = true;
-						v.at(i).click(time);
-						m_score += 25 * m_mult;
-						m_scr_tick++;
+					else if (type == SCR_G_ANY || type == SCR_G_TICK) {
+						if (!v.at(i).getTouched()) {
+							found = true;
+							v.at(i).click(time);
+							m_score += 25 * m_mult;
+							m_scr_tick++;
+						}
 					}
 				}
 			}
@@ -544,7 +546,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			bool found = false;
 			//loop for every note
 			for (size_t i = 0; i < v.size(); ++i) {
-				if (v.at(i).getHit()) {
+				if (v.at(i).getHit() && !v.at(i).getTouched()) {
 					int type = v.at(i).getType();
 					//if there is a scratch down inside the clicker
 					if (type == SCR_B_DOWN) {
@@ -555,7 +557,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						break;
 					}
 					//if there is a scratch anydir inside the clicker
-					else if (type == SCR_B_ANY) {
+					else if (type == SCR_B_ANY || type == SCR_B_TICK) {
 						found = true;
 						v.at(i).click(time);
 						m_score += 25 * m_mult;
@@ -579,6 +581,25 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			m_euphoria_active = true;
 		}
 	}
+	if (m_isUpPressed || m_isDownPressed) {
+		for (size_t i = 0; i < v.size(); ++i) {
+			if (v.at(i).getHit() && !v.at(i).getTouched() && !v.at(i).getTouched()) {
+				int type = v.at(i).getType();
+				if (type == SCR_G_TICK && m_isGreenPressed) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
+				else if (type == SCR_B_TICK && m_isBluePressed) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
+			}
+		}
+	}
 	//release section
 	//cross left released
 	if (m_wasCfGreenPressed && !m_isCfGreenPressed) {
@@ -595,7 +616,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						found = true;
 						break;
 					}
-					if (type == CROSS_B) {
+					else if (type == CROSS_B) {
 						found = true;
 						break;
 					}
@@ -610,11 +631,15 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		//loop for every note
 		for (size_t i = 0; i < v.size(); i++) {
 			int type = v.at(i).getType();
-			if (v.at(i).getHit()) {
+			if (v.at(i).getHit() && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
 					m_greenAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_B) {
+					found = true;
 					break;
 				}
 			}
@@ -655,11 +680,15 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		//loop for every note
 		for (size_t i = 0; i < v.size(); i++) {
 			int type = v.at(i).getType();
-			if (v.at(i).getHit()) {
+			if (v.at(i).getHit() && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
 					m_blueAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_G) {
+					found = true;
 					break;
 				}
 			}
@@ -674,7 +703,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 	if (m_euphoria_active) {
 		for (size_t i = 0; i < v.size(); ++i) {
 			int type = v.at(i).getType();
-			if (v.at(i).getHit() && !v.at(i).getTouched()) {
+			if (v.at(i).getMilli() < time && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					m_greenAnimation = true;
@@ -695,7 +724,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		for (size_t i = 0; i < cross.size(); ++i) {
 			int type = cross.at(i).getType();
-			if (cross.at(i).getHit() && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
+			if (cross.at(i).getMilli() < time && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
 				if (type == CROSS_G) {
 					m_cross = 0;
 					cross.at(i).click(time);
@@ -735,7 +764,7 @@ void Player::tick(double time) {
 	else m_mult = 1;
 
 	if (m_scr_tick >= 4) {
-		m_scr_tick = 0;
+		m_scr_tick -= 4;
 		m_combo++;
 	}
 
@@ -965,6 +994,7 @@ void Player::reset() {
 //poll reset signals from generator 
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){
+		std::cout << "broke from generator" << std::endl;
         m_combo = 0;
 		m_eu_zone_active = false;
     }

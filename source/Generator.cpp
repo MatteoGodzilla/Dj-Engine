@@ -130,23 +130,18 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			//remove if outside hit area
 			if (v.at(i).getDead()) {
 				if (v.at(i).getTouched()) {
+					if (type == SCR_G_TICK || type == SCR_B_TICK || type == SCR_G_ANY || type == SCR_B_ANY) {
+						m_notesTotal--;
+						m_notesHit--;
+						m_scr_tick++;
+					}
 					m_notesHit++;
 				}
-				else if(type != SCR_G_ANY && type != SCR_B_ANY){
+				else {
 					m_combo_reset = true;
-					v.at(i).click(time);
 				}
-				if (v.at(i).getLength() == 0) {
-					//actual remove
-					v.erase(v.begin() + i);
-					m_notesTotal++;
-					break;
-				}
-				else if (v.at(i).getMilli() + v.at(i).getLength() < time) {
-					v.erase(v.begin() + i);
-					m_notesTotal++;
-					break;
-				}
+				m_notesTotal++;
+				v.erase(v.begin() + i);
 			}
 		}
 	}
@@ -162,26 +157,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			if the corrisponding scratch end is before the clicker
 			*/
 
-			if (type == SCR_G_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-				if (ev.at(i).getMilli() < time || ev.at(i).getHit()) {
-					m_isGreenTapEnabled = false;
-				}
-				if (endTime < time) {
-					ev.erase(ev.begin() + i);
-					m_isGreenTapEnabled = true;
-				}
+			if (type == SCR_G_ZONE && ev.at(i).getDead()) {
+				ev.erase(ev.begin() + i);
 			}
 
-			if (type == SCR_B_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-				if (ev.at(i).getMilli() < time || ev.at(i).getHit()) {
-					m_isBlueTapEnabled = false;
-				}
-				if (endTime < time) {
-					ev.erase(ev.begin() + i);
-					m_isBlueTapEnabled = true;
-				}
+			if (type == SCR_B_ZONE && ev.at(i).getDead()) {
+				ev.erase(ev.begin() + i);
 			}
 			if (type == EU_ZONE) {
 				//start eu zone check when the event is on the clicker
@@ -226,6 +207,12 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			}
 		}
 		cross.at(cross.size() - 1).tick(time);
+	}
+
+	if (m_scr_tick > 4) {
+		m_scr_tick -= 4;
+		m_notesHit++;
+		m_notesTotal++;
 	}
 
 	/*
@@ -443,13 +430,13 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 
 			//decode type from entry
 			if (type == 0) {
-				pushNote((double)time, TAP_G, length);
+				pushNote((double)time, TAP_G, 0.0);
 			}
 			else if (type == 1) {
-				pushNote((double)time, TAP_B, length);
+				pushNote((double)time, TAP_B, 0.0);
 			}
 			else if (type == 2) {
-				pushNote((double)time, TAP_R, length);
+				pushNote((double)time, TAP_R, 0.0);
 			}
 			else if (type == 3) {
 				pushNote((double)time, SCR_G_UP, 0.0);
@@ -465,9 +452,23 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 			}
 			else if (type == 7) {
 				pushNote((double)time, SCR_G_ANY, length);
+				float end = time + length;
+				float betweenTicks = 60.0f / ((float)m_bpm * TICKS_PER_BEAT);
+				time += betweenTicks;
+				while (time < end) {
+					pushNote((double)time, SCR_G_TICK, 0.0);
+					time += betweenTicks;
+				}
 			}
 			else if (type == 8) {
 				pushNote((double)time, SCR_B_ANY, length);
+				float end = time + length;
+				float betweenTicks = 60.0f / ((float)m_bpm * TICKS_PER_BEAT);
+				time += betweenTicks;
+				while (time < end) {
+					pushNote((double)time, SCR_B_TICK, 0.0);
+					time += betweenTicks;
+				}
 			}
 			else if (type == 9) {
 				pushCross((double)time, CROSS_B, 0.0);
