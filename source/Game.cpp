@@ -24,7 +24,7 @@ void Game::pollInput() {
 	}
 }
 
-void Game::tick() {
+void Game::tick(double dt) {
 	if (m_active) {
 		if (m_mode == 0) {
 			//update notes and read chart (text or .fsgmub)
@@ -39,7 +39,7 @@ void Game::tick() {
 
 			m_render.pollState(m_global_time, m_player, m_gen);
 			m_audio.buffer();
-			if (m_global_time >= 0.0)m_audio.play();
+			if (m_global_time >= (double)-m_audioLatency)m_audio.play();
 
 			//add delta time to m_global_time
 			double nowTime = glfwGetTime();
@@ -107,6 +107,11 @@ void Game::setActive(bool active){
 
 Player* Game::getPlayer(){
 	return &m_player;
+}
+
+Audio* Game::getAudio()
+{
+	return &m_audio;
 }
 
 void Game::setButtonPos(bool value){

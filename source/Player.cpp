@@ -994,7 +994,6 @@ void Player::reset() {
 //poll reset signals from generator 
 void Player::pollState(Generator &g){
     if(g.m_combo_reset == true){
-		std::cout << "broke from generator" << std::endl;
         m_combo = 0;
 		m_eu_zone_active = false;
     }

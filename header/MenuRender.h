@@ -18,6 +18,7 @@ public:
 	void render(MenuNode node, int selected, unsigned int vOffset);
 	void remapping(Game* game, int uk, int dk, int sk, int bk, int ug, int dg, int sg, int bg);
 	void scratches(Player* player);
+	void calibration(Game* game, double time);
 	void splashArt();
 	GLFWwindow* getWindowPtr();
 	void doneEditing();
@@ -35,14 +36,19 @@ public:
 	bool m_input = true;
 	~MenuRender();
 private:
+	double m_cbPlayingTime = 0.0f;
+	bool m_isCalibrating = false;
+	ImFont* m_font;
+
 	std::string m_inputSelection = "Keyboard";
 	unsigned int m_buttonTexture = 0;
 	unsigned int m_splashTexture = 0;
+	unsigned int m_calibrationTex = 0;
 
 	void editingGameAxis(int axis);
 	void editingGameKey(int axis);
 
-	
+	std::vector<double> m_latencyHits;
 
 	void editingMenuAxis(int axis);
 	void editingMenuKey(int axis);

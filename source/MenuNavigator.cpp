@@ -60,8 +60,10 @@ MenuNavigator::MenuNavigator(){
 
 	MenuNode option1("Test Scratches", 4);
 	MenuNode option2("Toggle Buttons Right/Left", 5);
+	MenuNode option3("Calibrate latency", 6);
 	options.push(option1);
 	options.push(option2);
+	options.push(option3);
 	
 	m_root.push(play);
 	m_root.push(options);
@@ -82,7 +84,7 @@ void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
 	m_game = gameptr;
 	m_render.init(w);
-	render();
+	render(0.0f);
 	scan();
 }
 
@@ -150,18 +152,25 @@ void MenuNavigator::pollInput(){
 	
 
 	if (m_wasEscapePressed && !m_isEscapePressed) {
-		if (m_scene == 0 && m_activeNode.getId() == m_root.getId()) {
+		if (m_scene == MAIN_SCENE && m_activeNode.getId() == m_root.getId()) {
 			if (m_scene != 1) {
 				m_shouldClose = true;
 			}
 		}
-		else if (m_scene == 2)m_scene = 0;
+		else if (m_scene == CREDITS) {
+			m_scene = MAIN_SCENE;
+		}
+		else if (m_scene == CALIBRATION) {
+			m_scene = MAIN_SCENE;
+		}
 	}
 
 	if (m_render.m_shouldClose) {
-		writeConfigFile();
-		m_game->getPlayer()->writeMappingFile();
-		m_scene = 0;
+		if (m_scene == REMAPPING) {
+			writeConfigFile();
+			m_game->getPlayer()->writeMappingFile();
+		}
+		m_scene = MAIN_SCENE;
 	}
 
 	if (m_render.m_input != m_useKeyboardInput) {
@@ -172,7 +181,7 @@ void MenuNavigator::pollInput(){
 
 void MenuNavigator::update() {
 	if (m_active) {
-		if (m_scene == 0) {
+		if (m_scene == MAIN_SCENE) {
 
 			/*
 			activeNode is the selected node
@@ -240,7 +249,7 @@ void MenuNavigator::update() {
 			std::cout << std::endl;
 			*/
 		}
-		else if (m_scene == 1) {
+		else if (m_scene == REMAPPING) {
 			if (m_render.m_editingAxis && m_render.m_gameActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_GAMEPAD);
 				if (m_render.m_gameActionToChange == RED_INDEX) {
@@ -371,9 +380,9 @@ void MenuNavigator::update() {
 				}
 			}
 		}
-		else if (m_scene == 3) {
+		else if (m_scene == SCRATCHES) {
 			if (m_isSelectPressed && !m_wasSelectPressed) {
-				m_scene = 0;
+				m_scene = MAIN_SCENE;
 				resetMenu();
 			}
 		}
@@ -381,9 +390,9 @@ void MenuNavigator::update() {
 	}
 }
 
-void MenuNavigator::render() {
+void MenuNavigator::render(double dt) {
 	if (m_active) {
-		if (m_scene == 0) {
+		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
 			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
 
@@ -391,15 +400,18 @@ void MenuNavigator::render() {
 				m_render.splashArt();
 			}
 		}
-		else if (m_scene == 1) {
+		else if (m_scene == REMAPPING) {
 			m_render.remapping(m_game, UP_CODE, DOWN_CODE, SELECT_CODE, BACK_CODE, 
 				UP_GAMEPAD, DOWN_GAMEPAD, SELECT_GAMEPAD, BACK_GAMEPAD);
 		}
-		else if (m_scene == 2) {
+		else if (m_scene == CREDITS) {
 			m_render.credits();
 		}
-		else if (m_scene == 3) {
+		else if (m_scene == SCRATCHES) {
 			m_render.scratches(m_game->getPlayer());
+		}
+		else if (m_scene == CALIBRATION) {
+			m_render.calibration(m_game,dt);
 		}
 	}
 }
@@ -412,10 +424,10 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_shouldClose = true;
 	}
 	else if (id == 3) {
-		m_scene = 2;
+		m_scene = CREDITS;
 	}
 	else if (id == 4) {
-		m_scene = 3;
+		m_scene = SCRATCHES;
 	}
 	else if (id == 5) {
 		if (m_game->getPlayer()->m_isButtonsRight) {
@@ -426,6 +438,9 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 			std::cout << "Game message: Changed Buttons to Left" << std::endl;
 			m_game->setButtonPos(true);
 		}
+	}
+	else if (id == 6) {
+		m_scene = CALIBRATION;
 	}
 	else if (id == 255) {
 		index = findIndex(menu, parent);
@@ -439,7 +454,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 }
 
 void MenuNavigator::remap() {
-	m_scene = 1;
+	m_scene = REMAPPING;
 }
 
 void MenuNavigator::scan() {

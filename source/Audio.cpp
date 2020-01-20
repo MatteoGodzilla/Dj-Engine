@@ -97,6 +97,12 @@ void Audio::play() {
 	}
 }
 
+bool Audio::isPlaying() {
+	int result = 0;
+	alGetSourcei(m_source, AL_SOURCE_STATE, &result);
+	return result == AL_PLAYING;
+}
+
 void Audio::stop() {
 	alSourceStop(m_source);
 }

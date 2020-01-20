@@ -17,13 +17,17 @@ int scene = 0;
 
 GLFWwindow* window;
 
+double pastTick = 0.0;
+double now = 0.0f;
+double deltaTime = 0.0f;
+
 //utility function to handle resizing
 void resizeCallback(GLFWwindow* w,int width,int height) {
 	glViewport(0, 0, width, height);
 }
 
 int main() {
-	std::cout << "Dj-Engine version 0.9" << std::endl;
+	std::cout << "Dj-Engine version 1.0" << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);
@@ -63,6 +67,10 @@ int main() {
 		
 		glfwPollEvents();
 		
+		now = glfwGetTime();
+		deltaTime = now - pastTick;
+		pastTick = now;
+
 		if (scene == 0) {
 			//change scene if not active
 			if (!menu.getActive()) {
@@ -75,8 +83,7 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			menu.pollInput();
 			menu.update();
-			menu.render();
-
+			menu.render(deltaTime);
 		}
 		else if (scene == 1) {
 			//change scene if not active
@@ -88,9 +95,12 @@ int main() {
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			game.pollInput();
-			game.tick();
+			game.tick(deltaTime);
 			game.render();
 		}
+
+		//add delta time to m_global_time
+		
 
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {

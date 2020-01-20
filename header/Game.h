@@ -15,12 +15,13 @@ public:
 	Game();
 	void init(GLFWwindow* w);
 	void render();
-	void tick();
+	void tick(double dt);
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
 	void reset();
 	Player* getPlayer();
+	Audio* getAudio();
 	void start(std::string path);
 	void setButtonPos(bool value);
 	~Game();
@@ -30,7 +31,7 @@ public:
 
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
-	
+	float m_audioLatency = 0.0f;
 private:
 	double m_pastTime = 0.0;
 	bool firstRun = true;
