@@ -120,7 +120,7 @@ void Game::setButtonPos(bool value){
 	m_player.m_isButtonsRight = value;
 }
 
-void Game::start(std::string path) {
+void Game::start(std::string path,float bpm) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
 	m_pastTime = glfwGetTime();
@@ -129,7 +129,7 @@ void Game::start(std::string path) {
 	std::string audioPath = path + std::string("/song.ogg");
 	m_audio.load(audioPath.c_str());
 
-	m_gen.init(path);
+	m_gen.init(path,bpm);
 	m_bpm_arr.push_back(0.0);
 
 	m_active = true;

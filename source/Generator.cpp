@@ -23,8 +23,9 @@ void readToFloat(std::ifstream& stream, float* f) {
 Generator::Generator() {
 }
 
-void Generator::init(std::string& path) {
+void Generator::init(std::string& path, float bpm) {
 	pushCross(m_initialCrossfade, CROSS_C, 0.0);//Do not remove
+	m_bpm = bpm;
 	std::string textPath = path + std::string("/chart.txt");
 	m_chart.open(path);
 	if (m_chart.is_open()) {
@@ -509,7 +510,7 @@ void Generator::binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::v
 				//bpm marker
 			}
 			else if (type == 0x0B000002) {
-				m_bpm = (int)extra;
+				m_bpm = extra;
 			}
 			else if (type == 0x0AFFFFFF) {}
 			else if (type == 0xFFFFFFFF) {

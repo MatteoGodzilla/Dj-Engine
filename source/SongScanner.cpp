@@ -25,6 +25,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			std::string a2;
 			std::string charter;
 			std::string mixer;
+			float bpm;
 			int dTrack;
 			int dTap;
 			int dCrossfade;
@@ -36,6 +37,8 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			a2 = ini.GetValue("song", "artist2", "NULL");
 			charter = ini.GetValue("song", "charter", "NULL");
 			mixer = ini.GetValue("song", "dj", "NULL");
+
+			bpm = ini.GetDoubleValue("song", "bpm", 60.0);
 
 			dTrack = ini.GetLongValue("song", "track_complexity", 0);
 			dTap = ini.GetLongValue("song", "tap_complexity", 0);
@@ -67,6 +70,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 				s1, s2,
 				a1, a2,
 				charter, mixer,
+				bpm,
 				dTrack, dTap,
 				dCrossfade, dScratch
 			};

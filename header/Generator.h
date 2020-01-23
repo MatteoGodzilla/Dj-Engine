@@ -9,7 +9,7 @@
 class Generator {
 public:
 	Generator();
-	void init(std::string& path);
+	void init(std::string& path, float bpm);
     void tick(double time,std::vector<Note> &v,std::vector<Note>&ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
@@ -21,7 +21,7 @@ public:
     bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
-	int m_bpm = 60;
+	float m_bpm = 60;
 
 	bool m_isGreenTapEnabled = true;
 	bool m_isRedTapEnabled = true;

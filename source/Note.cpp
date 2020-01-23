@@ -30,6 +30,7 @@ void Note::tick(double time){
         m_hittable = true;
     }else m_hittable = false;
 
+
     if(time > m_milli+m_hit_window+m_length && !m_isEvent){
         m_dead = true;
     }

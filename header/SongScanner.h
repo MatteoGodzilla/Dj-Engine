@@ -16,6 +16,7 @@ struct SongEntry {
 	std::string a2;
 	std::string charter;
 	std::string mixer;
+	float bpm;
 	int dTrack;
 	int dTap;
 	int dCrossfade;

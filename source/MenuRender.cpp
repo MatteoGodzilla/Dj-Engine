@@ -901,9 +901,15 @@ void MenuRender::splashArt() {
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
 
-	drawText("*This is alpha v1.0. There are some bugs and you WILL see them*", 10.0, 10.0, 0.02f);
-	drawText("*Remember this when playing*", 10.0, 30.0, 0.02f);
-	drawText("*Have Fun! :)*", 10.0, 50.0, 0.02f);
+	float textScale = 0.02f;
+	drawText("*This is alpha v1.0. There are some bugs and you WILL see them*", 10.0, 10.0, textScale);
+	drawText("*Remember this when playing*", 10.0, 30.0, textScale);
+	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
+
+	std::string discord = "For any questions, ask on the Dj Hero Discord";
+	std::string discord2 = "https://discord.gg/HZ82gKR";
+	drawText(discord, 1270.0 - getTextWidth(discord, textScale), 10.0f, textScale);
+	drawText(discord2, 1270.0 - getTextWidth(discord2, textScale), 30.0f, textScale);
 }
 
 void MenuRender::scratches(Player* player) {
@@ -970,7 +976,7 @@ void MenuRender::calibration(Game* game, double dt) {
 	}
 	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
 	ImGui::Text("Press the 'Calibrate' Button ONLY when you hear the snare hits for best latency calculations");
-	ImGui::Text("(on zero latency the click should match the lights below)");
+	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
 	
 	ImGui::Separator();
 	
