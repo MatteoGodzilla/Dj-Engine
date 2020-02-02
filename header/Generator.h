@@ -1,6 +1,6 @@
-#ifndef GENERATOR_H
-#define GENERATOR_H
+#pragma once
 #include "Note.h"
+#include "SongScanner.h"
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -9,13 +9,14 @@
 class Generator {
 public:
 	Generator();
-	void init(std::string& path, float bpm);
+	void init(SongEntry entry);
     void tick(double time,std::vector<Note> &v,std::vector<Note>&ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void binaryParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void bpm(double time, std::vector<double>& arr);
 	int getNotesTotal();
 	int getNotesHit();
+	SongEntry getSongEntry();
 	void reset();
 
     bool m_combo_reset = false;
@@ -59,6 +60,6 @@ private:
 	double m_initialCrossfade = -2.0;
 
 	const int TICKS_PER_BEAT = 4;
-};
 
-#endif // GENERATOR_H
+	SongEntry m_songEntry;
+};

@@ -23,11 +23,12 @@ void readToFloat(std::ifstream& stream, float* f) {
 Generator::Generator() {
 }
 
-void Generator::init(std::string& path, float bpm) {
+void Generator::init(SongEntry entry) {
+	m_songEntry = entry;
 	pushCross(m_initialCrossfade, CROSS_C, 0.0);//Do not remove
-	m_bpm = bpm;
-	std::string textPath = path + std::string("/chart.txt");
-	m_chart.open(path);
+	m_bpm = entry.bpm;
+	std::string textPath = entry.path + std::string("/chart.txt");
+	m_chart.open(textPath);
 	if (m_chart.is_open()) {
 		//write chart data to console
 		m_isChartBinary = false;
@@ -38,7 +39,7 @@ void Generator::init(std::string& path, float bpm) {
 	}
 	else {
 		std::cout << "Generator msg: text chart not found, opening fgsmub" << std::endl;
-		std::string chartPath = path + std::string("/chart.fsgmub");
+		std::string chartPath = entry.path + std::string("/chart.fsgmub");
 		m_chart.open(chartPath, std::ios::binary);
 		if (m_chart.is_open()) {
 			//write chart data to console
@@ -56,7 +57,7 @@ void Generator::init(std::string& path, float bpm) {
 		}
 		else {
 			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
-			std::string chartPath = path + std::string("/chart.xmk");
+			std::string chartPath = entry.path + std::string("/chart.xmk");
 			m_chart.open(chartPath, std::ios::binary);
 			if (m_chart.is_open()) {
 				//write chart data to console
@@ -569,6 +570,11 @@ int Generator::getNotesTotal() {
 
 int Generator::getNotesHit() {
 	return m_notesHit;
+}
+
+SongEntry Generator::getSongEntry()
+{
+	return m_songEntry;
 }
 
 //utility functions 

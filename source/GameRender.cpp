@@ -1518,32 +1518,52 @@ void GameRender::meters() {
 
 void GameRender::result(Player& player, Generator& generator) {
 	useOrthoProj();
-	drawText("Result:", 10.0f, 50.0f, 0.05f);
+	float y = 50.0f;
+	float scale = 0.05f;
 
 	int all = generator.getNotesTotal();
 	int hit = generator.getNotesHit();
 	int score = player.getScore();
 	int combo = player.getHighCombo();
 
+	std::string firstSong = std::string(generator.getSongEntry().s1);
+	std::string secondSong = std::string(generator.getSongEntry().s2);
+	std::string completeName = firstSong;
+	if (!secondSong.empty()) {
+		completeName += " vs ";
+		completeName += secondSong;
+	}
 	std::string hitString = std::string("Number of notes hit:") + std::to_string(hit);
 	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
 	std::string scoreString = std::string("Score:") + std::to_string(score);
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
-	std::string percent = std::string("Percent:") + std::to_string((float)hit / (float)all * 100.0f) + std::string("%");
+	
+	drawText(completeName, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText("Result:", 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(hitString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(totalString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(comboString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(scoreString, 10.0f, y, scale);
+	y += scale * 1000.0f;
 
-
-	drawText(hitString, 10.0f, 110.0f, 0.05f);
-	drawText(totalString, 10.0f, 160.0f, 0.05f);
-	drawText(scoreString, 10.0f, 210.0f, 0.05f);
-	drawText(comboString, 10.0f, 260.0f, 0.05f);
-	drawText(percent, 10.0f, 310.0f, 0.05f);
-
-
-	if (combo == all) {
-		drawText("Wow! a Full Combo", 200.0f, 50.0f, 0.05f);
+	if (all > 0) {
+		std::string percent = std::string("Percent:") + std::to_string((float)hit / (float)all * 100.0f) + std::string("%");
+		drawText(percent, 10.0f, y, scale);
+	}
+	if (combo == all && all != 0) {
+		std::string t = "Wow! a Full Combo";
+		float x = 1270.0f - getTextWidth(t,scale);
+		drawText(t, x, 100.0f, scale);
 	}
 	else if (hit > all) {
-		drawText("Hold on a sec. How did you...", 200.0f, 50.0f, 0.05f);
+		std::string t = "Hold on a sec. How did you...";
+		float x = 1270.0f - getTextWidth(t, scale);
+		drawText(t, x, 100.0f, scale);
 	}
 }
 

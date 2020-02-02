@@ -445,7 +445,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	else if (id == 255) {
 		index = findIndex(menu, parent);
 		m_active = false;
-		m_game->start(m_songList.at(index).path,m_songList.at(index).bpm);
+		m_game->start(m_songList.at(index));
 		resetMenu();
 	}
 	else if(menu.getChildCount() == 0){

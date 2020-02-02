@@ -22,7 +22,7 @@ public:
 	void reset();
 	Player* getPlayer();
 	Audio* getAudio();
-	void start(std::string path,float bpm);
+	void start(SongEntry entry);
 	void setButtonPos(bool value);
 	~Game();
 	std::vector<Note> m_note_arr;
