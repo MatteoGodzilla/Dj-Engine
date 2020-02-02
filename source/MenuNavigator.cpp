@@ -449,7 +449,12 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		resetMenu();
 	}
 	else if(menu.getChildCount() == 0){
-		std::cout << "MenuNavigator: no function attached to id " << menu.getId() << std::endl;
+		if (menu.getId() == 1) {
+			std::cout << "MenuNavigator Message: No songs found in the install path."<< std::endl;
+		}
+		else {
+			std::cout << "MenuNavigator Error: no function attached to id " << menu.getId() << std::endl;
+		}
 	}
 }
 

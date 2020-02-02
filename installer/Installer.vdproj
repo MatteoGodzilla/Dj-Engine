@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4B069059B498416B8508DADD8F257CEC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4D97125E4B51466ABACC26638AE2EA88"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -106,6 +112,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F661CF5B897645A3B904D5026AC379E3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -240,6 +252,26 @@
             {
             "SourcePath" = "8:..\\res\\highway.png"
             "TargetName" = "8:highway.png"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B069059B498416B8508DADD8F257CEC"
+            {
+            "SourcePath" = "8:..\\res\\calibration.png"
+            "TargetName" = "8:calibration.png"
             "Tag" = "8:"
             "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
             "Condition" = "8:"
@@ -480,6 +512,26 @@
             {
             "SourcePath" = "8:..\\res\\NotoSans-Regular.ttf"
             "TargetName" = "8:NotoSans-Regular.ttf"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F661CF5B897645A3B904D5026AC379E3"
+            {
+            "SourcePath" = "8:..\\res\\calibration.ogg"
+            "TargetName" = "8:calibration.ogg"
             "Tag" = "8:"
             "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
             "Condition" = "8:"
