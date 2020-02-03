@@ -30,7 +30,7 @@ void Game::tick(double dt) {
 			//update notes and read chart (text or .fsgmub)
 			m_gen.tick(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
 			//m_gen.textParser(m_note_arr, m_event_arr);
-			m_gen.binaryParser(m_note_arr, m_event_arr, m_cross_arr);
+			m_gen.addNotesToBuffer(m_note_arr, m_event_arr, m_cross_arr);
 			m_gen.bpm(m_global_time, m_bpm_arr);
 
 			//update player (combo + multiplier)
@@ -72,7 +72,7 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			//m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+			m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
 		}
 		else if (m_mode == 1) {
 			m_render.result(m_player,m_gen);

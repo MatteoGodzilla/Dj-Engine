@@ -1567,17 +1567,22 @@ void GameRender::result(Player& player, Generator& generator) {
 	}
 }
 
-void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::vector<Note>& c) {
+void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
 	/*
 	std::string text = "Notes:";
-	for (size_t i = 0; i < note_arr.size()/10; i++) {
+	for (size_t i = 0; i < note_arr.size(); i++) {
+		if (i > 15)break;
 		int t = note_arr.at(i).getType();
-		text.append(std::to_string(t));
-		text.append(",");
+		double m = note_arr.at(i).getMilli();
+		text += std::to_string(t);
+		text += "(";
+		text += std::to_string(m);
+		text += ")";
+		text += ",";
 	}
-	drawText(text, 0, 40, 0.05);
+	drawText(text, 0.0f, 0.0f, 0.05f);
 	*/
-
+	
 	/*
 	std::string t2 = "Events:";
 	for (size_t i = 0; i < ev.size(); i++) {
@@ -1592,6 +1597,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 	}
 	//drawText(t2, 0.0f, 40.0f, 0.05f);
 	*/
+	/*
 	std::string cs = "Cross:";
 	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
@@ -1600,11 +1606,17 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 
 		cs.append(text);
 		cs.append(",");
-
 	}
 
 	drawText(cs, 0.0f, 0.0f, 0.05f);
 	//std::cout << t2 << std::endl;
+	*/
+
+	std::string sizes;
+	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
+	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
+	sizes += std::string("Cross:") + std::to_string(c.size());
+	drawText(sizes, 0.0f, 0.0f, 0.05f);
 
 }
 
