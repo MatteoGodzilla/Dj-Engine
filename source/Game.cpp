@@ -27,6 +27,9 @@ void Game::pollInput() {
 void Game::tick(double dt) {
 	if (m_active) {
 		if (m_mode == 0) {
+			m_render.m_noteVisibleTime = m_deckSpeed;
+			m_gen.m_deckSpeed = m_deckSpeed;
+
 			//update notes and read chart (text or .fsgmub)
 			m_gen.tick(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
 			//m_gen.textParser(m_note_arr, m_event_arr);
@@ -112,6 +115,11 @@ Player* Game::getPlayer(){
 Audio* Game::getAudio()
 {
 	return &m_audio;
+}
+
+GameRender* Game::getGameRender()
+{
+	return &m_render;
 }
 
 void Game::setButtonPos(bool value){

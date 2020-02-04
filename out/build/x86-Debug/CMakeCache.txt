@@ -495,7 +495,6 @@ GLFW_BUILD_TESTS:BOOL=ON
 GLFW_INSTALL:BOOL=ON
 
 //Value Computed by CMake
-
 GLFW_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/GLFW
 
 //Force use of high-performance GPU on hybrid systems
@@ -665,7 +664,6 @@ freetype_SOURCE_DIR:STATIC=C:/Users/caten/Dj-Engine/lib/freetype
 //Value Computed by CMake
 glew_BINARY_DIR:STATIC=C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/GLEW/build/cmake
 
-
 //Dependencies for the target
 glew_LIB_DEPENDS:STATIC=general;-BASE:0x62AA0000;general;-nodefaultlib;general;-noentry;general;opengl32;general;glu32;
 
@@ -695,7 +693,6 @@ vorbisenc_LIB_DEPENDS:STATIC=general;OGG_LIBRARIES-NOTFOUND;general;vorbis;
 
 //Dependencies for the target
 vorbisfile_LIB_DEPENDS:STATIC=general;OGG_LIBRARIES-NOTFOUND;general;vorbis;
-
 
 
 ########################
@@ -728,8 +725,6 @@ CMAKE_CACHE_PATCH_VERSION:INTERNAL=19080502
 CMAKE_COMMAND:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe
 //Path to cpack program executable.
 CMAKE_CPACK_COMMAND:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cpack.exe
-//ADVANCED property for variable: CMAKE_CTEST_COMMAND
-CMAKE_CTEST_COMMAND-ADVANCED:INTERNAL=1
 //Path to ctest program executable.
 CMAKE_CTEST_COMMAND:INTERNAL=C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/ctest.exe
 //ADVANCED property for variable: CMAKE_CXX_COMPILER

@@ -1,7 +1,7 @@
-prefix=C:/Users/caten/Dj-Engine/out/install/x86-Debug
+prefix=C:/Users/caten/Dj-engine/out/install/x86-Debug
 exec_prefix=${prefix}
-includedir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/include
-libdir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/lib
+includedir=C:/Users/caten/Dj-engine/out/install/x86-Debug/include
+libdir=C:/Users/caten/Dj-engine/out/install/x86-Debug/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input

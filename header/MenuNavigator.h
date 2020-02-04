@@ -87,4 +87,7 @@ private:
 
 	std::vector<float> m_pastGamepadValues;
 	std::vector<char> m_keyboardState;
+
+	int m_popupId = -1;
+	bool m_debounce = false;
 };

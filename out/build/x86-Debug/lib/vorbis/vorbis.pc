@@ -1,9 +1,9 @@
 # libvorbis pkg-config source file
 
-prefix=C:/Users/caten/Dj-Engine/out/install/x86-Debug
-exec_prefix=C:/Users/caten/Dj-Engine/out/install/x86-Debug/bin
-libdir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/lib
-includedir=C:/Users/caten/Dj-Engine/out/install/x86-Debug/include
+prefix=C:/Users/caten/Dj-engine/out/install/x86-Debug
+exec_prefix=C:/Users/caten/Dj-engine/out/install/x86-Debug/bin
+libdir=C:/Users/caten/Dj-engine/out/install/x86-Debug/lib
+includedir=C:/Users/caten/Dj-engine/out/install/x86-Debug/include
 
 Name: vorbis
 Description: vorbis is the primary Ogg Vorbis library

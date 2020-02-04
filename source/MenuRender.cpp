@@ -1002,6 +1002,33 @@ void MenuRender::calibration(Game* game, double dt) {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+void MenuRender::setDeckSpeed(Game* game){
+	useOrthoProj();
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGuiBackendFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+	ImGui::Begin("Set Deck Speed",NULL,flags);
+	ImGui::Text("Set the deck speed using the slider below.");
+	ImGui::Text("The value represents the visible time of a note in the highway");
+	ImGui::Text("(i.e. 1.0 is one second in the highway)");
+	ImGui::Text("A larger value means slower speed, smaller value means faster");
+	ImGui::SliderFloat("Speed", &(game->m_deckSpeed), 0.5f, 3.0f);
+	if (ImGui::Button("Close")) {
+		m_shouldClose = true;
+	}
+
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+}
+
 void MenuRender::editingGameAxis(int action) {
 	m_editingKey = false;
 	m_editingAxis = true;

@@ -1,5 +1,6 @@
 #pragma once
 #include "SimpleINI/SimpleIni.h"
+#include "nlohmann/json.hpp"
 #include <iostream>
 //remove visual studio warning
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING

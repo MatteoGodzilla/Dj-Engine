@@ -565,7 +565,7 @@ void Generator::bpm(double time, std::vector<double>& arr) {
 		}
 	}
 	double nextTick = m_lastBpmTick + ((double)60 / m_bpm);
-	while (time + 1.0 >= nextTick) {
+	while (time + m_deckSpeed >= nextTick) {
 		arr.push_back(nextTick);
 		m_lastBpmTick = nextTick;
 		nextTick = m_lastBpmTick + ((float)60 / m_bpm);

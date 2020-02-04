@@ -29,6 +29,8 @@ public:
 	bool m_isGreenTapEnabled = true;
 	bool m_isRedTapEnabled = true;
 	bool m_isBlueTapEnabled = true;
+
+	float m_deckSpeed = 1.0f;
     ~Generator();
 protected:
 

@@ -19,6 +19,7 @@ public:
 	void remapping(Game* game, int uk, int dk, int sk, int bk, int ug, int dg, int sg, int bg);
 	void scratches(Player* player);
 	void calibration(Game* game, double time);
+	void setDeckSpeed(Game* game);
 	void splashArt();
 	GLFWwindow* getWindowPtr();
 	void doneEditing();

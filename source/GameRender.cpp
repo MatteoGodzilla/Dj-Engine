@@ -27,7 +27,7 @@ void GameRender::init(GLFWwindow* w) {
 
 void GameRender::highway(double time) {
 	//convert from time to texture coords
-	float factor = (float)time * 0.875f;
+	float factor = (float)(time / m_noteVisibleTime);
 
 	float plane = 0.0f;
 
@@ -290,8 +290,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			//if the note is inside the visible highway
 
 			//calculate 'height' of note
-			double dt = v.at(i).getMilli() - time;
-			float z = 3.75f - (3.75f * (float)dt);
+			double percent = (v.at(i).getMilli() - time)/m_noteVisibleTime;
+			float z = 3.75f - (3.75f * (float)percent);
 
 			int type = v.at(i).getType();
 
@@ -752,10 +752,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double t = cross.at(i).getMilli();
 		double hitWindow = cross.at(i).hitWindow;
 		if (time + m_noteVisibleTime >= t && time <= t + hitWindow) {
-			double dt = cross.at(i).getMilli() - time;
+			double percent = (cross.at(i).getMilli() - time)/m_noteVisibleTime;
 			if (cross.at(i).getType() == CROSS_G && middle != CROSS_G) {
 				middle = CROSS_G;
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//change color if euphoria is active
 				if (m_renderEuActive) {
@@ -820,7 +820,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 			else if (cross.at(i).getType() == CROSS_B && middle != CROSS_B) {
 				middle = CROSS_B;
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//change color if euphoria is active
 				if (m_renderEuActive) {
@@ -884,7 +884,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			else if (cross.at(i).getType() == CROSS_C && middle != CROSS_C) {
 				middle = CROSS_C;
 				//crossfade center event
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//if crossfade was from the right
 				if (cross.at(i - 1).getType() == CROSS_G) {
@@ -1114,9 +1114,9 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 		exact same as Note.getRender(), but done manually
 		because bpm ticks are not Notes/Events
 		*/
-		if (time + 1.0 >= tickTime && time <= tickTime + 0.2) {
-			double dt = tickTime - time;
-			float z = 3.75f - (3.75f * (float)dt);
+		if (time + m_noteVisibleTime >= tickTime && time <= tickTime + 0.2) {
+			double percent = (tickTime - time)/m_noteVisibleTime;
+			float z = (float)(3.75 - 3.75 * percent);
 
 			//add tick
 			pushVertexColor(bpmVector, -1.0f, plane, z - size / 2, r, g, b);
@@ -1144,7 +1144,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 		double milli = ev.at(i).getMilli();
 		double hitWindow = ev.at(i).hitWindow;
 		int type = ev.at(i).getType();
-		double dt = ev.at(i).getMilli() - time;
+		double percent = (ev.at(i).getMilli() - time)/m_noteVisibleTime;
 
 		if (type == SCR_G_ZONE) {
 			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
@@ -1153,10 +1153,10 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 			float z;
 			for (size_t i = 0; i < cfChanges.size(); ++i) {
 				double cfMilli = cfChanges.at(i).getMilli();
-				double cfDt = cfMilli - time;
+				double cfPercent = (cfMilli - time)/m_noteVisibleTime;
 				int cfType = cfChanges.at(i).getType();
 				if (cfMilli <= time + m_noteVisibleTime) {
-					z = 3.75f - (3.75f * (float)cfDt);
+					z = (float)(3.75 - 3.75 * cfPercent);
 					if (cfType == CROSS_G) {
 						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
@@ -1208,10 +1208,10 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 			float z;
 			for (size_t i = 0; i < cfChanges.size(); ++i) {
 				double cfMilli = cfChanges.at(i).getMilli();
-				double cfDt = cfMilli - time;
+				double cfPercent = (cfMilli - time) / m_noteVisibleTime;
 				int cfType = cfChanges.at(i).getType();
 				if (cfMilli <= time + m_noteVisibleTime) {
-					z = 3.75f - (3.75f * (float)cfDt);
+					z = (float)(3.75 - 3.75 * cfPercent);
 					if (cfType == CROSS_B) {
 						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
@@ -1258,17 +1258,17 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 		}
 		else if (type == EU_ZONE) {
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
+			double endPercent = (endTime - time)/m_noteVisibleTime;
 			bool start_eu = false;
 			//if euphoria start is in the middle of the highway
-			if (dt >= 0.0 && dt < 1.0) {
-				float z = 3.75f - (3.75f * (float)dt);
+			if (percent >= 0.0 && percent < 1.0) {
+				float z = (float)(3.75 - 3.75 * percent);
 				pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
 				pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
 				start_eu = true;
 			}
 			//if euphoria start has already passed the clicker
-			else if (dt < 0.0) {
+			else if (percent < 0.0) {
 				//if (m_renderEuZone) {
 				pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
 				pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
@@ -1278,8 +1278,8 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 			//if the render has successfully added the start
 			if (start_eu) {
 				//if euphoria end is in the middle of the highway
-				if (endDt >= 0.0 && endDt < 1.0) {
-					float z = 3.75f - (3.75f * (float)endDt);
+				if (endPercent >= 0.0 && endPercent < 1.0) {
+					float z = 3.75f - (3.75f * (float)endPercent);
 					pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 					pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 
