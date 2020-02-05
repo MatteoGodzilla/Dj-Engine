@@ -2,23 +2,22 @@
 #include <iostream>
 
 Player::Player() {
-	for (int i = 0; i < 8;++i) {
+	for (int i = 0; i < 8; ++i) {
 		m_gpDead.push_back(0.5f);
 		m_gpMult.push_back(1.0f);
-		m_gpInvertDead.push_back(false);
 	}
 
 	m_gpDead.at(CF_RIGHT_INDEX) = 0.5;
 	m_gpDead.at(CF_LEFT_INDEX) = 0.5;
 	m_gpDead.at(SCR_UP_INDEX) = 0.2;
 	m_gpDead.at(SCR_DOWN_INDEX) = 0.2;
-	
+
 	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
 	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
 	readMappingFile();
 }
 
-void Player::pollInput(GLFWwindow* window){
+void Player::pollInput(GLFWwindow* window) {
 	m_wasRedPressed = m_isRedPressed;
 	m_wasGreenPressed = m_isGreenPressed;
 	m_wasBluePressed = m_isBluePressed;
@@ -41,137 +40,62 @@ void Player::pollInput(GLFWwindow* window){
 	}
 	else {
 		if (glfwJoystickPresent(m_gamepadId)) {
-			
+
 			updateGamepadState();
 
 			if (m_gpState.size() > 0) {
-				if (!m_gpInvertDead.at(GREEN_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
-						m_isGreenPressed = true;
-					}
-					else m_isGreenPressed = false;
-				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) <= m_gpDead.at(GREEN_INDEX)) {
-						m_isGreenPressed = true;
-					}
-					else m_isGreenPressed = false;
-				}
-				
-				if (!m_gpInvertDead.at(RED_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
-						m_isRedPressed = true;
-					}
-					else m_isRedPressed = false;
-				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) <= m_gpDead.at(RED_INDEX)) {
-						m_isRedPressed = true;
-					}
-					else m_isRedPressed = false;
-				}
 
-				if (!m_gpInvertDead.at(BLUE_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
-						m_isBluePressed = true;
-					}
-					else m_isBluePressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+					m_isGreenPressed = true;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) <= m_gpDead.at(BLUE_INDEX)) {
-						m_isBluePressed = true;
-					}
-					else m_isBluePressed = false;
-				}
+				else m_isGreenPressed = false;
 
-				if (!m_gpInvertDead.at(EU_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
-						m_isEuPressed = true;
-					}
-					else m_isEuPressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+					m_isRedPressed = true;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) <= m_gpDead.at(EU_INDEX)) {
-						m_isEuPressed = true;
-					}
-					else m_isEuPressed = false;
-				}
+				else m_isRedPressed = false;
 
-				if (!m_gpInvertDead.at(CF_LEFT_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
-						m_isCfGreenPressed = true;
-						m_isCfBluePressed = false;
-					}
-					else m_isCfGreenPressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+					m_isBluePressed = true;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) <= m_gpDead.at(CF_LEFT_INDEX)) {
-						m_isCfGreenPressed = true;
-						m_isCfBluePressed = false;
-					}
-					else m_isCfGreenPressed = false;
-				}
+				else m_isBluePressed = false;
 
-				if (!m_gpInvertDead.at(CF_RIGHT_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
-						m_isCfBluePressed = true;
-						m_isCfGreenPressed = false;
-					}
-					else m_isCfBluePressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
+					m_isEuPressed = true;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) <= m_gpDead.at(CF_RIGHT_INDEX)) {
-						m_isCfBluePressed = true;
-						m_isCfGreenPressed = false;
-					}
-					else m_isCfBluePressed = false;
-				}
+				else m_isEuPressed = false;
 
-				if (!m_gpInvertDead.at(SCR_UP_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
-						m_isUpPressed = true;
-						m_isDownPressed = false;
-					}
-					else m_isUpPressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
+					m_isCfGreenPressed = true;
+					m_isCfBluePressed = false;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) <= m_gpDead.at(SCR_UP_INDEX)) {
-						m_isUpPressed = true;
-						m_isDownPressed = false;
-					}
-					else m_isUpPressed = false;
-				}
+				else m_isCfGreenPressed = false;
 
-				if (!m_gpInvertDead.at(SCR_DOWN_INDEX)) {
-					//value * sensitivity >= deadzone
-					if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
-						m_isDownPressed = true;
-						m_isUpPressed = false;
-					}
-					else m_isDownPressed = false;
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
+					m_isCfBluePressed = true;
+					m_isCfGreenPressed = false;
 				}
-				else {
-					//value * sensitivity <= deadzone
-					if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) <= m_gpDead.at(SCR_DOWN_INDEX)) {
-						m_isDownPressed = true;
-						m_isUpPressed = false;
-					}
-					else m_isDownPressed = false;
+				else m_isCfBluePressed = false;
+
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
+					m_isUpPressed = true;
+					m_isDownPressed = false;
 				}
+				else m_isUpPressed = false;
+
+				//value * sensitivity >= deadzone
+				if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
+					m_isDownPressed = true;
+					m_isUpPressed = false;
+				}
+				else m_isDownPressed = false;
 			}
 		}
 	}
@@ -198,7 +122,7 @@ void Player::pollInput(GLFWwindow* window){
 	}
 }
 
-void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross){
+void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	//green pressed
 	if (m_isGreenTapEnabled) {
 		if (m_isGreenPressed && !m_wasGreenPressed) {
@@ -455,7 +379,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 							v.at(i).click(time);
 							m_score += 25 * m_mult;
 							m_scr_tick++;
-						}	
+						}
 					}
 				}
 			}
@@ -502,7 +426,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				m_blueAnimation = true;
 			}
 		}
-		
+
 	}
 	//down pressed
 	if (m_isDownPressed && !m_wasDownPressed) {
@@ -708,7 +632,8 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					v.at(i).click(time);
 					m_greenAnimation = true;
 					break;
-				}else if(type == CF_SPIKE_B) {
+				}
+				else if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					m_blueAnimation = true;
 					break;
@@ -716,7 +641,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				else if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					if (m_cross == 0)m_greenAnimation = true;
-					else if(m_cross == 2)m_blueAnimation = true;
+					else if (m_cross == 2)m_blueAnimation = true;
 					break;
 				}
 			}
@@ -815,7 +740,7 @@ void Player::readMappingFile() {
 		input >> token;
 		RED_GAMEPAD = std::stoi(token);
 		input >> token;
-		BLUE_GAMEPAD= std::stoi(token);
+		BLUE_GAMEPAD = std::stoi(token);
 		input >> token;
 		EU_GAMEPAD = std::stoi(token);
 		input >> token;
@@ -846,19 +771,19 @@ void Player::readMappingFile() {
 	input.close();
 }
 
-void Player::writeMappingFile(){
+void Player::writeMappingFile() {
 	std::ofstream output("config.txt");
 	if (output.is_open()) {
 		output << std::boolalpha;
 		output << GREEN_CODE << "\n";
 		output << RED_CODE << "\n";
-		output << BLUE_CODE<< "\n";
+		output << BLUE_CODE << "\n";
 		output << EUPHORIA << "\n";
 		output << CROSS_L_CODE << "\n";
 		output << CROSS_R_CODE << "\n";
 		output << SCRATCH_UP << "\n";
 		output << SCRATCH_DOWN << "\n\n";
-		
+
 		output << GREEN_GAMEPAD << "\n";
 		output << RED_GAMEPAD << "\n";
 		output << BLUE_GAMEPAD << "\n";
@@ -869,7 +794,7 @@ void Player::writeMappingFile(){
 		output << m_useSingleScrAxis << "\n";
 		output << SCR_UP_GAMEPAD << "\n";
 		output << SCR_DOWN_GAMEPAD << "\n";
-		
+
 		for (size_t i = 0; i < m_gpMult.size(); ++i) {
 			output << m_gpMult.at(i) << "\n";
 		}
@@ -887,7 +812,7 @@ void Player::writeMappingFile(){
 	output.close();
 }
 
-void Player::updateGamepadState(){
+void Player::updateGamepadState() {
 	if (glfwJoystickPresent(m_gamepadId)) {
 		int count;
 		const unsigned char* buttons = glfwGetJoystickButtons(m_gamepadId, &count);
@@ -992,16 +917,16 @@ void Player::reset() {
 }
 
 //poll reset signals from generator 
-void Player::pollState(Generator &g){
-    if(g.m_combo_reset == true){
-        m_combo = 0;
+void Player::pollState(Generator& g) {
+	if (g.m_combo_reset == true) {
+		m_combo = 0;
 		m_eu_zone_active = false;
-    }
+	}
 	if (g.m_eu_start) {
 		m_eu_zone_active = true;
 	}
 	if (g.m_eu_check && m_eu_zone_active) {
-		if(m_eu_value < 3.0)m_eu_value += 1.0;
+		if (m_eu_value < 3.0)m_eu_value += 1.0;
 	}
 	m_genBpm = g.m_bpm;
 
@@ -1034,20 +959,20 @@ std::vector<float> Player::getGamepadValues() {
 	return localGamepadState;
 }
 
-int Player::getScore(){
-    return m_score;
+int Player::getScore() {
+	return m_score;
 }
 
-int Player::getCombo(){
-    return m_combo;
+int Player::getCombo() {
+	return m_combo;
 }
 
 int Player::getHighCombo() {
 	return m_highestCombo;
 }
 
-int Player::getMult(){
-    return m_mult;
+int Player::getMult() {
+	return m_mult;
 }
 
 int Player::getCross() {
@@ -1078,5 +1003,5 @@ bool Player::getEuZoneActive() {
 }
 
 Player::~Player() {
-    //dtor
+	//dtor
 }
