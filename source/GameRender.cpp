@@ -108,7 +108,7 @@ void GameRender::clicker() {
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
 
-				float d = crossGreen.getPercent() * 0.35;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
 			}
@@ -125,9 +125,9 @@ void GameRender::clicker() {
 			//green clicker is on the left
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
-				m_greenLeft = -0.5;
-				m_greenRight = -0.2;
-				float d = crossGreen.getPercent() * 0.35;
+				m_greenLeft = -0.5f;
+				m_greenRight = -0.2f;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
 				m_greenRight -= d;
@@ -150,7 +150,7 @@ void GameRender::clicker() {
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
 
-				float d = crossGreen.getPercent() * 0.35;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
 			}
@@ -167,9 +167,9 @@ void GameRender::clicker() {
 			//green clicker is on the left
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
-				m_greenLeft = -0.5;
-				m_greenRight = -0.2;
-				float d = crossGreen.getPercent() * 0.35;
+				m_greenLeft = -0.5f;
+				m_greenRight = -0.2f;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
 				m_greenRight -= d;
@@ -191,10 +191,10 @@ void GameRender::clicker() {
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.55;
-				m_blueRight = 0.85;
+				m_blueLeft = 0.55f;
+				m_blueRight = 0.85f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft -= d;
 				m_blueRight -= d;
 			}
@@ -205,16 +205,16 @@ void GameRender::clicker() {
 			pushVertexTexture(clickerVector, m_blueRight - clickedOffset, plane, m_blueBack + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
-			m_blueLeft = 0.55;
-			m_blueRight = 0.85;
+			m_blueLeft = 0.55f;
+			m_blueRight = 0.85f;
 
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.2;
-				m_blueRight = 0.5;
+				m_blueLeft = 0.2f;
+				m_blueRight = 0.5f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft += d;
 				m_blueRight += d;
 			}
@@ -233,10 +233,10 @@ void GameRender::clicker() {
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.55;
-				m_blueRight = 0.85;
+				m_blueLeft = 0.55f;
+				m_blueRight = 0.85f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft -= d;
 				m_blueRight -= d;
 			}
@@ -247,16 +247,16 @@ void GameRender::clicker() {
 			pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
-			m_blueLeft = 0.55;
-			m_blueRight = 0.85;
+			m_blueLeft = 0.55f;
+			m_blueRight = 0.85f;
 
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.2;
-				m_blueRight = 0.5;
+				m_blueLeft = 0.2f;
+				m_blueRight = 0.5f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft += d;
 				m_blueRight += d;
 			}
@@ -403,10 +403,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					double endDt = end.getMilli() - time;
 					double endZ = 3.75 - (3.75 * (float)endDt);
 
-					int numOfSprites = floor((startZ - endZ) / length);
+					int numOfSprites = (int)floor((startZ - endZ) / length);
 
 					for (int j = 0; j < numOfSprites; ++j) {
-						float spriteZ = startZ - 0.15 - length * j;
+						float spriteZ = (float)(startZ - 0.15 - length * j);
 						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
 							if (start.getType() == CROSS_G) {
 								pushVertexTexture(noteVector, -0.85f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
@@ -510,10 +510,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					double endDt = end.getMilli() - time;
 					double endZ = 3.75 - (3.75 * endDt);
 
-					int numOfSprites = floor((startZ - endZ) / length);
+					int numOfSprites = (int)floor((startZ - endZ) / length);
 
 					for (int j = 0; j < numOfSprites; ++j) {
-						float spriteZ = startZ - 0.15 - length * j;
+						float spriteZ = (float)(startZ - 0.15 - length * j);
 						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
 							if (start.getType() == CROSS_B) {
 								pushVertexTexture(noteVector, 0.55f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
@@ -1682,10 +1682,10 @@ void GameRender::clickerAnimation() {
 		float y = 1.0f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenBack, x, y);
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenFront, x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenFront, x + 0.1, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenBack, x + 0.1, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenBack, (float)x, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenFront, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenFront, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenBack, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
@@ -1696,10 +1696,10 @@ void GameRender::clickerAnimation() {
 		float y = 0.75f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.6f, x, y);
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.9f, x, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.9f, x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, x + 0.1f, y);
+		pushVertexTexture(clickerVector, -0.15f, plane, 3.6f, (float)x, y);
+		pushVertexTexture(clickerVector, -0.15f, plane, 3.9f, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.15f, plane, 3.9f, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, (float)x + 0.1f, y);
 
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
@@ -1710,10 +1710,10 @@ void GameRender::clickerAnimation() {
 		float y = 0.5f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueBack, x, y);
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueFront, x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueFront, x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, x + 0.1f, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueBack, (float)x, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueFront, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueFront, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 

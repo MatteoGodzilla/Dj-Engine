@@ -75,7 +75,7 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+			//m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
 		}
 		else if (m_mode == 1) {
 			m_render.result(m_player,m_gen);

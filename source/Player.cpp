@@ -7,10 +7,10 @@ Player::Player() {
 		m_gpMult.push_back(1.0f);
 	}
 
-	m_gpDead.at(CF_RIGHT_INDEX) = 0.5;
-	m_gpDead.at(CF_LEFT_INDEX) = 0.5;
-	m_gpDead.at(SCR_UP_INDEX) = 0.2;
-	m_gpDead.at(SCR_DOWN_INDEX) = 0.2;
+	m_gpDead.at(CF_RIGHT_INDEX) = 0.5f;
+	m_gpDead.at(CF_LEFT_INDEX) = 0.5f;
+	m_gpDead.at(SCR_UP_INDEX) = 0.2f;
+	m_gpDead.at(SCR_DOWN_INDEX) = 0.2f;
 
 	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
 	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
@@ -807,7 +807,7 @@ void Player::writeMappingFile() {
 		std::cout << "Player Message: Written config to file" << std::endl;
 	}
 	else {
-		std::cerr << "Player Error: couldn't create 'config.txt'";
+		std::cerr << "Player Error: couldn't create 'config.txt'" << std::endl;
 	}
 	output.close();
 }
@@ -843,8 +843,8 @@ void Player::updateGamepadState() {
 
 			if (m_useSingleCfAxis) {
 				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
-				m_gpState.push_back(value);
 				m_gpState.push_back(-value);
+				m_gpState.push_back(value);
 			}
 			else {
 				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
@@ -853,8 +853,8 @@ void Player::updateGamepadState() {
 
 			if (m_useSingleScrAxis) {
 				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
-				m_gpState.push_back(-value);
 				m_gpState.push_back(value);
+				m_gpState.push_back(-value);
 			}
 			else {
 				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));

@@ -108,7 +108,7 @@ private:
 	bool m_double_mult = false;
 	double m_lastTapTime = 0.0;
 	double m_lastCrossTime = 0.0;
-	int m_genBpm = 0;
+	float m_genBpm = 0;
 
 	bool m_isGreenTapEnabled = true;
 	bool m_isRedTapEnabled = true;

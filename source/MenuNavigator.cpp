@@ -9,9 +9,9 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 }
 
 void MenuNavigator::writeConfigFile() {
-	std::cout << "MenuNavigator Message: wrote mapping file";
+	std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
 	std::ofstream output("config-menu.txt");
-	
+
 	output << UP_CODE << "\n";
 	output << DOWN_CODE << "\n";
 	output << SELECT_CODE << "\n";
@@ -51,10 +51,10 @@ void MenuNavigator::readConfigFile() {
 	}
 }
 
-MenuNavigator::MenuNavigator(){
+MenuNavigator::MenuNavigator() {
 	//create menu tree
-	MenuNode play("Play!",1);
-	MenuNode options("Options",2);
+	MenuNode play("Play!", 1);
+	MenuNode options("Options", 2);
 	MenuNode credits("Credits", 3);
 	MenuNode exit("Exit", -1);
 
@@ -66,7 +66,7 @@ MenuNavigator::MenuNavigator(){
 	options.push(latency);
 	options.push(flipButtons);
 	options.push(speed);
-	
+
 	m_root.push(play);
 	m_root.push(options);
 	m_root.push(credits);
@@ -76,13 +76,13 @@ MenuNavigator::MenuNavigator(){
 	m_activeNode = m_root;
 
 	m_gpDead.clear();
-	for (int i = 0; i < 15+6; ++i) {
+	for (int i = 0; i < 15 + 6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
 	readConfigFile();
 }
 
-void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
+void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
 	m_game = gameptr;
 	m_render.init(w);
@@ -90,7 +90,7 @@ void MenuNavigator::init(GLFWwindow* w,Game* gameptr) {
 	scan();
 }
 
-void MenuNavigator::pollInput(){
+void MenuNavigator::pollInput() {
 	m_wasUpPressed = m_isUpPressed;
 	m_wasDownPressed = m_isDownPressed;
 	m_wasSelectPressed = m_isSelectPressed;
@@ -148,7 +148,7 @@ void MenuNavigator::pollInput(){
 		m_useKeyboardInput = !m_useKeyboardInput;
 	}
 	*/
-	
+
 
 	if (m_wasBackPressed && !m_isBackPressed) {
 		if (m_popupId != -1) {
@@ -175,13 +175,17 @@ void MenuNavigator::pollInput(){
 			m_popupId = -1;
 			m_debounce = true;
 		}
-		else {
-			if (m_scene == REMAPPING) {
-				writeConfigFile();
-				m_game->getPlayer()->writeMappingFile();
-				m_scene = MAIN_SCENE;
-			}
+		else if (m_scene == REMAPPING) {
+			writeConfigFile();
+			m_game->getPlayer()->writeMappingFile();
+			m_scene = MAIN_SCENE;
+			resetMenu();
 		}
+		else if (m_scene == CALIBRATION) {
+			resetMenu();
+			m_scene = MAIN_SCENE;
+		}
+
 	}
 
 	if (m_render.m_input != m_useKeyboardInput) {
@@ -335,7 +339,7 @@ void MenuNavigator::update() {
 				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
-				
+
 				for (int i = 0; i < 512; ++i) {
 					if (glfwGetKey(m_render.getWindowPtr(), i)) {
 						*changing = i;
@@ -369,7 +373,8 @@ void MenuNavigator::update() {
 					}
 				}
 
-			}else if (m_render.m_editingKey && m_render.m_menuActionToChange != -1) {
+			}
+			else if (m_render.m_editingKey && m_render.m_menuActionToChange != -1) {
 				int* changing = &UP_CODE;
 				if (m_render.m_menuActionToChange == MENU_DOWN) {
 					changing = &DOWN_CODE;
@@ -392,7 +397,7 @@ void MenuNavigator::update() {
 			}
 		}
 		else if (m_scene == SCRATCHES) {
-			if (m_isSelectPressed && !m_wasSelectPressed) {
+			if (m_wasBackPressed && !m_isBackPressed) {
 				m_scene = MAIN_SCENE;
 				resetMenu();
 			}
@@ -413,7 +418,7 @@ void MenuNavigator::render(double dt) {
 			}
 		}
 		else if (m_scene == REMAPPING) {
-			m_render.remapping(m_game, UP_CODE, DOWN_CODE, SELECT_CODE, BACK_CODE, 
+			m_render.remapping(m_game, UP_CODE, DOWN_CODE, SELECT_CODE, BACK_CODE,
 				UP_GAMEPAD, DOWN_GAMEPAD, SELECT_GAMEPAD, BACK_GAMEPAD);
 		}
 		else if (m_scene == CREDITS) {
@@ -423,7 +428,7 @@ void MenuNavigator::render(double dt) {
 			m_render.scratches(m_game->getPlayer());
 		}
 		else if (m_scene == CALIBRATION) {
-			m_render.calibration(m_game,dt);
+			m_render.calibration(m_game, dt);
 		}
 		if (m_popupId != -1) {
 			if (m_popupId == 0) {
@@ -468,9 +473,9 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_game->start(m_songList.at(index));
 		resetMenu();
 	}
-	else if(menu.getChildCount() == 0){
+	else if (menu.getChildCount() == 0) {
 		if (menu.getId() == 1) {
-			std::cout << "MenuNavigator Message: No songs found in the install path."<< std::endl;
+			std::cout << "MenuNavigator Message: No songs found in the install path." << std::endl;
 		}
 		else {
 			std::cout << "MenuNavigator Error: no function attached to id " << menu.getId() << std::endl;
@@ -484,7 +489,7 @@ void MenuNavigator::remap() {
 
 void MenuNavigator::scan() {
 	SongScanner::load("./songs", m_songList);
-	for (const SongEntry& entry: m_songList) {
+	for (const SongEntry& entry : m_songList) {
 		std::string text;
 		if (!entry.s2.empty()) {
 			text = entry.s1 + " vs " + entry.s2;
@@ -529,7 +534,7 @@ void MenuNavigator::updateGamepadState() {
 		else {
 			m_gpState.push_back(1.0f);
 		}
-		
+
 	}
 	const float* axes = glfwGetJoystickAxes(m_game->getPlayer()->m_gamepadId, &count);
 
@@ -551,7 +556,6 @@ bool MenuNavigator::getActive() {
 	return m_active;
 }
 
-MenuNavigator::~MenuNavigator(){
+MenuNavigator::~MenuNavigator() {
 	m_render.~MenuRender();
 }
-

@@ -91,7 +91,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 				charter = ini.GetValue("song", "charter", "NULL");
 				mixer = ini.GetValue("song", "dj", "NULL");
 
-				bpm = ini.GetDoubleValue("song", "bpm", 60.0);
+				bpm = (float)ini.GetDoubleValue("song", "bpm", 60.0);
 
 				dTrack = ini.GetLongValue("song", "track_complexity", 0);
 				dTap = ini.GetLongValue("song", "tap_complexity", 0);
