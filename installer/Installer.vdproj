@@ -33,6 +33,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_4B069059B498416B8508DADD8F257CEC"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4D97125E4B51466ABACC26638AE2EA88"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -106,6 +112,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EDB3822929154E9889923762BA17242B"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F661CF5B897645A3B904D5026AC379E3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -240,6 +252,26 @@
             {
             "SourcePath" = "8:..\\res\\highway.png"
             "TargetName" = "8:highway.png"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4B069059B498416B8508DADD8F257CEC"
+            {
+            "SourcePath" = "8:..\\res\\calibration.png"
+            "TargetName" = "8:calibration.png"
             "Tag" = "8:"
             "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
             "Condition" = "8:"
@@ -496,6 +528,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F661CF5B897645A3B904D5026AC379E3"
+            {
+            "SourcePath" = "8:..\\res\\calibration.ogg"
+            "TargetName" = "8:calibration.ogg"
+            "Tag" = "8:"
+            "Folder" = "8:_10330963FB1F4D07ABD72EB255978E4B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -574,15 +626,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dj-Engine"
-        "ProductCode" = "8:{79C9BAC8-5082-4EC5-A080-471BFEE550D7}"
-        "PackageCode" = "8:{105F600F-B2C9-4041-B751-270204E5759B}"
+        "ProductCode" = "8:{CA6041C6-6146-456F-88AE-EF44DD706924}"
+        "PackageCode" = "8:{08AC5AAB-5141-411A-8604-93BA0A08EF24}"
         "UpgradeCode" = "8:{526D9FA9-9244-4B74-851D-FF7304ED25B1}"
         "AspNetVersion" = "8:"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.9"
+        "ProductVersion" = "8:1.1"
         "Manufacturer" = "8:MatteoGodzilla"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://https://github.com/MatteoGodzilla/Dj-Engine"

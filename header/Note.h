@@ -5,9 +5,9 @@ enum note {
 	TAP_G,TAP_R,TAP_B,
 	CROSS_G, CROSS_B, CROSS_C,
 	CF_SPIKE_G, CF_SPIKE_B, CF_SPIKE_C,
-	SCR_G_UP, SCR_G_DOWN, SCR_G_ANY,
-	SCR_B_UP,SCR_B_DOWN,SCR_B_ANY,
-	SCR_G_ZONE,SCR_B_ZONE,EU_ZONE
+	SCR_G_UP, SCR_G_DOWN, SCR_G_ANY, SCR_G_TICK,
+	SCR_B_UP, SCR_B_DOWN, SCR_B_ANY, SCR_B_TICK,
+	SCR_G_ZONE, SCR_B_ZONE, EU_ZONE
 };
 
 class Note {
@@ -39,6 +39,7 @@ private:
     bool m_hittable = false;
     bool m_touched = false;
     bool m_dead = false;
+	bool m_firstClick = true;
     int m_type;
     int m_lan_mod = -1;
 };

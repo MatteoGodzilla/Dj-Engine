@@ -27,7 +27,7 @@ void GameRender::init(GLFWwindow* w) {
 
 void GameRender::highway(double time) {
 	//convert from time to texture coords
-	float factor = (float)time * 0.875f;
+	float factor = (float)(time / m_noteVisibleTime);
 
 	float plane = 0.0f;
 
@@ -47,7 +47,7 @@ void GameRender::highway(double time) {
 	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
 }
 
-void GameRender::clicker(){
+void GameRender::clicker() {
 	//difference in size between pressed and not
 	float clickedOffset = 0.03f;
 
@@ -108,7 +108,7 @@ void GameRender::clicker(){
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
 
-				float d = crossGreen.getPercent() * 0.35;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
 			}
@@ -125,9 +125,9 @@ void GameRender::clicker(){
 			//green clicker is on the left
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
-				m_greenLeft = -0.5;
-				m_greenRight = -0.2;
-				float d = crossGreen.getPercent() * 0.35;
+				m_greenLeft = -0.5f;
+				m_greenRight = -0.2f;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
 				m_greenRight -= d;
@@ -142,7 +142,7 @@ void GameRender::clicker(){
 	}
 	else {
 		//default clicker position
-		
+
 		if (m_playerCross >= 1) {
 			//green clicker is on the left
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
@@ -150,7 +150,7 @@ void GameRender::clicker(){
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
 
-				float d = crossGreen.getPercent() * 0.35;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
 			}
@@ -167,9 +167,9 @@ void GameRender::clicker(){
 			//green clicker is on the left
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
-				m_greenLeft = -0.5;
-				m_greenRight = -0.2;
-				float d = crossGreen.getPercent() * 0.35;
+				m_greenLeft = -0.5f;
+				m_greenRight = -0.2f;
+				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
 				m_greenRight -= d;
@@ -191,10 +191,10 @@ void GameRender::clicker(){
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.55;
-				m_blueRight = 0.85;
+				m_blueLeft = 0.55f;
+				m_blueRight = 0.85f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft -= d;
 				m_blueRight -= d;
 			}
@@ -205,16 +205,16 @@ void GameRender::clicker(){
 			pushVertexTexture(clickerVector, m_blueRight - clickedOffset, plane, m_blueBack + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
-			m_blueLeft = 0.55;
-			m_blueRight = 0.85;
+			m_blueLeft = 0.55f;
+			m_blueRight = 0.85f;
 
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.2;
-				m_blueRight = 0.5;
+				m_blueLeft = 0.2f;
+				m_blueRight = 0.5f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft += d;
 				m_blueRight += d;
 			}
@@ -233,10 +233,10 @@ void GameRender::clicker(){
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.55;
-				m_blueRight = 0.85;
+				m_blueLeft = 0.55f;
+				m_blueRight = 0.85f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft -= d;
 				m_blueRight -= d;
 			}
@@ -247,16 +247,16 @@ void GameRender::clicker(){
 			pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, 1320.0f / 1760.0f, 840.0f / 1640.0f);
 		}
 		else {
-			m_blueLeft = 0.55;
-			m_blueRight = 0.85;
+			m_blueLeft = 0.55f;
+			m_blueRight = 0.85f;
 
 			Animation crossBlue = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 			if (crossBlue.isEnabled()) {
-				m_blueLeft = 0.2;
-				m_blueRight = 0.5;
+				m_blueLeft = 0.2f;
+				m_blueRight = 0.5f;
 
-				float d = crossBlue.getPercent() * 0.35;
+				float d = (float)(crossBlue.getPercent() * 0.35);
 				m_blueLeft += d;
 				m_blueRight += d;
 			}
@@ -274,7 +274,7 @@ void GameRender::clicker(){
 	renderTexture(clickerVector, clickerIndices, m_objTexture);
 }
 
-void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cross){
+void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
 	float plane = 0.0;
 
 	//vertices data
@@ -286,12 +286,12 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 	for (size_t i = 0; i < v.size(); i++) {
 		double milli = v.at(i).getMilli();
 		double hitWindow = v.at(i).hitWindow;
-		if (time+m_noteVisibleTime >= milli && time <= milli+hitWindow) {
+		if (time + m_noteVisibleTime >= milli) {
 			//if the note is inside the visible highway
 
 			//calculate 'height' of note
-			double dt = v.at(i).getMilli() - time;
-			float z = 3.75f - (3.75f * (float)dt);
+			double percent = (v.at(i).getMilli() - time)/m_noteVisibleTime;
+			float z = 3.75f - (3.75f * (float)percent);
 
 			int type = v.at(i).getType();
 
@@ -299,50 +299,54 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 			float s = 0.0;
 			float t = 0.0;
 
-			if (type == TAP_R) {
-				//change texture if euphoria is active
-				if (m_renderEuActive) {
-					s = 1200.0f / 1760.0f;
-					t = 0.0f;
-				}
-				else {
-					s = 400.0f / 1760.0f;
-					t = 0.0;
-				}
+			if (type == TAP_R && !v.at(i).getTouched()) {
+				if (!v.at(i).getDead()) {
+					//change texture if euphoria is active
+					if (m_renderEuActive) {
+						s = 1200.0f / 1760.0f;
+						t = 0.0f;
+					}
+					else {
+						s = 400.0f / 1760.0f;
+						t = 0.0;
+					}
 
-				//actual note vertices
-				pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, s, t + 400.0f / 1760.0f);
-				pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, s, t);
-				pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-				pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1760.0f);
-				pushRectangleIndices(noteIndices, noteVertexCount);
+					//actual note vertices
+					pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, s, t + 400.0f / 1760.0f);
+					pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, s, t);
+					pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+					pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1760.0f);
+					pushRectangleIndices(noteIndices, noteVertexCount);
+				}
 			}
-			else if (type == TAP_G) {
-				//change texture if euphoria is active
-				if (m_renderEuActive) {
-					s = 1200.0f / 1760.0f;
-					t = 0.0f;
+			else if (type == TAP_G && !v.at(i).getTouched()) {
+				if (!v.at(i).getDead()) {
+					//change texture if euphoria is active
+					if (m_renderEuActive) {
+						s = 1200.0f / 1760.0f;
+						t = 0.0f;
+					}
+					else {
+						s = 0.0f;
+						t = 0.0f;
+					}
+					//if the highway at the note's time is on the left
+					if (v.at(i).getLanMod() == 0) {
+						pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+						pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
+						pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+						pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+					}
+					else {
+						pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+						pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
+						pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+						pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+					}
+					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
-				else {
-					s = 0.0f;
-					t = 0.0f;
-				}
-				//if the highway at the note's time is on the left
-				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_G_UP) {
+			else if (type == SCR_G_UP && !v.at(i).getTouched()) {
 				s = 400.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -361,7 +365,7 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_G_DOWN) {
+			else if (type == SCR_G_DOWN && !v.at(i).getTouched()) {
 				s = 800.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -384,48 +388,72 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 				s = 0.0f;
 				t = 840.0f / 1640.0f;
 
-				//if the highway at the note's time is on the left
-				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				pushRectangleIndices(noteIndices, noteVertexCount);
-			}
-			else if (type == TAP_B) {
-				//change texture if euphoria is active
-				if (m_renderEuActive) {
-					s = 1200.0f / 1760.0f;
-					t = 0.0f;
-				}
-				else {
-					s = 800.0f / 1760.0f;
-					t = 0.0f;
-				}
+				double length = 0.30;
 
-				//if the highway at the note's time is on the left
-				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+				std::vector<Note> changes = getCrossInsideNote(v.at(i), cross);
+
+				int segments = changes.size() / 2;
+
+				for (int i = 0; i < segments; ++i) {
+					Note start = changes.at(i * 2);
+					Note end = changes.at(i * 2 + 1);
+
+					double startDt = start.getMilli() - time;
+					double startZ = 3.75 - (3.75 * (float)startDt);
+					double endDt = end.getMilli() - time;
+					double endZ = 3.75 - (3.75 * (float)endDt);
+
+					int numOfSprites = (int)floor((startZ - endZ) / length);
+
+					for (int j = 0; j < numOfSprites; ++j) {
+						float spriteZ = (float)(startZ - 0.15 - length * j);
+						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
+							if (start.getType() == CROSS_G) {
+								pushVertexTexture(noteVector, -0.85f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
+								pushVertexTexture(noteVector, -0.85f, plane, spriteZ + 0.15f, s, t);
+								pushVertexTexture(noteVector, -0.55f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
+								pushVertexTexture(noteVector, -0.55f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+							}
+							else {
+								pushVertexTexture(noteVector, -0.5f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
+								pushVertexTexture(noteVector, -0.5f, plane, spriteZ + 0.15f, s, t);
+								pushVertexTexture(noteVector, -0.2f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
+								pushVertexTexture(noteVector, -0.2f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+							}
+							pushRectangleIndices(noteIndices, noteVertexCount);
+						}
+					}
 				}
-				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_B_UP) {
+			else if (type == TAP_B && !v.at(i).getTouched()) {
+				if (!v.at(i).getDead()) {
+					//change texture if euphoria is active
+					if (m_renderEuActive) {
+						s = 1200.0f / 1760.0f;
+						t = 0.0f;
+					}
+					else {
+						s = 800.0f / 1760.0f;
+						t = 0.0f;
+					}
+
+					//if the highway at the note's time is on the left
+					if (v.at(i).getLanMod() == 2) {
+						pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+						pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
+						pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+						pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+					}
+					else {
+						pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
+						pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
+						pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
+						pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+					}
+					pushRectangleIndices(noteIndices, noteVertexCount);
+				}
+			}
+			else if (type == SCR_B_UP && !v.at(i).getTouched()) {
 				s = 400.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -444,7 +472,7 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 				}
 				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			else if (type == SCR_B_DOWN) {
+			else if (type == SCR_B_DOWN && !v.at(i).getTouched()) {
 				s = 800.0f / 1760.0f;
 				t = 840.0f / 1640.0f;
 
@@ -467,22 +495,44 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 				s = 0.0f;
 				t = 840.0f / 1640.0f;
 
-				//if the highway at the note's time is on the right
-				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+				double length = 0.30;
+
+				std::vector<Note> changes = getCrossInsideNote(v.at(i), cross);
+
+				int segments = changes.size() / 2;
+
+				for (int i = 0; i < segments; ++i) {
+					Note start = changes.at(i * 2);
+					Note end = changes.at(i * 2 + 1);
+
+					double startDt = start.getMilli() - time;
+					double startZ = 3.75 - (3.75 * startDt);
+					double endDt = end.getMilli() - time;
+					double endZ = 3.75 - (3.75 * endDt);
+
+					int numOfSprites = (int)floor((startZ - endZ) / length);
+
+					for (int j = 0; j < numOfSprites; ++j) {
+						float spriteZ = (float)(startZ - 0.15 - length * j);
+						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
+							if (start.getType() == CROSS_B) {
+								pushVertexTexture(noteVector, 0.55f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
+								pushVertexTexture(noteVector, 0.55f, plane, spriteZ + 0.15f, s, t);
+								pushVertexTexture(noteVector, 0.85f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
+								pushVertexTexture(noteVector, 0.85f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+							}
+							else {
+								pushVertexTexture(noteVector, 0.2f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
+								pushVertexTexture(noteVector, 0.2f, plane, spriteZ + 0.15f, s, t);
+								pushVertexTexture(noteVector, 0.5f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
+								pushVertexTexture(noteVector, 0.5f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+							}
+							pushRectangleIndices(noteIndices, noteVertexCount);
+						}
+					}
 				}
-				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				pushRectangleIndices(noteIndices, noteVertexCount);
 			}
-			if (type == CF_SPIKE_G) {
+			if (type == CF_SPIKE_G && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() >= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1460.0f / 1640.0f;
@@ -504,7 +554,7 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 
 				}
 			}
-			else if (type == CF_SPIKE_B) {
+			else if (type == CF_SPIKE_B && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() <= 1) {
 					s = 1200.0f / 1740.0f;
 					t = 1280.0f / 1640.0f;
@@ -526,7 +576,7 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 					pushRectangleIndices(noteIndices, noteVertexCount);
 				}
 			}
-			else if (type == CF_SPIKE_C) {
+			else if (type == CF_SPIKE_C && !v.at(i).getTouched()) {
 				if (v.at(i).getLanMod() == 0) {
 					s = 1200.0f / 1740.0f;
 					t = 1460.0f / 1640.0f;
@@ -550,32 +600,13 @@ void GameRender::notes(double time, std::vector<Note>& v,std::vector<Note>& cros
 
 				}
 			}
-			
+
 		}
-		else if(milli > time + m_noteVisibleTime){
+		else if (milli > time + m_noteVisibleTime) {
 			//if the note is outside the visible area, update lane position
 			v.at(i).setLanMod(m_renderCross);
 		}
 	}
-
-	/*
-	for (size_t i = 0; i < v.size(); i++) {
-		double milli = v.at(i).getMilli();
-		double hitWindow = v.at(i).hitWindow;
-		if (time + m_noteVisibleTime >= milli && time <= milli + hitWindow) {
-			int type = v.at(i).getType();
-			double dt = v.at(i).getMilli() - time;
-			float z = 3.75f - (3.75f * (float)dt);
-
-			float s, t;
-
-			
-		}
-	}*/
-
-
-
-
 	usePersProj();
 	renderTexture(noteVector, noteIndices, m_objTexture);
 }
@@ -618,7 +649,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	pushVertexColor(redLaneVector, -0.02f, plane, 0.0f, r, g, b);
 	pushRectangleIndices(redLaneIndices, redLaneVertexCount);
 
-	
+
 	int start = cross.at(0).getType();
 	int middle = start;
 
@@ -721,10 +752,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double t = cross.at(i).getMilli();
 		double hitWindow = cross.at(i).hitWindow;
 		if (time + m_noteVisibleTime >= t && time <= t + hitWindow) {
-			double dt = cross.at(i).getMilli() - time;
+			double percent = (cross.at(i).getMilli() - time)/m_noteVisibleTime;
 			if (cross.at(i).getType() == CROSS_G && middle != CROSS_G) {
 				middle = CROSS_G;
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//change color if euphoria is active
 				if (m_renderEuActive) {
@@ -754,7 +785,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
 				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z - offset, r, g, b);
 
-				if (cross.at(i-1).getType() == CROSS_B) {
+				if (cross.at(i - 1).getType() == CROSS_B) {
 					//in the case that the crossfade was right before,
 					//add horizontal lane to blue lane too
 
@@ -789,7 +820,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 			else if (cross.at(i).getType() == CROSS_B && middle != CROSS_B) {
 				middle = CROSS_B;
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//change color if euphoria is active
 				if (m_renderEuActive) {
@@ -818,7 +849,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z - offset, r, g, b);
 				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
 
-				if (cross.at(i-1).getType() == CROSS_G) {
+				if (cross.at(i - 1).getType() == CROSS_G) {
 					//in the case that the crossfade was left before,
 					//add horizontal lane to green lane too
 
@@ -851,12 +882,12 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				}
 			}
 			else if (cross.at(i).getType() == CROSS_C && middle != CROSS_C) {
-			middle = CROSS_C;
+				middle = CROSS_C;
 				//crossfade center event
-				float z = 3.75f - 3.75f * (float)dt;
+				float z = (float)(3.75 - 3.75 * percent);
 
 				//if crossfade was from the right
-				if (cross.at(i-1).getType() == CROSS_G) {
+				if (cross.at(i - 1).getType() == CROSS_G) {
 					//change color if euphoria is active
 					if (m_renderEuActive) {
 						r = 1.0;
@@ -916,105 +947,105 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 		}
 		else if (t > time + m_noteVisibleTime) {
-		if (middle == CROSS_G) {
-			m_renderCross = 0;
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
-			}
-			else {
-				r = 0.0;
-				g = 1.0;
-				b = 0.0;
-			}
-			//end green left lane
-			pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 0.0f, r, g, b);
-			pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 0.0f, r, g, b);
+			if (middle == CROSS_G) {
+				m_renderCross = 0;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
+				//end green left lane
+				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 0.0f, r, g, b);
+				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 0.0f, r, g, b);
 
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+				//end blue center lane
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 			}
-			else {
-				r = 0.0;
-				g = 0.0;
-				b = 1.0;
-			}
-			//end blue center lane
-			pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
-			pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
-		}
-		else if (middle == CROSS_B) {
-			m_renderCross = 2;
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
-			}
-			else {
-				r = 0.0;
-				g = 1.0;
-				b = 0.0;
-			}
-			//end green center lane
-			pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
-			pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
+			else if (middle == CROSS_B) {
+				m_renderCross = 2;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
+				//end green center lane
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
 
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+				//end blue right lane
+				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 0.0f, r, g, b);
+				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 0.0f, r, g, b);
 			}
-			else {
-				r = 0.0;
-				g = 0.0;
-				b = 1.0;
-			}
-			//end blue right lane
-			pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 0.0f, r, g, b);
-			pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 0.0f, r, g, b);
-		}
-		else if (middle == CROSS_C) {
-			m_renderCross = 1;
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
-			}
-			else {
-				r = 0.0;
-				g = 1.0;
-				b = 0.0;
-			}
-			//end green center lane
-			pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
-			pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
+			else if (middle == CROSS_C) {
+				m_renderCross = 1;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 1.0;
+					b = 0.0;
+				}
+				//end green center lane
+				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
+				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
 
-			//change color if euphoria is active
-			if (m_renderEuActive) {
-				r = 1.0;
-				g = 1.0;
-				b = 1.0;
+				//change color if euphoria is active
+				if (m_renderEuActive) {
+					r = 1.0;
+					g = 1.0;
+					b = 1.0;
+				}
+				else {
+					r = 0.0;
+					g = 0.0;
+					b = 1.0;
+				}
+				//end blue center lane
+				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
+				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 			}
-			else {
-				r = 0.0;
-				g = 0.0;
-				b = 1.0;
-			}
-			//end blue center lane
-			pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
-			pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
-		}
-		
 
-		break;
+
+			break;
 		}
 	}
 	if (greenLaneVector.size() == 2 * 7) {
@@ -1060,7 +1091,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 }
 
-void GameRender::bpmTicks(double time, std::vector<double>& bpmArr){
+void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 	//vertices data
 	std::vector<float> bpmVector;
 	std::vector<unsigned int> bpmIndices;
@@ -1083,9 +1114,9 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr){
 		exact same as Note.getRender(), but done manually
 		because bpm ticks are not Notes/Events
 		*/
-		if (time + 1.0 >= tickTime && time <= tickTime + 0.2) {
-			double dt = tickTime - time;
-			float z = 3.75f - (3.75f * (float)dt);
+		if (time + m_noteVisibleTime >= tickTime && time <= tickTime + 0.2) {
+			double percent = (tickTime - time)/m_noteVisibleTime;
+			float z = (float)(3.75 - 3.75 * percent);
 
 			//add tick
 			pushVertexColor(bpmVector, -1.0f, plane, z - size / 2, r, g, b);
@@ -1099,7 +1130,7 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr){
 	renderColor(bpmVector, bpmIndices);
 }
 
-void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cross) {
+void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& cross) {
 	float plane = 0.0;
 	float transparency = 0.35f; // euphoria transparency
 
@@ -1113,191 +1144,131 @@ void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cr
 		double milli = ev.at(i).getMilli();
 		double hitWindow = ev.at(i).hitWindow;
 		int type = ev.at(i).getType();
-		double dt = ev.at(i).getMilli() - time;
+		double percent = (ev.at(i).getMilli() - time)/m_noteVisibleTime;
 
 		if (type == SCR_G_ZONE) {
-			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
-
-			float z = 3.75f - (3.75f * (float)dt);
-			int lastChange = 0;
-
-			//start
-			if (ev.at(i).getLanMod() == 0) {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-					lastChange = CROSS_G;
-				}
-			}
-			else {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-					lastChange = CROSS_C;
-				}
-			}
-
-			//middle
-			for (size_t i = 0; i < cross.size(); i++) {
-				double crossMilli = cross.at(i).getMilli();
-				double crossDt = crossMilli - time;
-				z = 3.75f - (3.75f * (float)crossDt);
-				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
-					if (crossMilli >= milli && crossMilli <= endTime) {
-						int crossType = cross.at(i).getType();
-						if (crossType == CROSS_G && lastChange == CROSS_C) {
-							lastChange = CROSS_G;
-							//end center part
-							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-							//start left part
-							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-						}
-						else if (crossType == CROSS_C && lastChange == CROSS_G) {
-							lastChange = CROSS_C;
-							//end left part
+			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
+			int num = 0;
+			int lastVisible = -1;
+			float z;
+			for (size_t i = 0; i < cfChanges.size(); ++i) {
+				double cfMilli = cfChanges.at(i).getMilli();
+				double cfPercent = (cfMilli - time)/m_noteVisibleTime;
+				int cfType = cfChanges.at(i).getType();
+				if (cfMilli <= time + m_noteVisibleTime) {
+					z = (float)(3.75 - 3.75 * cfPercent);
+					if (cfType == CROSS_G) {
+						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
 							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-
-							//start center part
+							num += 2;
+						}
+						else {
+							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
+						}
+						lastVisible = CROSS_G;
+					}
+					else if (cfType == CROSS_C) {
+						if (num % 4 != 0) {
+							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
+						}
+						else {
 							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
 							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
+							num += 2;
 						}
+						lastVisible = CROSS_C;
+					}
+					if (num > 0 && num % 4 == 0) {
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
 			}
-
-			//end
-			z = 3.75f - (3.75f * (float)endDt);
-			if (lastChange == CROSS_C) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
+			if (num % 4 != 0) {
+				if (lastVisible == CROSS_G) {
+					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
+					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				else {
+				else if (lastVisible == CROSS_C) {
 					pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
 			}
-			else if (lastChange == CROSS_G) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else {
-					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				
-			}
-
 		}
 		else if (type == SCR_B_ZONE) {
-			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
-
-			float z = 3.75f - (3.75f * (float)dt);
-			int lastChange = 0;
-
-			//start
-			if (ev.at(i).getLanMod() == 2) {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-					lastChange = CROSS_B;
-				}
-			}
-			else {
-				if (dt <= m_noteVisibleTime) {
-					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-					lastChange = CROSS_C;
-				}
-			}
-
-			//middle
-			for (size_t i = 0; i < cross.size(); i++) {
-				double crossMilli = cross.at(i).getMilli();
-				double crossDt = crossMilli - time;
-				z = 3.75f - (3.75f * (float)crossDt);
-				if (crossMilli + hitWindow >= time && crossMilli < time + m_noteVisibleTime) {
-					if (crossMilli >= milli && crossMilli <= endTime) {
-						int crossType = cross.at(i).getType();
-						if (crossType == CROSS_B && lastChange == CROSS_C) {
-							lastChange = CROSS_B;
-							//end center part
-							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-							//start right part
-							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-						}
-						else if (crossType == CROSS_C && lastChange == CROSS_B) {
-							lastChange = CROSS_C;
-							//end right part
+			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
+			int num = 0;
+			int lastVisible = -1;
+			float z;
+			for (size_t i = 0; i < cfChanges.size(); ++i) {
+				double cfMilli = cfChanges.at(i).getMilli();
+				double cfPercent = (cfMilli - time) / m_noteVisibleTime;
+				int cfType = cfChanges.at(i).getType();
+				if (cfMilli <= time + m_noteVisibleTime) {
+					z = (float)(3.75 - 3.75 * cfPercent);
+					if (cfType == CROSS_B) {
+						if (num % 4 != 0) {
 							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
 							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushRectangleIndices(eventsIndices, eventsVertexCount);
-
-							//start center part
+							num += 2;
+						}
+						else {
+							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
+						}
+						lastVisible = CROSS_B;
+					}
+					else if (cfType == CROSS_C) {
+						if (num % 4 != 0) {
+							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
+						}
+						else {
 							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
 							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
+							num += 2;
 						}
+						lastVisible = CROSS_C;
+					}
+					if (num > 0 && num % 4 == 0) {
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 					}
 				}
 			}
-
-			//end
-			z = 3.75f - (3.75f * (float)endDt);
-			if (lastChange == CROSS_C) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
+			if (num % 4 != 0) {
+				if (lastVisible == CROSS_B) {
+					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
+					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
-				else {
+				else if (lastVisible == CROSS_C) {
 					pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
 					pushRectangleIndices(eventsIndices, eventsVertexCount);
 				}
 			}
-			else if (lastChange == CROSS_B) {
-				if (endDt <= m_noteVisibleTime && endDt > 0) {
-					pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else {
-					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-
-			}
-
 		}
 		else if (type == EU_ZONE) {
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endDt = endTime - time;
+			double endPercent = (endTime - time)/m_noteVisibleTime;
 			bool start_eu = false;
 			//if euphoria start is in the middle of the highway
-			if (dt >= 0.0 && dt < 1.0) {
-				float z = 3.75f - (3.75f * (float)dt);
+			if (percent >= 0.0 && percent < 1.0) {
+				float z = (float)(3.75 - 3.75 * percent);
 				pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
 				pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
 				start_eu = true;
 			}
 			//if euphoria start has already passed the clicker
-			else if (dt < 0.0) {
+			else if (percent < 0.0) {
 				//if (m_renderEuZone) {
 				pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
 				pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
@@ -1307,8 +1278,8 @@ void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cr
 			//if the render has successfully added the start
 			if (start_eu) {
 				//if euphoria end is in the middle of the highway
-				if (endDt >= 0.0 && endDt < 1.0) {
-					float z = 3.75f - (3.75f * (float)endDt);
+				if (endPercent >= 0.0 && endPercent < 1.0) {
+					float z = 3.75f - (3.75f * (float)endPercent);
 					pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 					pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
 
@@ -1322,7 +1293,7 @@ void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cr
 			}
 		}
 
-		if(milli > time + m_noteVisibleTime){
+		if (milli > time + m_noteVisibleTime) {
 			ev.at(i).setLanMod(m_renderCross);
 		}
 	}
@@ -1330,7 +1301,7 @@ void GameRender::events(double time, std::vector<Note>& ev,std::vector<Note>& cr
 	renderColor(eventsVector, eventsIndices);
 }
 
-void GameRender::meters(){
+void GameRender::meters() {
 	float yPlane = 0.1f;
 
 	//vertices data
@@ -1341,42 +1312,83 @@ void GameRender::meters(){
 	//multiplier display
 	if (m_playerMult == 2) {
 		//render a 'x2'
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		if (m_isButtonsRight) {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
+		}
+		else {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		}
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 3) {
 		//render a 'x3'
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+		if (m_isButtonsRight) {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+		}
+		else {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+		}
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 4) {
 		//render a 'x4'
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 0.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+		if (m_isButtonsRight) {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
+		}
+		else {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
+		}
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 6) {
 		//render a 'x6'
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 1.0f);
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+		if (m_isButtonsRight) {
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 1.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+		}
+		else {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 1.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+		}
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	else if (m_playerMult == 8) {
 		//render a 'x8'
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
-		pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
+		if (m_isButtonsRight) {
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
+		}
+		else {
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
+			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
+			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
+		}
+
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
@@ -1504,41 +1516,71 @@ void GameRender::meters(){
 	}
 }
 
-void GameRender::result(Player& player,Generator& generator) {
+void GameRender::result(Player& player, Generator& generator) {
 	useOrthoProj();
-	drawText("Result:", 0.0f, 50.0f, 0.05f);
+	float y = 50.0f;
+	float scale = 0.05f;
 
 	int all = generator.getNotesTotal();
 	int hit = generator.getNotesHit();
 	int score = player.getScore();
 	int combo = player.getHighCombo();
 
+	std::string firstSong = std::string(generator.getSongEntry().s1);
+	std::string secondSong = std::string(generator.getSongEntry().s2);
+	std::string completeName = firstSong;
+	if (!secondSong.empty()) {
+		completeName += " vs ";
+		completeName += secondSong;
+	}
 	std::string hitString = std::string("Number of notes hit:") + std::to_string(hit);
 	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
 	std::string scoreString = std::string("Score:") + std::to_string(score);
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
+	
+	drawText(completeName, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText("Result:", 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(hitString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(totalString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(comboString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(scoreString, 10.0f, y, scale);
+	y += scale * 1000.0f;
 
-
-	drawText(hitString, 0.0f, 100.0f, 0.05f);
-	drawText(totalString, 0.0f, 150.0f, 0.05f);
-	drawText(scoreString, 0.0f, 200.0f, 0.05f);
-	drawText(comboString, 0.0f, 250.0f, 0.05f);
-
-
-	if (combo == all) {
-		drawText("Wow! a Full Combo", 200.0f, 50.0f, 0.05f);
+	if (all > 0) {
+		std::string percent = std::string("Percent:") + std::to_string((float)hit / (float)all * 100.0f) + std::string("%");
+		drawText(percent, 10.0f, y, scale);
+	}
+	if (combo == all && all != 0) {
+		std::string t = "Wow! a Full Combo";
+		float x = 1270.0f - getTextWidth(t,scale);
+		drawText(t, x, 100.0f, scale);
+	}
+	else if (hit > all) {
+		std::string t = "Hold on a sec. How did you...";
+		float x = 1270.0f - getTextWidth(t, scale);
+		drawText(t, x, 100.0f, scale);
 	}
 }
 
-void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::vector<Note>& c) {	
+void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
 	/*
 	std::string text = "Notes:";
-	for (size_t i = 0; i < note_arr.size()/10; i++) {
+	for (size_t i = 0; i < note_arr.size(); i++) {
+		if (i > 15)break;
 		int t = note_arr.at(i).getType();
-		text.append(std::to_string(t));
-		text.append(",");
+		double m = note_arr.at(i).getMilli();
+		text += std::to_string(t);
+		text += "(";
+		text += std::to_string(m);
+		text += ")";
+		text += ",";
 	}
-	drawText(text, 0, 40, 0.05);
+	drawText(text, 0.0f, 0.0f, 0.05f);
 	*/
 	
 	/*
@@ -1555,6 +1597,7 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 	}
 	//drawText(t2, 0.0f, 40.0f, 0.05f);
 	*/
+	/*
 	std::string cs = "Cross:";
 	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
@@ -1563,12 +1606,18 @@ void GameRender::debug(std::vector<Note>& note_arr, std::vector<Note>& ev, std::
 
 		cs.append(text);
 		cs.append(",");
-
 	}
-	
+
 	drawText(cs, 0.0f, 0.0f, 0.05f);
 	//std::cout << t2 << std::endl;
-	
+	*/
+
+	std::string sizes;
+	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
+	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
+	sizes += std::string("Cross:") + std::to_string(c.size());
+	drawText(sizes, 0.0f, 0.0f, 0.05f);
+
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
@@ -1587,7 +1636,7 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool greenAnimEnabled = p.m_greenAnimation;
 	bool redAnimEnabled = p.m_redAnimation;
 	bool blueAnimEnabled = p.m_blueAnimation;
-	
+
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
 		if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
@@ -1601,7 +1650,7 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 		if (p.m_pastCross == 0)m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
 		else if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
 	}
-	
+
 	if (greenAnimEnabled) {
 		m_animManager.triggerAnimation(AN_GREEN_CLICKER, time);
 		p.m_greenAnimation = false;
@@ -1613,6 +1662,7 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
 		p.m_blueAnimation = false;
 	}
+	rendr_InvertedX = m_isButtonsRight;
 }
 
 void GameRender::clickerAnimation() {
@@ -1632,10 +1682,10 @@ void GameRender::clickerAnimation() {
 		float y = 1.0f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenBack, x, y);
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenFront, x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenFront, x + 0.1, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenBack, x + 0.1, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenBack, (float)x, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenFront, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenFront, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenBack, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
@@ -1646,10 +1696,10 @@ void GameRender::clickerAnimation() {
 		float y = 0.75f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.6f, x, y);
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.9f, x, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.9f, x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, x + 0.1f, y);
+		pushVertexTexture(clickerVector, -0.15f, plane, 3.6f, (float)x, y);
+		pushVertexTexture(clickerVector, -0.15f, plane, 3.9f, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.15f, plane, 3.9f, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, (float)x + 0.1f, y);
 
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
@@ -1660,10 +1710,10 @@ void GameRender::clickerAnimation() {
 		float y = 0.5f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueBack, x, y);
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueFront, x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueFront, x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, x + 0.1f, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueBack, (float)x, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueFront, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueFront, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
@@ -1673,7 +1723,7 @@ void GameRender::clickerAnimation() {
 
 void GameRender::reset() {
 	m_noteVisibleTime = 1.0;
-	m_red = false; 
+	m_red = false;
 	m_green = false;
 	m_blue = false;
 	m_playerCross = 1;
@@ -1689,6 +1739,43 @@ void GameRender::reset() {
 void GameRender::updateAnimations(double time) {
 	m_animManager.tick(time);
 }
+
+std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> cross) {
+	std::vector<Note> result = {};
+	double start = note.getMilli();
+	double end = start + note.getLength();
+	int lastChange = CROSS_C;
+
+	if (note.getLanMod() == 0)lastChange = CROSS_G;
+	else if (note.getLanMod() == 2)lastChange = CROSS_B;
+
+	result.push_back(Note(start, lastChange, 0.0f, true));
+	for (size_t i = 0; i < cross.size(); ++i) {
+		double crossMilli = cross.at(i).getMilli();
+		int crossType = cross.at(i).getType();
+		if (crossMilli <= end && crossMilli >= start) {
+			if (crossType == CROSS_G && lastChange != CROSS_G) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_G;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+			else if (crossType == CROSS_C && lastChange != CROSS_C) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_C;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+			else if (crossType == CROSS_B && lastChange != CROSS_B) {
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+				lastChange = CROSS_B;
+				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
+			}
+		}
+	}
+	result.push_back(Note(end, lastChange, 0.0f, true));
+	return result;
+}
+
+
 
 GameRender::~GameRender() {
 }

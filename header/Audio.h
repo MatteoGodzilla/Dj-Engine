@@ -17,6 +17,7 @@ public:
 	void buffer();
 	void reset();
 	bool isActive(double time);
+	bool isPlaying();
 private:
 	ALCdevice* m_device;
 	ALCcontext* m_context;

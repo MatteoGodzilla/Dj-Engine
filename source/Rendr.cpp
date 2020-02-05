@@ -27,7 +27,8 @@ void Rendr::checkError() {
 
 //utility function
 void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) {
-	v.push_back(x);
+	if (rendr_InvertedX) v.push_back(-x);
+	else v.push_back(x);
 	v.push_back(y);
 	v.push_back(z);
 	v.push_back(r);
@@ -38,7 +39,8 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 
 //utility function
 void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) {
-	v.push_back(x);
+	if (rendr_InvertedX) v.push_back(-x);
+	else v.push_back(x);
 	v.push_back(y);
 	v.push_back(z);
 	v.push_back(s);
@@ -177,6 +179,8 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 }
 
 void Rendr::drawText(const std::string& s, float x, float y, float scl) {
+	bool old = rendr_InvertedX;
+	rendr_InvertedX = false;
 	//loop for every char in string
 	float maxBearing = 0.0f;
 	for (char c : s) {
@@ -216,7 +220,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 			std::cerr << "Rendr error:Char not supported: " << c << std::endl;
 		}
 	}
-
+	rendr_InvertedX = old;
 }
 
 float Rendr::getTextWidth(const std::string& s,float scale) {

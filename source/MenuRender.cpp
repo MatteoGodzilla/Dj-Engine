@@ -17,6 +17,9 @@ void MenuRender::init(GLFWwindow* w) {
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 	loadTexture("res/buttons.png", &m_buttonTexture);
 	loadTexture("res/splashArt.png", &m_splashTexture);
+	loadTexture("res/calibration.png", &m_calibrationTex);
+
+	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
 }
 
 void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
@@ -643,7 +646,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(c);
 		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfLeftPressed ? 1.0f : 0.0f;
+		value = game->getPlayer()->m_isCfGreenPressed ? 1.0f : 0.0f;
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -671,7 +674,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(c);
 		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfRightPressed ? 1.0f : 0.0f;
+		value = game->getPlayer()->m_isCfBluePressed ? 1.0f : 0.0f;
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -751,7 +754,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(uk).c_str());
 		ImGui::NextColumn();
-		value = glfwGetKey(m_window, uk);
+		value = (float)glfwGetKey(m_window, uk);
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -775,7 +778,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(dk).c_str());
 		ImGui::NextColumn();
-		value = glfwGetKey(m_window, dk);
+		value = (float)glfwGetKey(m_window, dk);
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -799,7 +802,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(sk).c_str());
 		ImGui::NextColumn();
-		value = glfwGetKey(m_window, sk);
+		value = (float)glfwGetKey(m_window, sk);
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 		
@@ -823,7 +826,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::SameLine();
 		ImGui::Text(std::to_string(bk).c_str());
 		ImGui::NextColumn();
-		value = glfwGetKey(m_window, bk);
+		value = (float)glfwGetKey(m_window, bk);
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
 
@@ -890,17 +893,140 @@ void MenuRender::splashArt() {
 	float x = 1280.0f / 2.0f;
 	float y = 360.0f - 200.0f * scale / 2;
 	pushVertexTexture(vector, x, y, 0.0, 0.0, 1.0);
-	pushVertexTexture(vector, x, y + 200.0 * scale, 0.0, 0.0, 0.0);
-	pushVertexTexture(vector, x + 500.0 * scale, y + 200.0 * scale, 0.0, 1.0, 0.0);
-	pushVertexTexture(vector, x + 500.0 * scale, y, 0.0, 1.0, 1.0);
+	pushVertexTexture(vector, x, y + 200.0f * scale, 0.0, 0.0, 0.0);
+	pushVertexTexture(vector, x + 500.0f * scale, y + 200.0f * scale, 0.0, 1.0, 0.0);
+	pushVertexTexture(vector, x + 500.0f * scale, y, 0.0, 1.0, 1.0);
 	pushRectangleIndices(indices, indexCount);
 
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
 
-	drawText("*This is pre-release v0.9. There are some bugs and you WILL see them*", 10.0, 10.0, 0.02f);
-	drawText("*Remember this when playing*", 10.0, 30.0, 0.02f);
-	drawText("*Have Fun! :)*", 10.0, 50.0, 0.02f);
+	float textScale = 0.02f;
+	drawText("*This is alpha v1.1. There are some bugs and you WILL see them*", 10.0, 10.0, textScale);
+	drawText("*Remember this when playing*", 10.0, 30.0, textScale);
+	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
+
+	std::string discord = "For any questions, ask on the Dj Hero Discord";
+	std::string discord2 = "https://discord.gg/HZ82gKR";
+	drawText(discord, 1270.0f - getTextWidth(discord, textScale), 10.0f, textScale);
+	drawText(discord2, 1270.0f - getTextWidth(discord2, textScale), 30.0f, textScale);
+}
+
+void MenuRender::scratches(Player* player) {
+	useOrthoProj();
+	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
+
+	player->pollInput(m_window);
+	if (player->m_isUpPressed && !player->m_wasUpPressed) {
+		m_testBuffer.push_back('^');
+	}
+	if (player->m_isDownPressed && !player->m_wasDownPressed) {
+		m_testBuffer.push_back('v');
+	}
+	if (m_testBuffer.size() > 20)m_testBuffer.erase(0, 1);
+	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
+	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
+}
+
+void MenuRender::calibration(Game* game, double dt) {
+	useOrthoProj();
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGuiBackendFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoMove;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoCollapse;
+
+	ImGui::Begin("Calibration Window", NULL, flags);
+	ImGui::SetWindowPos({ 0.0f,0.0f });
+
+	int width, height;
+	glfwGetFramebufferSize(m_window, &width, &height);
+	ImGui::SetWindowSize({ (float)width,(float)height });
+
+	ImGui::SliderFloat("Audio Latency", &(game->m_audioLatency),0.0f,2.0f);
+	ImGui::SameLine();
+	if(ImGui::Button("Calibrate")){
+		m_isCalibrating = true;
+		game->getAudio()->reset();
+		m_cbPlayingTime = 0.0;
+		m_latencyHits.clear();
+		game->getAudio()->load("res/calibration.ogg");
+		game->getAudio()->play();
+	}
+	if (game->getAudio()->isPlaying()) {
+		game->getAudio()->buffer();
+		m_cbPlayingTime += dt;
+	}
+	else {
+		game->getAudio()->reset();
+		m_isCalibrating = false;
+		m_cbPlayingTime = 0.0;
+
+		if (!m_latencyHits.empty()) {
+			double sum = 0.0;
+			for (size_t i = 0; i < m_latencyHits.size(); ++i) {
+				sum += m_latencyHits.at(i) - (2.0 + 0.5 * i);
+			}
+			game->m_audioLatency = (float)(sum / m_latencyHits.size());
+			m_latencyHits.clear();
+		}
+	}
+	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
+	ImGui::Text("Press the 'Calibrate' Button ONLY when you hear the snare hits for best latency calculations");
+	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
+	
+	ImGui::Separator();
+	
+	for (int i = 0; i < 8; ++i) {
+		if (m_cbPlayingTime > 2.0 + 0.5 * i) {
+			ImGui::SameLine();
+			ImGui::Image((ImTextureID)m_calibrationTex, { 100.0f,100.0f }, { 0.5f,0.5f }, { 1.0f,1.0f });
+		}
+		else {
+			ImGui::SameLine();
+			ImGui::Image((ImTextureID)m_calibrationTex, { 100.0f,100.0f }, { 0.0f,0.0f }, { 0.5f,0.5f });
+		}
+	}
+	ImGui::Separator();
+	if (ImGui::Button("Tap Me", { 300.0f,250.0f })) {
+		m_latencyHits.push_back(m_cbPlayingTime);
+	}
+	if (ImGui::Button("Go back to main menu")) {
+		m_shouldClose = true;
+	}
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void MenuRender::setDeckSpeed(Game* game){
+	useOrthoProj();
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	ImGuiBackendFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+	ImGui::Begin("Set Deck Speed",NULL,flags);
+	ImGui::Text("Set the deck speed using the slider below.");
+	ImGui::Text("The value represents the visible time of a note in the highway");
+	ImGui::Text("(i.e. 1.0 is one second in the highway)");
+	ImGui::Text("A larger value means slower speed, smaller value means faster");
+	ImGui::SliderFloat("Speed", &(game->m_deckSpeed), 0.5f, 3.0f);
+	if (ImGui::Button("Close")) {
+		m_shouldClose = true;
+	}
+
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 }
 
 void MenuRender::editingGameAxis(int action) {

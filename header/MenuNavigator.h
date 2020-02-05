@@ -7,13 +7,17 @@
 #include <iostream>
 #include <fstream>
 
+enum scenes {
+	MAIN_SCENE,REMAPPING,CREDITS,SCRATCHES,CALIBRATION
+};
+
 class MenuNavigator {
 public:
 	MenuNavigator();
 	void init(GLFWwindow* w,Game* gameptr);
 	void pollInput();
 	void update();
-	void render();
+	void render(double dt);
 	void setActive(bool active);
 	bool getActive();
 	void activate(MenuNode& menu, MenuNode& parent);
@@ -83,4 +87,7 @@ private:
 
 	std::vector<float> m_pastGamepadValues;
 	std::vector<char> m_keyboardState;
+
+	int m_popupId = -1;
+	bool m_debounce = false;
 };

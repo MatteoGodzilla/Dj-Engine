@@ -1,5 +1,6 @@
 #pragma once
 #include "SimpleINI/SimpleIni.h"
+#include "nlohmann/json.hpp"
 #include <iostream>
 //remove visual studio warning
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
@@ -16,6 +17,7 @@ struct SongEntry {
 	std::string a2;
 	std::string charter;
 	std::string mixer;
+	float bpm;
 	int dTrack;
 	int dTap;
 	int dCrossfade;
