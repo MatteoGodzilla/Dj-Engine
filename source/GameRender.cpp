@@ -128,7 +128,6 @@ void GameRender::clicker() {
 				m_greenLeft = -0.5f;
 				m_greenRight = -0.2f;
 				float d = (float)(crossGreen.getPercent() * 0.35);
-
 				m_greenLeft -= d;
 				m_greenRight -= d;
 			}
@@ -149,7 +148,6 @@ void GameRender::clicker() {
 			if (crossGreen.isEnabled()) {
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
-
 				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
@@ -164,11 +162,13 @@ void GameRender::clicker() {
 			m_greenLeft = -0.85f;
 			m_greenRight = -0.55f;
 
-			//green clicker is on the left
+			//green clicker is on the center
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
 				m_greenLeft = -0.5f;
 				m_greenRight = -0.2f;
+
+				//std::cout << crossGreen.getPercent() << std::endl;
 				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
@@ -1645,6 +1645,12 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool greenAnimEnabled = p.m_greenAnimation;
 	bool redAnimEnabled = p.m_redAnimation;
 	bool blueAnimEnabled = p.m_blueAnimation;
+	/*
+	bool centerToGreen = p.m_cfCenterToGreen;
+	bool centerToBlue = p.m_cfCenterToBlue;
+	bool greenToCenter = p.m_cfGreenToCenter;
+	bool blueToCenter = p.m_cfBlueToCenter;
+	*/
 
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
@@ -1671,6 +1677,19 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
 		p.m_blueAnimation = false;
 	}
+	/*if (centerToGreen) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+		p.m_cfCenterToGreen = false;
+	}if (centerToBlue) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+		p.m_cfCenterToBlue = false;
+	}if (greenToCenter) {
+		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		p.m_cfGreenToCenter = false;
+	}if (centerToGreen) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		p.m_cfBlueToCenter = false;
+	}*/
 	rendr_InvertedX = m_isButtonsRight;
 }
 

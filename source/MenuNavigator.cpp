@@ -62,9 +62,11 @@ MenuNavigator::MenuNavigator() {
 	MenuNode latency("Calibrate latency", 5);
 	MenuNode flipButtons("Toggle Buttons Right/Left", 6);
 	MenuNode speed("Set Deck Speed", 7);
+	MenuNode bot("Toggle Bot", 8);
 	options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
+	options.push(bot);
 	options.push(speed);
 
 	m_root.push(play);
@@ -466,6 +468,16 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (id == 7) {
 		m_popupId = 0;
+	}
+	else if (id == 8) {
+		if (m_game->getPlayer()->m_botEnabled) {
+			std::cout << "Menu Message: disabled bot" << std::endl;
+			m_game->getPlayer()->m_botEnabled = false;
+		}
+		else {
+			std::cout << "Menu Message: enabled bot" << std::endl;
+			m_game->getPlayer()->m_botEnabled = true;
+		}
 	}
 	else if (id == 255) {
 		index = findIndex(menu, parent);

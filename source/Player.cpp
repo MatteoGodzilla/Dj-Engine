@@ -18,29 +18,13 @@ Player::Player() {
 }
 
 void Player::pollInput(GLFWwindow* window) {
-	m_wasRedPressed = m_isRedPressed;
-	m_wasGreenPressed = m_isGreenPressed;
-	m_wasBluePressed = m_isBluePressed;
-	m_wasUpPressed = m_isUpPressed;
-	m_wasDownPressed = m_isDownPressed;
-	m_wasCfGreenPressed = m_isCfGreenPressed;
-	m_wasCfBluePressed = m_isCfBluePressed;
-
 	m_pastCross = m_cross;
 
-	if (m_useKeyboardInput) {
-		m_isRedPressed = glfwGetKey(window, RED_CODE);
-		m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
-		m_isBluePressed = glfwGetKey(window, BLUE_CODE);
-		m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
-		m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
-		m_isCfGreenPressed = glfwGetKey(window, CROSS_L_CODE);
-		m_isCfBluePressed = glfwGetKey(window, CROSS_R_CODE);
-		m_isEuPressed = glfwGetKey(window, EUPHORIA);
-	}
+	//for exiting result screen
+	m_wasGreenPressed = m_isGreenPressed;
+	if (m_useKeyboardInput)m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
 	else {
 		if (glfwJoystickPresent(m_gamepadId)) {
-
 			updateGamepadState();
 
 			if (m_gpState.size() > 0) {
@@ -50,74 +34,111 @@ void Player::pollInput(GLFWwindow* window) {
 					m_isGreenPressed = true;
 				}
 				else m_isGreenPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
-					m_isRedPressed = true;
-				}
-				else m_isRedPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
-					m_isBluePressed = true;
-				}
-				else m_isBluePressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
-					m_isEuPressed = true;
-				}
-				else m_isEuPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
-					m_isCfGreenPressed = true;
-					m_isCfBluePressed = false;
-				}
-				else m_isCfGreenPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
-					m_isCfBluePressed = true;
-					m_isCfGreenPressed = false;
-				}
-				else m_isCfBluePressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
-					m_isUpPressed = true;
-					m_isDownPressed = false;
-				}
-				else m_isUpPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
-					m_isDownPressed = true;
-					m_isUpPressed = false;
-				}
-				else m_isDownPressed = false;
 			}
 		}
+
 	}
 
-	if (m_isButtonsRight) {
-		bool temp = m_isCfGreenPressed;
-		m_isCfGreenPressed = m_isCfBluePressed;
-		m_isCfBluePressed = temp;
-	}
+	if (!m_botEnabled) {
+		m_wasRedPressed = m_isRedPressed;
 
-	if (!m_euphoria_active) {
-		if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
-			m_cross = 0;
+		m_wasBluePressed = m_isBluePressed;
+		m_wasUpPressed = m_isUpPressed;
+		m_wasDownPressed = m_isDownPressed;
+		m_wasCfGreenPressed = m_isCfGreenPressed;
+		m_wasCfBluePressed = m_isCfBluePressed;
+
+		if (m_useKeyboardInput) {
+			m_isRedPressed = glfwGetKey(window, RED_CODE);
+			m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
+			m_isBluePressed = glfwGetKey(window, BLUE_CODE);
+			m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
+			m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
+			m_isCfGreenPressed = glfwGetKey(window, CROSS_L_CODE);
+			m_isCfBluePressed = glfwGetKey(window, CROSS_R_CODE);
+			m_isEuPressed = glfwGetKey(window, EUPHORIA);
 		}
-		else if (m_isCfBluePressed && !m_wasCfBluePressed) {
-			m_cross = 2;
+		else {
+			if (glfwJoystickPresent(m_gamepadId)) {
+
+				updateGamepadState();
+
+				if (m_gpState.size() > 0) {
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+						m_isGreenPressed = true;
+					}
+					else m_isGreenPressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+						m_isRedPressed = true;
+					}
+					else m_isRedPressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+						m_isBluePressed = true;
+					}
+					else m_isBluePressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
+						m_isEuPressed = true;
+					}
+					else m_isEuPressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
+						m_isCfGreenPressed = true;
+						m_isCfBluePressed = false;
+					}
+					else m_isCfGreenPressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
+						m_isCfBluePressed = true;
+						m_isCfGreenPressed = false;
+					}
+					else m_isCfBluePressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
+						m_isUpPressed = true;
+						m_isDownPressed = false;
+					}
+					else m_isUpPressed = false;
+
+					//value * sensitivity >= deadzone
+					if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
+						m_isDownPressed = true;
+						m_isUpPressed = false;
+					}
+					else m_isDownPressed = false;
+				}
+			}
 		}
-		else if (m_wasCfGreenPressed && !m_isCfGreenPressed && !m_isCfBluePressed) {
-			m_cross = 1;
+
+		if (m_isButtonsRight) {
+			bool temp = m_isCfGreenPressed;
+			m_isCfGreenPressed = m_isCfBluePressed;
+			m_isCfBluePressed = temp;
 		}
-		else if (m_wasCfBluePressed && !m_isCfBluePressed && !m_isCfGreenPressed) {
-			m_cross = 1;
+
+		if (!m_euphoria_active) {
+			if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
+				m_cross = 0;
+			}
+			else if (m_isCfBluePressed && !m_wasCfBluePressed) {
+				m_cross = 2;
+			}
+			else if (m_wasCfGreenPressed && !m_isCfGreenPressed && !m_isCfBluePressed) {
+				m_cross = 1;
+			}
+			else if (m_wasCfBluePressed && !m_isCfBluePressed && !m_isCfGreenPressed) {
+				m_cross = 1;
+			}
 		}
 	}
 }
@@ -677,7 +698,117 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 		}
 	}
+	if (m_botEnabled) {
+		for (size_t i = 0; i < v.size(); ++i) {
+			int type = v.at(i).getType();
+			if (v.at(i).getMilli() < time && !v.at(i).getTouched()) {
+				if (type == TAP_R) {
+					m_score += 100 * m_mult;
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_redAnimation = true;
+					break;
+				}
+				else if (type == TAP_G) {
+					m_score += 100 * m_mult;
+					//check for chords (i.e multiple taps in the same time)
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					break;
+				}
+				else if (type == TAP_B) {
+					m_score += 100 * m_mult;
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					break;
+				}
+				else if (type == SCR_G_UP || type == SCR_G_DOWN) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					m_score += 100 * m_mult;
+					m_combo++;
+					break;
+				}
+				else if (type == SCR_G_ANY || type == SCR_G_TICK) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
+				else if (type == SCR_B_UP || type == SCR_B_DOWN) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					m_score += 100 * m_mult;
+					m_combo++;
+					break;
+				}
+				else if (type == SCR_B_ANY || type == SCR_B_TICK) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
 
+				else if (type == CF_SPIKE_G) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_B) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_C) {
+					v.at(i).click(time);
+					if (m_cross == 0)m_greenAnimation = true;
+					else if (m_cross == 2)m_blueAnimation = true;
+					break;
+				}
+			}
+		}
+
+		for (size_t i = 0; i < cross.size(); ++i) {
+			int type = cross.at(i).getType();
+			if (cross.at(i).getMilli() < time && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
+				if (type == CROSS_G) {
+					m_cross = 0;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_C) {
+					m_cross = 1;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_B) {
+					m_cross = 2;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+			}
+		}
+	}
 }
 
 //update combo/multiplier for every frame

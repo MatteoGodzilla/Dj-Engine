@@ -89,11 +89,16 @@ public:
 	bool m_greenAnimation = false;
 	bool m_redAnimation = false;
 	bool m_blueAnimation = false;
+	bool m_cfCenterToGreen = false;
+	bool m_cfCenterToBlue= false;
+	bool m_cfGreenToCenter = false;
+	bool m_cfBlueToCenter = false;
 
 	int m_cross = 1;
 	int m_pastCross = 1;
 
 	bool m_isButtonsRight = false;
+	bool m_botEnabled;
 protected:
 
 private:
