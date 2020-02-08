@@ -286,11 +286,11 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	for (size_t i = 0; i < v.size(); i++) {
 		double milli = v.at(i).getMilli();
 		double hitWindow = v.at(i).hitWindow;
-		if (time + m_noteVisibleTime >= milli) {
+		if (time + m_noteVisibleTime > milli) {
 			//if the note is inside the visible highway
 
 			//calculate 'height' of note
-			double percent = (v.at(i).getMilli() - time)/m_noteVisibleTime;
+			double percent = (v.at(i).getMilli() - time) / m_noteVisibleTime;
 			float z = 3.75f - (3.75f * (float)percent);
 
 			int type = v.at(i).getType();
@@ -602,9 +602,17 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 
 		}
-		else if (milli > time + m_noteVisibleTime) {
+		else if (milli >= time + m_noteVisibleTime) {
 			//if the note is outside the visible area, update lane position
-			v.at(i).setLanMod(m_renderCross);
+			int position = 1;
+			for (size_t j = 0; j < cross.size(); ++j) {
+				if (cross.at(j).getMilli() <= milli) {
+					if (cross.at(j).getType() == CROSS_G) position = 0;
+					else if (cross.at(j).getType() == CROSS_C) position = 1;
+					else if (cross.at(j).getType() == CROSS_B) position = 2;
+				}
+			}
+			v.at(i).setLanMod(position);
 		}
 	}
 	usePersProj();
@@ -946,7 +954,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				}
 			}
 		}
-		else if (t > time + m_noteVisibleTime) {
+		else if (t >= time + m_noteVisibleTime) {
 			if (middle == CROSS_G) {
 				m_renderCross = 0;
 				//change color if euphoria is active
@@ -1597,11 +1605,11 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	}
 	//drawText(t2, 0.0f, 40.0f, 0.05f);
 	*/
-	/*
+	
 	std::string cs = "Cross:";
 	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
-		int t = (int)c.at(i).getMilli();
+		int t = (int)c.at(i).getType();
 		std::string text = std::to_string(t);
 
 		cs.append(text);
@@ -1610,14 +1618,15 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 
 	drawText(cs, 0.0f, 0.0f, 0.05f);
 	//std::cout << t2 << std::endl;
-	*/
+	
 
+	/*
 	std::string sizes;
 	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
 	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
 	sizes += std::string("Cross:") + std::to_string(c.size());
 	drawText(sizes, 0.0f, 0.0f, 0.05f);
-
+	*/
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {

@@ -54,5 +54,9 @@ private:
 
 	const int TICKS_PER_BEAT = 4;
 
+	bool m_firstSpikeGenerated = false;
+	double m_firstSpikeMilli = 0.0;
+	bool m_addedCrossCenter = false;
+
 	SongEntry m_songEntry;
 };

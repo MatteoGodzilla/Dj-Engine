@@ -159,14 +159,19 @@ void Generator::initialLoad(){
 				
 			}
 			else if (type == 9) {
+				m_firstSpikeGenerated = false;
+				m_addedCrossCenter = false;
 				m_allCross.push_back(Note(time, CROSS_B, 0.0, true));
 			}
 			else if (type == 10) {
+				m_firstSpikeGenerated = false;
+				m_addedCrossCenter = false;
 				if (time > 0.0) {
 					m_allCross.push_back(Note(time, CROSS_C, 0.0, true));
 				}
 			}
 			else if (type == 11) {
+				m_firstSpikeGenerated = false;
 				m_allCross.push_back(Note(time, CROSS_G, 0.0, true));
 			}
 			else if (type == 15) {
@@ -179,10 +184,28 @@ void Generator::initialLoad(){
 				m_allEvents.push_back(Note(time, SCR_B_ZONE, length, true));
 			}
 			else if (type == 27) {
+				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
+					m_addedCrossCenter = true;
+					m_allCross.push_back(Note(m_firstSpikeMilli, CROSS_C, 0.0, true));
+					m_firstSpikeMilli = 0.0;
+				}
+				else {
+					m_firstSpikeGenerated = true;
+					m_firstSpikeMilli = time;
+				}
 				m_allTaps.push_back(Note(time, CF_SPIKE_G, 0.0, false));
 				//pushNote((double)time, CF_SPIKE_G, 0.0);
 			}
 			else if (type == 28) {
+				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
+					m_addedCrossCenter = true;
+					m_allCross.push_back(Note(m_firstSpikeMilli, CROSS_C, 0.0, true));
+					m_firstSpikeMilli = 0.0;
+				}
+				else {
+					m_firstSpikeGenerated = true;
+					m_firstSpikeMilli = time;
+				}
 				m_allTaps.push_back(Note(time, CF_SPIKE_B, 0.0, false));
 				//pushNote((double)time, CF_SPIKE_B, 0.0);
 			}
