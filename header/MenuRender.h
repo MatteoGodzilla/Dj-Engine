@@ -11,12 +11,23 @@
 #include <iostream>
 #include <map>
 
+struct menuinputs {
+	int* uk;
+	int* dk;
+	int* sk;
+	int* bk;
+	int* ug;
+	int* dg;
+	int* sg;
+	int* bg;
+};
+
 class MenuRender : public Rendr {
 public:
 	MenuRender();
 	void init(GLFWwindow* w);
 	void render(MenuNode node, int selected, unsigned int vOffset);
-	void remapping(Game* game, int uk, int dk, int sk, int bk, int ug, int dg, int sg, int bg);
+	void remapping(Game* game, menuinputs input);
 	void scratches(Player* player);
 	void calibration(Game* game, double time);
 	void setDeckSpeed(Game* game);

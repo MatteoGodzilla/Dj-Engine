@@ -22,9 +22,10 @@ void MenuRender::init(GLFWwindow* w) {
 	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
 }
 
-void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
+void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	//enable exit from remapping menu
 	m_shouldClose = false;
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	//vertices data
 	std::vector<float> selVector;
@@ -62,7 +63,7 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 
 	if (menu.getChildCount() > 0) {
 		//draw every child from node
-		
+
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < menu.getChildCount(); i++) {
 				drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
@@ -86,7 +87,7 @@ void MenuRender::render(MenuNode menu,int selected,unsigned int vOffset) {
 	}
 }
 
-void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, int dg, int sg, int bg) {
+void MenuRender::remapping(Game* game, menuinputs input) {
 	game->getPlayer()->pollInput(m_window);
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -134,6 +135,24 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 	}
 
 	if (!game->getPlayer()->m_useKeyboardInput) {
+		ImGui::SameLine();
+		if (ImGui::Button("Axis viewer")) {
+			ImGui::OpenPopup("raw viewer");
+			ImGui::SetNextWindowSize(ImVec2(500.0f, 700.0f));
+		}
+		if (ImGui::BeginPopupModal("raw viewer")) {
+			if (ImGui::Button("Close"))ImGui::CloseCurrentPopup();
+			ImGui::Columns(2, "axes");
+			std::vector<float> values = game->getPlayer()->getGamepadValues();
+			for (size_t i = 0; i < values.size(); ++i) {
+				ImGui::Text(std::to_string(i).c_str());
+				ImGui::NextColumn();
+				ImGui::ProgressBar(values.at(i), ImVec2(0.0f, 0.0f), std::to_string(values.at(i)).c_str());
+				ImGui::NextColumn();
+			}
+			ImGui::Columns();
+			ImGui::EndPopup();
+		}
 		ImGui::Columns(colnum, "mycolumns3", false);  // 3-ways, no border
 		ImGui::Text("Action");
 		ImGui::NextColumn();
@@ -147,7 +166,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		ImGui::NextColumn();
 		ImGui::Separator();
 
-		if (glfwJoystickPresent(GLFW_JOYSTICK_1) && game->getPlayer()->m_gpState.size() > 0) {
+		if (glfwJoystickPresent(game->getPlayer()->m_gamepadId) && game->getPlayer()->m_gpState.size() > 0) {
 			ImGui::Text("Green Button:");
 			ImGui::NextColumn();
 			std::string id = std::string("Remap") + std::string("##01");
@@ -166,7 +185,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->GREEN_GAMEPAD).c_str());
+			ImGui::InputInt("##green", &(game->getPlayer()->GREEN_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->GREEN_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			float value = game->getPlayer()->m_gpState.at(GREEN_INDEX) * game->getPlayer()->m_gpMult.at(GREEN_INDEX);
 			ImGui::ProgressBar(value);
@@ -194,7 +214,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->RED_GAMEPAD).c_str());
+			ImGui::InputInt("##red", &(game->getPlayer()->RED_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->RED_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(RED_INDEX) * game->getPlayer()->m_gpMult.at(RED_INDEX);
 			ImGui::ProgressBar(value);
@@ -222,7 +243,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->BLUE_GAMEPAD).c_str());
+			ImGui::InputInt("##blue", &(game->getPlayer()->BLUE_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->BLUE_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(BLUE_INDEX) * game->getPlayer()->m_gpMult.at(BLUE_INDEX);
 			ImGui::ProgressBar(value);
@@ -250,7 +272,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->EU_GAMEPAD).c_str());
+			ImGui::InputInt("##eu", &(game->getPlayer()->EU_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->EU_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(EU_INDEX) * game->getPlayer()->m_gpMult.at(EU_INDEX);
 			ImGui::ProgressBar(value);
@@ -282,7 +305,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->CF_LEFT_GAMEPAD).c_str());
+			ImGui::InputInt("##left", &(game->getPlayer()->CF_LEFT_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->CF_LEFT_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(CF_LEFT_INDEX) * game->getPlayer()->m_gpMult.at(CF_LEFT_INDEX);
 			ImGui::ProgressBar(value);
@@ -310,7 +334,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->CF_RIGHT_GAMEPAD).c_str());
+			ImGui::InputInt("##right", &(game->getPlayer()->CF_RIGHT_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->CF_RIGHT_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(CF_RIGHT_INDEX) * game->getPlayer()->m_gpMult.at(CF_RIGHT_INDEX);
 			ImGui::ProgressBar(value);
@@ -342,7 +367,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->SCR_UP_GAMEPAD).c_str());
+			ImGui::InputInt("##up", &(game->getPlayer()->SCR_UP_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->SCR_UP_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(SCR_UP_INDEX) * game->getPlayer()->m_gpMult.at(SCR_UP_INDEX);
 			ImGui::ProgressBar(value);
@@ -370,7 +396,8 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(game->getPlayer()->SCR_DOWN_GAMEPAD).c_str());
+			ImGui::InputInt("##down", &(game->getPlayer()->SCR_DOWN_GAMEPAD));
+			//ImGui::Text(std::to_string(game->getPlayer()->SCR_DOWN_GAMEPAD).c_str());
 			ImGui::NextColumn();
 			value = game->getPlayer()->m_gpState.at(SCR_DOWN_INDEX) * game->getPlayer()->m_gpMult.at(SCR_DOWN_INDEX);
 			ImGui::ProgressBar(value);
@@ -398,10 +425,11 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(ug).c_str());
+			ImGui::InputInt("##meup", input.ug);
+			//ImGui::Text(std::to_string(ug).c_str());
 			ImGui::NextColumn();
 			if (glfwJoystickPresent(game->getPlayer()->m_gamepadId)) {
-				value = game->getPlayer()->getGamepadValues().at(ug);
+				value = game->getPlayer()->getGamepadValues().at(*input.ug);
 			}
 			else value = 0;
 			ImGui::ProgressBar(value);
@@ -427,10 +455,11 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(dg).c_str());
+			ImGui::InputInt("##medown", input.dg);
+			//ImGui::Text(std::to_string(*input.dg).c_str());
 			ImGui::NextColumn();
 			if (glfwJoystickPresent(game->getPlayer()->m_gamepadId)) {
-				value = game->getPlayer()->getGamepadValues().at(dg);
+				value = game->getPlayer()->getGamepadValues().at(*input.dg);
 			}
 			else value = 0;
 			ImGui::ProgressBar(value);
@@ -456,10 +485,11 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(sg).c_str());
+			ImGui::InputInt("##meselect", input.sg);
+			//ImGui::Text(std::to_string(*input.sg).c_str());
 			ImGui::NextColumn();
 			if (glfwJoystickPresent(game->getPlayer()->m_gamepadId)) {
-				value = game->getPlayer()->getGamepadValues().at(sg);
+				value = game->getPlayer()->getGamepadValues().at(*input.sg);
 			}
 			else value = 0;
 			ImGui::ProgressBar(value);
@@ -485,10 +515,11 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 				ImGui::EndPopup();
 			}
 			ImGui::SameLine();
-			ImGui::Text(std::to_string(bg).c_str());
+			ImGui::InputInt("##meback", input.bg);
+			//ImGui::Text(std::to_string(*input.bg).c_str());
 			ImGui::NextColumn();
 			if (glfwJoystickPresent(game->getPlayer()->m_gamepadId)) {
-				value = game->getPlayer()->getGamepadValues().at(bg);
+				value = game->getPlayer()->getGamepadValues().at(*input.bg);
 			}
 			else value = 0;
 			ImGui::ProgressBar(value);
@@ -500,336 +531,392 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 		}
 	}
 	else if (game->getPlayer()->m_useKeyboardInput) {
-		
-		ImGui::Columns(3, "mycolumns3", false);  // 3-ways, no border
+		ImGui::SameLine();
+		if (ImGui::Button("Axis viewer")) {
+			ImGui::OpenPopup("raw viewer");
+			ImGui::SetNextWindowSize(ImVec2(500.0f, 700.0f));
+		}
+		if (ImGui::BeginPopupModal("raw viewer")) {
+			if (ImGui::Button("Close"))ImGui::CloseCurrentPopup();
+			ImGui::Columns(2, "axes");
+			std::vector<float> values = game->getPlayer()->getKBMValues(m_window);
+			for (size_t i = 0; i < values.size(); ++i) {
+				ImGui::Text(std::to_string(i).c_str());
+				ImGui::NextColumn();
+				ImGui::ProgressBar(values.at(i), ImVec2(0.0f, 0.0f), std::to_string(values.at(i)).c_str());
+				ImGui::NextColumn();
+			}
+			ImGui::Columns();
+			ImGui::EndPopup();
+		}
+		ImGui::Columns(colnum, "mycolumns3", false);  // 3-ways, no border
 		ImGui::Text("Action");
 		ImGui::NextColumn();
 		ImGui::Text("ID");
 		ImGui::NextColumn();
 		ImGui::Text("Value");
 		ImGui::NextColumn();
+		ImGui::Text("Sensitivity");
+		ImGui::NextColumn();
+		ImGui::Text("Deadzone");
+		ImGui::NextColumn();
 		ImGui::Separator();
 
-		ImGui::Text("Green Button:");
-		ImGui::NextColumn();
-		std::string id = std::string("Remap") + std::string("##101");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(GREEN_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Green Button' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+		if (game->getPlayer()->m_gpState.size() > 0) {
+			ImGui::Text("Green Button:");
+			ImGui::NextColumn();
+			std::string id = std::string("Remap") + std::string("##01");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(GREEN_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		int code = game->getPlayer()->GREEN_CODE;
-		char c[2] = { code,'\0' };
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		float value = game->getPlayer()->m_isGreenPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
-		
-		ImGui::Text("Red Button:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##102");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(RED_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Red Button' ");
-			ImGui::Separator();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Green Button' ");
+				ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->RED_CODE;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isRedPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
-		
-		ImGui::Text("Blue Button:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##103");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(BLUE_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Blue Button' ");
-			ImGui::Separator();
+			ImGui::SameLine();
+			ImGui::InputInt("##green", &(game->getPlayer()->GREEN_CODE));
+			//ImGui::Text(std::to_string(game->getPlayer()->GREEN_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			float value = game->getPlayer()->m_gpState.at(GREEN_INDEX) * game->getPlayer()->m_gpMult.at(GREEN_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##1", &(game->getPlayer()->m_gpMult.at(GREEN_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##11", &(game->getPlayer()->m_gpDead.at(GREEN_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+			ImGui::Text("Red Button:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##02k");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(RED_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->BLUE_CODE;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isBluePressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Red Button' ");
+				ImGui::Separator();
 
-		ImGui::Text("Euphoria Button:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##104");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(EU_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Euphoria Button' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->EUPHORIA;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isEuPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			ImGui::SameLine();
+			ImGui::InputInt("##red", &(game->getPlayer()->RED_CODE));
+			//ImGui::Text(std::to_string(game->getPlayer()->RED_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(RED_INDEX) * game->getPlayer()->m_gpMult.at(RED_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##2", &(game->getPlayer()->m_gpMult.at(RED_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##21", &(game->getPlayer()->m_gpDead.at(RED_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
 
-		ImGui::Text("Crossfade left:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##105");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(CF_LEFT_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Crossfade Left' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+			ImGui::Text("Blue Button:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##03k");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(BLUE_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->CROSS_L_CODE;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfGreenPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Blue Button' ");
+				ImGui::Separator();
 
-		ImGui::Text("Crossfade right:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##106");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(CF_RIGHT_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Crossfade Right' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->CROSS_R_CODE;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isCfBluePressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			ImGui::SameLine();
+			ImGui::InputInt("##blue", &(game->getPlayer()->BLUE_CODE));
+			//ImGui::Text(std::to_string(game->getPlayer()->BLUE_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(BLUE_INDEX) * game->getPlayer()->m_gpMult.at(BLUE_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##3", &(game->getPlayer()->m_gpMult.at(BLUE_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##31", &(game->getPlayer()->m_gpDead.at(BLUE_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
 
-		ImGui::Text("Scratch up:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##107");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(SCR_UP_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Scratch Up' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+			ImGui::Text("Euphoria Button:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##04");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(EU_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->SCRATCH_UP;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isUpPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Euphoria Button' ");
+				ImGui::Separator();
 
-		ImGui::Text("Scratch down:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##108");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingGameKey(SCR_DOWN_INDEX);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Scratch Down' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		code = game->getPlayer()->SCRATCH_DOWN;
-		c[0] = code;
-		ImGui::Text(std::to_string(code).c_str());
-		ImGui::SameLine();
-		ImGui::Text(c);
-		ImGui::NextColumn();
-		value = game->getPlayer()->m_isDownPressed ? 1.0f : 0.0f;
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			ImGui::SameLine();
+			ImGui::InputInt("##eu", &(game->getPlayer()->EUPHORIA));
+			//ImGui::Text(std::to_string(game->getPlayer()->EU_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(EU_INDEX) * game->getPlayer()->m_gpMult.at(EU_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##4", &(game->getPlayer()->m_gpMult.at(EU_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##41", &(game->getPlayer()->m_gpDead.at(EU_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
+			ImGui::Columns();
 
-		ImGui::Text("Menu Up:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##109");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingMenuKey(MENU_UP);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Menu Up' ");
-			ImGui::Separator();
+			ImGui::Checkbox("Use Single Axis for Crossfade", &(game->getPlayer()->m_useSingleCfAxis));
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+			ImGui::Columns(colnum, "second col", false);
+			ImGui::Text("Crossfade left:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##05");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(CF_LEFT_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(uk).c_str());
-		ImGui::NextColumn();
-		value = (float)glfwGetKey(m_window, uk);
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Crossfade Left' ");
+				ImGui::Separator();
 
-		ImGui::Text("Menu Down:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##1091");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingMenuKey(MENU_DOWN);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Menu Down' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(dk).c_str());
-		ImGui::NextColumn();
-		value = (float)glfwGetKey(m_window, dk);
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			ImGui::SameLine();
+			ImGui::InputInt("##left", &(game->getPlayer()->CROSS_L_CODE));
+			//ImGui::Text(std::to_string(game->getPlayer()->CF_LEFT_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(CF_LEFT_INDEX) * game->getPlayer()->m_gpMult.at(CF_LEFT_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##5", &(game->getPlayer()->m_gpMult.at(CF_LEFT_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##51", &(game->getPlayer()->m_gpDead.at(CF_LEFT_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
 
-		ImGui::Text("Menu Select:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##1092");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingMenuKey(MENU_SELECT);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Menu Select' ");
-			ImGui::Separator();
-
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+			ImGui::Text("Crossfade right:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##06");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(CF_RIGHT_INDEX);
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(sk).c_str());
-		ImGui::NextColumn();
-		value = (float)glfwGetKey(m_window, sk);
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
-		
-		ImGui::Text("Menu Back:");
-		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##1093");
-		if (ImGui::Button(id.c_str())) {
-			ImGui::OpenPopup(id.c_str());
-			editingMenuKey(MENU_BACK);
-		}
-		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button for 'Menu Back' ");
-			ImGui::Separator();
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Crossfade Right' ");
+				ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-			if (!m_editingKey) {
-				ImGui::CloseCurrentPopup();
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
 			}
-			ImGui::EndPopup();
-		}
-		ImGui::SameLine();
-		ImGui::Text(std::to_string(bk).c_str());
-		ImGui::NextColumn();
-		value = (float)glfwGetKey(m_window, bk);
-		ImGui::ProgressBar(value);
-		ImGui::NextColumn();
+			ImGui::SameLine();
+			ImGui::InputInt("##right", &(game->getPlayer()->CROSS_R_CODE));
+			//ImGui::Text(std::to_string(game->getPlayer()->CF_RIGHT_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(CF_RIGHT_INDEX) * game->getPlayer()->m_gpMult.at(CF_RIGHT_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##6", &(game->getPlayer()->m_gpMult.at(CF_RIGHT_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##61", &(game->getPlayer()->m_gpDead.at(CF_RIGHT_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
+			ImGui::Columns();
 
+			ImGui::Checkbox("Use Single Axis for Scratch", &(game->getPlayer()->m_useSingleScrAxis));
+
+			ImGui::Columns(colnum, "third col", false);
+			ImGui::Text("Scratch up:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##07");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(SCR_UP_INDEX);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Scratch Up' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##up", &(game->getPlayer()->SCRATCH_UP));
+			//ImGui::Text(std::to_string(game->getPlayer()->SCR_UP_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(SCR_UP_INDEX) * game->getPlayer()->m_gpMult.at(SCR_UP_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##7", &(game->getPlayer()->m_gpMult.at(SCR_UP_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##71", &(game->getPlayer()->m_gpDead.at(SCR_UP_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
+
+			ImGui::Text("Scratch down:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##08");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingGameKey(SCR_DOWN_INDEX);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Scratch Down' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##down", &(game->getPlayer()->SCRATCH_DOWN));
+			//ImGui::Text(std::to_string(game->getPlayer()->SCR_DOWN_GAMEPAD).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->m_gpState.at(SCR_DOWN_INDEX) * game->getPlayer()->m_gpMult.at(SCR_DOWN_INDEX);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##8", &(game->getPlayer()->m_gpMult.at(SCR_DOWN_INDEX)), -5.0, 5.0);
+			ImGui::NextColumn();
+			ImGui::SliderFloat("##81", &(game->getPlayer()->m_gpDead.at(SCR_DOWN_INDEX)), -1.0, 1.0);
+			ImGui::NextColumn();
+
+			ImGui::Text("Menu up:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##09");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingMenuKey(MENU_UP);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Menu Up' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##meup", input.uk);
+			//ImGui::Text(std::to_string(ug).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->getKBMValues(m_window).at(*input.uk);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+
+			ImGui::Text("Menu down:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##091");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingMenuKey(MENU_DOWN);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Menu Down' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##medown", input.dk);
+			//ImGui::Text(std::to_string(*input.dg).c_str());
+			ImGui::NextColumn();
+
+			value = game->getPlayer()->getKBMValues(m_window).at(*input.dk);
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+
+			ImGui::Text("Menu Select:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##092");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingMenuKey(MENU_SELECT);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Menu Select' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##meselect", input.sk);
+			//ImGui::Text(std::to_string(*input.sg).c_str());
+			ImGui::NextColumn();
+			value = game->getPlayer()->getKBMValues(m_window).at(*input.sk);
+
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+
+			ImGui::Text("Menu Back:");
+			ImGui::NextColumn();
+			id = std::string("Remap") + std::string("##093");
+			if (ImGui::Button(id.c_str())) {
+				ImGui::OpenPopup(id.c_str());
+				editingMenuKey(MENU_BACK);
+			}
+			if (ImGui::BeginPopupModal(id.c_str())) {
+				ImGui::Text("Push a button / move an axis for 'Menu Back' ");
+				ImGui::Separator();
+
+				if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+				if (!m_editingKey) {
+					ImGui::CloseCurrentPopup();
+				}
+				ImGui::EndPopup();
+			}
+			ImGui::SameLine();
+			ImGui::InputInt("##meback", input.bk);
+			//ImGui::Text(std::to_string(*input.bg).c_str());
+			ImGui::NextColumn();
+
+			value = game->getPlayer()->getKBMValues(m_window).at(*input.bk);
+
+			ImGui::ProgressBar(value);
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+			ImGui::NextColumn();
+
+			ImGui::Columns();
+		}
 	}
 
 	ImGui::Separator();
@@ -843,7 +930,7 @@ void MenuRender::remapping(Game* game, int uk, int dk, int sk, int bk, int ug, i
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void MenuRender::credits(){
+void MenuRender::credits() {
 	float fontsize = 48.0f;
 	float y = 0.0;
 	float x = 10.0f;
@@ -946,9 +1033,9 @@ void MenuRender::calibration(Game* game, double dt) {
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({ (float)width,(float)height });
 
-	ImGui::SliderFloat("Audio Latency", &(game->m_audioLatency),0.0f,2.0f);
+	ImGui::SliderFloat("Audio Latency", &(game->m_audioLatency), 0.0f, 2.0f);
 	ImGui::SameLine();
-	if(ImGui::Button("Calibrate")){
+	if (ImGui::Button("Calibrate")) {
 		m_isCalibrating = true;
 		game->getAudio()->reset();
 		m_cbPlayingTime = 0.0;
@@ -977,9 +1064,9 @@ void MenuRender::calibration(Game* game, double dt) {
 	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
 	ImGui::Text("Press the 'Calibrate' Button ONLY when you hear the snare hits for best latency calculations");
 	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
-	
+
 	ImGui::Separator();
-	
+
 	for (int i = 0; i < 8; ++i) {
 		if (m_cbPlayingTime > 2.0 + 0.5 * i) {
 			ImGui::SameLine();
@@ -991,7 +1078,11 @@ void MenuRender::calibration(Game* game, double dt) {
 		}
 	}
 	ImGui::Separator();
-	if (ImGui::Button("Tap Me", { 300.0f,250.0f })) {
+	//if (ImGui::Button("Tap Me", { 300.0f,250.0f })) {
+	//	m_latencyHits.push_back(m_cbPlayingTime);
+	//}
+	if (ImGui::IsKeyPressed(32)) //space key
+	{
 		m_latencyHits.push_back(m_cbPlayingTime);
 	}
 	if (ImGui::Button("Go back to main menu")) {
@@ -1002,7 +1093,7 @@ void MenuRender::calibration(Game* game, double dt) {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void MenuRender::setDeckSpeed(Game* game){
+void MenuRender::setDeckSpeed(Game* game) {
 	useOrthoProj();
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
@@ -1013,7 +1104,7 @@ void MenuRender::setDeckSpeed(Game* game){
 	flags |= ImGuiWindowFlags_NoCollapse;
 	flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
-	ImGui::Begin("Set Deck Speed",NULL,flags);
+	ImGui::Begin("Set Deck Speed", NULL, flags);
 	ImGui::Text("Set the deck speed using the slider below.");
 	ImGui::Text("The value represents the visible time of a note in the highway");
 	ImGui::Text("(i.e. 1.0 is one second in the highway)");
@@ -1026,7 +1117,6 @@ void MenuRender::setDeckSpeed(Game* game){
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
 }
 
 void MenuRender::editingGameAxis(int action) {
@@ -1036,7 +1126,8 @@ void MenuRender::editingGameAxis(int action) {
 	m_menuActionToChange = -1;
 }
 
-void MenuRender::editingGameKey(int action){
+void MenuRender::editingGameKey(int action) {
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	m_editingKey = true;
 	m_editingAxis = false;
 	m_gameActionToChange = action;
@@ -1044,6 +1135,7 @@ void MenuRender::editingGameKey(int action){
 }
 
 void MenuRender::doneEditing() {
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	m_editingKey = false;
 	m_editingAxis = false;
 	m_gameActionToChange = -1;
@@ -1051,6 +1143,7 @@ void MenuRender::doneEditing() {
 }
 
 void MenuRender::editingMenuKey(int action) {
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	m_editingKey = true;
 	m_editingAxis = false;
 	m_gameActionToChange = -1;
@@ -1069,6 +1162,6 @@ GLFWwindow* MenuRender::getWindowPtr()
 	return m_window;
 }
 
-MenuRender::~MenuRender(){
-	
+MenuRender::~MenuRender() {
+
 }

@@ -94,6 +94,8 @@ void Game::reset() {
 	firstRun = true;
 	m_mode = 0;
 
+	m_player.m_deltaMouse = false;
+
 	m_render.reset();
 	m_gen.reset();
 	m_player.reset();
@@ -131,6 +133,8 @@ void Game::setButtonPos(bool value){
 void Game::start(SongEntry entry) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
+	glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	m_player.m_deltaMouse = true;
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
 	

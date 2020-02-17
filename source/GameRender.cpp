@@ -602,7 +602,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 
 		}
-		else if (milli >= time + m_noteVisibleTime) {
+		else if (milli >= time + m_noteVisibleTime && v.at(i).getLanMod() == -1) {
 			//if the note is outside the visible area, update lane position
 			int position = 1;
 			for (size_t j = 0; j < cross.size(); ++j) {
@@ -1545,10 +1545,14 @@ void GameRender::result(Player& player, Generator& generator) {
 	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
 	std::string scoreString = std::string("Score:") + std::to_string(score);
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
-	
+
 	drawText(completeName, 10.0f, y, scale);
 	y += scale * 1000.0f;
 	drawText("Result:", 10.0f, y, scale);
+	if (player.m_botEnabled) {
+		float x = getTextWidth("Result:", scale);
+		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
+	}
 	y += scale * 1000.0f;
 	drawText(hitString, 10.0f, y, scale);
 	y += scale * 1000.0f;
