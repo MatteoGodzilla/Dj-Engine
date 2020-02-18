@@ -20,6 +20,14 @@ void MenuRender::init(GLFWwindow* w) {
 	loadTexture("res/calibration.png", &m_calibrationTex);
 
 	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
+	m_pastTime = glfwGetTime();
+}
+
+void MenuRender::tick() {
+	double nowTime = glfwGetTime();
+	m_dTime = nowTime - m_pastTime;
+	m_globalTime += m_dTime;
+	m_pastTime = nowTime;
 }
 
 void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
@@ -54,10 +62,19 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	useOrthoProj();
 
 	//selection rectangle
-	pushVertexColor(selVector, 10.0f, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f + right, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f + right, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
+	if (10.0f - m_selectionDX + right > 1270.0f) {
+		std::cout << 10.0f - m_selectionDX + right << std::endl;
+		m_currentIdleTime += m_dTime;
+		if (m_currentIdleTime > m_timeBeforeAnimating) {
+			m_selectionDX = 150.0 * (m_currentIdleTime - m_timeBeforeAnimating);
+		}
+	}
+
+
+	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
 	pushRectangleIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
@@ -66,12 +83,23 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < menu.getChildCount(); i++) {
-				drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+				if (m_currentIdleTime > m_timeBeforeAnimating) {
+					drawText(list.at(i).getText(), 10.0f- m_selectionDX, 100.0f * i + 200.0f, scale);
+				}
+				else {
+					drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+				}
 			}
 		}
 		else {
 			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
-				drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+				if (m_currentIdleTime > m_timeBeforeAnimating && i+vOffset == selected) {
+					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 100.0f * i + 200.0f, scale);
+				}
+				else {
+					drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+				}
+				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 	}

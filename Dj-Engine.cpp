@@ -123,3 +123,10 @@ int main() {
 
 	glfwTerminate();
 }
+/*
+^ ^ V V < > < > B A Start
+
+Oh no you found the hidden konami code
+Please keep this hidden from others.
+Do not share
+*/

@@ -26,6 +26,7 @@ class MenuRender : public Rendr {
 public:
 	MenuRender();
 	void init(GLFWwindow* w);
+	void tick();
 	void render(MenuNode node, int selected, unsigned int vOffset);
 	void remapping(Game* game, menuinputs input);
 	void scratches(Player* player);
@@ -46,6 +47,11 @@ public:
 
 	bool m_shouldClose = false;
 	bool m_input = true;
+
+	double m_timeBeforeAnimating = 3.0f;
+	double m_currentIdleTime = 0.0f;
+	float m_selectionDX = 0.0f;
+
 	~MenuRender();
 private:
 	double m_cbPlayingTime = 0.0f;
@@ -64,4 +70,9 @@ private:
 
 	void editingMenuAxis(int axis);
 	void editingMenuKey(int axis);
+
+	double m_dTime = 0.0f;
+	double m_globalTime = 0.0f;
+	double m_pastTime = 0.0f;
+
 };

@@ -212,9 +212,12 @@ void MenuNavigator::update() {
 			m_selection contains all selected node indices
 			the last item in m_selection is the 'cursor position' moved by player
 			*/
-
+			m_render.tick();
 			updateMenuNode();
 			if (m_wasUpPressed && !m_isUpPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
 				}
@@ -231,6 +234,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasDownPressed && !m_isDownPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() < m_activeNode.getChildCount() + 1) {
 					m_selection.back()++;
 				}
@@ -247,6 +253,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasSelectPressed && !m_isSelectPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				MenuNode childNode = m_activeNode.getChildrens().at(m_selection.back());
 				if (childNode.getChildCount() == 0)
 				{
@@ -259,6 +268,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasBackPressed && !m_isBackPressed && m_popupId == -1 && !m_debounce) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.size() > 1) {
 					m_selection.pop_back();
 					m_viewOffset = 0;
