@@ -37,7 +37,7 @@ public:
 	void doneEditing();
 	void credits();
 
-	const size_t VISIBLE_ENTRIES = 4;
+	const size_t VISIBLE_ENTRIES = 6;
 	bool m_editingAxis = false;
 	bool m_editingKey = false;
 	int m_gameActionToChange = -1;

@@ -160,20 +160,14 @@ void MenuNavigator::pollInput() {
 			m_debounce = true;
 		}
 		else {
+			glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			resetMenu();
 			if (m_scene == MAIN_SCENE && m_activeNode.getId() == m_root.getId()) {
 				if (m_scene != 1) {
 					m_shouldClose = true;
 				}
 			}
 			else if (m_scene == CREDITS) {
-				m_scene = MAIN_SCENE;
-			}
-			if (m_wasBackPressed && !m_isBackPressed) {
-				m_scene = MAIN_SCENE;
-				glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-				resetMenu();
-			}
-			else if (m_scene == CALIBRATION) {
 				m_scene = MAIN_SCENE;
 			}
 		}

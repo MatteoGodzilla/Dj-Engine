@@ -31,6 +31,7 @@ public:
 	bool m_isBlueTapEnabled = true;
 
 	float m_deckSpeed = 1.0f;
+	int m_baseScore = 0;
     ~Generator();
 protected:
 

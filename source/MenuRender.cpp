@@ -41,7 +41,7 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	unsigned int selVertexCount = 0;
 
 	//text scale
-	float scale = 0.1f;
+	float scale = 0.075f;
 
 	//selection color
 	float r = 0.83f;
@@ -63,18 +63,16 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 
 	//selection rectangle
 	if (10.0f - m_selectionDX + right > 1270.0f) {
-		std::cout << 10.0f - m_selectionDX + right << std::endl;
 		m_currentIdleTime += m_dTime;
 		if (m_currentIdleTime > m_timeBeforeAnimating) {
 			m_selectionDX = 150.0 * (m_currentIdleTime - m_timeBeforeAnimating);
 		}
 	}
-
-
-	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 100.0f * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 100.0f * heightIndex, 0.0f, r, g, b);
+	
+	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
 	pushRectangleIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
@@ -84,20 +82,20 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < menu.getChildCount(); i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating) {
-					drawText(list.at(i).getText(), 10.0f- m_selectionDX, 100.0f * i + 200.0f, scale);
+					drawText(list.at(i).getText(), 10.0f- m_selectionDX, 1000.0*scale * i + 200.0f, scale);
 				}
 				else {
-					drawText(list.at(i).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+					drawText(list.at(i).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
 				}
 			}
 		}
 		else {
 			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating && i+vOffset == selected) {
-					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 100.0f * i + 200.0f, scale);
+					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
 				}
 				else {
-					drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
+					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
 				}
 				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
@@ -110,7 +108,8 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 			drawText("^", 10.0f, 150.0f, scale);
 		}
 		if (vOffset < menu.getChildCount() - VISIBLE_ENTRIES) {
-			drawText("v", 10.0f, 602.0f, scale);
+			float h = getTextHeight("v", scale);
+			drawText("v", 10.0f, 700.0 - h, scale);
 		}
 	}
 }
