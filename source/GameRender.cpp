@@ -22,6 +22,8 @@ void GameRender::init(GLFWwindow* w) {
 		loadTexture("res/objects.png", &m_objTexture);
 		loadTexture("res/meters.png", &m_metersTexture);
 		loadTexture("res/clickerAnim.png", &m_clickerAnimation);
+		loadTexture("res/pgBar-frame.png", &m_pgBarFrame);
+		loadTexture("res/pgBar-inside.png", &m_pgBarInside);
 	}
 }
 
@@ -128,7 +130,6 @@ void GameRender::clicker() {
 				m_greenLeft = -0.5f;
 				m_greenRight = -0.2f;
 				float d = (float)(crossGreen.getPercent() * 0.35);
-
 				m_greenLeft -= d;
 				m_greenRight -= d;
 			}
@@ -149,7 +150,6 @@ void GameRender::clicker() {
 			if (crossGreen.isEnabled()) {
 				m_greenLeft = -0.85f;
 				m_greenRight = -0.55f;
-
 				float d = (float)(crossGreen.getPercent() * 0.35);
 				m_greenLeft += d;
 				m_greenRight += d;
@@ -164,11 +164,13 @@ void GameRender::clicker() {
 			m_greenLeft = -0.85f;
 			m_greenRight = -0.55f;
 
-			//green clicker is on the left
+			//green clicker is on the center
 			Animation crossGreen = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 			if (crossGreen.isEnabled()) {
 				m_greenLeft = -0.5f;
 				m_greenRight = -0.2f;
+
+				//std::cout << crossGreen.getPercent() << std::endl;
 				float d = (float)(crossGreen.getPercent() * 0.35);
 
 				m_greenLeft -= d;
@@ -286,11 +288,11 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	for (size_t i = 0; i < v.size(); i++) {
 		double milli = v.at(i).getMilli();
 		double hitWindow = v.at(i).hitWindow;
-		if (time + m_noteVisibleTime >= milli) {
+		if (time + m_noteVisibleTime > milli) {
 			//if the note is inside the visible highway
 
 			//calculate 'height' of note
-			double percent = (v.at(i).getMilli() - time)/m_noteVisibleTime;
+			double percent = (v.at(i).getMilli() - time) / m_noteVisibleTime;
 			float z = 3.75f - (3.75f * (float)percent);
 
 			int type = v.at(i).getType();
@@ -602,9 +604,17 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			}
 
 		}
-		else if (milli > time + m_noteVisibleTime) {
+		else if (milli >= time + m_noteVisibleTime && v.at(i).getLanMod() == -1) {
 			//if the note is outside the visible area, update lane position
-			v.at(i).setLanMod(m_renderCross);
+			int position = 1;
+			for (size_t j = 0; j < cross.size(); ++j) {
+				if (cross.at(j).getMilli() <= milli) {
+					if (cross.at(j).getType() == CROSS_G) position = 0;
+					else if (cross.at(j).getType() == CROSS_C) position = 1;
+					else if (cross.at(j).getType() == CROSS_B) position = 2;
+				}
+			}
+			v.at(i).setLanMod(position);
 		}
 	}
 	usePersProj();
@@ -752,7 +762,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double t = cross.at(i).getMilli();
 		double hitWindow = cross.at(i).hitWindow;
 		if (time + m_noteVisibleTime >= t && time <= t + hitWindow) {
-			double percent = (cross.at(i).getMilli() - time)/m_noteVisibleTime;
+			double percent = (cross.at(i).getMilli() - time) / m_noteVisibleTime;
 			if (cross.at(i).getType() == CROSS_G && middle != CROSS_G) {
 				middle = CROSS_G;
 				float z = (float)(3.75 - 3.75 * percent);
@@ -946,7 +956,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				}
 			}
 		}
-		else if (t > time + m_noteVisibleTime) {
+		else if (t >= time + m_noteVisibleTime) {
 			if (middle == CROSS_G) {
 				m_renderCross = 0;
 				//change color if euphoria is active
@@ -1115,7 +1125,7 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 		because bpm ticks are not Notes/Events
 		*/
 		if (time + m_noteVisibleTime >= tickTime && time <= tickTime + 0.2) {
-			double percent = (tickTime - time)/m_noteVisibleTime;
+			double percent = (tickTime - time) / m_noteVisibleTime;
 			float z = (float)(3.75 - 3.75 * percent);
 
 			//add tick
@@ -1144,7 +1154,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 		double milli = ev.at(i).getMilli();
 		double hitWindow = ev.at(i).hitWindow;
 		int type = ev.at(i).getType();
-		double percent = (ev.at(i).getMilli() - time)/m_noteVisibleTime;
+		double percent = (ev.at(i).getMilli() - time) / m_noteVisibleTime;
 
 		if (type == SCR_G_ZONE) {
 			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
@@ -1153,7 +1163,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 			float z;
 			for (size_t i = 0; i < cfChanges.size(); ++i) {
 				double cfMilli = cfChanges.at(i).getMilli();
-				double cfPercent = (cfMilli - time)/m_noteVisibleTime;
+				double cfPercent = (cfMilli - time) / m_noteVisibleTime;
 				int cfType = cfChanges.at(i).getType();
 				if (cfMilli <= time + m_noteVisibleTime) {
 					z = (float)(3.75 - 3.75 * cfPercent);
@@ -1258,7 +1268,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 		}
 		else if (type == EU_ZONE) {
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endPercent = (endTime - time)/m_noteVisibleTime;
+			double endPercent = (endTime - time) / m_noteVisibleTime;
 			bool start_eu = false;
 			//if euphoria start is in the middle of the highway
 			if (percent >= 0.0 && percent < 1.0) {
@@ -1301,7 +1311,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 	renderColor(eventsVector, eventsIndices);
 }
 
-void GameRender::meters() {
+void GameRender::meters(double time) {
 	float yPlane = 0.1f;
 
 	//vertices data
@@ -1498,16 +1508,94 @@ void GameRender::meters() {
 			}
 		}
 	}
-
 	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
 
-	//score meter
+	metersVector.clear();
+	metersIndices.clear();
+	metersVertexCount = 0;
+	//progress bar
 	std::string s = std::to_string(m_playerScore);
 	std::string scoreDisplay("00000000");
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
-	drawText(scoreDisplay, 940.0f, 230.0f, 0.05f);
+
+	float scale = 0.05f;
+	float x = 0.0;
+	float width = 200.0f;
+	x = (float)m_playerScore / (float)m_genBaseScore;
+	float y = 20.0f;
+
+	pushVertexTexture(metersVector, 940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
+	pushVertexTexture(metersVector, 940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
+	pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
+	pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
+
+
+	pushVertexTexture(metersVector, 940.0f + width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
+	pushVertexTexture(metersVector, 940.0f + width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
+	pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
+	pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
+
+	useOrthoProj();
+	renderTexture(metersVector, metersIndices, m_pgBarFrame);
+	metersVector.clear();
+	metersIndices.clear();
+	metersVertexCount = 0;
+
+	float textX = 960.0f + width + 3.0f;
+	float textY = 305.0f;
+
+	if (x < 0.1) {
+		x = x / 0.1;
+		x *= width;
+	}
+	else if (x < 0.2) {
+		drawText("1", textX, textY, scale);
+		x = (x - 0.1) / 0.1;
+		x *= width;
+	}
+	else if (x < 0.3) {
+		drawText("2", textX, textY, scale);
+		x = (x - 0.2) / 0.1;
+		x *= width;
+	}
+	else if (x < 0.4) {
+		drawText("3", textX, textY, scale);
+		x = (x - 0.3) / 0.1;
+		x *= width;
+	}
+	else if (x < 0.5) {
+		drawText("4", textX - 2.0f, textY, scale);
+		x = (x - 0.40) / 0.10;
+		x *= width;
+	}
+	else if (x < 0.7) {
+		drawText("5", textX, textY, scale);
+		x = (x - 0.50) / 0.20;
+		x *= width;
+	}
+	else {
+		drawText("5", textX, textY, scale);
+		x = width;
+	}
+
+	float ratio = x / y;
+	float toffset = time * -1;
+	pushVertexTexture(metersVector, 950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
+	pushVertexTexture(metersVector, 950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
+	pushVertexTexture(metersVector, 950.0f + x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
+	pushVertexTexture(metersVector, 950.0f + x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
+
+	useOrthoProj();
+	renderTexture(metersVector, metersIndices, m_pgBarInside);
+
+	//score meter
+
+	drawText(scoreDisplay, 940.0f, 230.0f, scale);
 
 	//combo meter
 	if (m_playerCombo >= 15) {
@@ -1517,6 +1605,10 @@ void GameRender::meters() {
 }
 
 void GameRender::result(Player& player, Generator& generator) {
+	std::vector<float> resultVector;
+	std::vector<unsigned int> resultIndices;
+	unsigned int resultVertexCount = 0;
+
 	useOrthoProj();
 	float y = 50.0f;
 	float scale = 0.05f;
@@ -1537,10 +1629,56 @@ void GameRender::result(Player& player, Generator& generator) {
 	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
 	std::string scoreString = std::string("Score:") + std::to_string(score);
 	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
-	
+
 	drawText(completeName, 10.0f, y, scale);
 	y += scale * 1000.0f;
 	drawText("Result:", 10.0f, y, scale);
+	if (player.m_botEnabled) {
+		float x = getTextWidth("Result:", scale);
+		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
+	}
+	else {
+		float x = getTextWidth("Result:", scale);
+		if (x >= 0.1) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (x >= 0.2) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (x >= 0.3) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (x >= 0.4) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (x >= 0.5) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (resultVector.size() > 0) {
+			useOrthoProj();
+			renderTexture(resultVector, resultIndices, m_pgBarFrame);
+		}
+	}
 	y += scale * 1000.0f;
 	drawText(hitString, 10.0f, y, scale);
 	y += scale * 1000.0f;
@@ -1557,7 +1695,7 @@ void GameRender::result(Player& player, Generator& generator) {
 	}
 	if (combo == all && all != 0) {
 		std::string t = "Wow! a Full Combo";
-		float x = 1270.0f - getTextWidth(t,scale);
+		float x = 1270.0f - getTextWidth(t, scale);
 		drawText(t, x, 100.0f, scale);
 	}
 	else if (hit > all) {
@@ -1582,8 +1720,8 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	}
 	drawText(text, 0.0f, 0.0f, 0.05f);
 	*/
-	
-	/*
+
+
 	std::string t2 = "Events:";
 	for (size_t i = 0; i < ev.size(); i++) {
 		int t = ev.at(i).getType();
@@ -1595,13 +1733,13 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 		float x = getTextWidth(t2.c_str(), 0.05f);
 		if (x > 960.0f)break;
 	}
-	//drawText(t2, 0.0f, 40.0f, 0.05f);
-	*/
+	drawText(t2, 0.0f, 40.0f, 0.05f);
+
 	/*
 	std::string cs = "Cross:";
 	for (size_t i = 0; i < c.size(); i++) {
 		if (i > 15)break;
-		int t = (int)c.at(i).getMilli();
+		int t = (int)c.at(i).getType();
 		std::string text = std::to_string(t);
 
 		cs.append(text);
@@ -1612,12 +1750,17 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	//std::cout << t2 << std::endl;
 	*/
 
+	/*
 	std::string sizes;
 	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
 	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
 	sizes += std::string("Cross:") + std::to_string(c.size());
 	drawText(sizes, 0.0f, 0.0f, 0.05f);
+	*/
 
+	std::string baseScore;
+	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
+	drawText(baseScore, 10.0f, 90.0f, 0.05f);
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
@@ -1632,10 +1775,17 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	m_renderEuValue = p.getEuValue();
 	m_renderEuActive = p.getEuActive();
 	m_renderEuZone = p.getEuZoneActive();
+	m_genBaseScore = g.m_baseScore;
 
 	bool greenAnimEnabled = p.m_greenAnimation;
 	bool redAnimEnabled = p.m_redAnimation;
 	bool blueAnimEnabled = p.m_blueAnimation;
+	/*
+	bool centerToGreen = p.m_cfCenterToGreen;
+	bool centerToBlue = p.m_cfCenterToBlue;
+	bool greenToCenter = p.m_cfGreenToCenter;
+	bool blueToCenter = p.m_cfBlueToCenter;
+	*/
 
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
@@ -1662,6 +1812,19 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
 		p.m_blueAnimation = false;
 	}
+	/*if (centerToGreen) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+		p.m_cfCenterToGreen = false;
+	}if (centerToBlue) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+		p.m_cfCenterToBlue = false;
+	}if (greenToCenter) {
+		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		p.m_cfGreenToCenter = false;
+	}if (centerToGreen) {
+		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		p.m_cfBlueToCenter = false;
+	}*/
 	rendr_InvertedX = m_isButtonsRight;
 }
 
@@ -1774,8 +1937,6 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 	result.push_back(Note(end, lastChange, 0.0f, true));
 	return result;
 }
-
-
 
 GameRender::~GameRender() {
 }

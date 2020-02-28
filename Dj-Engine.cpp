@@ -26,6 +26,12 @@ void resizeCallback(GLFWwindow* w,int width,int height) {
 	glViewport(0, 0, width, height);
 }
 
+void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
+	game.getPlayer()->m_scrollX = xoff;
+	game.getPlayer()->m_scrollY = yoff;
+	game.getPlayer()->m_changedScroll = true;
+}
+
 int main() {
 	std::cout << "Dj-Engine version alpha 1.1" << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
@@ -41,6 +47,9 @@ int main() {
 	//GLFW init functions (window and callbacks)
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
 	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	glfwSetScrollCallback(window,scrollCallback);
 
 	if (!window) {
 		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
@@ -101,7 +110,7 @@ int main() {
 
 		//add delta time to m_global_time
 		
-
+		
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);
@@ -114,3 +123,10 @@ int main() {
 
 	glfwTerminate();
 }
+/*
+^ ^ V V < > < > B A Start
+
+Oh no you found the hidden konami code
+Please keep this hidden from others.
+Do not share
+*/

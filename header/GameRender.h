@@ -24,7 +24,7 @@ public:
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void clickerAnimation();
 	void result(Player& player,Generator& generator);
-	void meters();
+	void meters(double time);
     void pollState(double time,Player& p,Generator &g);
 	void updateAnimations(double time);
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
@@ -56,6 +56,8 @@ private:
 	unsigned int m_objTexture = 0;
 	unsigned int m_metersTexture = 0;
 	unsigned int m_clickerAnimation = 0;
+	unsigned int m_pgBarFrame = 0;
+	unsigned int m_pgBarInside = 0;
 	unsigned int m_fontTexture = 0;
 	unsigned int m_textureVAO = 0;
 	unsigned int m_textureVBO = 0;
@@ -80,6 +82,6 @@ private:
 	float m_blueBack = 0.0f;
 	float m_blueFront = 0.0f;
 
-	
+	int m_genBaseScore = 0;
 };
 

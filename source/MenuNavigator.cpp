@@ -62,9 +62,11 @@ MenuNavigator::MenuNavigator() {
 	MenuNode latency("Calibrate latency", 5);
 	MenuNode flipButtons("Toggle Buttons Right/Left", 6);
 	MenuNode speed("Set Deck Speed", 7);
+	MenuNode bot("Toggle Bot", 8);
 	options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
+	options.push(bot);
 	options.push(speed);
 
 	m_root.push(play);
@@ -84,6 +86,8 @@ MenuNavigator::MenuNavigator() {
 
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
+	m_pastKBMState = gameptr->getPlayer()->getKBMValues(w);
+	//std::cout << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << std::endl;
 	m_game = gameptr;
 	m_render.init(w);
 	render(0.0f);
@@ -134,7 +138,7 @@ void MenuNavigator::pollInput() {
 	}
 
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
-		remap();
+		if(m_scene != CALIBRATION) remap();
 	}
 	/*
 	if (m_wasTabPressed && !m_isTabPressed) {
@@ -156,15 +160,14 @@ void MenuNavigator::pollInput() {
 			m_debounce = true;
 		}
 		else {
+			glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			resetMenu();
 			if (m_scene == MAIN_SCENE && m_activeNode.getId() == m_root.getId()) {
 				if (m_scene != 1) {
 					m_shouldClose = true;
 				}
 			}
 			else if (m_scene == CREDITS) {
-				m_scene = MAIN_SCENE;
-			}
-			else if (m_scene == CALIBRATION) {
 				m_scene = MAIN_SCENE;
 			}
 		}
@@ -203,9 +206,12 @@ void MenuNavigator::update() {
 			m_selection contains all selected node indices
 			the last item in m_selection is the 'cursor position' moved by player
 			*/
-
+			m_render.tick();
 			updateMenuNode();
 			if (m_wasUpPressed && !m_isUpPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
 				}
@@ -222,6 +228,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasDownPressed && !m_isDownPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() < m_activeNode.getChildCount() + 1) {
 					m_selection.back()++;
 				}
@@ -238,6 +247,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasSelectPressed && !m_isSelectPressed) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				MenuNode childNode = m_activeNode.getChildrens().at(m_selection.back());
 				if (childNode.getChildCount() == 0)
 				{
@@ -250,6 +262,9 @@ void MenuNavigator::update() {
 				}
 			}
 			if (m_wasBackPressed && !m_isBackPressed && m_popupId == -1 && !m_debounce) {
+				//reset idle animation
+				m_render.m_currentIdleTime = 0.0f;
+				m_render.m_selectionDX = 0.0f;
 				if (m_selection.size() > 1) {
 					m_selection.pop_back();
 					m_viewOffset = 0;
@@ -303,8 +318,6 @@ void MenuNavigator::update() {
 
 				float deadzone = 0.05f;
 
-				if (m_render.m_gameActionToChange == SCR_UP_INDEX)deadzone = 0.0f;
-				if (m_render.m_gameActionToChange == SCR_DOWN_INDEX)deadzone = 0.0f;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
@@ -340,13 +353,18 @@ void MenuNavigator::update() {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
 
-				for (int i = 0; i < 512; ++i) {
-					if (glfwGetKey(m_render.getWindowPtr(), i)) {
+				float deadzone = 0.5f;
+				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
+
+				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
+					float diff = abs(m_pastKBMState.at(i) - KBMState.at(i));
+					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
 						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
+
 				}
 			}
 			else if (m_render.m_editingAxis && m_render.m_menuActionToChange != -1) {
@@ -361,7 +379,7 @@ void MenuNavigator::update() {
 					changing = &BACK_GAMEPAD;
 				}
 
-				float deadzone = 0.05f;
+				float deadzone = 0.5f;
 				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
 				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
 					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
@@ -386,8 +404,12 @@ void MenuNavigator::update() {
 					changing = &BACK_CODE;
 				}
 
-				for (int i = 0; i < 512; ++i) {
-					if (glfwGetKey(m_render.getWindowPtr(), i)) {
+				float deadzone = 0.05f;
+				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
+
+				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
+					float diff = abs(m_pastKBMState.at(i) - KBMState.at(i));
+					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
 						m_game->getPlayer()->writeMappingFile();
@@ -395,14 +417,10 @@ void MenuNavigator::update() {
 					}
 				}
 			}
+			m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();
+			m_pastKBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
 		}
-		else if (m_scene == SCRATCHES) {
-			if (m_wasBackPressed && !m_isBackPressed) {
-				m_scene = MAIN_SCENE;
-				resetMenu();
-			}
-		}
-		m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();
+		
 		m_debounce = false;
 	}
 }
@@ -418,8 +436,8 @@ void MenuNavigator::render(double dt) {
 			}
 		}
 		else if (m_scene == REMAPPING) {
-			m_render.remapping(m_game, UP_CODE, DOWN_CODE, SELECT_CODE, BACK_CODE,
-				UP_GAMEPAD, DOWN_GAMEPAD, SELECT_GAMEPAD, BACK_GAMEPAD);
+			m_render.remapping(m_game, { &UP_CODE, &DOWN_CODE, &SELECT_CODE, &BACK_CODE,
+				&UP_GAMEPAD, &DOWN_GAMEPAD, &SELECT_GAMEPAD, &BACK_GAMEPAD });
 		}
 		else if (m_scene == CREDITS) {
 			m_render.credits();
@@ -450,6 +468,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (id == 4) {
 		m_scene = SCRATCHES;
+		glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 	else if (id == 5) {
 		m_scene = CALIBRATION;
@@ -466,6 +485,16 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (id == 7) {
 		m_popupId = 0;
+	}
+	else if (id == 8) {
+		if (m_game->getPlayer()->m_botEnabled) {
+			std::cout << "Menu Message: disabled bot" << std::endl;
+			m_game->getPlayer()->m_botEnabled = false;
+		}
+		else {
+			std::cout << "Menu Message: enabled bot" << std::endl;
+			m_game->getPlayer()->m_botEnabled = true;
+		}
 	}
 	else if (id == 255) {
 		index = findIndex(menu, parent);

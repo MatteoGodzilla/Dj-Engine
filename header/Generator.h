@@ -31,6 +31,7 @@ public:
 	bool m_isBlueTapEnabled = true;
 
 	float m_deckSpeed = 1.0f;
+	int m_baseScore = 0;
     ~Generator();
 protected:
 
@@ -53,6 +54,10 @@ private:
 	double m_initialCrossfade = -2.0;
 
 	const int TICKS_PER_BEAT = 4;
+
+	bool m_firstSpikeGenerated = false;
+	double m_firstSpikeMilli = 0.0;
+	bool m_addedCrossCenter = false;
 
 	SongEntry m_songEntry;
 };

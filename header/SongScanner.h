@@ -8,6 +8,7 @@
 #include <fstream>
 #include <string>
 #include <list>
+#include <algorithm>
 
 struct SongEntry {
 	std::string path;

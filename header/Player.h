@@ -19,6 +19,7 @@ public:
 	void hit(double time,std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 
     virtual ~Player();
+
 	bool getRedClicker();
 	bool getGreenClicker();
 	bool getBlueClicker();
@@ -34,7 +35,9 @@ public:
 	void readMappingFile();
 	void writeMappingFile();
 	void updateGamepadState();
+	void updateKBMState(GLFWwindow* w);
 	std::vector<float> getGamepadValues();
+	std::vector<float> getKBMValues(GLFWwindow* w);
 	void tick(double time);
 	void reset();
 
@@ -69,6 +72,8 @@ public:
 	std::vector<float> m_gpDead;
 	std::vector<bool> m_gpInvertDead;
 
+	std::vector<float> m_pastKBMState;
+
 	bool m_isRedPressed = false;
 	bool m_isGreenPressed = false;
 	bool m_isBluePressed = false;
@@ -89,11 +94,21 @@ public:
 	bool m_greenAnimation = false;
 	bool m_redAnimation = false;
 	bool m_blueAnimation = false;
+	bool m_cfCenterToGreen = false;
+	bool m_cfCenterToBlue= false;
+	bool m_cfGreenToCenter = false;
+	bool m_cfBlueToCenter = false;
 
 	int m_cross = 1;
 	int m_pastCross = 1;
 
+	bool m_deltaMouse = false;
+	double m_scrollX;
+	double m_scrollY;
+	bool m_changedScroll = false;
+	
 	bool m_isButtonsRight = false;
+	bool m_botEnabled;
 protected:
 
 private:
@@ -114,6 +129,10 @@ private:
 	bool m_isRedTapEnabled = true;
 	bool m_isBlueTapEnabled = true;
 
-	int m_highestCombo = 0;
+	double m_pastMouseX = 0.0;
+	double m_pastMouseY = 0.0;
+	double m_nowMouseX = 0.0;
+	double m_nowMouseY = 0.0;
 
+	int m_highestCombo = 0;
 };

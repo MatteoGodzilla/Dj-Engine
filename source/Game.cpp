@@ -64,7 +64,7 @@ void Game::render() {
 			//each function is responsible for rendering a single 'object' on screen
 			m_render.highway(m_global_time);
 			m_render.bpmTicks(m_global_time, m_bpm_arr);
-			m_render.meters();
+			m_render.meters(m_global_time);
 
 			m_render.events(m_global_time, m_event_arr,m_cross_arr);
 			m_render.clicker();
@@ -75,7 +75,7 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			//m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+			m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
 		}
 		else if (m_mode == 1) {
 			m_render.result(m_player,m_gen);
@@ -93,6 +93,8 @@ void Game::reset() {
 	m_active = false;
 	firstRun = true;
 	m_mode = 0;
+
+	m_player.m_deltaMouse = false;
 
 	m_render.reset();
 	m_gen.reset();
@@ -131,6 +133,8 @@ void Game::setButtonPos(bool value){
 void Game::start(SongEntry entry) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
+	glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	m_player.m_deltaMouse = true;
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
 	

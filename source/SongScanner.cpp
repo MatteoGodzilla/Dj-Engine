@@ -136,12 +136,25 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 	}
 }
 
+bool compareSongEntries(SongEntry a, SongEntry b) {
+	std::string first;
+	std::string second;
+	for (int i = 0; i < a.s1.size(); ++i) {
+		first += std::toupper(a.s1.at(i));
+	}
+	for (int i = 0; i < b.s1.size(); ++i) {
+		second += std::toupper(b.s1.at(i));
+	}
+	if (first.compare(second) > 0)return false;
+	else return true;
+}
 
 void SongScanner::load(const std::string& rootPath,std::vector<SongEntry>& list){
 	fs::path root(rootPath);
 	if (fs::is_directory(root)) {
 		//the root is a directory, so start scanning
 		checkFolder(root, list);
+		std::sort(list.begin(), list.end(), compareSongEntries);
 	}
 	else {
 		std::cerr << "SongScanner error: Root path is not a folder" << std::endl;

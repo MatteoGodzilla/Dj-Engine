@@ -14,33 +14,27 @@ Player::Player() {
 
 	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
 	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
+	m_pastKBMState.resize(400);
 	readMappingFile();
 }
 
 void Player::pollInput(GLFWwindow* window) {
-	m_wasRedPressed = m_isRedPressed;
-	m_wasGreenPressed = m_isGreenPressed;
-	m_wasBluePressed = m_isBluePressed;
-	m_wasUpPressed = m_isUpPressed;
-	m_wasDownPressed = m_isDownPressed;
-	m_wasCfGreenPressed = m_isCfGreenPressed;
-	m_wasCfBluePressed = m_isCfBluePressed;
-
 	m_pastCross = m_cross;
+	m_pastMouseX = m_nowMouseX;
+	m_pastMouseY = m_nowMouseY;
 
-	if (m_useKeyboardInput) {
-		m_isRedPressed = glfwGetKey(window, RED_CODE);
-		m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
-		m_isBluePressed = glfwGetKey(window, BLUE_CODE);
-		m_isUpPressed = glfwGetKey(window, SCRATCH_UP);
-		m_isDownPressed = glfwGetKey(window, SCRATCH_DOWN);
-		m_isCfGreenPressed = glfwGetKey(window, CROSS_L_CODE);
-		m_isCfBluePressed = glfwGetKey(window, CROSS_R_CODE);
-		m_isEuPressed = glfwGetKey(window, EUPHORIA);
+	glfwGetCursorPos(window, &m_nowMouseX, &m_nowMouseY);
+	if (m_deltaMouse) {
+		int w, h;
+		glfwGetWindowSize(window, &w, &h);
+		glfwSetCursorPos(window, w / 2, h / 2);
 	}
+
+	//for exiting result screen with bot active
+	m_wasGreenPressed = m_isGreenPressed;
+	if (m_useKeyboardInput)m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
 	else {
 		if (glfwJoystickPresent(m_gamepadId)) {
-
 			updateGamepadState();
 
 			if (m_gpState.size() > 0) {
@@ -50,74 +44,104 @@ void Player::pollInput(GLFWwindow* window) {
 					m_isGreenPressed = true;
 				}
 				else m_isGreenPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
-					m_isRedPressed = true;
-				}
-				else m_isRedPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
-					m_isBluePressed = true;
-				}
-				else m_isBluePressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
-					m_isEuPressed = true;
-				}
-				else m_isEuPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
-					m_isCfGreenPressed = true;
-					m_isCfBluePressed = false;
-				}
-				else m_isCfGreenPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
-					m_isCfBluePressed = true;
-					m_isCfGreenPressed = false;
-				}
-				else m_isCfBluePressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
-					m_isUpPressed = true;
-					m_isDownPressed = false;
-				}
-				else m_isUpPressed = false;
-
-				//value * sensitivity >= deadzone
-				if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
-					m_isDownPressed = true;
-					m_isUpPressed = false;
-				}
-				else m_isDownPressed = false;
 			}
 		}
+
 	}
 
-	if (m_isButtonsRight) {
-		bool temp = m_isCfGreenPressed;
-		m_isCfGreenPressed = m_isCfBluePressed;
-		m_isCfBluePressed = temp;
-	}
+	if (!m_botEnabled) {
+		m_wasRedPressed = m_isRedPressed;
 
-	if (!m_euphoria_active) {
-		if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
-			m_cross = 0;
+		m_wasBluePressed = m_isBluePressed;
+		m_wasUpPressed = m_isUpPressed;
+		m_wasDownPressed = m_isDownPressed;
+		m_wasCfGreenPressed = m_isCfGreenPressed;
+		m_wasCfBluePressed = m_isCfBluePressed;
+
+		if (m_useKeyboardInput) {
+			updateKBMState(window);
 		}
-		else if (m_isCfBluePressed && !m_wasCfBluePressed) {
-			m_cross = 2;
+		else {
+			if (glfwJoystickPresent(m_gamepadId)) {
+				updateGamepadState();
+			}
 		}
-		else if (m_wasCfGreenPressed && !m_isCfGreenPressed && !m_isCfBluePressed) {
-			m_cross = 1;
+
+		if (m_gpState.size() > 0) {
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+				m_isGreenPressed = true;
+			}
+			else m_isGreenPressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+				m_isRedPressed = true;
+			}
+			else m_isRedPressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+				m_isBluePressed = true;
+			}
+			else m_isBluePressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
+				m_isEuPressed = true;
+			}
+			else m_isEuPressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
+				m_isCfGreenPressed = true;
+				m_isCfBluePressed = false;
+			}
+			else m_isCfGreenPressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX) >= m_gpDead.at(CF_RIGHT_INDEX)) {
+				m_isCfBluePressed = true;
+				m_isCfGreenPressed = false;
+			}
+			else m_isCfBluePressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(SCR_UP_INDEX) * m_gpMult.at(SCR_UP_INDEX) >= m_gpDead.at(SCR_UP_INDEX)) {
+				m_isUpPressed = true;
+				m_isDownPressed = false;
+			}
+			else m_isUpPressed = false;
+
+			//value * sensitivity >= deadzone
+			if (m_gpState.at(SCR_DOWN_INDEX) * m_gpMult.at(SCR_DOWN_INDEX) >= m_gpDead.at(SCR_DOWN_INDEX)) {
+				m_isDownPressed = true;
+				m_isUpPressed = false;
+			}
+			else m_isDownPressed = false;
 		}
-		else if (m_wasCfBluePressed && !m_isCfBluePressed && !m_isCfGreenPressed) {
-			m_cross = 1;
+
+
+		if (m_isButtonsRight) {
+			bool temp = m_isCfGreenPressed;
+			m_isCfGreenPressed = m_isCfBluePressed;
+			m_isCfBluePressed = temp;
+		}
+
+		if (!m_euphoria_active) {
+			if (m_isCfGreenPressed && !m_wasCfGreenPressed) {
+				m_cross = 0;
+			}
+			else if (m_isCfBluePressed && !m_wasCfBluePressed) {
+				m_cross = 2;
+			}
+			else if (m_wasCfGreenPressed && !m_isCfGreenPressed && !m_isCfBluePressed) {
+				m_cross = 1;
+			}
+			else if (m_wasCfBluePressed && !m_isCfBluePressed && !m_isCfGreenPressed) {
+				m_cross = 1;
+			}
 		}
 	}
 }
@@ -677,12 +701,121 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 		}
 	}
+	if (m_botEnabled) {
+		for (size_t i = 0; i < v.size(); ++i) {
+			int type = v.at(i).getType();
+			if (v.at(i).getMilli() < time && !v.at(i).getTouched()) {
+				if (type == TAP_R) {
+					m_score += 100 * m_mult;
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_redAnimation = true;
+					break;
+				}
+				else if (type == TAP_G) {
+					m_score += 100 * m_mult;
+					//check for chords (i.e multiple taps in the same time)
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					break;
+				}
+				else if (type == TAP_B) {
+					m_score += 100 * m_mult;
+					if (v.at(i).getMilli() != m_past_tap) {
+						m_combo++;
+						m_past_tap = v.at(i).getMilli();
+					}
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					break;
+				}
+				else if (type == SCR_G_UP || type == SCR_G_DOWN) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					m_score += 100 * m_mult;
+					m_combo++;
+					break;
+				}
+				else if (type == SCR_G_ANY || type == SCR_G_TICK) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
+				else if (type == SCR_B_UP || type == SCR_B_DOWN) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					m_score += 100 * m_mult;
+					m_combo++;
+					break;
+				}
+				else if (type == SCR_B_ANY || type == SCR_B_TICK) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					m_score += 25 * m_mult;
+					m_scr_tick++;
+				}
 
+				else if (type == CF_SPIKE_G) {
+					v.at(i).click(time);
+					m_greenAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_B) {
+					v.at(i).click(time);
+					m_blueAnimation = true;
+					break;
+				}
+				else if (type == CF_SPIKE_C) {
+					v.at(i).click(time);
+					if (m_cross == 0)m_greenAnimation = true;
+					else if (m_cross == 2)m_blueAnimation = true;
+					break;
+				}
+			}
+		}
+
+		for (size_t i = 0; i < cross.size(); ++i) {
+			int type = cross.at(i).getType();
+			if (cross.at(i).getMilli() < time && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
+				if (type == CROSS_G) {
+					m_cross = 0;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_C) {
+					m_cross = 1;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+				else if (type == CROSS_B) {
+					m_cross = 2;
+					cross.at(i).click(time);
+					m_score += 100 * m_mult;
+					m_combo++;
+					m_lastCrossTime = cross.at(i).getMilli();
+					break;
+				}
+			}
+		}
+	}
 }
 
 //update combo/multiplier for every frame
 void Player::tick(double time) {
-
 	if (m_combo >= 24)m_mult = 4;
 	else if (m_combo >= 16 && m_combo < 24) m_mult = 3;
 	else if (m_combo >= 8 && m_combo < 16) m_mult = 2;
@@ -812,6 +945,37 @@ void Player::writeMappingFile() {
 	output.close();
 }
 
+void Player::updateKBMState(GLFWwindow* w) {
+	std::vector<float> KBMState = getKBMValues(w);
+	m_gpState.clear();
+
+	m_gpState.push_back(KBMState.at(GREEN_CODE));
+	m_gpState.push_back(KBMState.at(RED_CODE));
+	m_gpState.push_back(KBMState.at(BLUE_CODE));
+	m_gpState.push_back(KBMState.at(EUPHORIA));
+	m_gpState.push_back(KBMState.at(CROSS_L_CODE));
+	m_gpState.push_back(KBMState.at(CROSS_R_CODE));
+	m_gpState.push_back(KBMState.at(SCRATCH_UP));
+	m_gpState.push_back(KBMState.at(SCRATCH_DOWN));
+
+	/*if (glfwGetKey(w, GREEN_CODE))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, RED_CODE))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, BLUE_CODE))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, EUPHORIA))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, CROSS_L_CODE))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, CROSS_R_CODE))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, SCRATCH_UP))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);
+	if (glfwGetKey(w, SCRATCH_DOWN))m_gpState.push_back(1.0f);
+	else m_gpState.push_back(0.0f);*/
+}
+
 void Player::updateGamepadState() {
 	if (glfwJoystickPresent(m_gamepadId)) {
 		int count;
@@ -836,28 +1000,48 @@ void Player::updateGamepadState() {
 
 		if (count > 0) {
 			m_gpState.clear();
+			GREEN_GAMEPAD = max(GREEN_GAMEPAD, 0);
+			GREEN_GAMEPAD = min(GREEN_GAMEPAD, localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
+			RED_GAMEPAD = max(RED_GAMEPAD, 0);
+			RED_GAMEPAD = min(RED_GAMEPAD, localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
+			BLUE_GAMEPAD = max(BLUE_GAMEPAD, 0);
+			BLUE_GAMEPAD = min(BLUE_GAMEPAD, localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
+			EU_GAMEPAD = max(EU_GAMEPAD, 0);
+			EU_GAMEPAD = min(EU_GAMEPAD, localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
 
 			if (m_useSingleCfAxis) {
+				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
 				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
 				m_gpState.push_back(-value);
 				m_gpState.push_back(value);
 			}
 			else {
+				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
+				CF_RIGHT_GAMEPAD = max(CF_RIGHT_GAMEPAD, 0);
+				CF_RIGHT_GAMEPAD = min(CF_RIGHT_GAMEPAD, localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
 			}
 
 			if (m_useSingleScrAxis) {
+				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
 				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
 				m_gpState.push_back(value);
 				m_gpState.push_back(-value);
 			}
 			else {
+				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
+				SCR_UP_GAMEPAD = max(SCR_UP_GAMEPAD, 0);
+				SCR_UP_GAMEPAD = min(SCR_UP_GAMEPAD, localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
 			}
 
@@ -957,6 +1141,30 @@ std::vector<float> Player::getGamepadValues() {
 		}
 	}
 	return localGamepadState;
+}
+
+std::vector<float> Player::getKBMValues(GLFWwindow* w) {
+	std::vector<float>localState;
+	localState.resize(400);
+	for (int i = GLFW_KEY_SPACE; i < GLFW_KEY_LAST; ++i) {
+		if (glfwGetKey(w, i) != -1) {
+			localState.at(i) = glfwGetKey(w, i);
+		}
+	}
+
+	localState.at(0) = (m_nowMouseX - m_pastMouseX) / 100;
+	localState.at(1) = (m_nowMouseY - m_pastMouseY) / 100;
+	localState.at(2) = m_scrollX;
+	localState.at(3) = m_scrollY;
+	if (m_changedScroll) {
+		m_changedScroll = false;
+		m_scrollX = 0.0;
+		m_scrollY = 0.0;
+	}
+	for (int i = GLFW_MOUSE_BUTTON_1; i < GLFW_MOUSE_BUTTON_LAST; ++i) {
+		localState.at(i + 4) = glfwGetMouseButton(w, i);
+	}
+	return localState;
 }
 
 int Player::getScore() {
