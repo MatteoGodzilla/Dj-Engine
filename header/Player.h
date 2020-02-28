@@ -19,6 +19,7 @@ public:
 	void hit(double time,std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 
     virtual ~Player();
+
 	bool getRedClicker();
 	bool getGreenClicker();
 	bool getBlueClicker();
@@ -34,8 +35,11 @@ public:
 	void readMappingFile();
 	void writeMappingFile();
 	void updateGamepadState();
+	void updateKBMState(GLFWwindow* w);
 	std::vector<float> getGamepadValues();
+	std::vector<float> getKBMValues(GLFWwindow* w);
 	void tick(double time);
+	void reset();
 
 	int GREEN_CODE = GLFW_KEY_J;
 	int RED_CODE = GLFW_KEY_K;
@@ -61,18 +65,22 @@ public:
 
 	bool m_useKeyboardInput = true;
 
+	int m_gamepadId = 1;
+
 	std::vector<float> m_gpState;
 	std::vector<float> m_gpMult;
 	std::vector<float> m_gpDead;
 	std::vector<bool> m_gpInvertDead;
+
+	std::vector<float> m_pastKBMState;
 
 	bool m_isRedPressed = false;
 	bool m_isGreenPressed = false;
 	bool m_isBluePressed = false;
 	bool m_isUpPressed = false;
 	bool m_isDownPressed = false;
-	bool m_isCfLeftPressed = false;
-	bool m_isCfRightPressed = false;
+	bool m_isCfGreenPressed = false;
+	bool m_isCfBluePressed = false;
 	bool m_isEuPressed = false;
 
 	bool m_wasRedPressed = false;
@@ -80,14 +88,30 @@ public:
 	bool m_wasBluePressed = false;
 	bool m_wasUpPressed = false;
 	bool m_wasDownPressed = false;
-	bool m_wasCfLeftPressed = false;
-	bool m_wasCfRightPressed = false;
+	bool m_wasCfGreenPressed = false;
+	bool m_wasCfBluePressed = false;
+
+	bool m_greenAnimation = false;
+	bool m_redAnimation = false;
+	bool m_blueAnimation = false;
+	bool m_cfCenterToGreen = false;
+	bool m_cfCenterToBlue= false;
+	bool m_cfGreenToCenter = false;
+	bool m_cfBlueToCenter = false;
+
+	int m_cross = 1;
+	int m_pastCross = 1;
+
+	bool m_deltaMouse = false;
+	double m_scrollX;
+	double m_scrollY;
+	bool m_changedScroll = false;
+	
+	bool m_isButtonsRight = false;
+	bool m_botEnabled;
 protected:
 
 private:
-	
-	int m_cross = 1;
-
     int m_score = 0;
     int m_mult = 1;
     int m_combo = 0;
@@ -97,8 +121,18 @@ private:
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
 	bool m_double_mult = false;
-	double m_lastTime = 0.0;
-	int m_genBpm = 0;
+	double m_lastTapTime = 0.0;
+	double m_lastCrossTime = 0.0;
+	float m_genBpm = 0;
+
+	bool m_isGreenTapEnabled = true;
+	bool m_isRedTapEnabled = true;
+	bool m_isBlueTapEnabled = true;
+
+	double m_pastMouseX = 0.0;
+	double m_pastMouseY = 0.0;
+	double m_nowMouseX = 0.0;
+	double m_nowMouseY = 0.0;
 
 	int m_highestCombo = 0;
 };

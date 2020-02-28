@@ -2,6 +2,7 @@
 
 #include "Graphics.h"
 #include "Rendr.h"
+#include "AnimationManager.h"
 
 #include "Note.h"
 #include "Player.h"
@@ -21,14 +22,19 @@ public:
     void events(double time, std::vector<Note>&ev, std::vector<Note>& cross);
     void lanes(double time, std::vector<Note> &v,std::vector<Note>&ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
+	void clickerAnimation();
 	void result(Player& player,Generator& generator);
-	void meters();
+	void meters(double time);
     void pollState(double time,Player& p,Generator &g);
+	void updateAnimations(double time);
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
+	void reset();
     virtual ~GameRender();
-	
+
+	bool m_isButtonsRight = false;
+	float m_noteVisibleTime = 1.0;
 private:
-	double m_noteVisibleTime = 1.0;
+	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 
 	bool m_red = false, m_green = false, m_blue = false;
     int m_playerCross = 1;
@@ -49,7 +55,9 @@ private:
 	unsigned int m_highwayTexture = 0;
 	unsigned int m_objTexture = 0;
 	unsigned int m_metersTexture = 0;
-	unsigned int m_splashTexture = 0;
+	unsigned int m_clickerAnimation = 0;
+	unsigned int m_pgBarFrame = 0;
+	unsigned int m_pgBarInside = 0;
 	unsigned int m_fontTexture = 0;
 	unsigned int m_textureVAO = 0;
 	unsigned int m_textureVBO = 0;
@@ -60,5 +68,20 @@ private:
 	FT_Library m_FTLibrary;
 	FT_Face m_font;
 	
+	AnimationManager m_animManager;
+
+	//default green clicker position
+	float m_greenLeft = 0.0f;
+	float m_greenRight = 0.0f;
+	float m_greenBack = 0.0f;
+	float m_greenFront = 0.0f;
+
+	//default blue clicker position
+	float m_blueLeft = 0.0f;
+	float m_blueRight = 0.0f;
+	float m_blueBack = 0.0f;
+	float m_blueFront = 0.0f;
+
+	int m_genBaseScore = 0;
 };
 

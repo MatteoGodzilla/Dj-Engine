@@ -5,6 +5,11 @@
 #include "GLFW/include/GLFW/glfw3.h"
 
 #include <iostream>
+#include <fstream>
+
+enum scenes {
+	MAIN_SCENE,REMAPPING,CREDITS,SCRATCHES,CALIBRATION
+};
 
 class MenuNavigator {
 public:
@@ -12,7 +17,7 @@ public:
 	void init(GLFWwindow* w,Game* gameptr);
 	void pollInput();
 	void update();
-	void render();
+	void render(double dt);
 	void setActive(bool active);
 	bool getActive();
 	void activate(MenuNode& menu, MenuNode& parent);
@@ -43,6 +48,8 @@ private:
 	void updateGamepadState();
 	void updateMenuNode();
 	void resetMenu();
+	void writeConfigFile();
+	void readConfigFile();
 
 	//gamepad status
 	std::vector<float> m_gpState;
@@ -79,5 +86,8 @@ private:
 	Game* m_game = nullptr;
 
 	std::vector<float> m_pastGamepadValues;
-	std::vector<char> m_keyboardState;
+	std::vector<float> m_pastKBMState;
+
+	int m_popupId = -1;
+	bool m_debounce = false;
 };

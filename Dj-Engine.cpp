@@ -6,8 +6,8 @@
 
 #include "GLFW/include/GLFW/glfw3.h"
 
-unsigned int WIDTH = 1024;
-unsigned int HEIGHT = 600;
+unsigned int WIDTH = 1280;
+unsigned int HEIGHT = 720;
 
 Game game;
 MenuNavigator menu;
@@ -17,13 +17,23 @@ int scene = 0;
 
 GLFWwindow* window;
 
+double pastTick = 0.0;
+double now = 0.0f;
+double deltaTime = 0.0f;
+
 //utility function to handle resizing
 void resizeCallback(GLFWwindow* w,int width,int height) {
 	glViewport(0, 0, width, height);
 }
 
+void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
+	game.getPlayer()->m_scrollX = xoff;
+	game.getPlayer()->m_scrollY = yoff;
+	game.getPlayer()->m_changedScroll = true;
+}
+
 int main() {
-	std::cout << "Dj-Engine version 0.8" << std::endl;
+	std::cout << "Dj-Engine version alpha 1.1" << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);
@@ -37,6 +47,9 @@ int main() {
 	//GLFW init functions (window and callbacks)
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
 	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	glfwSetScrollCallback(window,scrollCallback);
 
 	if (!window) {
 		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
@@ -54,16 +67,19 @@ int main() {
 	ImGui_ImplOpenGL3_Init("#version 130");
 
 	//setting up menu and game
+	game.init(window);
 	menu.init(window,&game);
-	menu.setActive(true);
 	game.setActive(false);
-
-	
+	menu.setActive(true);
 
 	while (!glfwWindowShouldClose(window)) {
 		
 		glfwPollEvents();
 		
+		now = glfwGetTime();
+		deltaTime = now - pastTick;
+		pastTick = now;
+
 		if (scene == 0) {
 			//change scene if not active
 			if (!menu.getActive()) {
@@ -76,8 +92,7 @@ int main() {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			menu.pollInput();
 			menu.update();
-			menu.render();
-
+			menu.render(deltaTime);
 		}
 		else if (scene == 1) {
 			//change scene if not active
@@ -89,10 +104,13 @@ int main() {
 			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			game.pollInput();
-			game.tick();
+			game.tick(deltaTime);
 			game.render();
 		}
 
+		//add delta time to m_global_time
+		
+		
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);
@@ -105,3 +123,10 @@ int main() {
 
 	glfwTerminate();
 }
+/*
+^ ^ V V < > < > B A Start
+
+Oh no you found the hidden konami code
+Please keep this hidden from others.
+Do not share
+*/
