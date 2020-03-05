@@ -1000,48 +1000,48 @@ void Player::updateGamepadState() {
 
 		if (count > 0) {
 			m_gpState.clear();
-			GREEN_GAMEPAD = max(GREEN_GAMEPAD, 0);
-			GREEN_GAMEPAD = min(GREEN_GAMEPAD, localGamepadState.size() - 1);
+			GREEN_GAMEPAD = std::max(GREEN_GAMEPAD, 0);
+			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
-			RED_GAMEPAD = max(RED_GAMEPAD, 0);
-			RED_GAMEPAD = min(RED_GAMEPAD, localGamepadState.size() - 1);
+			RED_GAMEPAD = std::max(RED_GAMEPAD, 0);
+			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
-			BLUE_GAMEPAD = max(BLUE_GAMEPAD, 0);
-			BLUE_GAMEPAD = min(BLUE_GAMEPAD, localGamepadState.size() - 1);
+			BLUE_GAMEPAD = std::max(BLUE_GAMEPAD, 0);
+			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
-			EU_GAMEPAD = max(EU_GAMEPAD, 0);
-			EU_GAMEPAD = min(EU_GAMEPAD, localGamepadState.size() - 1);
+			EU_GAMEPAD = std::max(EU_GAMEPAD, 0);
+			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
 
 			if (m_useSingleCfAxis) {
-				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
+				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
 				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
 				m_gpState.push_back(-value);
 				m_gpState.push_back(value);
 			}
 			else {
-				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
+				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
-				CF_RIGHT_GAMEPAD = max(CF_RIGHT_GAMEPAD, 0);
-				CF_RIGHT_GAMEPAD = min(CF_RIGHT_GAMEPAD, localGamepadState.size() - 1);
+				CF_RIGHT_GAMEPAD = std::max(CF_RIGHT_GAMEPAD, 0);
+				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
 			}
 
 			if (m_useSingleScrAxis) {
-				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
+				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
 				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
 				m_gpState.push_back(value);
 				m_gpState.push_back(-value);
 			}
 			else {
-				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
+				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
-				SCR_UP_GAMEPAD = max(SCR_UP_GAMEPAD, 0);
-				SCR_UP_GAMEPAD = min(SCR_UP_GAMEPAD, localGamepadState.size() - 1);
+				SCR_UP_GAMEPAD = std::max(SCR_UP_GAMEPAD, 0);
+				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
 			}
 

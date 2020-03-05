@@ -1706,61 +1706,47 @@ void GameRender::result(Player& player, Generator& generator) {
 }
 
 void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
-	/*
-	std::string text = "Notes:";
-	for (size_t i = 0; i < note_arr.size(); i++) {
-		if (i > 15)break;
-		int t = note_arr.at(i).getType();
-		double m = note_arr.at(i).getMilli();
-		text += std::to_string(t);
-		text += "(";
-		text += std::to_string(m);
-		text += ")";
-		text += ",";
+	std::string text = "Notes";
+	text.append("(");
+	text.append(std::to_string(v.size()));
+	text.append("):");
+	for (size_t i = 0; i < v.size() && i < 15; i++) {
+		text.append(std::to_string(v.at(i).getType()));
+		text.append(",");
 	}
-	drawText(text, 0.0f, 0.0f, 0.05f);
-	*/
+	drawText(text, 10.0f, 10.0f, 0.05f);
 
-
-	std::string t2 = "Events:";
-	for (size_t i = 0; i < ev.size(); i++) {
-		int t = ev.at(i).getType();
-		std::string text = std::to_string(t);
-
-		t2.append(text);
+	std::string t2 = "Events";
+	t2.append("(");
+	t2.append(std::to_string(ev.size()));
+	t2.append("):");
+	for (size_t i = 0; i < ev.size() && i < 15; i++) {
+		t2.append(std::to_string(ev.at(i).getType()));
 		t2.append(",");
-
-		float x = getTextWidth(t2.c_str(), 0.05f);
-		if (x > 960.0f)break;
 	}
-	drawText(t2, 0.0f, 40.0f, 0.05f);
+	drawText(t2, 10.0f, 70.0f, 0.05f);
 
-	/*
-	std::string cs = "Cross:";
-	for (size_t i = 0; i < c.size(); i++) {
-		if (i > 15)break;
-		int t = (int)c.at(i).getType();
-		std::string text = std::to_string(t);
-
-		cs.append(text);
+	std::string cs = "Cross";
+	cs.append("(");
+	cs.append(std::to_string(c.size()));
+	cs.append("):");
+	for (size_t i = 0; i < c.size() && i < 15; i++) {
+		cs.append(std::to_string(c.at(i).getType()));
 		cs.append(",");
 	}
-
-	drawText(cs, 0.0f, 0.0f, 0.05f);
-	//std::cout << t2 << std::endl;
-	*/
+	drawText(cs, 10.0f, 120.0f, 0.05f);
 
 	/*
 	std::string sizes;
 	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
 	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
 	sizes += std::string("Cross:") + std::to_string(c.size());
-	drawText(sizes, 0.0f, 0.0f, 0.05f);
+	drawText(sizes, 10.0f, 170.0f, 0.05f);
 	*/
 
 	std::string baseScore;
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
-	drawText(baseScore, 10.0f, 90.0f, 0.05f);
+	drawText(baseScore, 940.0f, 370.0f, 0.03f);
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {

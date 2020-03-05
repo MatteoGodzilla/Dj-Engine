@@ -68,8 +68,8 @@ private:
 
 	std::vector<double> m_latencyHits;
 
-	void editingMenuAxis(int axis);
-	void editingMenuKey(int axis);
+	void editingAxisController(int axis);
+	void editingAxisKBAM(int axis);
 
 	double m_dTime = 0.0f;
 	double m_globalTime = 0.0f;
