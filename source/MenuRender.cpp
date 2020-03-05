@@ -846,7 +846,7 @@ void MenuRender::splashArt() {
 	renderTexture(vector, indices, m_splashTexture);
 
 	float textScale = 0.02f;
-	drawText("*This is alpha v1.1. There are some bugs and you WILL see them*", 10.0, 10.0, textScale);
+	drawText("*This is alpha v1.2. There are some bugs and you WILL see them*", 10.0, 10.0, textScale);
 	drawText("*Remember this when playing*", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 

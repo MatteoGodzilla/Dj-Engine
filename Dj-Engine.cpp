@@ -33,7 +33,7 @@ void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
 }
 
 int main() {
-	std::cout << "Dj-Engine version alpha 1.1" << std::endl;
+	std::cout << "Dj-Engine version alpha 1.2" << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);
@@ -46,16 +46,15 @@ int main() {
 
 	//GLFW init functions (window and callbacks)
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
-	glfwSetWindowSizeCallback(window, resizeCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-	glfwSetScrollCallback(window,scrollCallback);
-
 	if (!window) {
 		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
 		glfwTerminate();
 		return -1;
 	}
+	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
 
 	//imgui init
