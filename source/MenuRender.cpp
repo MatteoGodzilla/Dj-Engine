@@ -68,11 +68,11 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 			m_selectionDX = 150.0 * (m_currentIdleTime - m_timeBeforeAnimating);
 		}
 	}
-	
-	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f-m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
+
+	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
 	pushRectangleIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
@@ -82,7 +82,7 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 		if (menu.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < menu.getChildCount(); i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating) {
-					drawText(list.at(i).getText(), 10.0f- m_selectionDX, 1000.0*scale * i + 200.0f, scale);
+					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
 				}
 				else {
 					drawText(list.at(i).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
@@ -91,7 +91,7 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 		}
 		else {
 			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating && i+vOffset == selected) {
+				if (m_currentIdleTime > m_timeBeforeAnimating&& i + vOffset == selected) {
 					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
 				}
 				else {
@@ -854,6 +854,9 @@ void MenuRender::splashArt() {
 	std::string discord2 = "https://discord.gg/HZ82gKR";
 	drawText(discord, 1270.0f - getTextWidth(discord, textScale), 10.0f, textScale);
 	drawText(discord2, 1270.0f - getTextWidth(discord2, textScale), 30.0f, textScale);
+
+	std::string remap = std::string("Press spacebar to enter Remapping screen");
+	drawText(remap, (1280.0 - getTextWidth(remap, 0.03f)) / 2.0, 680.0f, 0.03f);
 }
 
 void MenuRender::scratches(Player* player) {
@@ -890,8 +893,6 @@ void MenuRender::calibration(Game* game, double dt) {
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({ (float)width,(float)height });
 
-	ImGui::SliderFloat("Audio Latency", &(game->m_audioLatency), 0.0f, 2.0f);
-	ImGui::SameLine();
 	if (ImGui::Button("Calibrate")) {
 		m_isCalibrating = true;
 		game->getAudio()->reset();
@@ -918,8 +919,10 @@ void MenuRender::calibration(Game* game, double dt) {
 			m_latencyHits.clear();
 		}
 	}
+	ImGui::SameLine();
+	ImGui::SliderFloat("Current audio latency (in ms.)", &(game->m_audioLatency), 0.0f, 2.0f);
 	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
-	ImGui::Text("Press the 'Calibrate' Button ONLY when you hear the snare hits for best latency calculations");
+	ImGui::Text("Press the Spacebar when you hear the snare hits WITHOUT pressing for the ding");
 	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
 
 	ImGui::Separator();

@@ -9,23 +9,36 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 }
 
 void MenuNavigator::writeConfigFile() {
-	std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
-	std::ofstream output("config-menu.txt");
+	m_game->getPlayer()->writeMappingFile();
 
-	output << UP_CODE << "\n";
-	output << DOWN_CODE << "\n";
-	output << SELECT_CODE << "\n";
-	output << BACK_CODE << "\n\n";
+	std::ofstream output("config.txt", std::ios::app);
+	if (output.is_open()) {
+		output << "{Menu}" << std::endl;
+		output << UP_CODE << std::endl;
+		output << DOWN_CODE << std::endl;
+		output << SELECT_CODE << std::endl;
+		output << BACK_CODE << "\n\n";
 
-	output << UP_GAMEPAD << "\n";
-	output << DOWN_GAMEPAD << "\n";
-	output << SELECT_GAMEPAD << "\n";
-	output << BACK_GAMEPAD << "\n\n";
-	output.close();
+		output << UP_GAMEPAD << std::endl;
+		output << DOWN_GAMEPAD << std::endl;
+		output << SELECT_GAMEPAD << std::endl;
+		output << BACK_GAMEPAD << std::endl << std::endl;
+		std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
+		output.close();
+	}
 }
 
 void MenuNavigator::readConfigFile() {
-	std::ifstream input("config-menu.txt");
+	std::ifstream input("config.txt");
+	std::string s;
+	while (s != std::string("{Menu}")) {
+		std::getline(input, s);
+		if (input.eof()) {
+			std::cerr << "MenuNavigator Error: found config file, but not {Menu} marker.";
+			std::cerr << "Stopped loading of config file" << std::endl;
+			return;
+		}
+	}
 	if (input.is_open()) {
 		std::cout << "MenuNavigator Message: loading config from file" << std::endl;
 		std::string token;
@@ -138,7 +151,7 @@ void MenuNavigator::pollInput() {
 	}
 
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
-		if(m_scene != CALIBRATION) remap();
+		if (m_scene != CALIBRATION) remap();
 	}
 	/*
 	if (m_wasTabPressed && !m_isTabPressed) {
@@ -180,7 +193,6 @@ void MenuNavigator::pollInput() {
 		}
 		else if (m_scene == REMAPPING) {
 			writeConfigFile();
-			m_game->getPlayer()->writeMappingFile();
 			m_scene = MAIN_SCENE;
 			resetMenu();
 		}
@@ -324,7 +336,6 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
@@ -361,7 +372,6 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 
@@ -386,7 +396,6 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
@@ -412,7 +421,6 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
@@ -420,7 +428,7 @@ void MenuNavigator::update() {
 			m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();
 			m_pastKBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
 		}
-		
+
 		m_debounce = false;
 	}
 }

@@ -848,6 +848,15 @@ void Player::tick(double time) {
 
 void Player::readMappingFile() {
 	std::ifstream input("config.txt");
+	std::string s;
+	while (s != "{Game}") {
+		std::getline(input, s);
+		if (input.eof()) {
+			std::cerr << "Player Error: found config file, but not {Game} marker.";
+			std::cerr << "Stopped loading of config file" << std::endl;
+			return;
+		}
+	}
 	if (input.is_open()) {
 		std::cout << "Player Message: loading config from file" << std::endl;
 		std::string token;
@@ -907,35 +916,36 @@ void Player::readMappingFile() {
 void Player::writeMappingFile() {
 	std::ofstream output("config.txt");
 	if (output.is_open()) {
+		output << "{Game}" << std::endl;
 		output << std::boolalpha;
-		output << GREEN_CODE << "\n";
-		output << RED_CODE << "\n";
-		output << BLUE_CODE << "\n";
-		output << EUPHORIA << "\n";
-		output << CROSS_L_CODE << "\n";
-		output << CROSS_R_CODE << "\n";
-		output << SCRATCH_UP << "\n";
-		output << SCRATCH_DOWN << "\n\n";
+		output << GREEN_CODE << std::endl;
+		output << RED_CODE << std::endl;
+		output << BLUE_CODE << std::endl;
+		output << EUPHORIA << std::endl;
+		output << CROSS_L_CODE << std::endl;
+		output << CROSS_R_CODE << std::endl;
+		output << SCRATCH_UP << std::endl;
+		output << SCRATCH_DOWN << std::endl << std::endl;;
 
-		output << GREEN_GAMEPAD << "\n";
-		output << RED_GAMEPAD << "\n";
-		output << BLUE_GAMEPAD << "\n";
-		output << EU_GAMEPAD << "\n";
-		output << m_useSingleCfAxis << "\n";
-		output << CF_LEFT_GAMEPAD << "\n";
-		output << CF_RIGHT_GAMEPAD << "\n";
-		output << m_useSingleScrAxis << "\n";
-		output << SCR_UP_GAMEPAD << "\n";
-		output << SCR_DOWN_GAMEPAD << "\n";
+		output << GREEN_GAMEPAD << std::endl;
+		output << RED_GAMEPAD << std::endl;
+		output << BLUE_GAMEPAD << std::endl;
+		output << EU_GAMEPAD << std::endl;
+		output << m_useSingleCfAxis << std::endl;
+		output << CF_LEFT_GAMEPAD << std::endl;
+		output << CF_RIGHT_GAMEPAD << std::endl;
+		output << m_useSingleScrAxis << std::endl;
+		output << SCR_UP_GAMEPAD << std::endl;
+		output << SCR_DOWN_GAMEPAD << std::endl;
 
 		for (size_t i = 0; i < m_gpMult.size(); ++i) {
-			output << m_gpMult.at(i) << "\n";
+			output << m_gpMult.at(i) << std::endl;
 		}
-		output << "\n";
+		output << std::endl;
 		for (size_t i = 0; i < m_gpDead.size(); ++i) {
-			output << m_gpDead.at(i) << "\n";
+			output << m_gpDead.at(i) << std::endl;
 		}
-		output << "\n";
+		output << std::endl;
 
 		std::cout << "Player Message: Written config to file" << std::endl;
 	}
