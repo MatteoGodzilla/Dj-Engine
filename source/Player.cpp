@@ -828,7 +828,10 @@ void Player::tick(double time) {
 
 	//decrease euphoria if active
 	if (m_euphoria_active) {
-		if (m_eu_value < 0.0)m_euphoria_active = false;
+		if (m_eu_value < 0.0) {
+			m_euphoria_active = false;
+			m_eu_value = 0.0f;
+		}
 		else {
 			m_double_mult = true;
 			double dt = time - m_lastTapTime;

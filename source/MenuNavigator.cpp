@@ -525,7 +525,8 @@ void MenuNavigator::remap() {
 }
 
 void MenuNavigator::scan() {
-	SongScanner::load("./songs", m_songList);
+	SongScanner scanner = SongScanner();
+	scanner.load("./songs", m_songList);
 	for (const SongEntry& entry : m_songList) {
 		std::string text;
 		if (!entry.s2.empty()) {
@@ -534,7 +535,6 @@ void MenuNavigator::scan() {
 		else {
 			text = entry.s1;
 		}
-
 		MenuNode song(text, 255);
 		std::vector<MenuNode> list = m_root.getChildrens();
 		list.at(0).push(song);

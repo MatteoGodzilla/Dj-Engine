@@ -4,11 +4,11 @@
 namespace fs = std::experimental::filesystem;
 
 //recursive scan inside folders to find songs 
-void checkFolder(fs::path p, std::vector<SongEntry>&list) {
+void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
 	for (const fs::directory_entry entry : fs::directory_iterator(p)) {
 		//if there's a sub-directory, repeat the scan inside that sub-directory
 		if (fs::is_directory(entry)) {
-			checkFolder(entry.path(), list);
+			checkFolder(entry.path(), list, duplicates);
 		}
 		//if it's not a directory, check for song.json/info.ini
 		std::string file = p.generic_string() + std::string("/song.json");
@@ -29,39 +29,58 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 			int dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
 			int dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
 
-			dTrack = (dTrack < 100 ? dTrack : 100);//min(dTrack, 100);
-			dTrack = (dTrack > 0 ? dTrack : 0);//max(dTrack, 0);
+			dTrack = std::min(dTrack, 100);
+			dTrack = std::max(dTrack, 0);
 
-			dTap = (dTap < 100 ? dTap : 100);//min(dTap, 100);
-			dTap = (dTap > 0 ? dTap : 0);//max(dTap, 0);
+			dTap = std::min(dTap, 100);
+			dTap = std::max(dTap, 0);
 
-			dCrossfade = (dCrossfade < 100 ? dCrossfade : 100);//min(dCrossfade, 100);
-			dCrossfade = (dCrossfade > 0 ? dCrossfade : 0);//max(dCrossfade, 0);
+			dCrossfade = std::min(dCrossfade, 100);
+			dCrossfade = std::max(dCrossfade, 0);
 
-			dScratch = (dScratch < 100 ? dScratch : 100);//min(dScratch, 100);
-			dScratch = (dScratch > 0 ? dScratch : 0);//max(dScratch, 0);
+			dScratch = std::min(dScratch, 100);
+			dScratch = std::max(dScratch, 0);
 
 			if (s2 == std::string("NULL")) {
-					s2.clear();
+				s2.clear();
+			}
+
+			if (a2 == std::string("NULL")) {
+				a2.clear();
+			}
+
+			for (SongEntry& entry : list) {
+				if (entry.s1.compare(s1) == 0) {
+					//found same text
+					if (duplicates.find(s1) == duplicates.end()) {
+						//duplicate not found in dictionary
+						duplicates[s1] = 1;
+					}
+					else {
+						//duplicate found in the dictionary
+						duplicates[s1]++;
+					}
+					std::string temp = s1;
+					temp.append(" [");
+					temp.append(std::to_string(duplicates[s1]));
+					temp.append("]");
+					s1 = temp;
 				}
+			}
 
-				if (a2 == std::string("NULL")) {
-					a2.clear();
-				}
+			SongEntry t = {
+				p.generic_string(),
+				s1, s2,
+				a1, a2,
+				charter, mixer,
+				bpm,
+				dTrack, dTap,
+				dCrossfade, dScratch
+			};
 
-				SongEntry t = {
-					p.generic_string(),
-					s1, s2,
-					a1, a2,
-					charter, mixer,
-					bpm,
-					dTrack, dTap,
-					dCrossfade, dScratch
-				};
-
-				list.push_back(t);
-				std::cout << "found " << file << std::endl;
-				break;
+			list.push_back(t);
+			std::cout << "found " << file << std::endl;
+			break;
 		}
 		else {
 			file = p.generic_string() + std::string("/info.ini");
@@ -98,17 +117,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 				dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
 				dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
 
-				dTrack = (dTrack < 100 ? dTrack : 100);//min(dTrack, 100);
-				dTrack = (dTrack > 0 ? dTrack : 0);//max(dTrack, 0);
+				dTrack = std::min(dTrack, 100);
+				dTrack = std::max(dTrack, 0);
 
-				dTap = (dTap < 100 ? dTap : 100);//min(dTap, 100);
-				dTap = (dTap > 0 ? dTap : 0);//max(dTap, 0);
+				dTap = std::min(dTap, 100);
+				dTap = std::max(dTap, 0);
 
-				dCrossfade = (dCrossfade < 100 ? dCrossfade : 100);//min(dCrossfade, 100);
-				dCrossfade = (dCrossfade > 0 ? dCrossfade : 0);//max(dCrossfade, 0);
+				dCrossfade = std::min(dCrossfade, 100);
+				dCrossfade = std::max(dCrossfade, 0);
 
-				dScratch = (dScratch < 100 ? dScratch : 100);//min(dScratch, 100);
-				dScratch = (dScratch > 0 ? dScratch : 0);//max(dScratch, 0);
+				dScratch = std::min(dScratch, 100);
+				dScratch = std::max(dScratch, 0);
 
 				if (s2 == std::string("NULL")) {
 					s2.clear();
@@ -116,6 +135,26 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 
 				if (a2 == std::string("NULL")) {
 					a2.clear();
+				}
+
+				for (SongEntry& entry : list) {
+					if (entry.s1.compare(s1) == 0) {
+						//found same text
+						if (duplicates.find(s1) == duplicates.end()) {
+							//duplicate not found in dictionary
+							duplicates[s1] = 1;
+						}
+						else {
+							//duplicate found in the dictionary
+							duplicates[s1]++;
+						}
+
+						std::string temp = s1;
+						temp.append(" [");
+						temp.append(std::to_string(duplicates[s1]));
+						temp.append("] ");
+						s1 = temp;
+					}
 				}
 
 				SongEntry t = {
@@ -137,23 +176,48 @@ void checkFolder(fs::path p, std::vector<SongEntry>&list) {
 }
 
 bool compareSongEntries(SongEntry a, SongEntry b) {
-	std::string first;
-	std::string second;
-	for (int i = 0; i < a.s1.size(); ++i) {
-		first += std::toupper(a.s1.at(i));
+	std::string a1, a2, b1, b2;
+
+	for (size_t i = 0; i < a.s1.size(); ++i) {
+		a1 += std::toupper(a.s1.at(i));
 	}
-	for (int i = 0; i < b.s1.size(); ++i) {
-		second += std::toupper(b.s1.at(i));
+
+	for (size_t i = 0; i < b.s1.size(); ++i) {
+		b1 += std::toupper(b.s1.at(i));
 	}
-	if (first.compare(second) > 0)return false;
+
+	if (!a.s2.empty()) {
+		for (size_t i = 0; i < a.s2.size(); ++i) {
+			a2 += std::toupper(a.s2.at(i));
+		}
+	}
+
+	if (!b.s2.empty()) {
+		for (size_t i = 0; i < b.s2.size(); ++i) {
+			b2 += std::toupper(b.s2.at(i));
+		}
+	}
+	int res = a1.compare(b1);
+	if (res > 0)return false;
+	else if (res == 0) {
+		int res2 = a2.compare(b2);
+		if (res2 >= 0) return false;
+		else return true;
+	}
 	else return true;
 }
 
-void SongScanner::load(const std::string& rootPath,std::vector<SongEntry>& list){
+void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list) {
 	fs::path root(rootPath);
 	if (fs::is_directory(root)) {
 		//the root is a directory, so start scanning
-		checkFolder(root, list);
+		checkFolder(root, list, m_duplicates);
+
+		/*
+		for (auto& entry : m_duplicates) {
+			std::cout << entry.first << " | " << entry.second << std::endl;
+		}
+		*/
 		std::sort(list.begin(), list.end(), compareSongEntries);
 	}
 	else {

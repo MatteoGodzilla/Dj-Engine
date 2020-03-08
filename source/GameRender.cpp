@@ -1633,41 +1633,41 @@ void GameRender::result(Player& player, Generator& generator) {
 	drawText(completeName, 10.0f, y, scale);
 	y += scale * 1000.0f;
 	drawText("Result:", 10.0f, y, scale);
+	float x = getTextWidth("Result:", scale);
 	if (player.m_botEnabled) {
-		float x = getTextWidth("Result:", scale);
 		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
 	}
 	else {
-		float x = getTextWidth("Result:", scale);
-		if (x >= 0.1) {
+		float stars = (float)player.getScore() / (float)generator.m_baseScore;
+		if (stars >= 0.1) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.2) {
+		if (stars >= 0.2) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.3) {
+		if (stars >= 0.3) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.4) {
+		if (stars >= 0.4) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.5) {
+		if (stars >= 0.5) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
@@ -1747,6 +1747,8 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	std::string baseScore;
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
 	drawText(baseScore, 940.0f, 370.0f, 0.03f);
+
+	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
