@@ -292,39 +292,39 @@ void MenuNavigator::update() {
 			*/
 		}
 		else if (m_scene == REMAPPING) {
-			if (m_render.m_editingAxis && m_render.m_gameActionToChange != -1) {
+			if (m_render.m_editingAxis && m_render.m_ActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_GAMEPAD);
-				if (m_render.m_gameActionToChange == RED_INDEX) {
+				if (m_render.m_ActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
+				else if (m_render.m_ActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == EU_INDEX) {
+				else if (m_render.m_ActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EU_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_LEFT_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_RIGHT_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_UP_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == MENU_UP) {
+				else if (m_render.m_ActionToChange == MENU_UP) {
 					changing = &UP_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_DOWN) {
+				else if (m_render.m_ActionToChange == MENU_DOWN) {
 					changing = &DOWN_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_SELECT) {
+				else if (m_render.m_ActionToChange == MENU_SELECT) {
 					changing = &SELECT_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_BACK) {
+				else if (m_render.m_ActionToChange == MENU_BACK) {
 					changing = &BACK_GAMEPAD;
 				}
 
@@ -340,80 +340,43 @@ void MenuNavigator::update() {
 					}
 				}
 			}
-			else if (m_render.m_editingKey && m_render.m_gameActionToChange != -1) {
+			else if (m_render.m_editingKey && m_render.m_ActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_CODE);
-				if (m_render.m_gameActionToChange == RED_INDEX) {
+				if (m_render.m_ActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_CODE);
 				}
-				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
+				else if (m_render.m_ActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_CODE);
 				}
-				else if (m_render.m_gameActionToChange == EU_INDEX) {
+				else if (m_render.m_ActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EUPHORIA);
 				}
-				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_L_CODE);
 				}
-				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_R_CODE);
 				}
-				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_UP);
 				}
-				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
-
-				float deadzone = 0.5f;
-				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
-
-				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
-					float diff = abs(m_pastKBMState.at(i) - KBMState.at(i));
-					if (diff > deadzone) {
-						*changing = i;
-						m_render.doneEditing();
-						break;
-					}
-
+				else if (m_render.m_ActionToChange == MENU_UP) {
+					changing = &UP_CODE;
 				}
-			}
-			else if (m_render.m_editingAxis && m_render.m_menuActionToChange != -1) {
-				int* changing = &UP_GAMEPAD;
-				if (m_render.m_menuActionToChange == MENU_DOWN) {
-					changing = &DOWN_GAMEPAD;
-				}
-				else if (m_render.m_menuActionToChange == MENU_SELECT) {
-					changing = &SELECT_GAMEPAD;
-				}
-				else if (m_render.m_menuActionToChange == MENU_BACK) {
-					changing = &BACK_GAMEPAD;
-				}
-
-				float deadzone = 0.5f;
-				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
-				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
-					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
-					if (diff > deadzone) {
-						*changing = i;
-						m_render.doneEditing();
-						break;
-					}
-				}
-
-			}
-			else if (m_render.m_editingKey && m_render.m_menuActionToChange != -1) {
-				int* changing = &UP_CODE;
-				if (m_render.m_menuActionToChange == MENU_DOWN) {
+				else if (m_render.m_ActionToChange == MENU_DOWN) {
 					changing = &DOWN_CODE;
 				}
-				else if (m_render.m_menuActionToChange == MENU_SELECT) {
+				else if (m_render.m_ActionToChange == MENU_SELECT) {
 					changing = &SELECT_CODE;
 				}
-				else if (m_render.m_menuActionToChange == MENU_BACK) {
+				else if (m_render.m_ActionToChange == MENU_BACK) {
 					changing = &BACK_CODE;
 				}
 
-				float deadzone = 0.05f;
+				float deadzone = 0.5f;
 				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
 
 				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
@@ -423,6 +386,7 @@ void MenuNavigator::update() {
 						m_render.doneEditing();
 						break;
 					}
+
 				}
 			}
 			m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();

@@ -979,42 +979,24 @@ void MenuRender::setDeckSpeed(Game* game) {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void MenuRender::editingGameAxis(int action) {
+void MenuRender::editingAxisController(int action) {
 	m_editingKey = false;
 	m_editingAxis = true;
-	m_gameActionToChange = action;
-	m_menuActionToChange = -1;
-}
-
-void MenuRender::editingGameKey(int action) {
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	m_editingKey = true;
-	m_editingAxis = false;
-	m_gameActionToChange = action;
-	m_menuActionToChange = -1;
-}
-
-void MenuRender::doneEditing() {
-	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-	m_editingKey = false;
-	m_editingAxis = false;
-	m_gameActionToChange = -1;
-	m_menuActionToChange = -1;
+	m_ActionToChange = action;
 }
 
 void MenuRender::editingAxisKBAM(int action) {
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	m_editingKey = true;
 	m_editingAxis = false;
-	m_gameActionToChange = -1;
-	m_menuActionToChange = action;
+	m_ActionToChange = action;
 }
 
-void MenuRender::editingAxisController(int action) {
+void MenuRender::doneEditing() {
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	m_editingKey = false;
-	m_editingAxis = true;
-	m_gameActionToChange = -1;
-	m_menuActionToChange = action;
+	m_editingAxis = false;
+	m_ActionToChange = -1;
 }
 
 GLFWwindow* MenuRender::getWindowPtr()
