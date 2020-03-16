@@ -15,7 +15,6 @@ Player::Player() {
 	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
 	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
 	m_pastKBMState.resize(400);
-	readMappingFile();
 }
 
 void Player::pollInput(GLFWwindow* window) {
@@ -917,7 +916,7 @@ void Player::readMappingFile() {
 }
 
 void Player::writeMappingFile() {
-	std::ofstream output("config.txt");
+	std::ofstream output("config.txt", std::ios::app);
 	if (output.is_open()) {
 		output << "{Game}" << std::endl;
 		output << std::boolalpha;

@@ -9,7 +9,7 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 }
 
 void MenuNavigator::writeConfigFile() {
-	m_game->getPlayer()->writeMappingFile();
+	m_game->writeConfig();
 
 	std::ofstream output("config.txt", std::ios::app);
 	if (output.is_open()) {
@@ -66,21 +66,24 @@ void MenuNavigator::readConfigFile() {
 
 MenuNavigator::MenuNavigator() {
 	//create menu tree
-	MenuNode play("Play!", 1);
-	MenuNode options("Options", 2);
-	MenuNode credits("Credits", 3);
-	MenuNode exit("Exit", -1);
+	MenuNode play("Play!", PLAY_ID);
+	MenuNode options("Options", OPTIONS_ID);
+	MenuNode credits("Credits", CREDITS_ID);
+	MenuNode exit("Exit", EXIT_ID);
 
-	MenuNode scratches("Test Scratches", 4);
-	MenuNode latency("Calibrate latency", 5);
-	MenuNode flipButtons("Toggle Buttons Right/Left", 6);
-	MenuNode speed("Set Deck Speed", 7);
-	MenuNode bot("Toggle Bot", 8);
+	MenuNode scratches("Test Scratches", SCRATCHES_ID);
+	MenuNode latency("Calibrate latency", LATENCY_ID);
+	MenuNode flipButtons("Toggle Buttons Right/Left", LR_BUTTONS_ID);
+	MenuNode speed("Set Deck Speed", SPEED_ID);
+	MenuNode bot("Toggle Bot", BOT_ID);
+	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
+
 	options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
 	options.push(bot);
 	options.push(speed);
+	options.push(debug);
 
 	m_root.push(play);
 	m_root.push(options);
@@ -188,6 +191,7 @@ void MenuNavigator::pollInput() {
 
 	if (m_render.m_shouldClose) {
 		if (m_popupId != -1) {
+			if (m_popupId == 0)writeConfigFile();
 			m_popupId = -1;
 			m_debounce = true;
 		}
@@ -197,6 +201,7 @@ void MenuNavigator::pollInput() {
 			resetMenu();
 		}
 		else if (m_scene == CALIBRATION) {
+			writeConfigFile();
 			resetMenu();
 			m_scene = MAIN_SCENE;
 		}
@@ -432,33 +437,34 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	//every case represents a function called on activate
 	size_t index = 0;
 	int id = menu.getId();
-	if (id == -1) {
+	if (id == EXIT_ID) {
 		m_shouldClose = true;
 	}
-	else if (id == 3) {
+	else if (id == CREDITS_ID) {
 		m_scene = CREDITS;
 	}
-	else if (id == 4) {
+	else if (id == SCRATCHES_ID) {
 		m_scene = SCRATCHES;
 		glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
-	else if (id == 5) {
+	else if (id == LATENCY_ID) {
 		m_scene = CALIBRATION;
 	}
-	else if (id == 6) {
+	else if (id == LR_BUTTONS_ID) {
 		if (m_game->getPlayer()->m_isButtonsRight) {
-			std::cout << "Game message: Changed Buttons to Right" << std::endl;
+			std::cout << "Menu message: Changed Buttons to Right" << std::endl;
 			m_game->setButtonPos(false);
 		}
 		else {
-			std::cout << "Game message: Changed Buttons to Left" << std::endl;
+			std::cout << "Menu message: Changed Buttons to Left" << std::endl;
 			m_game->setButtonPos(true);
 		}
+		writeConfigFile();
 	}
-	else if (id == 7) {
+	else if (id == SPEED_ID) {
 		m_popupId = 0;
 	}
-	else if (id == 8) {
+	else if (id == BOT_ID) {
 		if (m_game->getPlayer()->m_botEnabled) {
 			std::cout << "Menu Message: disabled bot" << std::endl;
 			m_game->getPlayer()->m_botEnabled = false;
@@ -468,7 +474,17 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 			m_game->getPlayer()->m_botEnabled = true;
 		}
 	}
-	else if (id == 255) {
+	else if (id == DEBUG_ID) {
+		if (m_game->m_debugView) {
+			std::cout << "Menu Message: Disabled debug informations" << std::endl;
+			m_game->m_debugView = false;
+		}
+		else {
+			std::cout << "Menu Message: Enabled debug informations" << std::endl;
+			m_game->m_debugView = true;
+		}
+	}
+	else if (id == SONG_GENERAL_ID) {
 		index = findIndex(menu, parent);
 		m_active = false;
 		m_game->start(m_songList.at(index));
@@ -476,10 +492,10 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (menu.getChildCount() == 0) {
 		if (menu.getId() == 1) {
-			std::cout << "MenuNavigator Message: No songs found in the install path." << std::endl;
+			std::cout << "Menu Message: No songs found in the install path." << std::endl;
 		}
 		else {
-			std::cout << "MenuNavigator Error: no function attached to id " << menu.getId() << std::endl;
+			std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
 		}
 	}
 }
@@ -499,7 +515,7 @@ void MenuNavigator::scan() {
 		else {
 			text = entry.s1;
 		}
-		MenuNode song(text, 255);
+		MenuNode song(text, SONG_GENERAL_ID);
 		std::vector<MenuNode> list = m_root.getChildrens();
 		list.at(0).push(song);
 		m_root.updateChildrens(list);

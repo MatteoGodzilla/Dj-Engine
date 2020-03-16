@@ -4,6 +4,38 @@ Game::Game() {}
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
+	std::ifstream input("config.txt");
+	std::string s;
+	while (s != std::string("{Engine}")) {
+		std::getline(input, s);
+		if (input.eof()) {
+			std::cerr << "Game Error: found config file, but not {Engine} marker.";
+			std::cerr << "Stopped loading of config file" << std::endl;
+			return;
+		}
+	}
+	if (input.is_open()) {
+		std::cout << "Game Message: loading from config file" << std::endl;
+		std::string token;
+		input >> token;
+		/*
+		output << m_audioLatency << std::endl;
+		output << m_deckSpeed << std::endl;
+		output << m_isButtonsRight << std::endl << std::endl;
+		*/
+
+		m_audioLatency = std::stof(token);
+		input >> token;
+		m_deckSpeed = std::stof(token);
+		input >> token;
+		m_isButtonsRight = token == "true" ? true : false;
+		input >> token;
+		m_debugView = token == "true" ? true : false;
+		m_player.readMappingFile();
+	}
+	else {
+		std::cerr << "Game Error: Cannot open config file" << std::endl;
+	}
 }
 
 void Game::pollInput() {
@@ -75,7 +107,8 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+			if(m_debugView)
+				m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
 		}
 		else if (m_mode == 1) {
 			m_render.result(m_player,m_gen);
@@ -146,6 +179,23 @@ void Game::start(SongEntry entry) {
 
 	m_active = true;
 	m_mode = 0;
+}
+
+void Game::writeConfig() {
+	std::ofstream output("config.txt");
+	if (output.is_open()) {
+		output << std::boolalpha;
+		output << "{Engine}" << std::endl;
+		output << m_audioLatency << std::endl;
+		output << m_deckSpeed << std::endl;
+		output << m_isButtonsRight << std::endl;
+		output << m_debugView << std::endl << std::endl;
+		
+		std::cout << "Game Message: updated engine values in config file." << std::endl;
+		output.close();
+	}
+
+	m_player.writeMappingFile();
 }
 
 Game::~Game() {
