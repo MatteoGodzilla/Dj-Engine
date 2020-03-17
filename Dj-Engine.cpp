@@ -9,6 +9,8 @@
 unsigned int WIDTH = 1280;
 unsigned int HEIGHT = 720;
 
+std::string VERSION = "alpha v1.3";
+
 Game game;
 MenuNavigator menu;
 
@@ -33,7 +35,7 @@ void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
 }
 
 int main() {
-	std::cout << "Dj-Engine version alpha 1.2" << std::endl;
+	std::cout << "Dj-Engine " << VERSION << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);
@@ -45,7 +47,8 @@ int main() {
 	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
 
 	//GLFW init functions (window and callbacks)
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Dj-Engine", nullptr, nullptr);
+	std::string title = std::string("Dj-Engine ") + VERSION;
+	window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
 	if (!window) {
 		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
 		glfwTerminate();
