@@ -8,13 +8,18 @@
 #include <fstream>
 
 enum scenes {
-	MAIN_SCENE,REMAPPING,CREDITS,SCRATCHES,CALIBRATION
+	MAIN_SCENE, REMAPPING, CREDITS, SCRATCHES, CALIBRATION
+};
+
+enum actions {
+	SONG_GENERAL_ID, PLAY_ID, OPTIONS_ID, CREDITS_ID, EXIT_ID, SCRATCHES_ID, LATENCY_ID,
+	LR_BUTTONS_ID, SPEED_ID, BOT_ID, DEBUG_ID
 };
 
 class MenuNavigator {
 public:
 	MenuNavigator();
-	void init(GLFWwindow* w,Game* gameptr);
+	void init(GLFWwindow* w, Game* gameptr);
 	void pollInput();
 	void update();
 	void render(double dt);
@@ -76,10 +81,10 @@ private:
 	bool m_active = false;
 
 	//menu structure
-	MenuNode m_root = MenuNode("Main Menu",0);
+	MenuNode m_root = MenuNode("Main Menu", 0);
 	MenuNode m_activeNode = m_root;
 	std::vector<unsigned int> m_selection;
-	
+
 	MenuRender m_render;
 
 	std::vector<SongEntry> m_songList = {};

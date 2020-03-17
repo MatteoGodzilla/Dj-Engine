@@ -7,6 +7,7 @@
 #include <experimental/filesystem>
 #include <fstream>
 #include <string>
+#include <map>
 #include <list>
 #include <algorithm>
 
@@ -28,6 +29,8 @@ struct SongEntry {
 class SongScanner
 {
 public:
-	static void load(const std::string& root, std::vector<SongEntry>& list);
+	void load(const std::string& root, std::vector<SongEntry>& list);
+private:
+	std::map<std::string, int> m_duplicates;
 };
 

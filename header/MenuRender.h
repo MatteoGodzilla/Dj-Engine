@@ -40,8 +40,7 @@ public:
 	const size_t VISIBLE_ENTRIES = 6;
 	bool m_editingAxis = false;
 	bool m_editingKey = false;
-	int m_gameActionToChange = -1;
-	int m_menuActionToChange = -1;
+	int m_ActionToChange = -1;
 
 	std::string m_testBuffer = "";
 
@@ -63,13 +62,10 @@ private:
 	unsigned int m_splashTexture = 0;
 	unsigned int m_calibrationTex = 0;
 
-	void editingGameAxis(int axis);
-	void editingGameKey(int axis);
+	void editingAxisController(int axis);
+	void editingAxisKBAM(int axis);
 
 	std::vector<double> m_latencyHits;
-
-	void editingMenuAxis(int axis);
-	void editingMenuKey(int axis);
 
 	double m_dTime = 0.0f;
 	double m_globalTime = 0.0f;

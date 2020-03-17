@@ -15,7 +15,6 @@ Player::Player() {
 	m_gpMult.at(SCR_UP_INDEX) = 1000.0f;
 	m_gpMult.at(SCR_DOWN_INDEX) = 1000.0f;
 	m_pastKBMState.resize(400);
-	readMappingFile();
 }
 
 void Player::pollInput(GLFWwindow* window) {
@@ -828,7 +827,10 @@ void Player::tick(double time) {
 
 	//decrease euphoria if active
 	if (m_euphoria_active) {
-		if (m_eu_value < 0.0)m_euphoria_active = false;
+		if (m_eu_value < 0.0) {
+			m_euphoria_active = false;
+			m_eu_value = 0.0f;
+		}
 		else {
 			m_double_mult = true;
 			double dt = time - m_lastTapTime;
@@ -848,6 +850,15 @@ void Player::tick(double time) {
 
 void Player::readMappingFile() {
 	std::ifstream input("config.txt");
+	std::string s;
+	while (s != "{Game}") {
+		std::getline(input, s);
+		if (input.eof()) {
+			std::cerr << "Player Error: found config file, but not {Game} marker.";
+			std::cerr << "Stopped loading of config file" << std::endl;
+			return;
+		}
+	}
 	if (input.is_open()) {
 		std::cout << "Player Message: loading config from file" << std::endl;
 		std::string token;
@@ -905,37 +916,38 @@ void Player::readMappingFile() {
 }
 
 void Player::writeMappingFile() {
-	std::ofstream output("config.txt");
+	std::ofstream output("config.txt", std::ios::app);
 	if (output.is_open()) {
+		output << "{Game}" << std::endl;
 		output << std::boolalpha;
-		output << GREEN_CODE << "\n";
-		output << RED_CODE << "\n";
-		output << BLUE_CODE << "\n";
-		output << EUPHORIA << "\n";
-		output << CROSS_L_CODE << "\n";
-		output << CROSS_R_CODE << "\n";
-		output << SCRATCH_UP << "\n";
-		output << SCRATCH_DOWN << "\n\n";
+		output << GREEN_CODE << std::endl;
+		output << RED_CODE << std::endl;
+		output << BLUE_CODE << std::endl;
+		output << EUPHORIA << std::endl;
+		output << CROSS_L_CODE << std::endl;
+		output << CROSS_R_CODE << std::endl;
+		output << SCRATCH_UP << std::endl;
+		output << SCRATCH_DOWN << std::endl << std::endl;;
 
-		output << GREEN_GAMEPAD << "\n";
-		output << RED_GAMEPAD << "\n";
-		output << BLUE_GAMEPAD << "\n";
-		output << EU_GAMEPAD << "\n";
-		output << m_useSingleCfAxis << "\n";
-		output << CF_LEFT_GAMEPAD << "\n";
-		output << CF_RIGHT_GAMEPAD << "\n";
-		output << m_useSingleScrAxis << "\n";
-		output << SCR_UP_GAMEPAD << "\n";
-		output << SCR_DOWN_GAMEPAD << "\n";
+		output << GREEN_GAMEPAD << std::endl;
+		output << RED_GAMEPAD << std::endl;
+		output << BLUE_GAMEPAD << std::endl;
+		output << EU_GAMEPAD << std::endl;
+		output << m_useSingleCfAxis << std::endl;
+		output << CF_LEFT_GAMEPAD << std::endl;
+		output << CF_RIGHT_GAMEPAD << std::endl;
+		output << m_useSingleScrAxis << std::endl;
+		output << SCR_UP_GAMEPAD << std::endl;
+		output << SCR_DOWN_GAMEPAD << std::endl;
 
 		for (size_t i = 0; i < m_gpMult.size(); ++i) {
-			output << m_gpMult.at(i) << "\n";
+			output << m_gpMult.at(i) << std::endl;
 		}
-		output << "\n";
+		output << std::endl;
 		for (size_t i = 0; i < m_gpDead.size(); ++i) {
-			output << m_gpDead.at(i) << "\n";
+			output << m_gpDead.at(i) << std::endl;
 		}
-		output << "\n";
+		output << std::endl;
 
 		std::cout << "Player Message: Written config to file" << std::endl;
 	}
@@ -1000,48 +1012,48 @@ void Player::updateGamepadState() {
 
 		if (count > 0) {
 			m_gpState.clear();
-			GREEN_GAMEPAD = max(GREEN_GAMEPAD, 0);
-			GREEN_GAMEPAD = min(GREEN_GAMEPAD, localGamepadState.size() - 1);
+			GREEN_GAMEPAD = std::max(GREEN_GAMEPAD, 0);
+			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
-			RED_GAMEPAD = max(RED_GAMEPAD, 0);
-			RED_GAMEPAD = min(RED_GAMEPAD, localGamepadState.size() - 1);
+			RED_GAMEPAD = std::max(RED_GAMEPAD, 0);
+			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
-			BLUE_GAMEPAD = max(BLUE_GAMEPAD, 0);
-			BLUE_GAMEPAD = min(BLUE_GAMEPAD, localGamepadState.size() - 1);
+			BLUE_GAMEPAD = std::max(BLUE_GAMEPAD, 0);
+			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
-			EU_GAMEPAD = max(EU_GAMEPAD, 0);
-			EU_GAMEPAD = min(EU_GAMEPAD, localGamepadState.size() - 1);
+			EU_GAMEPAD = std::max(EU_GAMEPAD, 0);
+			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)localGamepadState.size() - 1);
 			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
 
 			if (m_useSingleCfAxis) {
-				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
+				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
 				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
 				m_gpState.push_back(-value);
 				m_gpState.push_back(value);
 			}
 			else {
-				CF_LEFT_GAMEPAD = max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = min(CF_LEFT_GAMEPAD, localGamepadState.size() - 1);
+				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
-				CF_RIGHT_GAMEPAD = max(CF_RIGHT_GAMEPAD, 0);
-				CF_RIGHT_GAMEPAD = min(CF_RIGHT_GAMEPAD, localGamepadState.size() - 1);
+				CF_RIGHT_GAMEPAD = std::max(CF_RIGHT_GAMEPAD, 0);
+				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
 			}
 
 			if (m_useSingleScrAxis) {
-				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
+				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
 				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
 				m_gpState.push_back(value);
 				m_gpState.push_back(-value);
 			}
 			else {
-				SCR_DOWN_GAMEPAD = max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = min(SCR_DOWN_GAMEPAD, localGamepadState.size() - 1);
+				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
-				SCR_UP_GAMEPAD = max(SCR_UP_GAMEPAD, 0);
-				SCR_UP_GAMEPAD = min(SCR_UP_GAMEPAD, localGamepadState.size() - 1);
+				SCR_UP_GAMEPAD = std::max(SCR_UP_GAMEPAD, 0);
+				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)localGamepadState.size() - 1);
 				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
 			}
 

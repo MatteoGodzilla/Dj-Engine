@@ -9,23 +9,36 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 }
 
 void MenuNavigator::writeConfigFile() {
-	std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
-	std::ofstream output("config-menu.txt");
+	m_game->writeConfig();
 
-	output << UP_CODE << "\n";
-	output << DOWN_CODE << "\n";
-	output << SELECT_CODE << "\n";
-	output << BACK_CODE << "\n\n";
+	std::ofstream output("config.txt", std::ios::app);
+	if (output.is_open()) {
+		output << "{Menu}" << std::endl;
+		output << UP_CODE << std::endl;
+		output << DOWN_CODE << std::endl;
+		output << SELECT_CODE << std::endl;
+		output << BACK_CODE << "\n\n";
 
-	output << UP_GAMEPAD << "\n";
-	output << DOWN_GAMEPAD << "\n";
-	output << SELECT_GAMEPAD << "\n";
-	output << BACK_GAMEPAD << "\n\n";
-	output.close();
+		output << UP_GAMEPAD << std::endl;
+		output << DOWN_GAMEPAD << std::endl;
+		output << SELECT_GAMEPAD << std::endl;
+		output << BACK_GAMEPAD << std::endl << std::endl;
+		std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
+		output.close();
+	}
 }
 
 void MenuNavigator::readConfigFile() {
-	std::ifstream input("config-menu.txt");
+	std::ifstream input("config.txt");
+	std::string s;
+	while (s != std::string("{Menu}")) {
+		std::getline(input, s);
+		if (input.eof()) {
+			std::cerr << "MenuNavigator Error: found config file, but not {Menu} marker.";
+			std::cerr << "Stopped loading of config file" << std::endl;
+			return;
+		}
+	}
 	if (input.is_open()) {
 		std::cout << "MenuNavigator Message: loading config from file" << std::endl;
 		std::string token;
@@ -53,21 +66,24 @@ void MenuNavigator::readConfigFile() {
 
 MenuNavigator::MenuNavigator() {
 	//create menu tree
-	MenuNode play("Play!", 1);
-	MenuNode options("Options", 2);
-	MenuNode credits("Credits", 3);
-	MenuNode exit("Exit", -1);
+	MenuNode play("Play!", PLAY_ID);
+	MenuNode options("Options", OPTIONS_ID);
+	MenuNode credits("Credits", CREDITS_ID);
+	MenuNode exit("Exit", EXIT_ID);
 
-	MenuNode scratches("Test Scratches", 4);
-	MenuNode latency("Calibrate latency", 5);
-	MenuNode flipButtons("Toggle Buttons Right/Left", 6);
-	MenuNode speed("Set Deck Speed", 7);
-	MenuNode bot("Toggle Bot", 8);
+	MenuNode scratches("Test Scratches", SCRATCHES_ID);
+	MenuNode latency("Calibrate latency", LATENCY_ID);
+	MenuNode flipButtons("Toggle Buttons Right/Left", LR_BUTTONS_ID);
+	MenuNode speed("Set Deck Speed", SPEED_ID);
+	MenuNode bot("Toggle Bot", BOT_ID);
+	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
+
 	options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
 	options.push(bot);
 	options.push(speed);
+	options.push(debug);
 
 	m_root.push(play);
 	m_root.push(options);
@@ -138,7 +154,7 @@ void MenuNavigator::pollInput() {
 	}
 
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
-		if(m_scene != CALIBRATION) remap();
+		if (m_scene != CALIBRATION) remap();
 	}
 	/*
 	if (m_wasTabPressed && !m_isTabPressed) {
@@ -175,16 +191,17 @@ void MenuNavigator::pollInput() {
 
 	if (m_render.m_shouldClose) {
 		if (m_popupId != -1) {
+			if (m_popupId == 0)writeConfigFile();
 			m_popupId = -1;
 			m_debounce = true;
 		}
 		else if (m_scene == REMAPPING) {
 			writeConfigFile();
-			m_game->getPlayer()->writeMappingFile();
 			m_scene = MAIN_SCENE;
 			resetMenu();
 		}
 		else if (m_scene == CALIBRATION) {
+			writeConfigFile();
 			resetMenu();
 			m_scene = MAIN_SCENE;
 		}
@@ -280,39 +297,39 @@ void MenuNavigator::update() {
 			*/
 		}
 		else if (m_scene == REMAPPING) {
-			if (m_render.m_editingAxis && m_render.m_gameActionToChange != -1) {
+			if (m_render.m_editingAxis && m_render.m_ActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_GAMEPAD);
-				if (m_render.m_gameActionToChange == RED_INDEX) {
+				if (m_render.m_ActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
+				else if (m_render.m_ActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == EU_INDEX) {
+				else if (m_render.m_ActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EU_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_LEFT_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CF_RIGHT_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_UP_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				}
-				else if (m_render.m_gameActionToChange == MENU_UP) {
+				else if (m_render.m_ActionToChange == MENU_UP) {
 					changing = &UP_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_DOWN) {
+				else if (m_render.m_ActionToChange == MENU_DOWN) {
 					changing = &DOWN_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_SELECT) {
+				else if (m_render.m_ActionToChange == MENU_SELECT) {
 					changing = &SELECT_GAMEPAD;
 				}
-				else if (m_render.m_gameActionToChange == MENU_BACK) {
+				else if (m_render.m_ActionToChange == MENU_BACK) {
 					changing = &BACK_GAMEPAD;
 				}
 
@@ -324,87 +341,47 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
 				}
 			}
-			else if (m_render.m_editingKey && m_render.m_gameActionToChange != -1) {
+			else if (m_render.m_editingKey && m_render.m_ActionToChange != -1) {
 				int* changing = &(m_game->getPlayer()->GREEN_CODE);
-				if (m_render.m_gameActionToChange == RED_INDEX) {
+				if (m_render.m_ActionToChange == RED_INDEX) {
 					changing = &(m_game->getPlayer()->RED_CODE);
 				}
-				else if (m_render.m_gameActionToChange == BLUE_INDEX) {
+				else if (m_render.m_ActionToChange == BLUE_INDEX) {
 					changing = &(m_game->getPlayer()->BLUE_CODE);
 				}
-				else if (m_render.m_gameActionToChange == EU_INDEX) {
+				else if (m_render.m_ActionToChange == EU_INDEX) {
 					changing = &(m_game->getPlayer()->EUPHORIA);
 				}
-				else if (m_render.m_gameActionToChange == CF_LEFT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_LEFT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_L_CODE);
 				}
-				else if (m_render.m_gameActionToChange == CF_RIGHT_INDEX) {
+				else if (m_render.m_ActionToChange == CF_RIGHT_INDEX) {
 					changing = &(m_game->getPlayer()->CROSS_R_CODE);
 				}
-				else if (m_render.m_gameActionToChange == SCR_UP_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_UP_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_UP);
 				}
-				else if (m_render.m_gameActionToChange == SCR_DOWN_INDEX) {
+				else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				}
-
-				float deadzone = 0.5f;
-				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
-
-				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
-					float diff = abs(m_pastKBMState.at(i) - KBMState.at(i));
-					if (diff > deadzone) {
-						*changing = i;
-						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
-						break;
-					}
-
+				else if (m_render.m_ActionToChange == MENU_UP) {
+					changing = &UP_CODE;
 				}
-			}
-			else if (m_render.m_editingAxis && m_render.m_menuActionToChange != -1) {
-				int* changing = &UP_GAMEPAD;
-				if (m_render.m_menuActionToChange == MENU_DOWN) {
-					changing = &DOWN_GAMEPAD;
-				}
-				else if (m_render.m_menuActionToChange == MENU_SELECT) {
-					changing = &SELECT_GAMEPAD;
-				}
-				else if (m_render.m_menuActionToChange == MENU_BACK) {
-					changing = &BACK_GAMEPAD;
-				}
-
-				float deadzone = 0.5f;
-				std::vector<float> nowState = m_game->getPlayer()->getGamepadValues();
-				for (size_t i = 0; i < m_pastGamepadValues.size(); ++i) {
-					float diff = abs(m_pastGamepadValues.at(i) - nowState.at(i));
-					if (diff > deadzone) {
-						*changing = i;
-						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
-						break;
-					}
-				}
-
-			}
-			else if (m_render.m_editingKey && m_render.m_menuActionToChange != -1) {
-				int* changing = &UP_CODE;
-				if (m_render.m_menuActionToChange == MENU_DOWN) {
+				else if (m_render.m_ActionToChange == MENU_DOWN) {
 					changing = &DOWN_CODE;
 				}
-				else if (m_render.m_menuActionToChange == MENU_SELECT) {
+				else if (m_render.m_ActionToChange == MENU_SELECT) {
 					changing = &SELECT_CODE;
 				}
-				else if (m_render.m_menuActionToChange == MENU_BACK) {
+				else if (m_render.m_ActionToChange == MENU_BACK) {
 					changing = &BACK_CODE;
 				}
 
-				float deadzone = 0.05f;
+				float deadzone = 0.5f;
 				std::vector<float> KBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
 
 				for (size_t i = 0; i < m_pastKBMState.size(); ++i) {
@@ -412,15 +389,15 @@ void MenuNavigator::update() {
 					if (diff > deadzone) {
 						*changing = i;
 						m_render.doneEditing();
-						m_game->getPlayer()->writeMappingFile();
 						break;
 					}
+
 				}
 			}
 			m_pastGamepadValues = m_game->getPlayer()->getGamepadValues();
 			m_pastKBMState = m_game->getPlayer()->getKBMValues(m_render.getWindowPtr());
 		}
-		
+
 		m_debounce = false;
 	}
 }
@@ -460,33 +437,34 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	//every case represents a function called on activate
 	size_t index = 0;
 	int id = menu.getId();
-	if (id == -1) {
+	if (id == EXIT_ID) {
 		m_shouldClose = true;
 	}
-	else if (id == 3) {
+	else if (id == CREDITS_ID) {
 		m_scene = CREDITS;
 	}
-	else if (id == 4) {
+	else if (id == SCRATCHES_ID) {
 		m_scene = SCRATCHES;
 		glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
-	else if (id == 5) {
+	else if (id == LATENCY_ID) {
 		m_scene = CALIBRATION;
 	}
-	else if (id == 6) {
+	else if (id == LR_BUTTONS_ID) {
 		if (m_game->getPlayer()->m_isButtonsRight) {
-			std::cout << "Game message: Changed Buttons to Right" << std::endl;
+			std::cout << "Menu message: Changed Buttons to Right" << std::endl;
 			m_game->setButtonPos(false);
 		}
 		else {
-			std::cout << "Game message: Changed Buttons to Left" << std::endl;
+			std::cout << "Menu message: Changed Buttons to Left" << std::endl;
 			m_game->setButtonPos(true);
 		}
+		writeConfigFile();
 	}
-	else if (id == 7) {
+	else if (id == SPEED_ID) {
 		m_popupId = 0;
 	}
-	else if (id == 8) {
+	else if (id == BOT_ID) {
 		if (m_game->getPlayer()->m_botEnabled) {
 			std::cout << "Menu Message: disabled bot" << std::endl;
 			m_game->getPlayer()->m_botEnabled = false;
@@ -496,7 +474,17 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 			m_game->getPlayer()->m_botEnabled = true;
 		}
 	}
-	else if (id == 255) {
+	else if (id == DEBUG_ID) {
+		if (m_game->m_debugView) {
+			std::cout << "Menu Message: Disabled debug informations" << std::endl;
+			m_game->m_debugView = false;
+		}
+		else {
+			std::cout << "Menu Message: Enabled debug informations" << std::endl;
+			m_game->m_debugView = true;
+		}
+	}
+	else if (id == SONG_GENERAL_ID) {
 		index = findIndex(menu, parent);
 		m_active = false;
 		m_game->start(m_songList.at(index));
@@ -504,10 +492,10 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	}
 	else if (menu.getChildCount() == 0) {
 		if (menu.getId() == 1) {
-			std::cout << "MenuNavigator Message: No songs found in the install path." << std::endl;
+			std::cout << "Menu Message: No songs found in the install path." << std::endl;
 		}
 		else {
-			std::cout << "MenuNavigator Error: no function attached to id " << menu.getId() << std::endl;
+			std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
 		}
 	}
 }
@@ -517,7 +505,8 @@ void MenuNavigator::remap() {
 }
 
 void MenuNavigator::scan() {
-	SongScanner::load("./songs", m_songList);
+	SongScanner scanner = SongScanner();
+	scanner.load("./songs", m_songList);
 	for (const SongEntry& entry : m_songList) {
 		std::string text;
 		if (!entry.s2.empty()) {
@@ -526,8 +515,7 @@ void MenuNavigator::scan() {
 		else {
 			text = entry.s1;
 		}
-
-		MenuNode song(text, 255);
+		MenuNode song(text, SONG_GENERAL_ID);
 		std::vector<MenuNode> list = m_root.getChildrens();
 		list.at(0).push(song);
 		m_root.updateChildrens(list);

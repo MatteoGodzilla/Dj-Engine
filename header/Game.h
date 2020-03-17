@@ -25,6 +25,7 @@ public:
 	GameRender* getGameRender();
 	void start(SongEntry entry);
 	void setButtonPos(bool value);
+	void writeConfig();
 	~Game();
 	std::vector<Note> m_note_arr;
 	std::vector<Note> m_event_arr;
@@ -34,6 +35,7 @@ public:
 	double m_global_time = -2.0;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
+	bool m_debugView = false;
 private:
 	double m_pastTime = 0.0;
 	bool firstRun = true;

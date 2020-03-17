@@ -1526,18 +1526,36 @@ void GameRender::meters(double time) {
 	x = (float)m_playerScore / (float)m_genBaseScore;
 	float y = 20.0f;
 
-	pushVertexTexture(metersVector, 940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
-	pushVertexTexture(metersVector, 940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
-	pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
-	pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
-	pushRectangleIndices(metersIndices, metersVertexCount);
+	if (m_isButtonsRight) {
+		pushVertexTexture(metersVector, -940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
+		pushVertexTexture(metersVector, -940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
+		pushVertexTexture(metersVector, -940.0f - width - 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
+		pushVertexTexture(metersVector, -940.0f - width - 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
 
+		pushVertexTexture(metersVector, -940.0f - width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
+		pushVertexTexture(metersVector, -940.0f - width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
+		pushVertexTexture(metersVector, -940.0f - width - 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
+		pushVertexTexture(metersVector, -940.0f - width - 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	else {		
+		pushVertexTexture(metersVector, 940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
+		pushVertexTexture(metersVector, 940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
+		pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
+		pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
 
-	pushVertexTexture(metersVector, 940.0f + width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
-	pushVertexTexture(metersVector, 940.0f + width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
-	pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
-	pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
-	pushRectangleIndices(metersIndices, metersVertexCount);
+		pushVertexTexture(metersVector, 940.0f + width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
+		pushVertexTexture(metersVector, 940.0f + width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
+		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
+		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	
+	}
+	
+	
+	
 
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarFrame);
@@ -1584,12 +1602,22 @@ void GameRender::meters(double time) {
 
 	float ratio = x / y;
 	float toffset = time * -1;
-	pushVertexTexture(metersVector, 950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
-	pushVertexTexture(metersVector, 950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
-	pushVertexTexture(metersVector, 950.0f + x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
-	pushVertexTexture(metersVector, 950.0f + x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
-	pushRectangleIndices(metersIndices, metersVertexCount);
 
+	if (m_isButtonsRight) {
+		pushVertexTexture(metersVector, -950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
+		pushVertexTexture(metersVector, -950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
+		pushVertexTexture(metersVector, -950.0f - x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
+		pushVertexTexture(metersVector, -950.0f - x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	else {
+		pushVertexTexture(metersVector, 950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
+		pushVertexTexture(metersVector, 950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
+		pushVertexTexture(metersVector, 950.0f + x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
+		pushVertexTexture(metersVector, 950.0f + x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
+		pushRectangleIndices(metersIndices, metersVertexCount);
+	}
+	
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarInside);
 
@@ -1633,41 +1661,41 @@ void GameRender::result(Player& player, Generator& generator) {
 	drawText(completeName, 10.0f, y, scale);
 	y += scale * 1000.0f;
 	drawText("Result:", 10.0f, y, scale);
+	float x = getTextWidth("Result:", scale);
 	if (player.m_botEnabled) {
-		float x = getTextWidth("Result:", scale);
 		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
 	}
 	else {
-		float x = getTextWidth("Result:", scale);
-		if (x >= 0.1) {
+		float stars = (float)player.getScore() / (float)generator.m_baseScore;
+		if (stars >= 0.1) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.2) {
+		if (stars >= 0.2) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.3) {
+		if (stars >= 0.3) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.4) {
+		if (stars >= 0.4) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushRectangleIndices(resultIndices, resultVertexCount);
 		}
-		if (x >= 0.5) {
+		if (stars >= 0.5) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
@@ -1706,61 +1734,43 @@ void GameRender::result(Player& player, Generator& generator) {
 }
 
 void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
-	/*
-	std::string text = "Notes:";
-	for (size_t i = 0; i < note_arr.size(); i++) {
-		if (i > 15)break;
-		int t = note_arr.at(i).getType();
-		double m = note_arr.at(i).getMilli();
-		text += std::to_string(t);
-		text += "(";
-		text += std::to_string(m);
-		text += ")";
-		text += ",";
+	std::string text = "Notes";
+	text.append("(");
+	text.append(std::to_string(v.size()));
+	text.append("):");
+	for (size_t i = 0; i < v.size() && i < 15; i++) {
+		text.append(std::to_string(v.at(i).getType()));
+		text.append(",");
 	}
-	drawText(text, 0.0f, 0.0f, 0.05f);
-	*/
+	drawText(text, 10.0f, 10.0f, 0.05f);
 
-
-	std::string t2 = "Events:";
-	for (size_t i = 0; i < ev.size(); i++) {
-		int t = ev.at(i).getType();
-		std::string text = std::to_string(t);
-
-		t2.append(text);
+	std::string t2 = "Events";
+	t2.append("(");
+	t2.append(std::to_string(ev.size()));
+	t2.append("):");
+	for (size_t i = 0; i < ev.size() && i < 15; i++) {
+		t2.append(std::to_string(ev.at(i).getType()));
 		t2.append(",");
-
-		float x = getTextWidth(t2.c_str(), 0.05f);
-		if (x > 960.0f)break;
 	}
-	drawText(t2, 0.0f, 40.0f, 0.05f);
+	drawText(t2, 10.0f, 70.0f, 0.05f);
 
-	/*
-	std::string cs = "Cross:";
-	for (size_t i = 0; i < c.size(); i++) {
-		if (i > 15)break;
-		int t = (int)c.at(i).getType();
-		std::string text = std::to_string(t);
-
-		cs.append(text);
+	std::string cs = "Cross";
+	cs.append("(");
+	cs.append(std::to_string(c.size()));
+	cs.append("):");
+	for (size_t i = 0; i < c.size() && i < 15; i++) {
+		cs.append(std::to_string(c.at(i).getType()));
 		cs.append(",");
 	}
-
-	drawText(cs, 0.0f, 0.0f, 0.05f);
-	//std::cout << t2 << std::endl;
-	*/
-
-	/*
-	std::string sizes;
-	sizes += std::string("Notes:") + std::to_string(v.size()) + std::string("|");
-	sizes += std::string("Events:") + std::to_string(ev.size()) + std::string("|");
-	sizes += std::string("Cross:") + std::to_string(c.size());
-	drawText(sizes, 0.0f, 0.0f, 0.05f);
-	*/
+	drawText(cs, 10.0f, 120.0f, 0.05f);
 
 	std::string baseScore;
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
-	drawText(baseScore, 10.0f, 90.0f, 0.05f);
+	baseScore.append("|");
+	baseScore.append(std::to_string(m_genBaseScore));
+	drawText(baseScore, 940.0f, 370.0f, 0.03f);
+
+	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
