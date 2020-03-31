@@ -58,6 +58,13 @@ void Rendr::pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& val
 	value += 4;
 }
 
+void Rendr::pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value){
+	v.push_back(value);
+	v.push_back(value + 1);
+	v.push_back(value + 2);
+	value += 3;
+}
+
 void Rendr::usePersProj() {
 	//setting up projection uniform on all programs
 	glUseProgram(m_textureProgram);
@@ -282,7 +289,20 @@ void Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 
 }
 
+void Rendr::startImGuiFrame(std::string winName,ImGuiBackendFlags flags) {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
 
+	ImGui::Begin(winName.c_str(),NULL,flags);
+}
+
+void Rendr::renderImGuiFrame() {
+	ImGui::End();
+
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
 
 Rendr::Rendr() {
 	//ctor
@@ -458,9 +478,12 @@ void Rendr::init(GLFWwindow* w) {
 	//projection init
 	{
 		//m_persProj = main perspective projection
+		float angle = glm::quarter_pi<float>();
+
 		m_persProj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
-		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 2.0, 5.0),
-			glm::vec3(0.0, 0.0, 2.0), glm::vec3(0.0, 1.0, 0.0));
+		glm::mat4 look = glm::lookAt(glm::vec3(0.0, 
+			sin(angle)*4.0,cos(angle)*4.0),
+			glm::vec3(0.0, 0.0, -2.0), glm::vec3(0.0, 1.0, 0.0));
 		m_persProj = m_persProj * look;
 
 		m_orthoProj = glm::ortho(0.0f, 1280.0f, 720.0f, 0.0f, 1.0f, -1.0f);

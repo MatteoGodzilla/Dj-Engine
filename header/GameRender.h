@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Graphics.h"
 #include "Rendr.h"
 #include "AnimationManager.h"
 
@@ -11,6 +10,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <math.h>
 
 class GameRender : public Rendr{
 public:
@@ -35,6 +35,7 @@ public:
 	float m_noteVisibleTime = 1.0;
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
+	glm::vec2 getCirclePoint(double radius, double angle);
 
 	bool m_red = false, m_green = false, m_blue = false;
     int m_playerCross = 1;

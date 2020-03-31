@@ -217,7 +217,6 @@ void MenuNavigator::pollInput() {
 void MenuNavigator::update() {
 	if (m_active) {
 		if (m_scene == MAIN_SCENE) {
-
 			/*
 			activeNode is the selected node
 			m_selection contains all selected node indices

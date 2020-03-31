@@ -35,6 +35,7 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	m_shouldClose = false;
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
+	
 	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;
@@ -846,7 +847,7 @@ void MenuRender::splashArt() {
 	renderTexture(vector, indices, m_splashTexture);
 
 	float textScale = 0.02f;
-	drawText("*This is alpha v1.3. There are still some bugs left,*", 10.0, 10.0, textScale);
+	drawText("*This is alpha v1.4. There are still some bugs left,*", 10.0, 10.0, textScale);
 	drawText("*but I think most of them should be fixed by now*", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 
@@ -955,16 +956,13 @@ void MenuRender::calibration(Game* game, double dt) {
 
 void MenuRender::setDeckSpeed(Game* game) {
 	useOrthoProj();
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
 
 	ImGuiBackendFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoResize;
 	flags |= ImGuiWindowFlags_NoCollapse;
 	flags |= ImGuiWindowFlags_AlwaysAutoResize;
 
-	ImGui::Begin("Set Deck Speed", NULL, flags);
+	startImGuiFrame("Set Deck Speed", flags);
 	ImGui::Text("Set the deck speed using the slider below.");
 	ImGui::Text("The value represents the visible time of a note in the highway");
 	ImGui::Text("(i.e. 1.0 is one second in the highway)");
@@ -974,9 +972,9 @@ void MenuRender::setDeckSpeed(Game* game) {
 		m_shouldClose = true;
 	}
 
-	ImGui::End();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
+	renderImGuiFrame();
 }
 
 void MenuRender::editingAxisController(int action) {

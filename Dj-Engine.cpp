@@ -9,7 +9,7 @@
 unsigned int WIDTH = 1280;
 unsigned int HEIGHT = 720;
 
-std::string VERSION = "alpha v1.3";
+std::string VERSION = "alpha v1.4";
 
 Game game;
 MenuNavigator menu;

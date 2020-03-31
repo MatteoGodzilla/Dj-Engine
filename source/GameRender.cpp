@@ -28,6 +28,42 @@ void GameRender::init(GLFWwindow* w) {
 }
 
 void GameRender::highway(double time) {
+	std::vector<float> highwayVector;
+	std::vector<unsigned int> highwayIndices;
+	unsigned int highwayVertexCount = 0;
+
+	static float radius = 10.0;
+	static float deltaRadius = 1.5;
+	static float deltaAngle = 0.001;
+	static float maxAngle = glm::quarter_pi<float>();
+	static float height = -1.160f;
+
+	glm::vec2 center = { radius, height};
+
+	//value depends from max radius, time, notevisibletime and the highway texture
+	float offsetFactor = 1/m_noteVisibleTime*time;
+	
+	glm::vec2 beforeOuter = getCirclePoint((double)radius + deltaAngle, 0.0);
+	glm::vec2 beforeInner = getCirclePoint((double)radius - deltaAngle, 0.0);
+
+	for (float angle = 0.0; angle < maxAngle; angle += deltaAngle) {
+		glm::vec2 outer = getCirclePoint((double)radius + deltaRadius, (double)angle);
+		glm::vec2 inner = getCirclePoint((double)radius - deltaRadius, (double)angle);
+
+		pushVertexTexture(highwayVector, -beforeOuter.x + center.x, 0.0, -beforeOuter.y - center.y, 0.0, (angle / maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -beforeInner.x + center.x, 0.0, -beforeInner.y - center.y, 1.0, (angle / maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -inner.x + center.x, 0.0, -inner.y - center.y, 1.0, (angle / maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -outer.x + center.x, 0.0, -outer.y - center.y, 0.0, (angle / maxAngle) + offsetFactor);
+		pushRectangleIndices(highwayIndices, highwayVertexCount);
+
+		beforeOuter = outer;
+		beforeInner = inner;
+	}
+
+	usePersProj();
+	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
+
+	/*
 	//convert from time to texture coords
 	float factor = (float)(time / m_noteVisibleTime);
 
@@ -47,9 +83,11 @@ void GameRender::highway(double time) {
 
 	usePersProj();
 	renderTexture(highwayVector, highwayIndices, m_highwayTexture);
+	*/
 }
 
 void GameRender::clicker() {
+	/*
 	//difference in size between pressed and not
 	float clickedOffset = 0.03f;
 
@@ -274,9 +312,11 @@ void GameRender::clicker() {
 
 	usePersProj();
 	renderTexture(clickerVector, clickerIndices, m_objTexture);
+	*/
 }
 
 void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
+	/*
 	float plane = 0.0;
 
 	//vertices data
@@ -619,9 +659,11 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	}
 	usePersProj();
 	renderTexture(noteVector, noteIndices, m_objTexture);
+	*/
 }
 
 void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
+	/*
 	float plane = 0.0;
 
 	//vertices data for each lane
@@ -1090,7 +1132,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
 	}
 
-	//finally, render each lane 
+	//finally, render each lane
 	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
 	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
 
@@ -1098,10 +1140,11 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	renderColor(redLaneVector, redLaneIndices);
 	renderColor(greenLaneVector, greenLaneIndices);
 	renderColor(blueLaneVector, blueLaneIndices);
-
+	*/
 }
 
 void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
+	/*
 	//vertices data
 	std::vector<float> bpmVector;
 	std::vector<unsigned int> bpmIndices;
@@ -1119,11 +1162,6 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 	for (size_t i = 0; i < bpmArr.size(); i++) {
 		double tickTime = bpmArr.at(i);
 
-		/*
-		if the bar is visible on the highway
-		exact same as Note.getRender(), but done manually
-		because bpm ticks are not Notes/Events
-		*/
 		if (time + m_noteVisibleTime >= tickTime && time <= tickTime + 0.2) {
 			double percent = (tickTime - time) / m_noteVisibleTime;
 			float z = (float)(3.75 - 3.75 * percent);
@@ -1138,9 +1176,11 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 	}
 	usePersProj();
 	renderColor(bpmVector, bpmIndices);
+	*/
 }
 
 void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& cross) {
+	/*
 	float plane = 0.0;
 	float transparency = 0.35f; // euphoria transparency
 
@@ -1309,9 +1349,11 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 	}
 	usePersProj();
 	renderColor(eventsVector, eventsIndices);
+	*/
 }
 
 void GameRender::meters(double time) {
+	/*
 	float yPlane = 0.1f;
 
 	//vertices data
@@ -1539,7 +1581,7 @@ void GameRender::meters(double time) {
 		pushVertexTexture(metersVector, -940.0f - width - 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
-	else {		
+	else {
 		pushVertexTexture(metersVector, 940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
 		pushVertexTexture(metersVector, 940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
 		pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
@@ -1551,11 +1593,11 @@ void GameRender::meters(double time) {
 		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
 		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
-	
+
 	}
-	
-	
-	
+
+
+
 
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarFrame);
@@ -1617,7 +1659,7 @@ void GameRender::meters(double time) {
 		pushVertexTexture(metersVector, 950.0f + x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
-	
+
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarInside);
 
@@ -1630,6 +1672,7 @@ void GameRender::meters(double time) {
 		std::string c = std::to_string(m_playerCombo);
 		drawText(c, 940.0f, 280.0f, 0.03f);
 	}
+	*/
 }
 
 void GameRender::result(Player& player, Generator& generator) {
@@ -1734,6 +1777,7 @@ void GameRender::result(Player& player, Generator& generator) {
 }
 
 void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
+	/*
 	std::string text = "Notes";
 	text.append("(");
 	text.append(std::to_string(v.size()));
@@ -1771,6 +1815,7 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	drawText(baseScore, 940.0f, 370.0f, 0.03f);
 
 	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
+	*/
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
@@ -1839,6 +1884,7 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 }
 
 void GameRender::clickerAnimation() {
+	/*
 	float plane = 0.0;
 	std::vector<float>clickerVector = {};
 	std::vector<unsigned int>clickerIndices = {};
@@ -1892,6 +1938,7 @@ void GameRender::clickerAnimation() {
 
 	usePersProj();
 	renderTexture(clickerVector, clickerIndices, m_clickerAnimation);
+	*/
 }
 
 void GameRender::reset() {
@@ -1946,6 +1993,13 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 	}
 	result.push_back(Note(end, lastChange, 0.0f, true));
 	return result;
+}
+
+glm::vec2 GameRender::getCirclePoint(double radius, double angle)
+{
+	double x = radius * cos(angle);
+	double y = radius * sin(angle);
+	return { x,y };
 }
 
 GameRender::~GameRender() {
