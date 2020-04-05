@@ -4,7 +4,7 @@
 #include "Game.h"
 #include "MenuNavigator.h"
 
-#include "GLFW/include/GLFW/glfw3.h"
+#include "GLFW/glfw3.h"
 
 unsigned int WIDTH = 1280;
 unsigned int HEIGHT = 720;

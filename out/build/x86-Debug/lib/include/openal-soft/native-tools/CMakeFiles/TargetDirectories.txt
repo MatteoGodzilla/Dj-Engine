@@ -1,4 +1,0 @@
-C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft/native-tools/CMakeFiles/bin2h.dir
-C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft/native-tools/CMakeFiles/edit_cache.dir
-C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft/native-tools/CMakeFiles/bsincgen.dir
-C:/Users/caten/Dj-Engine/out/build/x86-Debug/lib/include/openal-soft/native-tools/CMakeFiles/rebuild_cache.dir

@@ -1,7 +1,7 @@
 #include "Rendr.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb/stb_image.h"
+#include "stb_image.h"
 
 //character struct to store freetype glyph data
 struct Character {

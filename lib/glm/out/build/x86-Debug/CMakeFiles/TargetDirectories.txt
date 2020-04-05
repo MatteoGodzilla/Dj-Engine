@@ -1,3 +1,0 @@
-C:/Users/caten/Dj-Engine/lib/include/glm/out/build/x86-Debug/CMakeFiles/edit_cache.dir
-C:/Users/caten/Dj-Engine/lib/include/glm/out/build/x86-Debug/CMakeFiles/Dj-Engine.dir
-C:/Users/caten/Dj-Engine/lib/include/glm/out/build/x86-Debug/CMakeFiles/rebuild_cache.dir
