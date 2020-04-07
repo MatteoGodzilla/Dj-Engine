@@ -1,7 +1,7 @@
 #include "SongScanner.h"
 
 //alias to make code shorter (and easier to read)
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 //recursive scan inside folders to find songs 
 void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {

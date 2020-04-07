@@ -2,9 +2,7 @@
 #include "SimpleIni.h"
 #include "json.hpp"
 #include <iostream>
-//remove visual studio warning
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
+#include <filesystem>
 #include <fstream>
 #include <string>
 #include <map>
