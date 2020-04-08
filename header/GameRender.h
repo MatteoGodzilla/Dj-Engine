@@ -1,44 +1,47 @@
 #pragma once
 
+// clang-format off
 #include "Rendr.h"
+// clang-format on
 #include "AnimationManager.h"
-
+#include "Generator.h"
 #include "Note.h"
 #include "Player.h"
-#include "Generator.h"
-#include <vector>
+
 #include <iostream>
-#include <string>
 #include <map>
 #include <math.h>
+#include <string>
+#include <vector>
 
-class GameRender : public Rendr{
+class GameRender : public Rendr {
 public:
-    GameRender();
+	GameRender();
 	void init(GLFWwindow* w);
 	void highway(double time);
-    void clicker();
-    void notes(double time,std::vector<Note> &v, std::vector<Note>& cross);
-    void events(double time, std::vector<Note>&ev, std::vector<Note>& cross);
-    void lanes(double time, std::vector<Note> &v,std::vector<Note>&ev);
+	void clicker();
+	void notes(double time, std::vector<Note>& v, std::vector<Note>& cross);
+	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
+	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev);
 	void bpmTicks(double time, std::vector<double>& bpm_arr);
 	void clickerAnimation();
-	void result(Player& player,Generator& generator);
+	void result(Player& player, Generator& generator);
 	void meters(double time);
-    void pollState(double time,Player& p,Generator &g);
+	void pollState(double time, Player& p, Generator& g);
 	void updateAnimations(double time);
 	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
-    virtual ~GameRender();
+	virtual ~GameRender();
 
 	bool m_isButtonsRight = false;
 	float m_noteVisibleTime = 1.0;
+
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	glm::vec2 getCirclePoint(double radius, double angle);
 
 	bool m_red = false, m_green = false, m_blue = false;
-    int m_playerCross = 1;
+	int m_playerCross = 1;
 	int m_playerCombo = 0;
 	int m_playerMult = 0;
 	int m_playerScore = 0;
@@ -65,10 +68,9 @@ private:
 	unsigned int m_colorVAO = 0;
 	unsigned int m_colorVBO = 0;
 
-
 	FT_Library m_FTLibrary;
 	FT_Face m_font;
-	
+
 	AnimationManager m_animManager;
 
 	//default green clicker position
@@ -85,4 +87,3 @@ private:
 
 	int m_genBaseScore = 0;
 };
-

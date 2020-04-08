@@ -1,6 +1,6 @@
 #include "MenuNode.h"
 
-MenuNode::MenuNode(std::string text,int id) {
+MenuNode::MenuNode(std::string text, int id) {
 	m_text = text;
 	m_id = id;
 }
@@ -27,7 +27,7 @@ size_t MenuNode::getChildCount() {
 	return m_childrens.size();
 }
 
-void MenuNode::updateChildrens(std::vector<MenuNode> list){
+void MenuNode::updateChildrens(std::vector<MenuNode> list) {
 	m_childrens = list;
 }
 

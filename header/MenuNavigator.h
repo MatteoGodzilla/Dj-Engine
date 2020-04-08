@@ -1,19 +1,32 @@
 #pragma once
-#include "MenuRender.h"
 #include "MenuNode.h"
+#include "MenuRender.h"
 #include "SongScanner.h"
-#include "GLFW/glfw3.h"
 
-#include <iostream>
+#include <GLFW/glfw3.h>
 #include <fstream>
+#include <iostream>
 
 enum scenes {
-	MAIN_SCENE, REMAPPING, CREDITS, SCRATCHES, CALIBRATION
+	MAIN_SCENE,
+	REMAPPING,
+	CREDITS,
+	SCRATCHES,
+	CALIBRATION
 };
 
 enum actions {
-	SONG_GENERAL_ID, PLAY_ID, OPTIONS_ID, CREDITS_ID, EXIT_ID, SCRATCHES_ID, LATENCY_ID,
-	LR_BUTTONS_ID, SPEED_ID, BOT_ID, DEBUG_ID
+	SONG_GENERAL_ID,
+	PLAY_ID,
+	OPTIONS_ID,
+	CREDITS_ID,
+	EXIT_ID,
+	SCRATCHES_ID,
+	LATENCY_ID,
+	LR_BUTTONS_ID,
+	SPEED_ID,
+	BOT_ID,
+	DEBUG_ID
 };
 
 class MenuNavigator {

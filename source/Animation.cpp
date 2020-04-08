@@ -71,5 +71,4 @@ double Animation::getDuration() {
 }
 
 Animation::~Animation() {
-
 }

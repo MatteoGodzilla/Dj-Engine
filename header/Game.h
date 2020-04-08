@@ -1,16 +1,16 @@
 #pragma once
-#include "GameRender.h"
-#include "Note.h"
-#include "Generator.h"
-#include "Player.h"
-#include "Audio.h"
 #include "Animation.h"
-#include <vector>
+#include "Audio.h"
+#include "GameRender.h"
+#include "Generator.h"
+#include "Note.h"
+#include "Player.h"
+
 #include <iostream>
 #include <string>
+#include <vector>
 
-class Game
-{
+class Game {
 public:
 	Game();
 	void init(GLFWwindow* w);
@@ -36,6 +36,7 @@ public:
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
 	bool m_debugView = false;
+
 private:
 	double m_pastTime = 0.0;
 	bool firstRun = true;
@@ -47,4 +48,3 @@ private:
 	int m_mode = 0;
 	bool m_isButtonsRight = false;
 };
-

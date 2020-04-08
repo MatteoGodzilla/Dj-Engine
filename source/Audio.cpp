@@ -5,7 +5,6 @@ Audio::Audio() {
 	if (m_device != NULL) {
 		m_context = alcCreateContext(m_device, NULL);
 		if (m_context != NULL) {
-
 			//initialize audio
 			alcMakeContextCurrent(m_context);
 			alGenSources(1, &m_source);
@@ -30,7 +29,7 @@ void Audio::load(const char* filename) {
 		info = ov_info(&m_oggFile, -1);
 		m_frequency = info->rate;
 		m_songLength = ov_time_total(&m_oggFile, -1);
-		
+
 		int buffers = 0;
 		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
 		while (buffers < 50) {
@@ -48,8 +47,7 @@ void Audio::load(const char* filename) {
 			alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
 		}
 		buffer();
-	}
-	else {
+	} else {
 		std::cerr << "Audio Error: Cannot load 'song.ogg'" << std::endl;
 	}
 }
@@ -62,10 +60,9 @@ void Audio::buffer() {
 
 	//get already processed buffers
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-	
+
 	//upload buffers until all are processed
 	while (processed > 0) {
-
 		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
 
 		//read and upload

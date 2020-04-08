@@ -1,17 +1,18 @@
 #pragma once
 #include "Note.h"
 #include "SongScanner.h"
-#include <vector>
+
 #include <deque>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
 
 class Generator {
 public:
 	Generator();
 	void init(SongEntry entry);
-    void tick(double time,std::vector<Note> &v,std::vector<Note>&ev, std::vector<Note>& c);
+	void tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void initialLoad();
@@ -21,7 +22,7 @@ public:
 	SongEntry getSongEntry();
 	void reset();
 
-    bool m_combo_reset = false;
+	bool m_combo_reset = false;
 	bool m_eu_start = false;
 	bool m_eu_check = false;
 	float m_bpm = 60;
@@ -32,13 +33,13 @@ public:
 
 	float m_deckSpeed = 1.0f;
 	int m_baseScore = 0;
-    ~Generator();
-protected:
+	~Generator();
 
+protected:
 private:
-	std::deque<Note>m_allTaps;
-	std::deque<Note>m_allEvents;
-	std::deque<Note>m_allCross;
+	std::deque<Note> m_allTaps;
+	std::deque<Note> m_allEvents;
+	std::deque<Note> m_allCross;
 
 	std::ifstream m_chart;
 	bool m_isChartBinary = false;

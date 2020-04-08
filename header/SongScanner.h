@@ -1,13 +1,14 @@
 #pragma once
 #include "SimpleIni.h"
 #include "json.hpp"
-#include <iostream>
+
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
-#include <string>
-#include <map>
+#include <iostream>
 #include <list>
-#include <algorithm>
+#include <map>
+#include <string>
 
 struct SongEntry {
 	std::string path;
@@ -24,11 +25,10 @@ struct SongEntry {
 	int dScratch;
 };
 
-class SongScanner
-{
+class SongScanner {
 public:
 	void load(const std::string& root, std::vector<SongEntry>& list);
+
 private:
 	std::map<std::string, int> m_duplicates;
 };
-

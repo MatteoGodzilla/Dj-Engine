@@ -10,3 +10,6 @@ Dj-Engine
 # Local songs folder
 songs/*
 !songs/Drag\ &\ Drop\ songs\ here.txt
+
+# Vim
+*.swp

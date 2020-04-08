@@ -3,7 +3,7 @@
 //alias to make code shorter (and easier to read)
 namespace fs = std::filesystem;
 
-//recursive scan inside folders to find songs 
+//recursive scan inside folders to find songs
 void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
 	for (const fs::directory_entry entry : fs::directory_iterator(p)) {
 		//if there's a sub-directory, repeat the scan inside that sub-directory
@@ -55,8 +55,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 					if (duplicates.find(s1) == duplicates.end()) {
 						//duplicate not found in dictionary
 						duplicates[s1] = 1;
-					}
-					else {
+					} else {
 						//duplicate found in the dictionary
 						duplicates[s1]++;
 					}
@@ -70,19 +69,23 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 
 			SongEntry t = {
 				p.generic_string(),
-				s1, s2,
-				a1, a2,
-				charter, mixer,
+				s1,
+				s2,
+				a1,
+				a2,
+				charter,
+				mixer,
 				bpm,
-				dTrack, dTap,
-				dCrossfade, dScratch
+				dTrack,
+				dTap,
+				dCrossfade,
+				dScratch,
 			};
 
 			list.push_back(t);
 			std::cout << "found " << file << std::endl;
 			break;
-		}
-		else {
+		} else {
 			file = p.generic_string() + std::string("/info.ini");
 			if (fs::exists(fs::path(file))) {
 				//found info.ini
@@ -143,8 +146,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 						if (duplicates.find(s1) == duplicates.end()) {
 							//duplicate not found in dictionary
 							duplicates[s1] = 1;
-						}
-						else {
+						} else {
 							//duplicate found in the dictionary
 							duplicates[s1]++;
 						}
@@ -159,12 +161,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 
 				SongEntry t = {
 					p.generic_string(),
-					s1, s2,
-					a1, a2,
-					charter, mixer,
+					s1,
+					s2,
+					a1,
+					a2,
+					charter,
+					mixer,
 					bpm,
-					dTrack, dTap,
-					dCrossfade, dScratch
+					dTrack,
+					dTap,
+					dCrossfade,
+					dScratch,
 				};
 
 				list.push_back(t);
@@ -198,13 +205,18 @@ bool compareSongEntries(SongEntry a, SongEntry b) {
 		}
 	}
 	int res = a1.compare(b1);
-	if (res > 0)return false;
-	else if (res == 0) {
+	if (res > 0) {
+		return false;
+	} else if (res == 0) {
 		int res2 = a2.compare(b2);
-		if (res2 >= 0) return false;
-		else return true;
+		if (res2 >= 0) {
+			return false;
+		} else {
+			return true;
+		}
+	} else {
+		return true;
 	}
-	else return true;
 }
 
 void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list) {
@@ -219,8 +231,7 @@ void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list
 		}
 		*/
 		std::sort(list.begin(), list.end(), compareSongEntries);
-	}
-	else {
+	} else {
 		std::cerr << "SongScanner error: Root path is not a folder" << std::endl;
 	}
 }

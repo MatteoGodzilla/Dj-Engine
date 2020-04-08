@@ -38,11 +38,11 @@ void GameRender::highway(double time) {
 	static float maxAngle = glm::quarter_pi<float>();
 	static float height = -1.160f;
 
-	glm::vec2 center = { radius, height};
+	glm::vec2 center = {radius, height};
 
 	//value depends from max radius, time, notevisibletime and the highway texture
-	float offsetFactor = 1/m_noteVisibleTime*time;
-	
+	float offsetFactor = 1 / m_noteVisibleTime * time;
+
 	glm::vec2 beforeOuter = getCirclePoint((double)radius + deltaAngle, 0.0);
 	glm::vec2 beforeInner = getCirclePoint((double)radius - deltaAngle, 0.0);
 
@@ -1707,8 +1707,7 @@ void GameRender::result(Player& player, Generator& generator) {
 	float x = getTextWidth("Result:", scale);
 	if (player.m_botEnabled) {
 		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
-	}
-	else {
+	} else {
 		float stars = (float)player.getScore() / (float)generator.m_baseScore;
 		if (stars >= 0.1) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
@@ -1768,8 +1767,7 @@ void GameRender::result(Player& player, Generator& generator) {
 		std::string t = "Wow! a Full Combo";
 		float x = 1270.0f - getTextWidth(t, scale);
 		drawText(t, x, 100.0f, scale);
-	}
-	else if (hit > all) {
+	} else if (hit > all) {
 		std::string t = "Hold on a sec. How did you...";
 		float x = 1270.0f - getTextWidth(t, scale);
 		drawText(t, x, 100.0f, scale);
@@ -1844,16 +1842,19 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
-		if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
-	}
-	else if (p.m_pastCross <= 1 && p.m_cross == 2) {
+		if (p.m_pastCross == 2)
+			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+	} else if (p.m_pastCross <= 1 && p.m_cross == 2) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
-		if (p.m_pastCross == 0) m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		if (p.m_pastCross == 0)
+			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
 	}
 
 	if (p.m_cross == 1) {
-		if (p.m_pastCross == 0)m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-		else if (p.m_pastCross == 2)m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		if (p.m_pastCross == 0)
+			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		else if (p.m_pastCross == 2)
+			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
 	}
 
 	if (greenAnimEnabled) {
@@ -1863,7 +1864,8 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	if (redAnimEnabled) {
 		m_animManager.triggerAnimation(AN_RED_CLICKER, time);
 		p.m_redAnimation = false;
-	}if (blueAnimEnabled) {
+	}
+	if (blueAnimEnabled) {
 		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
 		p.m_blueAnimation = false;
 	}
@@ -1966,8 +1968,10 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 	double end = start + note.getLength();
 	int lastChange = CROSS_C;
 
-	if (note.getLanMod() == 0)lastChange = CROSS_G;
-	else if (note.getLanMod() == 2)lastChange = CROSS_B;
+	if (note.getLanMod() == 0)
+		lastChange = CROSS_G;
+	else if (note.getLanMod() == 2)
+		lastChange = CROSS_B;
 
 	result.push_back(Note(start, lastChange, 0.0f, true));
 	for (size_t i = 0; i < cross.size(); ++i) {
@@ -1978,13 +1982,11 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
 				lastChange = CROSS_G;
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
-			}
-			else if (crossType == CROSS_C && lastChange != CROSS_C) {
+			} else if (crossType == CROSS_C && lastChange != CROSS_C) {
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
 				lastChange = CROSS_C;
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
-			}
-			else if (crossType == CROSS_B && lastChange != CROSS_B) {
+			} else if (crossType == CROSS_B && lastChange != CROSS_B) {
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
 				lastChange = CROSS_B;
 				result.push_back(Note(crossMilli, lastChange, 0.0f, true));
@@ -1995,11 +1997,10 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 	return result;
 }
 
-glm::vec2 GameRender::getCirclePoint(double radius, double angle)
-{
+glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
 	double x = radius * cos(angle);
 	double y = radius * sin(angle);
-	return { x,y };
+	return {x, y};
 }
 
 GameRender::~GameRender() {

@@ -32,8 +32,7 @@ void Game::init(GLFWwindow* w) {
 		input >> token;
 		m_debugView = token == "true" ? true : false;
 		m_player.readMappingFile();
-	}
-	else {
+	} else {
 		std::cerr << "Game Error: Cannot open config file" << std::endl;
 	}
 }
@@ -44,10 +43,13 @@ void Game::pollInput() {
 		if (m_mode == 0) {
 			m_player.hit(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
 			//m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
-			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_T))std::cout << m_global_time << std::endl;
-			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_F1))m_mode = 1;
-		}
-		else {
+			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_T)) {
+				std::cout << m_global_time << std::endl;
+			}
+			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_F1)) {
+				m_mode = 1;
+			}
+		} else {
 			if (m_player.m_wasGreenPressed && !m_player.m_isGreenPressed) {
 				m_active = false;
 				reset();
@@ -74,13 +76,13 @@ void Game::tick(double dt) {
 
 			m_render.pollState(m_global_time, m_player, m_gen);
 			m_audio.buffer();
-			if (m_global_time >= (double)-m_audioLatency)m_audio.play();
+			if (m_global_time >= (double)-m_audioLatency)
+				m_audio.play();
 
 			//add delta time to m_global_time
 			double nowTime = glfwGetTime();
 			m_global_time += nowTime - m_pastTime;
 			m_pastTime = nowTime;
-
 		}
 		if (!m_audio.isActive(m_global_time)) {
 			m_mode = 1;
@@ -89,29 +91,27 @@ void Game::tick(double dt) {
 	}
 }
 
-
 void Game::render() {
-	if (m_active){
+	if (m_active) {
 		if (m_mode == 0) {
 			//each function is responsible for rendering a single 'object' on screen
 			m_render.highway(m_global_time);
 			m_render.bpmTicks(m_global_time, m_bpm_arr);
 			m_render.meters(m_global_time);
 
-			m_render.events(m_global_time, m_event_arr,m_cross_arr);
+			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.clicker();
 			m_render.lanes(m_global_time, m_note_arr, m_cross_arr);
-			m_render.notes(m_global_time, m_note_arr,m_cross_arr);
+			m_render.notes(m_global_time, m_note_arr, m_cross_arr);
 
 			m_render.updateAnimations(m_global_time);
 			m_render.clickerAnimation();
 
 			//debug
-			if(m_debugView)
+			if (m_debugView)
 				m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
-		}
-		else if (m_mode == 1) {
-			m_render.result(m_player,m_gen);
+		} else if (m_mode == 1) {
+			m_render.result(m_player, m_gen);
 		}
 	}
 }
@@ -139,25 +139,23 @@ bool Game::getActive() {
 	return m_active;
 }
 
-void Game::setActive(bool active){
+void Game::setActive(bool active) {
 	m_active = active;
 }
 
-Player* Game::getPlayer(){
+Player* Game::getPlayer() {
 	return &m_player;
 }
 
-Audio* Game::getAudio()
-{
+Audio* Game::getAudio() {
 	return &m_audio;
 }
 
-GameRender* Game::getGameRender()
-{
+GameRender* Game::getGameRender() {
 	return &m_render;
 }
 
-void Game::setButtonPos(bool value){
+void Game::setButtonPos(bool value) {
 	m_isButtonsRight = value;
 	m_render.m_isButtonsRight = value;
 	m_player.m_isButtonsRight = value;
@@ -170,7 +168,7 @@ void Game::start(SongEntry entry) {
 	//m_player.m_deltaMouse = true;
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
-	
+
 	std::string audioPath = entry.path + std::string("/song.ogg");
 	m_audio.load(audioPath.c_str());
 
@@ -189,8 +187,9 @@ void Game::writeConfig() {
 		output << m_audioLatency << std::endl;
 		output << m_deckSpeed << std::endl;
 		output << m_isButtonsRight << std::endl;
-		output << m_debugView << std::endl << std::endl;
-		
+		output << m_debugView << std::endl
+			   << std::endl;
+
 		std::cout << "Game Message: updated engine values in config file." << std::endl;
 		output.close();
 	}
@@ -202,4 +201,3 @@ Game::~Game() {
 	m_note_arr.clear();
 	m_event_arr.clear();
 }
-

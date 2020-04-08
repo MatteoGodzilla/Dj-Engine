@@ -1,13 +1,11 @@
 #pragma once
-#include "Rendr.h"
-
+#include "Game.h"
 #include "Graphics.h"
 #include "MenuNode.h"
+#include "Rendr.h"
 #include "SongScanner.h"
 
-#include "Game.h"
-
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include <map>
 
@@ -52,6 +50,7 @@ public:
 	float m_selectionDX = 0.0f;
 
 	~MenuRender();
+
 private:
 	double m_cbPlayingTime = 0.0f;
 	bool m_isCalibrating = false;
@@ -70,5 +69,4 @@ private:
 	double m_dTime = 0.0f;
 	double m_globalTime = 0.0f;
 	double m_pastTime = 0.0f;
-
 };

@@ -1,10 +1,9 @@
-#include <iostream>
-#include <vector>
-
 #include "Game.h"
 #include "MenuNavigator.h"
 
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include <vector>
 
 unsigned int WIDTH = 1280;
 unsigned int HEIGHT = 720;
@@ -24,7 +23,7 @@ double now = 0.0f;
 double deltaTime = 0.0f;
 
 //utility function to handle resizing
-void resizeCallback(GLFWwindow* w,int width,int height) {
+void resizeCallback(GLFWwindow* w, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
@@ -56,7 +55,9 @@ int main() {
 	}
 	glfwSetWindowSizeCallback(window, resizeCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	if (glfwRawMouseMotionSupported()) {
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
 
@@ -70,14 +71,13 @@ int main() {
 
 	//setting up menu and game
 	game.init(window);
-	menu.init(window,&game);
+	menu.init(window, &game);
 	game.setActive(false);
 	menu.setActive(true);
 
 	while (!glfwWindowShouldClose(window)) {
-		
 		glfwPollEvents();
-		
+
 		now = glfwGetTime();
 		deltaTime = now - pastTick;
 		pastTick = now;
@@ -95,8 +95,7 @@ int main() {
 			menu.pollInput();
 			menu.update();
 			menu.render(deltaTime);
-		}
-		else if (scene == 1) {
+		} else if (scene == 1) {
 			//change scene if not active
 			if (!game.getActive()) {
 				scene = 0;
@@ -111,8 +110,7 @@ int main() {
 		}
 
 		//add delta time to m_global_time
-		
-		
+
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);

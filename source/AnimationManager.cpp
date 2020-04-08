@@ -1,7 +1,6 @@
 #include "AnimationManager.h"
 
-AnimationManager::AnimationManager() 
-{
+AnimationManager::AnimationManager() {
 }
 
 void AnimationManager::init(double time) {
@@ -13,7 +12,6 @@ void AnimationManager::init(double time) {
 	Animation anim5(AN_GREEN_CLICKER, 0.200);
 	Animation anim6(AN_RED_CLICKER, 0.200);
 	Animation anim7(AN_BLUE_CLICKER, 0.200);
-
 
 	m_animLisit.push_back(anim1);
 	m_animLisit.push_back(anim2);
@@ -30,11 +28,11 @@ void AnimationManager::tick(double time) {
 	}
 }
 
-std::vector<Animation> AnimationManager::getAnimList(){
+std::vector<Animation> AnimationManager::getAnimList() {
 	return m_animLisit;
 }
 
-Animation AnimationManager::getAnimById(int id){
+Animation AnimationManager::getAnimById(int id) {
 	for (size_t i = 0; i < m_animLisit.size(); ++i) {
 		if (m_animLisit.at(i).getId() == id) {
 			return m_animLisit.at(i);
@@ -44,7 +42,7 @@ Animation AnimationManager::getAnimById(int id){
 	return Animation(-1, 0.0);
 }
 
-void AnimationManager::updateAnimation(int id, Animation a){
+void AnimationManager::updateAnimation(int id, Animation a) {
 	for (size_t i = 0; i < m_animLisit.size(); ++i) {
 		if (m_animLisit.at(i).getId() == id) {
 			m_animLisit.at(i) = a;
@@ -62,5 +60,5 @@ void AnimationManager::triggerAnimation(int id, double time) {
 	}
 }
 
-AnimationManager::~AnimationManager(){
+AnimationManager::~AnimationManager() {
 }

@@ -1,7 +1,6 @@
 #include "MenuRender.h"
 
-MenuRender::MenuRender()
-{
+MenuRender::MenuRender() {
 }
 
 void MenuRender::init(GLFWwindow* w) {
@@ -35,7 +34,6 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	m_shouldClose = false;
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
-	
 	//vertices data
 	std::vector<float> selVector;
 	std::vector<unsigned int> selIndices;
@@ -84,18 +82,15 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 			for (size_t i = 0; i < menu.getChildCount(); i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating) {
 					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
-				}
-				else {
+				} else {
 					drawText(list.at(i).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
 				}
 			}
-		}
-		else {
+		} else {
 			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating&& i + vOffset == selected) {
+				if (m_currentIdleTime > m_timeBeforeAnimating && i + vOffset == selected) {
 					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
-				}
-				else {
+				} else {
 					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
 				}
 				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
@@ -129,11 +124,11 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	flags |= ImGuiWindowFlags_NoCollapse;
 
 	ImGui::Begin("Remapper Window", NULL, flags);
-	ImGui::SetWindowPos({ 0.0f,0.0f });
+	ImGui::SetWindowPos({0.0f, 0.0f});
 
 	int width, height;
 	glfwGetFramebufferSize(m_window, &width, &height);
-	ImGui::SetWindowSize({ (float)width,(float)height });
+	ImGui::SetWindowSize({(float)width, (float)height});
 
 	ImGui::Text("Using: ");
 	ImGui::SameLine();
@@ -147,8 +142,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			std::string name = "";
 			if (glfwJoystickPresent(i)) {
 				name = glfwGetJoystickName(i);
-			}
-			else {
+			} else {
 				name = "No Controller detected";
 			}
 			std::string t = "Id " + std::to_string(i) + ":" + name;
@@ -169,7 +163,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::SetNextWindowSize(ImVec2(500.0f, 700.0f));
 		}
 		if (ImGui::BeginPopupModal("raw viewer")) {
-			if (ImGui::Button("Close"))ImGui::CloseCurrentPopup();
+			if (ImGui::Button("Close")) {
+				ImGui::CloseCurrentPopup();
+			}
 			ImGui::Columns(2, "axes");
 			std::vector<float> values = game->getPlayer()->getGamepadValues();
 			for (size_t i = 0; i < values.size(); ++i) {
@@ -181,15 +177,15 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Columns();
 			ImGui::EndPopup();
 		}
-	}
-	else if (game->getPlayer()->m_useKeyboardInput) {
+	} else if (game->getPlayer()->m_useKeyboardInput) {
 		ImGui::SameLine();
 		if (ImGui::Button("Axis viewer")) {
 			ImGui::OpenPopup("raw viewer");
 			ImGui::SetNextWindowSize(ImVec2(500.0f, 700.0f));
 		}
 		if (ImGui::BeginPopupModal("raw viewer")) {
-			if (ImGui::Button("Close"))ImGui::CloseCurrentPopup();
+			if (ImGui::Button("Close"))
+				ImGui::CloseCurrentPopup();
 			ImGui::Columns(2, "axes");
 			std::vector<float> values = game->getPlayer()->getKBMValues(m_window);
 			for (size_t i = 0; i < values.size(); ++i) {
@@ -204,7 +200,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	}
 
 	if (game->getPlayer()->m_gpState.size() > 0) {
-		ImGui::Columns(colnum, "mycolumns3", false);  // 3-ways, no border
+		ImGui::Columns(colnum, "mycolumns3", false); // 3-ways, no border
 
 		ImGui::Text("Action");
 		ImGui::NextColumn();
@@ -222,10 +218,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		float value = game->getPlayer()->m_gpState.at(GREEN_INDEX) * game->getPlayer()->m_gpMult.at(GREEN_INDEX);
 		float dead = game->getPlayer()->m_gpDead.at(GREEN_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Green Button:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Green Button:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Green Button:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Green Button:");
 		}
 		ImGui::NextColumn();
 		std::string id = std::string("Remap") + std::string("##01");
@@ -233,8 +228,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(GREEN_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(GREEN_INDEX);
 			}
 		}
@@ -242,7 +236,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Green Button' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -251,8 +247,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##green", &(game->getPlayer()->GREEN_CODE));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##green", &(game->getPlayer()->GREEN_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -267,10 +262,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(RED_INDEX) * game->getPlayer()->m_gpMult.at(RED_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(RED_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Red Button:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Red Button:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Red Button:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Red Button:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##02k");
@@ -278,8 +272,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(RED_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(RED_INDEX);
 			}
 		}
@@ -287,7 +280,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Red Button' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -296,8 +291,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##red", &(game->getPlayer()->RED_CODE));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##red", &(game->getPlayer()->RED_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -312,10 +306,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(BLUE_INDEX) * game->getPlayer()->m_gpMult.at(BLUE_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(BLUE_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Blue Button:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Blue Button:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Blue Button:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Blue Button:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##03k");
@@ -323,8 +316,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(BLUE_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(BLUE_INDEX);
 			}
 		}
@@ -332,7 +324,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Blue Button' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -341,8 +335,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##blue", &(game->getPlayer()->BLUE_CODE));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##blue", &(game->getPlayer()->BLUE_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -357,10 +350,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(EU_INDEX) * game->getPlayer()->m_gpMult.at(EU_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(EU_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Euphoria Button:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Euphoria Button:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Euphoria Button:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Euphoria Button:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##04");
@@ -368,8 +360,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(EU_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(EU_INDEX);
 			}
 		}
@@ -377,7 +368,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Euphoria Button' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -386,8 +379,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##eu", &(game->getPlayer()->EUPHORIA));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##eu", &(game->getPlayer()->EU_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -406,10 +398,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(CF_LEFT_INDEX) * game->getPlayer()->m_gpMult.at(CF_LEFT_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(CF_LEFT_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Crossfade left:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Crossfade left:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Crossfade left:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Crossfade left:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##05");
@@ -417,8 +408,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(CF_LEFT_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(CF_LEFT_INDEX);
 			}
 		}
@@ -426,7 +416,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Crossfade Left' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -435,8 +427,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##left", &(game->getPlayer()->CROSS_L_CODE));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##left", &(game->getPlayer()->CF_LEFT_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -451,10 +442,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(CF_RIGHT_INDEX) * game->getPlayer()->m_gpMult.at(CF_RIGHT_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(CF_RIGHT_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Crossfade right:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Crossfade right:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Crossfade right:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Crossfade right:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##06");
@@ -462,8 +452,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(CF_RIGHT_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(CF_RIGHT_INDEX);
 			}
 		}
@@ -471,7 +460,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Crossfade Right' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -480,8 +471,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##right", &(game->getPlayer()->CROSS_R_CODE));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##right", &(game->getPlayer()->CF_RIGHT_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -500,10 +490,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(SCR_UP_INDEX) * game->getPlayer()->m_gpMult.at(SCR_UP_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(SCR_UP_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Scratch up:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Scratch up:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Scratch up:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Scratch up:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##07");
@@ -511,8 +500,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(SCR_UP_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(SCR_UP_INDEX);
 			}
 		}
@@ -520,7 +508,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Scratch Up' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -529,8 +519,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##up", &(game->getPlayer()->SCRATCH_UP));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##up", &(game->getPlayer()->SCR_UP_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -545,10 +534,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		value = game->getPlayer()->m_gpState.at(SCR_DOWN_INDEX) * game->getPlayer()->m_gpMult.at(SCR_DOWN_INDEX);
 		dead = game->getPlayer()->m_gpDead.at(SCR_DOWN_INDEX);
 		if (value > dead) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Scratch down:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Scratch down:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Scratch down:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Scratch down:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##08");
@@ -556,8 +544,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(SCR_DOWN_INDEX);
-			}
-			else {
+			} else {
 				editingAxisController(SCR_DOWN_INDEX);
 			}
 		}
@@ -565,7 +552,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Scratch Down' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -574,8 +563,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##down", &(game->getPlayer()->SCRATCH_DOWN));
-		}
-		else {
+		} else {
 			ImGui::InputInt("##down", &(game->getPlayer()->SCR_DOWN_GAMEPAD));
 		}
 		ImGui::NextColumn();
@@ -589,15 +577,13 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		//Menu Up
 		if (game->getPlayer()->m_useKeyboardInput) {
 			value = game->getPlayer()->getKBMValues(m_window).at(*input.uk);
-		}
-		else {
+		} else {
 			value = game->getPlayer()->getGamepadValues().at(*input.ug);
 		}
 		if (value > 0) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Menu up:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Menu up:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu up:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu up:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##09");
@@ -605,8 +591,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(MENU_UP);
-			}
-			else {
+			} else {
 				editingAxisController(MENU_UP);
 			}
 		}
@@ -614,7 +599,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Menu Up' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -623,8 +610,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##meup", input.uk);
-		}
-		else {
+		} else {
 			ImGui::InputInt("##meup", input.ug);
 		}
 		ImGui::NextColumn();
@@ -636,15 +622,13 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		//Menu Down
 		if (game->getPlayer()->m_useKeyboardInput) {
 			value = game->getPlayer()->getKBMValues(m_window).at(*input.dk);
-		}
-		else {
+		} else {
 			value = game->getPlayer()->getGamepadValues().at(*input.dg);
 		}
 		if (value > 0) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Menu down:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Menu down:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu down:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu down:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##091");
@@ -652,8 +636,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(MENU_DOWN);
-			}
-			else {
+			} else {
 				editingAxisController(MENU_DOWN);
 			}
 		}
@@ -661,7 +644,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Menu Down' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -670,8 +655,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##medown", input.dk);
-		}
-		else {
+		} else {
 			ImGui::InputInt("##medown", input.dg);
 		}
 		ImGui::NextColumn();
@@ -683,15 +667,13 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		//Menu Select
 		if (game->getPlayer()->m_useKeyboardInput) {
 			value = game->getPlayer()->getKBMValues(m_window).at(*input.sk);
-		}
-		else {
+		} else {
 			value = game->getPlayer()->getGamepadValues().at(*input.sg);
 		}
 		if (value > 0) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Menu Select:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Menu Select:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu Select:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu Select:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##092");
@@ -699,8 +681,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(MENU_SELECT);
-			}
-			else {
+			} else {
 				editingAxisController(MENU_SELECT);
 			}
 		}
@@ -708,7 +689,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Menu Select' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -717,8 +700,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##meselect", input.sk);
-		}
-		else {
+		} else {
 			ImGui::InputInt("##meselect", input.sg);
 		}
 		ImGui::NextColumn();
@@ -730,15 +712,13 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		//Menu Back
 		if (game->getPlayer()->m_useKeyboardInput) {
 			value = game->getPlayer()->getKBMValues(m_window).at(*input.bk);
-		}
-		else {
+		} else {
 			value = game->getPlayer()->getGamepadValues().at(*input.bg);
 		}
 		if (value > 0) {
-			ImGui::TextColored({ 0.0f,1.0f,0.0f,1.0f }, "Menu Back:");
-		}
-		else {
-			ImGui::TextColored({ 1.0f,1.0f,1.0f,1.0f }, "Menu Back:");
+			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu Back:");
+		} else {
+			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu Back:");
 		}
 		ImGui::NextColumn();
 		id = std::string("Remap") + std::string("##093");
@@ -746,8 +726,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
 				editingAxisKBAM(MENU_BACK);
-			}
-			else {
+			} else {
 				editingAxisController(MENU_BACK);
 			}
 		}
@@ -755,7 +734,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Text("Push a button / move an axis for 'Menu Back' ");
 			ImGui::Separator();
 
-			if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
+			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+				ImGui::CloseCurrentPopup();
+			}
 			if (!m_editingKey && !m_editingAxis) {
 				ImGui::CloseCurrentPopup();
 			}
@@ -764,8 +745,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
 			ImGui::InputInt("##meback", input.bk);
-		}
-		else {
+		} else {
 			ImGui::InputInt("##meback", input.bg);
 		}
 		ImGui::NextColumn();
@@ -794,38 +774,38 @@ void MenuRender::credits() {
 	float x = 10.0f;
 
 	drawText("Thanks to MexicanPB for the Logo", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
-	y += fontsize;//new line
+	y += fontsize; //new line
+	y += fontsize; //new line
 
 	drawText("Thanks to everyone in the Dj Hero Fan Server ", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line	
+	y += fontsize; //new line
 
 	drawText("for supporting me and this game", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
-	y += fontsize;//new line
+	y += fontsize; //new line
+	y += fontsize; //new line
 
 	drawText("A thank you to every programming youtuber", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
+	y += fontsize; //new line
 
 	drawText("for giving me the passion to create games", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
-	y += fontsize;//new line
+	y += fontsize; //new line
+	y += fontsize; //new line
 
 	drawText("And finally a thank you to you, player", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
+	y += fontsize; //new line
 	drawText("You are the reason why I'm doing this", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
-	y += fontsize;//new line
-	y += fontsize;//new line
+	y += fontsize; //new line
+	y += fontsize; //new line
+	y += fontsize; //new line
 
 	drawText("MatteoGodzilla <3", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
+	y += fontsize; //new line
 
 	drawText("(now that you read the credits, DM me", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
+	y += fontsize; //new line
 
 	drawText("on twitter (@MatteoGodzilla) with '#truedj')", x, y, fontsize / 1000.0f);
-	y += fontsize;//new line
+	y += fontsize; //new line
 }
 
 void MenuRender::splashArt() {
@@ -871,7 +851,8 @@ void MenuRender::scratches(Player* player) {
 	if (player->m_isDownPressed && !player->m_wasDownPressed) {
 		m_testBuffer.push_back('v');
 	}
-	if (m_testBuffer.size() > 20)m_testBuffer.erase(0, 1);
+	if (m_testBuffer.size() > 20)
+		m_testBuffer.erase(0, 1);
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
 	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
 }
@@ -888,11 +869,11 @@ void MenuRender::calibration(Game* game, double dt) {
 	flags |= ImGuiWindowFlags_NoCollapse;
 
 	ImGui::Begin("Calibration Window", NULL, flags);
-	ImGui::SetWindowPos({ 0.0f,0.0f });
+	ImGui::SetWindowPos({0.0f, 0.0f});
 
 	int width, height;
 	glfwGetFramebufferSize(m_window, &width, &height);
-	ImGui::SetWindowSize({ (float)width,(float)height });
+	ImGui::SetWindowSize({(float)width, (float)height});
 
 	if (ImGui::Button("Calibrate")) {
 		m_isCalibrating = true;
@@ -905,8 +886,7 @@ void MenuRender::calibration(Game* game, double dt) {
 	if (game->getAudio()->isPlaying()) {
 		game->getAudio()->buffer();
 		m_cbPlayingTime += dt;
-	}
-	else {
+	} else {
 		game->getAudio()->reset();
 		m_isCalibrating = false;
 		m_cbPlayingTime = 0.0;
@@ -931,19 +911,17 @@ void MenuRender::calibration(Game* game, double dt) {
 	for (int i = 0; i < 8; ++i) {
 		if (m_cbPlayingTime > 2.0 + 0.5 * i) {
 			ImGui::SameLine();
-			ImGui::Image((ImTextureID)m_calibrationTex, { 100.0f,100.0f }, { 0.5f,0.5f }, { 1.0f,1.0f });
-		}
-		else {
+			ImGui::Image((ImTextureID)m_calibrationTex, {100.0f, 100.0f}, {0.5f, 0.5f}, {1.0f, 1.0f});
+		} else {
 			ImGui::SameLine();
-			ImGui::Image((ImTextureID)m_calibrationTex, { 100.0f,100.0f }, { 0.0f,0.0f }, { 0.5f,0.5f });
+			ImGui::Image((ImTextureID)m_calibrationTex, {100.0f, 100.0f}, {0.0f, 0.0f}, {0.5f, 0.5f});
 		}
 	}
 	ImGui::Separator();
 	//if (ImGui::Button("Tap Me", { 300.0f,250.0f })) {
 	//	m_latencyHits.push_back(m_cbPlayingTime);
 	//}
-	if (ImGui::IsKeyPressed(32)) //space key
-	{
+	if (ImGui::IsKeyPressed(32)) { //space key
 		m_latencyHits.push_back(m_cbPlayingTime);
 	}
 	if (ImGui::Button("Go back to main menu")) {
@@ -972,8 +950,6 @@ void MenuRender::setDeckSpeed(Game* game) {
 		m_shouldClose = true;
 	}
 
-
-
 	renderImGuiFrame();
 }
 
@@ -997,11 +973,9 @@ void MenuRender::doneEditing() {
 	m_ActionToChange = -1;
 }
 
-GLFWwindow* MenuRender::getWindowPtr()
-{
+GLFWwindow* MenuRender::getWindowPtr() {
 	return m_window;
 }
 
 MenuRender::~MenuRender() {
-
 }
