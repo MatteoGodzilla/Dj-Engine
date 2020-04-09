@@ -27,10 +27,11 @@ void Rendr::checkError() {
 
 //utility function
 void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) {
-	if (rendr_InvertedX)
+	if (rendr_InvertedX) {
 		v.push_back(-x);
-	else
+	} else {
 		v.push_back(x);
+	}
 	v.push_back(y);
 	v.push_back(z);
 	v.push_back(r);

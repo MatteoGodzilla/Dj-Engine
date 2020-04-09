@@ -25,7 +25,7 @@ target_link_libraries(${CMAKE_PROJECT_NAME} Freetype::Freetype)
 
 # GLEW
 find_package(GLEW REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} GLEW::glew)
+target_link_libraries(${CMAKE_PROJECT_NAME} GLEW::GLEW)
 
 # GLFW
 find_package(glfw3 3.3 REQUIRED)
@@ -45,7 +45,7 @@ add_library("ImGui" STATIC
 	"lib/IMGUI/imgui_impl_opengl3.cpp"
 	"lib/IMGUI/imgui_widgets.cpp"
 )
-target_link_libraries("ImGui" glfw GLEW::glew)
+target_link_libraries("ImGui" glfw GLEW::GLEW)
 target_link_libraries(${CMAKE_PROJECT_NAME} "ImGui")
 
 # JSON

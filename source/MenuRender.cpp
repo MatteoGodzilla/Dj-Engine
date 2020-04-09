@@ -184,8 +184,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::SetNextWindowSize(ImVec2(500.0f, 700.0f));
 		}
 		if (ImGui::BeginPopupModal("raw viewer")) {
-			if (ImGui::Button("Close"))
+			if (ImGui::Button("Close")) {
 				ImGui::CloseCurrentPopup();
+			}
 			ImGui::Columns(2, "axes");
 			std::vector<float> values = game->getPlayer()->getKBMValues(m_window);
 			for (size_t i = 0; i < values.size(); ++i) {
@@ -851,8 +852,9 @@ void MenuRender::scratches(Player* player) {
 	if (player->m_isDownPressed && !player->m_wasDownPressed) {
 		m_testBuffer.push_back('v');
 	}
-	if (m_testBuffer.size() > 20)
+	if (m_testBuffer.size() > 20) {
 		m_testBuffer.erase(0, 1);
+	}
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
 	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
 }

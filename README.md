@@ -1,18 +1,11 @@
+# Dj-Engine, A Dj Hero Clone :)
+
 ![Dj-Engine logo](https://i.imgur.com/FTnUXnr_d.jpg)
 
-A Dj Hero Clone :)
+Recreation of the Dj-Hero™ 2 engine, made by FreeStyleGames®, for pc.
 
-An attempt to recreate the dj hero engine for pc
+If you just want to play, you can download [the latest version](https://github.com/MatteoGodzilla/Dj-Engine/releases/latest) from the repo.
 
-Default Keybindings:
+Instead if you want to build the game from the source files, follow the guide at [compile.md](./compile.md)
 
-Green = J
-Red = K
-Blue = L
-Crossfade left = A
-Crossfade left = D
-Scratch up = W
-Scratch down = S
-Euphoria = E
-
-__Thanks to MexicanPB for making the logo__
+***This repository is not affiliated or sponsored by Activision nor their affiliates.***

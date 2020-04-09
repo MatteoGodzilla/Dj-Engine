@@ -32,9 +32,9 @@ void Player::pollInput(GLFWwindow* window) {
 
 	//for exiting result screen with bot active
 	m_wasGreenPressed = m_isGreenPressed;
-	if (m_useKeyboardInput)
+	if (m_useKeyboardInput) {
 		m_isGreenPressed = glfwGetKey(window, GREEN_CODE);
-	else {
+	} else {
 		if (glfwJoystickPresent(m_gamepadId)) {
 			updateGamepadState();
 
@@ -738,10 +738,11 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					break;
 				} else if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
-					if (m_cross == 0)
+					if (m_cross == 0) {
 						m_greenAnimation = true;
-					else if (m_cross == 2)
+					} else if (m_cross == 2) {
 						m_blueAnimation = true;
+					}
 					break;
 				}
 			}
@@ -779,14 +780,15 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 //update combo/multiplier for every frame
 void Player::tick(double time) {
-	if (m_combo >= 24)
+	if (m_combo >= 24) {
 		m_mult = 4;
-	else if (m_combo >= 16 && m_combo < 24)
+	} else if (m_combo >= 16 && m_combo < 24) {
 		m_mult = 3;
-	else if (m_combo >= 8 && m_combo < 16)
+	} else if (m_combo >= 8 && m_combo < 16) {
 		m_mult = 2;
-	else
+	} else {
 		m_mult = 1;
+	}
 
 	if (m_scr_tick >= 4) {
 		m_scr_tick -= 4;
@@ -808,12 +810,14 @@ void Player::tick(double time) {
 		m_double_mult = false;
 	}
 
-	if (m_double_mult)
+	if (m_double_mult) {
 		m_mult *= 2;
+	}
 	m_lastTapTime = time;
 
-	if (m_combo > m_highestCombo)
+	if (m_combo > m_highestCombo) {
 		m_highestCombo = m_combo;
+	}
 }
 
 void Player::readMappingFile() {
@@ -1086,8 +1090,9 @@ void Player::pollState(Generator& g) {
 		m_eu_zone_active = true;
 	}
 	if (g.m_eu_check && m_eu_zone_active) {
-		if (m_eu_value < 3.0)
+		if (m_eu_value < 3.0) {
 			m_eu_value += 1.0;
+		}
 	}
 	m_genBpm = g.m_bpm;
 

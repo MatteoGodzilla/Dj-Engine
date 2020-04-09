@@ -1842,19 +1842,22 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
-		if (p.m_pastCross == 2)
+		if (p.m_pastCross == 2) {
 			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		}
 	} else if (p.m_pastCross <= 1 && p.m_cross == 2) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
-		if (p.m_pastCross == 0)
+		if (p.m_pastCross == 0) {
 			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		}
 	}
 
 	if (p.m_cross == 1) {
-		if (p.m_pastCross == 0)
+		if (p.m_pastCross == 0) {
 			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-		else if (p.m_pastCross == 2)
+		} else if (p.m_pastCross == 2) {
 			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		}
 	}
 
 	if (greenAnimEnabled) {
@@ -1968,10 +1971,11 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> c
 	double end = start + note.getLength();
 	int lastChange = CROSS_C;
 
-	if (note.getLanMod() == 0)
+	if (note.getLanMod() == 0) {
 		lastChange = CROSS_G;
-	else if (note.getLanMod() == 2)
+	} else if (note.getLanMod() == 2) {
 		lastChange = CROSS_B;
+	}
 
 	result.push_back(Note(start, lastChange, 0.0f, true));
 	for (size_t i = 0; i < cross.size(); ++i) {

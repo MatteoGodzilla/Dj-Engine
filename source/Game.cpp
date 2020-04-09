@@ -18,6 +18,8 @@ void Game::init(GLFWwindow* w) {
 		std::cout << "Game Message: loading from config file" << std::endl;
 		std::string token;
 		input >> token;
+
+		
 		/*
 		output << m_audioLatency << std::endl;
 		output << m_deckSpeed << std::endl;
@@ -76,8 +78,9 @@ void Game::tick(double dt) {
 
 			m_render.pollState(m_global_time, m_player, m_gen);
 			m_audio.buffer();
-			if (m_global_time >= (double)-m_audioLatency)
+			if (m_global_time >= (double)-m_audioLatency) {
 				m_audio.play();
+			}
 
 			//add delta time to m_global_time
 			double nowTime = glfwGetTime();
