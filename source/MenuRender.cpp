@@ -112,10 +112,6 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 
 void MenuRender::remapping(Game* game, menuinputs input) {
 	game->getPlayer()->pollInput(m_window);
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
 	int colnum = 5;
 
 	ImGuiBackendFlags flags = 0;
@@ -123,7 +119,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	flags |= ImGuiWindowFlags_NoResize;
 	flags |= ImGuiWindowFlags_NoCollapse;
 
-	ImGui::Begin("Remapper Window", NULL, flags);
+	startImGuiFrame("Remapper Window", flags);
 	ImGui::SetWindowPos({0.0f, 0.0f});
 
 	int width, height;
@@ -762,11 +758,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	if (ImGui::Button("Go Back to menu")) {
 		m_shouldClose = true;
 	}
-
-	ImGui::End();
-
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+	renderImGuiFrame();
 }
 
 void MenuRender::credits() {
@@ -861,16 +853,13 @@ void MenuRender::scratches(Player* player) {
 
 void MenuRender::calibration(Game* game, double dt) {
 	useOrthoProj();
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
 
 	ImGuiBackendFlags flags = 0;
 	flags |= ImGuiWindowFlags_NoMove;
 	flags |= ImGuiWindowFlags_NoResize;
 	flags |= ImGuiWindowFlags_NoCollapse;
 
-	ImGui::Begin("Calibration Window", NULL, flags);
+	startImGuiFrame("Calibration Window", flags);
 	ImGui::SetWindowPos({0.0f, 0.0f});
 
 	int width, height;
@@ -913,10 +902,10 @@ void MenuRender::calibration(Game* game, double dt) {
 	for (int i = 0; i < 8; ++i) {
 		if (m_cbPlayingTime > 2.0 + 0.5 * i) {
 			ImGui::SameLine();
-			ImGui::Image((ImTextureID)m_calibrationTex, {100.0f, 100.0f}, {0.5f, 0.5f}, {1.0f, 1.0f});
+			ImGui::Image((ImTextureID*)m_calibrationTex, {100.0f, 100.0f}, {0.5f, 0.5f}, {1.0f, 1.0f});
 		} else {
 			ImGui::SameLine();
-			ImGui::Image((ImTextureID)m_calibrationTex, {100.0f, 100.0f}, {0.0f, 0.0f}, {0.5f, 0.5f});
+			ImGui::Image((ImTextureID*)m_calibrationTex, {100.0f, 100.0f}, {0.0f, 0.0f}, {0.5f, 0.5f});
 		}
 	}
 	ImGui::Separator();
@@ -929,9 +918,8 @@ void MenuRender::calibration(Game* game, double dt) {
 	if (ImGui::Button("Go back to main menu")) {
 		m_shouldClose = true;
 	}
-	ImGui::End();
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	renderImGuiFrame();
 }
 
 void MenuRender::setDeckSpeed(Game* game) {

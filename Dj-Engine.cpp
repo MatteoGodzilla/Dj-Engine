@@ -33,6 +33,10 @@ void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
 	game.getPlayer()->m_changedScroll = true;
 }
 
+void errorCallback(int code, const char* description) {
+	std::cerr << "GLFW ERROR:(" << code << ")," << description << std::endl;
+}
+
 int main() {
 	std::cout << "Dj-Engine " << VERSION << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
@@ -54,6 +58,7 @@ int main() {
 		return -1;
 	}
 	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetErrorCallback(&errorCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported()) {
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);

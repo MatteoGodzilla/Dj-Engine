@@ -480,10 +480,12 @@ void Rendr::init(GLFWwindow* w) {
 		//m_persProj = main perspective projection
 		float angle = glm::quarter_pi<float>();
 
+		float zOffset = -1.160f;
+
 		m_persProj = glm::perspective(45.0f, 1024.0f / 600, 1.0f, -2.0f);
 		glm::mat4 look = glm::lookAt(
-			glm::vec3(0.0, sin(angle) * 4.0, cos(angle) * 4.0),
-			glm::vec3(0.0, 0.0, -2.0),
+			glm::vec3(0.0, sin(angle) * 4.0, cos(angle) * 4.0 + zOffset),
+			glm::vec3(0.0, 0.0, -2.0 + zOffset),
 			glm::vec3(0.0, 1.0, 0.0));
 		m_persProj = m_persProj * look;
 

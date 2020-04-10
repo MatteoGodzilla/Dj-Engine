@@ -19,7 +19,6 @@ void Game::init(GLFWwindow* w) {
 		std::string token;
 		input >> token;
 
-		
 		/*
 		output << m_audioLatency << std::endl;
 		output << m_deckSpeed << std::endl;

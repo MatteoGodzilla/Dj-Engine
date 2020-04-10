@@ -76,14 +76,12 @@ private:
 	//default green clicker position
 	float m_greenLeft = 0.0f;
 	float m_greenRight = 0.0f;
-	float m_greenBack = 0.0f;
-	float m_greenFront = 0.0f;
+	float m_back = 0.0f;
+	float m_front = 0.0f;
 
 	//default blue clicker position
 	float m_blueLeft = 0.0f;
 	float m_blueRight = 0.0f;
-	float m_blueBack = 0.0f;
-	float m_blueFront = 0.0f;
 
 	int m_genBaseScore = 0;
 };
