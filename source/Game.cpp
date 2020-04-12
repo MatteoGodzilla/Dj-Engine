@@ -83,7 +83,8 @@ void Game::tick(double dt) {
 
 			//add delta time to m_global_time
 			double nowTime = glfwGetTime();
-			m_global_time += nowTime - m_pastTime;
+			m_deltaTime = nowTime - m_pastTime;
+			m_global_time += m_deltaTime;
 			m_pastTime = nowTime;
 		}
 		if (!m_audio.isActive(m_global_time)) {
@@ -111,7 +112,7 @@ void Game::render() {
 
 			//debug
 			if (m_debugView)
-				m_render.debug(m_note_arr, m_event_arr, m_cross_arr);
+				m_render.debug(m_deltaTime,m_note_arr, m_event_arr, m_cross_arr);
 		} else if (m_mode == 1) {
 			m_render.result(m_player, m_gen);
 		}

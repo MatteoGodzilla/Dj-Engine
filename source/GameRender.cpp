@@ -32,32 +32,26 @@ void GameRender::highway(double time) {
 	std::vector<unsigned int> highwayIndices;
 	unsigned int highwayVertexCount = 0;
 
-	static float radius = 10.0;
-	static float deltaRadius = 1.5;
-	static float deltaAngle = 0.001;
-	static float maxAngle = glm::quarter_pi<float>();
-	static float height = 0.0f;
-
-	glm::vec2 center = {radius, height};
+	glm::vec2 center = {m_radius, 0.0};
 
 	//value depends from max radius, time, notevisibletime and the highway texture
 	float offsetFactor = 1 / m_noteVisibleTime * time;
 
-	glm::vec2 beforeOuter = getCirclePoint((double)radius + deltaAngle, 0.0);
-	glm::vec2 beforeInner = getCirclePoint((double)radius - deltaAngle, 0.0);
+	glm::vec2 beforeOuter = getCirclePoint((double)m_radius + m_deltaAngle, 0.0);
+	glm::vec2 greenBeforeInner = getCirclePoint((double)m_radius - m_deltaAngle, 0.0);
 
-	for (float angle = 0.0; angle < maxAngle; angle += deltaAngle) {
-		glm::vec2 outer = getCirclePoint((double)radius + deltaRadius, (double)angle);
-		glm::vec2 inner = getCirclePoint((double)radius - deltaRadius, (double)angle);
+	for (float angle = 0.0; angle < m_maxAngle; angle += m_deltaAngle) {
+		glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, (double)angle);
+		glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, (double)angle);
 
-		pushVertexTexture(highwayVector, -beforeOuter.x + center.x, 0.0, -beforeOuter.y - center.y, 0.0, (angle / maxAngle) + offsetFactor);
-		pushVertexTexture(highwayVector, -beforeInner.x + center.x, 0.0, -beforeInner.y - center.y, 1.0, (angle / maxAngle) + offsetFactor);
-		pushVertexTexture(highwayVector, -inner.x + center.x, 0.0, -inner.y - center.y, 1.0, (angle / maxAngle) + offsetFactor);
-		pushVertexTexture(highwayVector, -outer.x + center.x, 0.0, -outer.y - center.y, 0.0, (angle / maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -beforeOuter.x + center.x, 0.0, -beforeOuter.y - center.y, 0.0, (angle / m_maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -greenBeforeInner.x + center.x, 0.0, -greenBeforeInner.y - center.y, 1.0, (angle / m_maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -inner.x + center.x, 0.0, -inner.y - center.y, 1.0, (angle / m_maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -outer.x + center.x, 0.0, -outer.y - center.y, 0.0, (angle / m_maxAngle) + offsetFactor);
 		pushRectangleIndices(highwayIndices, highwayVertexCount);
 
 		beforeOuter = outer;
-		beforeInner = inner;
+		greenBeforeInner = inner;
 	}
 
 	usePersProj();
@@ -552,484 +546,105 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 }
 
 void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
-	/*
 	float plane = 0.0;
 
-	//vertices data for each lane
-	std::vector<float> greenLaneVector = {};
-	std::vector<unsigned int> greenLaneIndices = {};
-	unsigned int greenLaneVertexCount = 0;
+	//vertices data for the lanes
 
-	std::vector<float> blueLaneVector = {};
-	std::vector<unsigned int> blueLaneIndices = {};
-	unsigned int blueLaneVertexCount = 0;
+	std::vector<float> lanesVector = {};
+	std::vector<unsigned int> lanesIndices = {};
+	unsigned int lanesVertexCount = 0;
 
-	std::vector<float> redLaneVector = {};
-	std::vector<unsigned int>redLaneIndices = {};
-	unsigned int redLaneVertexCount = 0;
+	std::vector<float> greenColor = {0.0, 1.0, 0.0, 1.0};
+	std::vector<float> redColor = {1.0, 0.0, 0.0, 1.0};
+	std::vector<float> blueColor = {0.0, 0.0, 1.0, 1.0};
+	std::vector<float> euphoriaColor = {1.0, 1.0, 1.0, 1.0};
 
-	float r, g, b;
-
-	float offset = 0.04f;
-
-	//if euphoria is active, turn red lane white
-	if (m_renderEuActive) {
-		r = 1.0f;
-		g = 1.0f;
-		b = 1.0f;
-	}
-	else {
-		r = 1.0f;
-		g = 0.0f;
-		b = 0.0f;
-	}
-
-	pushVertexColor(redLaneVector, -0.02f, plane, 3.75f, r, g, b);
-	pushVertexColor(redLaneVector, 0.02f, plane, 3.75f, r, g, b);
-	pushVertexColor(redLaneVector, 0.02f, plane, 0.0f, r, g, b);
-	pushVertexColor(redLaneVector, -0.02f, plane, 0.0f, r, g, b);
-	pushRectangleIndices(redLaneIndices, redLaneVertexCount);
-
-
-	int start = cross.at(0).getType();
-	int middle = start;
-
-	if (start == CROSS_G) {
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 1.0;
-			b = 0.0;
-		}
-		//start green left lane
-		pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 3.75f, r, g, b);
-		pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 3.75f, r, g, b);
-
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 0.0;
-			b = 1.0;
-		}
-		//start blue center lane
-		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, r, g, b);
-		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, r, g, b);
-		start = 0;
-	}
-	else if (start == CROSS_B) {
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 1.0;
-			b = 0.0;
-		}
-		//start green center lane
-		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, r, g, b);
-		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, r, g, b);
-
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 0.0;
-			b = 1.0;
-		}
-		//start blue right lane
-		pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 3.75f, r, g, b);
-		pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 3.75f, r, g, b);
-	}
-	else if (start == CROSS_C) {
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 1.0;
-			b = 0.0;
-		}
-		//start green center lane
-		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 3.75f, r, g, b);
-		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 3.75f, r, g, b);
-
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 0.0;
-			b = 1.0;
-		}
-		//start blue center lane
-		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 3.75f, r, g, b);
-		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 3.75f, r, g, b);
-	}
-
-	for (size_t i = 1; i < cross.size(); i++) {
-		double t = cross.at(i).getMilli();
-		double hitWindow = cross.at(i).hitWindow;
-		if (time + m_noteVisibleTime >= t && time <= t + hitWindow) {
-			double percent = (cross.at(i).getMilli() - time) / m_noteVisibleTime;
-			if (cross.at(i).getType() == CROSS_G && middle != CROSS_G) {
-				middle = CROSS_G;
-				float z = (float)(3.75 - 3.75 * percent);
-
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 1.0;
-					b = 0.0;
-				}
-
-				//end green center lane
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z + offset, 0.0f, 1.0f, 0.0f);
-				pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-				//add horizontal line
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
-				pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-				//start green left lane
-				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
-				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z - offset, r, g, b);
-
-				if (cross.at(i - 1).getType() == CROSS_B) {
-					//in the case that the crossfade was right before,
-					//add horizontal lane to blue lane too
-
-					//change color if euphoria is active
-					if (m_renderEuActive) {
-						r = 1.0;
-						g = 1.0;
-						b = 1.0;
-					}
-					else {
-						r = 0.0;
-						g = 0.0;
-						b = 1.0;
-					}
-
-					//end blue right lane
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-					//add horizontal line
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-					//start blue center lane
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, r, g, b);
-				}
-			}
-			else if (cross.at(i).getType() == CROSS_B && middle != CROSS_B) {
-				middle = CROSS_B;
-				float z = (float)(3.75 - 3.75 * percent);
-
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 0.0;
-					b = 1.0;
-				}
-				//end blue center lane
-				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z + offset, r, g, b);
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
-				pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-				//add horizontal line
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
-				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
-				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
-				pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-				//start blue right lane
-				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z - offset, r, g, b);
-				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
-
-				if (cross.at(i - 1).getType() == CROSS_G) {
-					//in the case that the crossfade was left before,
-					//add horizontal lane to green lane too
-
-					//change color if euphoria is active
-					if (m_renderEuActive) {
-						r = 1.0;
-						g = 1.0;
-						b = 1.0;
-					}
-					else {
-						r = 0.0;
-						g = 1.0;
-						b = 0.0;
-					}
-					//end green left lane
-					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-					//add horizontal line
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-					//start green center lane
-					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
-				}
-			}
-			else if (cross.at(i).getType() == CROSS_C && middle != CROSS_C) {
-				middle = CROSS_C;
-				//crossfade center event
-				float z = (float)(3.75 - 3.75 * percent);
-
-				//if crossfade was from the right
-				if (cross.at(i - 1).getType() == CROSS_G) {
-					//change color if euphoria is active
-					if (m_renderEuActive) {
-						r = 1.0;
-						g = 1.0;
-						b = 1.0;
-					}
-					else {
-						r = 0.0;
-						g = 1.0;
-						b = 0.0;
-					}
-					//end green left lane
-					pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-					//add horizontal line
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z + offset, r, g, b);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-
-					//start green center line
-					pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, z - offset, r, g, b);
-				}
-				//if crossfade was from the left
-				else if (cross.at(i - 1).getType() == CROSS_B) {
-					//change color if euphoria is active
-					if (m_renderEuActive) {
-						r = 1.0;
-						g = 1.0;
-						b = 1.0;
-					}
-					else {
-						r = 0.0;
-						g = 0.0;
-						b = 1.0;
-					}
-					//end blue right lane
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-					//add horizontal line
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z + offset, r, g, b);
-					pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z + offset, r, g, b);
-					pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-					//start blue center lane
-					pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, z - offset, r, g, b);
-					pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, z - offset, r, g, b);
-				}
-			}
-		}
-		else if (t >= time + m_noteVisibleTime) {
-			if (middle == CROSS_G) {
-				m_renderCross = 0;
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 1.0;
-					b = 0.0;
-				}
-				//end green left lane
-				pushVertexColor(greenLaneVector, 0.02f - 0.7f, plane, 0.0f, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.7f, plane, 0.0f, r, g, b);
-
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 0.0;
-					b = 1.0;
-				}
-				//end blue center lane
-				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
-			}
-			else if (middle == CROSS_B) {
-				m_renderCross = 2;
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 1.0;
-					b = 0.0;
-				}
-				//end green center lane
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
-
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 0.0;
-					b = 1.0;
-				}
-				//end blue right lane
-				pushVertexColor(blueLaneVector, 0.02f + 0.7f, plane, 0.0f, r, g, b);
-				pushVertexColor(blueLaneVector, -0.02f + 0.7f, plane, 0.0f, r, g, b);
-			}
-			else if (middle == CROSS_C) {
-				m_renderCross = 1;
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 1.0;
-					b = 0.0;
-				}
-				//end green center lane
-				pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
-				pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
-
-				//change color if euphoria is active
-				if (m_renderEuActive) {
-					r = 1.0;
-					g = 1.0;
-					b = 1.0;
-				}
-				else {
-					r = 0.0;
-					g = 0.0;
-					b = 1.0;
-				}
-				//end blue center lane
-				pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
-				pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
-			}
-
-
-			break;
-		}
-	}
-	if (greenLaneVector.size() == 2 * 7) {
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 1.0;
-			b = 0.0;
-		}
-		//end green center lane
-		pushVertexColor(greenLaneVector, 0.02f - 0.35f, plane, 0.0f, r, g, b);
-		pushVertexColor(greenLaneVector, -0.02f - 0.35f, plane, 0.0f, r, g, b);
-	}
-	if (blueLaneVector.size() == 2 * 7) {
-		//change color if euphoria is active
-		if (m_renderEuActive) {
-			r = 1.0;
-			g = 1.0;
-			b = 1.0;
-		}
-		else {
-			r = 0.0;
-			g = 0.0;
-			b = 1.0;
-		}
-		//end blue center lane
-		pushVertexColor(blueLaneVector, 0.02f + 0.35f, plane, 0.0f, r, g, b);
-		pushVertexColor(blueLaneVector, -0.02f + 0.35f, plane, 0.0f, r, g, b);
-	}
-
-	//finally, render each lane
-	pushRectangleIndices(greenLaneIndices, greenLaneVertexCount);
-	pushRectangleIndices(blueLaneIndices, blueLaneVertexCount);
-
-	usePersProj();
-	renderColor(redLaneVector, redLaneIndices);
-	renderColor(greenLaneVector, greenLaneIndices);
-	renderColor(blueLaneVector, blueLaneIndices);
+	/*
+	startImGuiFrame("test",ImGuiBackendFlags_None);
+	ImGui::ColorEdit4("Green",greenColor.data());
+	ImGui::ColorEdit4("Red",redColor.data());
+	ImGui::ColorEdit4("Blue",blueColor.data());
+	ImGui::ColorEdit4("Euphoria",euphoriaColor.data());
+	renderImGuiFrame();
 	*/
+
+	if (m_renderEuActive) {
+		greenColor = euphoriaColor;
+		redColor = euphoriaColor;
+		blueColor = euphoriaColor;
+	}
+
+	float size = 0.05;
+
+	float startAngle = asin(0.25 / m_radius);
+
+	glm::vec2 center = {m_radius, 0.0};
+	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startAngle);
+	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startAngle);
+	glm::vec2 greenBeforeOuter = getCirclePoint((double)m_radius + 0.5 + size, startAngle);
+	glm::vec2 greenBeforeInner = getCirclePoint((double)m_radius + 0.5 - size, startAngle);
+	glm::vec2 blueBeforeOuter = getCirclePoint((double)m_radius - 0.5 + size, startAngle);
+	glm::vec2 blueBeforeInner = getCirclePoint((double)m_radius - 0.5 - size, startAngle);
+
+	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
+		float angleTime = time + angle * m_noteVisibleTime / m_maxAngle;
+
+		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
+		glm::vec2 redInner = getCirclePoint((double)m_radius - size, (double)angle);
+
+		pushVertexColor(lanesVector, -redBeforeOuter.x + center.x, 0.0, -redBeforeOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redBeforeInner.x + center.x, 0.0, -redBeforeInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redInner.x + center.x, 0.0, -redInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redOuter.x + center.x, 0.0, -redOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushRectangleIndices(lanesIndices, lanesVertexCount);
+
+		redBeforeOuter = redOuter;
+		redBeforeInner = redInner;
+
+		//green
+
+		glm::vec2 greenOuter;
+		glm::vec2 greenInner;
+		if (getCrossAtTime(angleTime, cross) >= 1) {
+			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
+			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
+		} else {
+			greenOuter = getCirclePoint((double)m_radius + 1.0 + size, (double)angle);
+			greenInner = getCirclePoint((double)m_radius + 1.0 - size, (double)angle);
+		}
+
+		pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, 0.0, -greenBeforeOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, 0.0, -greenBeforeInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenInner.x + center.x, 0.0, -greenInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenOuter.x + center.x, 0.0, -greenOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushRectangleIndices(lanesIndices, lanesVertexCount);
+
+		greenBeforeOuter = greenOuter;
+		greenBeforeInner = greenInner;
+
+		//blue
+
+		glm::vec2 blueOuter;
+		glm::vec2 blueInner;
+		if (getCrossAtTime(angleTime, cross) <= 1) {
+			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
+			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
+		} else {
+			blueOuter = getCirclePoint((double)m_radius - 1.0 + size, (double)angle);
+			blueInner = getCirclePoint((double)m_radius - 1.0 - size, (double)angle);
+		}
+
+		pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+		pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+		pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+		pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+		pushRectangleIndices(lanesIndices, lanesVertexCount);
+
+		blueBeforeOuter = blueOuter;
+		blueBeforeInner = blueInner;
+	}
+	usePersProj();
+	renderColor(lanesVector, lanesIndices);
 }
 
 void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
@@ -1663,8 +1278,7 @@ void GameRender::result(Player& player, Generator& generator) {
 	}
 }
 
-void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
-	/*
+void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
 	std::string text = "Notes";
 	text.append("(");
 	text.append(std::to_string(v.size()));
@@ -1694,7 +1308,10 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 		cs.append(",");
 	}
 	drawText(cs, 10.0f, 120.0f, 0.05f);
-
+	std::string fps = "FPS:";
+	fps.append(std::to_string(1/deltaTime));
+	drawText(fps,10.0f,170.0f,0.05f);
+	
 	std::string baseScore;
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
 	baseScore.append("|");
@@ -1702,7 +1319,6 @@ void GameRender::debug(std::vector<Note>& v, std::vector<Note>& ev, std::vector<
 	drawText(baseScore, 940.0f, 370.0f, 0.03f);
 
 	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
-	*/
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
@@ -1888,6 +1504,24 @@ glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
 	double x = radius * cos(angle);
 	double y = radius * sin(angle);
 	return {x, y};
+}
+
+int GameRender::getCrossAtTime(double time, std::vector<Note> crossArr) {
+	int index = 0;
+	for (size_t i = 0; i < crossArr.size(); ++i) {
+		if (crossArr.at(i).getMilli() > time) {
+			index = i - 1;
+			break;
+		}
+	}
+	int type = crossArr.at(index).getType();
+	if (type == CROSS_G) {
+		return 0;
+	} else if (type == CROSS_C) {
+		return 1;
+	} else {
+		return 2;
+	}
 }
 
 GameRender::~GameRender() {

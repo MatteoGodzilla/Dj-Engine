@@ -33,6 +33,7 @@ public:
 
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
+	double m_deltaTime = 0.0;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
 	bool m_debugView = false;

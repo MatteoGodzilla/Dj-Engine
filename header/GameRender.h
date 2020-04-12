@@ -29,7 +29,7 @@ public:
 	void meters(double time);
 	void pollState(double time, Player& p, Generator& g);
 	void updateAnimations(double time);
-	void debug(std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
+	void debug(double deltaTime, std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
 	virtual ~GameRender();
 
@@ -39,6 +39,7 @@ public:
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	glm::vec2 getCirclePoint(double radius, double angle);
+	int getCrossAtTime(double time, std::vector<Note>crossArr);
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;
@@ -72,6 +73,12 @@ private:
 	FT_Face m_font;
 
 	AnimationManager m_animManager;
+
+	//base curve information
+	float m_radius = 10.0;
+	float m_deltaRadius = 1.5;
+	float m_deltaAngle = 0.004 ;
+	float m_maxAngle = glm::quarter_pi<float>();
 
 	//default green clicker position
 	float m_greenLeft = 0.0f;
