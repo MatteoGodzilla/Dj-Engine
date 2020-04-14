@@ -112,7 +112,7 @@ void Game::render() {
 
 			//debug
 			if (m_debugView)
-				m_render.debug(m_deltaTime,m_note_arr, m_event_arr, m_cross_arr);
+				m_render.debug(m_deltaTime, m_note_arr, m_event_arr, m_cross_arr);
 		} else if (m_mode == 1) {
 			m_render.result(m_player, m_gen);
 		}

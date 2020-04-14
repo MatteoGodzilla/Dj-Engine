@@ -25,6 +25,40 @@ void GameRender::init(GLFWwindow* w) {
 		loadTexture("res/pgBar-frame.png", &m_pgBarFrame);
 		loadTexture("res/pgBar-inside.png", &m_pgBarInside);
 	}
+	//setting up object sprite atlas informations
+	{
+		float colSize = 1.0 / 4.0;
+		float rowSize = 1.0 / 6.0;
+
+		m_objectAtlas.insert(std::make_pair(TAP_GREEN_1, glm::vec4(0 * colSize, 0 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_GREEN_2, glm::vec4(1 * colSize, 0 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_GREEN_3, glm::vec4(2 * colSize, 0 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_GREEN_4, glm::vec4(3 * colSize, 0 * rowSize, colSize, rowSize)));
+
+		m_objectAtlas.insert(std::make_pair(TAP_RED_1, glm::vec4(0 * colSize, 1 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_RED_2, glm::vec4(1 * colSize, 1 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_RED_3, glm::vec4(2 * colSize, 1 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_RED_4, glm::vec4(3 * colSize, 1 * rowSize, colSize, rowSize)));
+
+		m_objectAtlas.insert(std::make_pair(TAP_BLUE_1, glm::vec4(0 * colSize, 2 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_BLUE_2, glm::vec4(1 * colSize, 2 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_BLUE_3, glm::vec4(2 * colSize, 2 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_BLUE_4, glm::vec4(3 * colSize, 2 * rowSize, colSize, rowSize)));
+
+		m_objectAtlas.insert(std::make_pair(TAP_EUPHORIA_1, glm::vec4(0 * colSize, 3 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_EUPHORIA_2, glm::vec4(1 * colSize, 3 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_EUPHORIA_3, glm::vec4(2 * colSize, 3 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(TAP_EUPHORIA_4, glm::vec4(3 * colSize, 3 * rowSize, colSize, rowSize)));
+
+		m_objectAtlas.insert(std::make_pair(CLICKER_GREEN, glm::vec4(0 * colSize, 4 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(CLICKER_RED, glm::vec4(1 * colSize, 4 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(CLICKER_BLUE, glm::vec4(2 * colSize, 4 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(CLICKER_TRAY, glm::vec4(4 * colSize, 4 * rowSize, -1 * colSize, 2 * rowSize)));
+
+		m_objectAtlas.insert(std::make_pair(SCRATCH_ANYDIR, glm::vec4(0 * colSize, 5 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(SCRATCH_UP, glm::vec4(1 * colSize, 5 * rowSize, colSize, rowSize)));
+		m_objectAtlas.insert(std::make_pair(SCRATCH_DOWN, glm::vec4(2 * colSize, 5 * rowSize, colSize, rowSize)));
+	}
 }
 
 void GameRender::highway(double time) {
@@ -38,20 +72,20 @@ void GameRender::highway(double time) {
 	float offsetFactor = 1 / m_noteVisibleTime * time;
 
 	glm::vec2 beforeOuter = getCirclePoint((double)m_radius + m_deltaAngle, 0.0);
-	glm::vec2 greenBeforeInner = getCirclePoint((double)m_radius - m_deltaAngle, 0.0);
+	glm::vec2 BeforeInner = getCirclePoint((double)m_radius - m_deltaAngle, 0.0);
 
 	for (float angle = 0.0; angle < m_maxAngle; angle += m_deltaAngle) {
 		glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, (double)angle);
 		glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, (double)angle);
 
 		pushVertexTexture(highwayVector, -beforeOuter.x + center.x, 0.0, -beforeOuter.y - center.y, 0.0, (angle / m_maxAngle) + offsetFactor);
-		pushVertexTexture(highwayVector, -greenBeforeInner.x + center.x, 0.0, -greenBeforeInner.y - center.y, 1.0, (angle / m_maxAngle) + offsetFactor);
+		pushVertexTexture(highwayVector, -BeforeInner.x + center.x, 0.0, -BeforeInner.y - center.y, 1.0, (angle / m_maxAngle) + offsetFactor);
 		pushVertexTexture(highwayVector, -inner.x + center.x, 0.0, -inner.y - center.y, 1.0, (angle / m_maxAngle) + offsetFactor);
 		pushVertexTexture(highwayVector, -outer.x + center.x, 0.0, -outer.y - center.y, 0.0, (angle / m_maxAngle) + offsetFactor);
 		pushRectangleIndices(highwayIndices, highwayVertexCount);
 
 		beforeOuter = outer;
-		greenBeforeInner = inner;
+		BeforeInner = inner;
 	}
 
 	usePersProj();
@@ -60,7 +94,8 @@ void GameRender::highway(double time) {
 
 void GameRender::clicker() {
 	//difference in size between pressed and not
-	float clickedOffset = 0.05f;
+	float deltaSize = 0.05f;
+	float PosOffset = 0.025;
 
 	float plane = 0.0f;
 
@@ -70,31 +105,36 @@ void GameRender::clicker() {
 	unsigned int clickerVertexCount = 0;
 
 	//left tray object
-	pushVertexTexture(clickerVector, -1.25f, plane, -0.5f, 1.0f, 400.0f / 1640.0f);
-	pushVertexTexture(clickerVector, -1.25f, plane, 0.0f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-	pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, 1320.0f / 1760.0f, 1280.0f / 1640.0f);
-	pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, 1.0f, 1280.0f / 1640.0f);
+	glm::vec4 clickerTray = m_objectAtlas.at(CLICKER_TRAY);
+
+	pushVertexTexture(clickerVector, -1.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, -1.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
 	//right tray object
-	pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, 1.0f, 400.0f / 1640.0f);
-	pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-	pushVertexTexture(clickerVector, 1.25f, plane, 0.0f, 1320.0f / 1760.0f, 1280.0f / 1640.0f);
-	pushVertexTexture(clickerVector, 1.25f, plane, -0.5f, 1.0f, 1280.0f / 1640.0f);
+
+	pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, 1.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, 1.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
+
+	glm::vec4 clickerRedInfo = m_objectAtlas.at(CLICKER_RED);
 
 	if (m_red) {
 		//red pressed clicker
-		pushVertexTexture(clickerVector, -0.25f + clickedOffset, plane, -0.5f + clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, -0.25f + clickedOffset, plane, 0.0f - clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, 0.25f - clickedOffset, plane, 0.0f - clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, 0.25f - clickedOffset, plane, -0.5f + clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, -0.5f + deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, 0.0f - deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, 0.0f - deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, -0.5f + deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
 	} else {
 		//red normal clicker
-		pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, 440.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, 440.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, 880.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, 880.0f / 1760.0f, 400.0f / 1640.0f);
+		pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
 	}
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
@@ -167,31 +207,35 @@ void GameRender::clicker() {
 		}
 	}
 
+	glm::vec4 clickerGreenInfo = m_objectAtlas.at(CLICKER_GREEN);
+
 	if (m_green) {
-		pushVertexTexture(clickerVector, greenLeft + clickedOffset, plane, -0.5 + clickedOffset, 0.0, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenLeft + clickedOffset, plane, 0.0 - clickedOffset, 0.0, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenRight - clickedOffset, plane, 0.0 - clickedOffset, 440.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenRight - clickedOffset, plane, -0.5 + clickedOffset, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, greenLeft + deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, greenLeft + deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, greenRight - deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, greenRight - deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	} else {
-		pushVertexTexture(clickerVector, greenLeft, plane, -0.5, 0.0, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenLeft, plane, 0.0, 0.0, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenRight, plane, 0.0, 440.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, greenRight, plane, -0.5, 440.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, greenLeft, plane, -0.5, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, greenLeft, plane, 0.0, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, greenRight, plane, 0.0, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, greenRight, plane, -0.5, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
+	glm::vec4 clickerBlueInfo = m_objectAtlas.at(CLICKER_BLUE);
+
 	if (m_blue) {
-		pushVertexTexture(clickerVector, blueLeft + clickedOffset, plane, -0.5 + clickedOffset, 880.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueLeft + clickedOffset, plane, 0.0 - clickedOffset, 880.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueRight - clickedOffset, plane, 0.0 - clickedOffset, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueRight - clickedOffset, plane, -0.5 + clickedOffset, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, blueLeft + deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, blueLeft + deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, blueRight - deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, blueRight - deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	} else {
-		pushVertexTexture(clickerVector, blueLeft, plane, -0.5, 880.0f / 1760.0f, 840.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueLeft, plane, 0.0, 880.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueRight, plane, 0.0, 1320.0f / 1760.0f, 400.0f / 1640.0f);
-		pushVertexTexture(clickerVector, blueRight, plane, -0.5, 1320.0f / 1760.0f, 840.0f / 1640.0f);
+		pushVertexTexture(clickerVector, blueLeft, plane, -0.5, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, blueLeft, plane, 0.0, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, blueRight, plane, 0.0, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, blueRight, plane, -0.5, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 	usePersProj();
@@ -199,7 +243,6 @@ void GameRender::clicker() {
 }
 
 void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
-	/*
 	float plane = 0.0;
 
 	//vertices data
@@ -207,342 +250,348 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	std::vector<unsigned int> noteIndices = {};
 	unsigned int noteVertexCount = 0;
 
-	//loop for every note inside vector
-	for (size_t i = 0; i < v.size(); i++) {
-		double milli = v.at(i).getMilli();
-		double hitWindow = v.at(i).hitWindow;
-		if (time + m_noteVisibleTime > milli) {
-			//if the note is inside the visible highway
+	glm::vec2 center = {m_radius, 0.0};
+	float height = 0.025;
 
-			//calculate 'height' of note
-			double percent = (v.at(i).getMilli() - time) / m_noteVisibleTime;
-			float z = 3.75f - (3.75f * (float)percent);
+	for (size_t i = 0; i < v.size(); ++i) {
+		double milli = v.at(i).getMilli();
+		if (time + m_noteVisibleTime > milli) {
+			double dt = milli - time;
+			float clickerAngle = asin(0.25 / m_radius);
+			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
 
 			int type = v.at(i).getType();
 
-			//texture coordinates (bottom left cause OpenGl)
-			float s = 0.0;
-			float t = 0.0;
+			if (type == TAP_R && !v.at(i).getDead() && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / m_radius);
+				glm::vec2 topLeft = getCirclePoint(m_radius + 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.25, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius - 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 0.25, noteAngle - dAngle / 2);
 
-			if (type == TAP_R && !v.at(i).getTouched()) {
-				if (!v.at(i).getDead()) {
-					//change texture if euphoria is active
-					if (m_renderEuActive) {
-						s = 1200.0f / 1760.0f;
-						t = 0.0f;
-					}
-					else {
-						s = 400.0f / 1760.0f;
-						t = 0.0;
-					}
+				glm::vec4 OneInfo = m_objectAtlas.at(TAP_RED_1);
+				glm::vec4 TwoInfo = m_objectAtlas.at(TAP_RED_2);
+				glm::vec4 ThreeInfo = m_objectAtlas.at(TAP_RED_3);
+				glm::vec4 FourInfo = m_objectAtlas.at(TAP_RED_4);
+				if (m_renderEuActive) {
+					OneInfo = m_objectAtlas.at(TAP_EUPHORIA_1);
+					TwoInfo = m_objectAtlas.at(TAP_EUPHORIA_2);
+					ThreeInfo = m_objectAtlas.at(TAP_EUPHORIA_3);
+					FourInfo = m_objectAtlas.at(TAP_EUPHORIA_4);
+				}
 
-					//actual note vertices
-					pushVertexTexture(noteVector, -0.15f, plane, z - 0.15f, s, t + 400.0f / 1760.0f);
-					pushVertexTexture(noteVector, -0.15f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.15f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.15f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1760.0f);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-				}
-			}
-			else if (type == TAP_G && !v.at(i).getTouched()) {
-				if (!v.at(i).getDead()) {
-					//change texture if euphoria is active
-					if (m_renderEuActive) {
-						s = 1200.0f / 1760.0f;
-						t = 0.0f;
-					}
-					else {
-						s = 0.0f;
-						t = 0.0f;
-					}
-					//if the highway at the note's time is on the left
-					if (v.at(i).getLanMod() == 0) {
-						pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-						pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
-						pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-						pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-					}
-					else {
-						pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-						pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
-						pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-						pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-					}
-					pushRectangleIndices(noteIndices, noteVertexCount);
-				}
-			}
-			else if (type == SCR_G_UP && !v.at(i).getTouched()) {
-				s = 400.0f / 1760.0f;
-				t = 840.0f / 1640.0f;
-
-				//if the highway at the note's time is on the left
-				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
 				pushRectangleIndices(noteIndices, noteVertexCount);
-			}
-			else if (type == SCR_G_DOWN && !v.at(i).getTouched()) {
-				s = 800.0f / 1760.0f;
-				t = 840.0f / 1640.0f;
 
-				//if the highway at the note's time is on the left
-				if (v.at(i).getLanMod() == 0) {
-					pushVertexTexture(noteVector, -0.85f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.85f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.55f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				else {
-					pushVertexTexture(noteVector, -0.5f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.5f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.2f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
+				//layer 2
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 1 * height, -topLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 1 * height, -bottomLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 1 * height, -bottomRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 1 * height, -topRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y);
 				pushRectangleIndices(noteIndices, noteVertexCount);
-			}
-			else if (type == SCR_G_ANY) {
-				s = 0.0f;
-				t = 840.0f / 1640.0f;
 
-				double length = 0.30;
+				//layer 3
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 2 * height, -topLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 2 * height, -bottomLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 2 * height, -bottomRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 2 * height, -topRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
 
-				std::vector<Note> changes = getCrossInsideNote(v.at(i), cross);
+				//layer 4
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 3 * height, -topLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 3 * height, -bottomLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 3 * height, -bottomRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 3 * height, -topRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
 
-				int segments = changes.size() / 2;
+			} else if (type == TAP_G && !v.at(i).getDead() && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius + 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius + 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.25, noteAngle - dAngle / 2);
 
-				for (int i = 0; i < segments; ++i) {
-					Note start = changes.at(i * 2);
-					Note end = changes.at(i * 2 + 1);
-
-					double startDt = start.getMilli() - time;
-					double startZ = 3.75 - (3.75 * (float)startDt);
-					double endDt = end.getMilli() - time;
-					double endZ = 3.75 - (3.75 * (float)endDt);
-
-					int numOfSprites = (int)floor((startZ - endZ) / length);
-
-					for (int j = 0; j < numOfSprites; ++j) {
-						float spriteZ = (float)(startZ - 0.15 - length * j);
-						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
-							if (start.getType() == CROSS_G) {
-								pushVertexTexture(noteVector, -0.85f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
-								pushVertexTexture(noteVector, -0.85f, plane, spriteZ + 0.15f, s, t);
-								pushVertexTexture(noteVector, -0.55f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
-								pushVertexTexture(noteVector, -0.55f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-							}
-							else {
-								pushVertexTexture(noteVector, -0.5f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
-								pushVertexTexture(noteVector, -0.5f, plane, spriteZ + 0.15f, s, t);
-								pushVertexTexture(noteVector, -0.2f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
-								pushVertexTexture(noteVector, -0.2f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-							}
-							pushRectangleIndices(noteIndices, noteVertexCount);
-						}
-					}
+				if (v.at(i).getLanMod() == 0) {
+					dAngle = asin(0.5 / (m_radius + 1.0));
+					topLeft = getCirclePoint(m_radius + 1.25, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius + 1.25, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
 				}
-			}
-			else if (type == TAP_B && !v.at(i).getTouched()) {
-				if (!v.at(i).getDead()) {
-					//change texture if euphoria is active
-					if (m_renderEuActive) {
-						s = 1200.0f / 1760.0f;
-						t = 0.0f;
-					}
-					else {
-						s = 800.0f / 1760.0f;
-						t = 0.0f;
-					}
 
-					//if the highway at the note's time is on the left
-					if (v.at(i).getLanMod() == 2) {
-						pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-						pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
-						pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-						pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-					}
-					else {
-						pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-						pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
-						pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-						pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-					}
-					pushRectangleIndices(noteIndices, noteVertexCount);
+				glm::vec4 OneInfo = m_objectAtlas.at(TAP_GREEN_1);
+				glm::vec4 TwoInfo = m_objectAtlas.at(TAP_GREEN_2);
+				glm::vec4 ThreeInfo = m_objectAtlas.at(TAP_GREEN_3);
+				glm::vec4 FourInfo = m_objectAtlas.at(TAP_GREEN_4);
+				if (m_renderEuActive) {
+					OneInfo = m_objectAtlas.at(TAP_EUPHORIA_1);
+					TwoInfo = m_objectAtlas.at(TAP_EUPHORIA_2);
+					ThreeInfo = m_objectAtlas.at(TAP_EUPHORIA_3);
+					FourInfo = m_objectAtlas.at(TAP_EUPHORIA_4);
 				}
-			}
-			else if (type == SCR_B_UP && !v.at(i).getTouched()) {
-				s = 400.0f / 1760.0f;
-				t = 840.0f / 1640.0f;
 
-				//if the highway at the note's time is on the right
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+				//layer 2
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 1 * height, -topLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 1 * height, -bottomLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 1 * height, -bottomRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 1 * height, -topRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+				//layer 3
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 2 * height, -topLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 2 * height, -bottomLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 2 * height, -bottomRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 2 * height, -topRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+				//layer 4
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 3 * height, -topLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 3 * height, -bottomLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 3 * height, -bottomRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 3 * height, -topRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+			} else if (type == TAP_B && !v.at(i).getDead() && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius - 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius - 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.25, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+
 				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+					dAngle = asin(0.5 / (m_radius - 1.0));
+					topLeft = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius - 1.25, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius - 1.25, noteAngle - dAngle / 2);
 				}
-				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
+
+				glm::vec4 OneInfo = m_objectAtlas.at(TAP_BLUE_1);
+				glm::vec4 TwoInfo = m_objectAtlas.at(TAP_BLUE_2);
+				glm::vec4 ThreeInfo = m_objectAtlas.at(TAP_BLUE_3);
+				glm::vec4 FourInfo = m_objectAtlas.at(TAP_BLUE_4);
+				if (m_renderEuActive) {
+					OneInfo = m_objectAtlas.at(TAP_EUPHORIA_1);
+					TwoInfo = m_objectAtlas.at(TAP_EUPHORIA_2);
+					ThreeInfo = m_objectAtlas.at(TAP_EUPHORIA_3);
+					FourInfo = m_objectAtlas.at(TAP_EUPHORIA_4);
 				}
+
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
 				pushRectangleIndices(noteIndices, noteVertexCount);
-			}
-			else if (type == SCR_B_DOWN && !v.at(i).getTouched()) {
-				s = 800.0f / 1760.0f;
-				t = 840.0f / 1640.0f;
 
-				//if the highway at the note's time is on the right
-				if (v.at(i).getLanMod() == 2) {
-					pushVertexTexture(noteVector, 0.55f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.55f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.85f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
-				else {
-					pushVertexTexture(noteVector, 0.2f, plane, z - 0.15f, s, t + 400.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.2f, plane, z + 0.15f, s, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z + 0.15f, s + 400.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.5f, plane, z - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-				}
+				//layer 2
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 1 * height, -topLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 1 * height, -bottomLeft.y + center.y, TwoInfo.x, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 1 * height, -bottomRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y - TwoInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 1 * height, -topRight.y + center.y, TwoInfo.x + TwoInfo.z, 1.0 - TwoInfo.y);
 				pushRectangleIndices(noteIndices, noteVertexCount);
-			}
-			else if (type == SCR_B_ANY) {
-				s = 0.0f;
-				t = 840.0f / 1640.0f;
 
-				double length = 0.30;
+				//layer 3
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 2 * height, -topLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 2 * height, -bottomLeft.y + center.y, ThreeInfo.x, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 2 * height, -bottomRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y - ThreeInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 2 * height, -topRight.y + center.y, ThreeInfo.x + ThreeInfo.z, 1.0 - ThreeInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
 
-				std::vector<Note> changes = getCrossInsideNote(v.at(i), cross);
+				//layer 4
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 3 * height, -topLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 3 * height, -bottomLeft.y + center.y, FourInfo.x, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 3 * height, -bottomRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y - FourInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 3 * height, -topRight.y + center.y, FourInfo.x + FourInfo.z, 1.0 - FourInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
 
-				int segments = changes.size() / 2;
+			} else if (type == SCR_G_UP && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius + 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius + 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.25, noteAngle - dAngle / 2);
 
-				for (int i = 0; i < segments; ++i) {
-					Note start = changes.at(i * 2);
-					Note end = changes.at(i * 2 + 1);
+				if (v.at(i).getLanMod() == 0) {
+					dAngle = asin(0.5 / (m_radius + 1.0));
+					topLeft = getCirclePoint(m_radius + 1.25, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius + 1.25, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
+				}
 
-					double startDt = start.getMilli() - time;
-					double startZ = 3.75 - (3.75 * startDt);
-					double endDt = end.getMilli() - time;
-					double endZ = 3.75 - (3.75 * endDt);
+				glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_UP);
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
 
-					int numOfSprites = (int)floor((startZ - endZ) / length);
+			} else if (type == SCR_G_DOWN && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius + 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius + 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.25, noteAngle - dAngle / 2);
 
-					for (int j = 0; j < numOfSprites; ++j) {
-						float spriteZ = (float)(startZ - 0.15 - length * j);
-						if (spriteZ >= 0.0f && spriteZ <= 3.75f) {
-							if (start.getType() == CROSS_B) {
-								pushVertexTexture(noteVector, 0.55f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
-								pushVertexTexture(noteVector, 0.55f, plane, spriteZ + 0.15f, s, t);
-								pushVertexTexture(noteVector, 0.85f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
-								pushVertexTexture(noteVector, 0.85f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-							}
-							else {
-								pushVertexTexture(noteVector, 0.2f, plane, spriteZ - 0.15f, s, t + 400.0f / 1640.0f);
-								pushVertexTexture(noteVector, 0.2f, plane, spriteZ + 0.15f, s, t);
-								pushVertexTexture(noteVector, 0.5f, plane, spriteZ + 0.15f, s + 400.0f / 1760.0f, t);
-								pushVertexTexture(noteVector, 0.5f, plane, spriteZ - 0.15f, s + 400.0f / 1760.0f, t + 400.0f / 1640.0f);
-							}
-							pushRectangleIndices(noteIndices, noteVertexCount);
+				if (v.at(i).getLanMod() == 0) {
+					dAngle = asin(0.5 / (m_radius + 1.0));
+					topLeft = getCirclePoint(m_radius + 1.25, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius + 1.25, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius + 0.75, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius + 0.75, noteAngle - dAngle / 2);
+				}
+
+				glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_DOWN);
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+			} else if (type == SCR_G_ANY) {
+				double dAngle = asin(0.5 / (m_radius + 0.5));
+				double timeBetween = dAngle * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+
+				for (double j = milli; j < milli + v.at(i).getLength(); j += timeBetween) {
+					if (j >= time && j <= time + m_noteVisibleTime) {
+						double spriteAngle = (j - time) * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+
+						glm::vec2 topLeft = getCirclePoint(m_radius + 0.75, spriteAngle + dAngle / 2);
+						glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.75, spriteAngle - dAngle / 2);
+						glm::vec2 topRight = getCirclePoint(m_radius + 0.25, spriteAngle + dAngle / 2);
+						glm::vec2 bottomRight = getCirclePoint(m_radius + 0.25, spriteAngle - dAngle / 2);
+
+						if (getCrossAtTime(j, cross) == 0) {
+							dAngle = asin(0.5 / (m_radius + 1.0));
+							topLeft = getCirclePoint(m_radius + 1.25, spriteAngle + dAngle / 2);
+							bottomLeft = getCirclePoint(m_radius + 1.25, spriteAngle - dAngle / 2);
+							topRight = getCirclePoint(m_radius + 0.75, spriteAngle + dAngle / 2);
+							bottomRight = getCirclePoint(m_radius + 0.75, spriteAngle - dAngle / 2);
 						}
+
+						glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_ANYDIR);
+						//layer 1
+						pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+						pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+						pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+						pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+						pushRectangleIndices(noteIndices, noteVertexCount);
+					}
+				}
+			} else if (type == SCR_B_UP && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius - 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius - 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.25, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+
+				if (v.at(i).getLanMod() == 2) {
+					dAngle = asin(0.5 / (m_radius - 1.0));
+					topLeft = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius - 1.25, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius - 1.25, noteAngle - dAngle / 2);
+				}
+
+				glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_UP);
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+			} else if (type == SCR_B_DOWN && !v.at(i).getTouched()) {
+				double dAngle = asin(0.5 / (m_radius - 0.5));
+				glm::vec2 topLeft = getCirclePoint(m_radius - 0.25, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.25, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+
+				if (v.at(i).getLanMod() == 2) {
+					dAngle = asin(0.5 / (m_radius - 1.0));
+					topLeft = getCirclePoint(m_radius - 0.75, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius - 0.75, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius - 1.25, noteAngle + dAngle / 2);
+					bottomRight = getCirclePoint(m_radius - 1.25, noteAngle - dAngle / 2);
+				}
+
+				glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_DOWN);
+				//layer 1
+				pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+				pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+				pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+				pushRectangleIndices(noteIndices, noteVertexCount);
+
+			} else if (type == SCR_B_ANY) {
+				double dAngle = asin(0.5 / (m_radius + 0.5));
+				double timeBetween = dAngle * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+
+				for (double j = milli; j < milli + v.at(i).getLength(); j += timeBetween) {
+					if (j >= time && j <= time + m_noteVisibleTime) {
+						double spriteAngle = (j - time) * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+
+						double dAngle = asin(0.5 / (m_radius - 0.5));
+						glm::vec2 topLeft = getCirclePoint(m_radius - 0.25, spriteAngle + dAngle / 2);
+						glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.25, spriteAngle - dAngle / 2);
+						glm::vec2 topRight = getCirclePoint(m_radius - 0.75, spriteAngle + dAngle / 2);
+						glm::vec2 bottomRight = getCirclePoint(m_radius - 0.75, spriteAngle - dAngle / 2);
+
+						if (getCrossAtTime(j, cross) == 2) {
+							dAngle = asin(0.5 / (m_radius - 1.0));
+							topLeft = getCirclePoint(m_radius - 0.75, spriteAngle + dAngle / 2);
+							bottomLeft = getCirclePoint(m_radius - 0.75, spriteAngle - dAngle / 2);
+							topRight = getCirclePoint(m_radius - 1.25, spriteAngle + dAngle / 2);
+							bottomRight = getCirclePoint(m_radius - 1.25, spriteAngle - dAngle / 2);
+						}
+
+						glm::vec4 OneInfo = m_objectAtlas.at(SCRATCH_ANYDIR);
+						//layer 1
+						pushVertexTexture(noteVector, -topLeft.x + center.x, plane + 0 * height, -topLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y);
+						pushVertexTexture(noteVector, -bottomLeft.x + center.x, plane + 0 * height, -bottomLeft.y + center.y, OneInfo.x, 1.0 - OneInfo.y - OneInfo.w);
+						pushVertexTexture(noteVector, -bottomRight.x + center.x, plane + 0 * height, -bottomRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y - OneInfo.w);
+						pushVertexTexture(noteVector, -topRight.x + center.x, plane + 0 * height, -topRight.y + center.y, OneInfo.x + OneInfo.z, 1.0 - OneInfo.y);
+						pushRectangleIndices(noteIndices, noteVertexCount);
 					}
 				}
 			}
-			if (type == CF_SPIKE_G && !v.at(i).getTouched()) {
-				if (v.at(i).getLanMod() >= 1) {
-					s = 1200.0f / 1740.0f;
-					t = 1460.0f / 1640.0f;
 
-					pushVertexTexture(noteVector, -0.7f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.7f, plane, z + 0.1f, s, t);
-					pushVertexTexture(noteVector, -0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-				}if (v.at(i).getLanMod() == 2) {
-					s = 1200.0f / 1740.0f;
-					t = 1280.0f / 1640.0f;
-
-					pushVertexTexture(noteVector, 0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.7f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s, t);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-
-				}
-			}
-			else if (type == CF_SPIKE_B && !v.at(i).getTouched()) {
-				if (v.at(i).getLanMod() <= 1) {
-					s = 1200.0f / 1740.0f;
-					t = 1280.0f / 1640.0f;
-
-					pushVertexTexture(noteVector, 0.35f, plane, z - 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.35f, plane, z + 0.1f, s, t);
-					pushVertexTexture(noteVector, 0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-				}
-				if (v.at(i).getLanMod() == 0) {
-					s = 1200.0f / 1740.0f;
-					t = 1460.0f / 1640.0f;
-
-					pushVertexTexture(noteVector, -0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.35f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s, t);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-				}
-			}
-			else if (type == CF_SPIKE_C && !v.at(i).getTouched()) {
-				if (v.at(i).getLanMod() == 0) {
-					s = 1200.0f / 1740.0f;
-					t = 1460.0f / 1640.0f;
-
-					pushVertexTexture(noteVector, -0.7f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, -0.7f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.35f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, -0.35f, plane, z - 0.1f, s, t);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-
-				}
-				else if (v.at(i).getLanMod() == 2) {
-					s = 1200.0f / 1740.0f;
-					t = 1280.0f / 1640.0f;
-
-					pushVertexTexture(noteVector, 0.35f, plane, z - 0.1f, s + 560.0f / 1760.0f, t);
-					pushVertexTexture(noteVector, 0.35f, plane, z + 0.1f, s + 560.0f / 1760.0f, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.7f, plane, z + 0.1f, s, t + 180.0f / 1640.0f);
-					pushVertexTexture(noteVector, 0.7f, plane, z - 0.1f, s, t);
-					pushRectangleIndices(noteIndices, noteVertexCount);
-
-				}
-			}
-
-		}
-		else if (milli >= time + m_noteVisibleTime && v.at(i).getLanMod() == -1) {
+		} else if (milli >= time + m_noteVisibleTime && v.at(i).getLanMod() == -1) {
 			//if the note is outside the visible area, update lane position
 			int position = 1;
 			for (size_t j = 0; j < cross.size(); ++j) {
 				if (cross.at(j).getMilli() <= milli) {
-					if (cross.at(j).getType() == CROSS_G) position = 0;
-					else if (cross.at(j).getType() == CROSS_C) position = 1;
-					else if (cross.at(j).getType() == CROSS_B) position = 2;
+					if (cross.at(j).getType() == CROSS_G) {
+						position = 0;
+					} else if (cross.at(j).getType() == CROSS_C) {
+						position = 1;
+					} else if (cross.at(j).getType() == CROSS_B) {
+						position = 2;
+					}
 				}
 			}
 			v.at(i).setLanMod(position);
 		}
 	}
+
 	usePersProj();
 	renderTexture(noteVector, noteIndices, m_objTexture);
-	*/
+	
 }
 
 void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
@@ -587,7 +636,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	glm::vec2 blueBeforeInner = getCirclePoint((double)m_radius - 0.5 - size, startAngle);
 
 	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
-		float angleTime = time + angle * m_noteVisibleTime / m_maxAngle;
+		float angleTime = time + angle * m_noteVisibleTime / (m_maxAngle - startAngle);
 
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
 		glm::vec2 redInner = getCirclePoint((double)m_radius - size, (double)angle);
@@ -1309,9 +1358,9 @@ void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>
 	}
 	drawText(cs, 10.0f, 120.0f, 0.05f);
 	std::string fps = "FPS:";
-	fps.append(std::to_string(1/deltaTime));
-	drawText(fps,10.0f,170.0f,0.05f);
-	
+	fps.append(std::to_string(1 / deltaTime));
+	drawText(fps, 10.0f, 170.0f, 0.05f);
+
 	std::string baseScore;
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
 	baseScore.append("|");

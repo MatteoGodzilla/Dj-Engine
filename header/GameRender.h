@@ -7,12 +7,38 @@
 #include "Generator.h"
 #include "Note.h"
 #include "Player.h"
-
+#include <algorithm>
 #include <iostream>
 #include <map>
 #include <math.h>
 #include <string>
 #include <vector>
+
+enum AtlasIndices {
+	TAP_GREEN_1,
+	TAP_GREEN_2,
+	TAP_GREEN_3,
+	TAP_GREEN_4,
+	TAP_RED_1,
+	TAP_RED_2,
+	TAP_RED_3,
+	TAP_RED_4,
+	TAP_BLUE_1,
+	TAP_BLUE_2,
+	TAP_BLUE_3,
+	TAP_BLUE_4,
+	TAP_EUPHORIA_1,
+	TAP_EUPHORIA_2,
+	TAP_EUPHORIA_3,
+	TAP_EUPHORIA_4,
+	CLICKER_GREEN,
+	CLICKER_RED,
+	CLICKER_BLUE,
+	CLICKER_TRAY,
+	SCRATCH_ANYDIR,
+	SCRATCH_UP,
+	SCRATCH_DOWN
+};
 
 class GameRender : public Rendr {
 public:
@@ -39,7 +65,7 @@ public:
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	glm::vec2 getCirclePoint(double radius, double angle);
-	int getCrossAtTime(double time, std::vector<Note>crossArr);
+	int getCrossAtTime(double time, std::vector<Note> crossArr);
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;
@@ -74,10 +100,12 @@ private:
 
 	AnimationManager m_animManager;
 
+	std::map<int, glm::vec4> m_objectAtlas;
+
 	//base curve information
 	float m_radius = 10.0;
 	float m_deltaRadius = 1.5;
-	float m_deltaAngle = 0.004 ;
+	float m_deltaAngle = 0.004;
 	float m_maxAngle = glm::quarter_pi<float>();
 
 	//default green clicker position
