@@ -591,7 +591,6 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 	usePersProj();
 	renderTexture(noteVector, noteIndices, m_objTexture);
-	
 }
 
 void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
@@ -641,10 +640,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
 		glm::vec2 redInner = getCirclePoint((double)m_radius - size, (double)angle);
 
-		pushVertexColor(lanesVector, -redBeforeOuter.x + center.x, 0.0, -redBeforeOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redBeforeInner.x + center.x, 0.0, -redBeforeInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redInner.x + center.x, 0.0, -redInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redOuter.x + center.x, 0.0, -redOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redBeforeOuter.x + center.x, plane, -redBeforeOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redBeforeInner.x + center.x, plane, -redBeforeInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redInner.x + center.x, plane, -redInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		pushVertexColor(lanesVector, -redOuter.x + center.x, plane, -redOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
 		pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 		redBeforeOuter = redOuter;
@@ -662,10 +661,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			greenInner = getCirclePoint((double)m_radius + 1.0 - size, (double)angle);
 		}
 
-		pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, 0.0, -greenBeforeOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, 0.0, -greenBeforeInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenInner.x + center.x, 0.0, -greenInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenOuter.x + center.x, 0.0, -greenOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+		pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
 		pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 		greenBeforeOuter = greenOuter;
@@ -691,6 +690,182 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 		blueBeforeOuter = blueOuter;
 		blueBeforeInner = blueInner;
+	}
+	for (size_t i = 0; i < v.size(); ++i) {
+		double milli = v.at(i).getMilli();
+		if (time + m_noteVisibleTime > milli) {
+			double dt = milli - time;
+			float clickerAngle = asin(0.25 / m_radius);
+			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+
+			int type = v.at(i).getType();
+			if (type == CF_SPIKE_G) {
+				double dAngle = asin(0.25 / (m_radius + 0.5));
+				glm::vec2 side = getCirclePoint(m_radius + 1.0, noteAngle);
+				glm::vec2 top = getCirclePoint(m_radius + 0.5, noteAngle + dAngle / 2);
+				glm::vec2 bottom = getCirclePoint(m_radius + 0.5, noteAngle - dAngle / 2);
+
+				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushTriangleIndices(lanesIndices, lanesVertexCount);
+
+				if (v.at(i).getLanMod() == 2) {
+					double dAngle = asin(0.25 / (m_radius - 1.0));
+					glm::vec2 side = getCirclePoint(m_radius - 0.5, noteAngle);
+					glm::vec2 top = getCirclePoint(m_radius - 1.0, noteAngle + dAngle / 2);
+					glm::vec2 bottom = getCirclePoint(m_radius - 1.0, noteAngle - dAngle / 2);
+
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushTriangleIndices(lanesIndices, lanesVertexCount);
+				}
+			} else if (type == CF_SPIKE_B) {
+				double dAngle = asin(0.25 / (m_radius - 0.5));
+				glm::vec2 side = getCirclePoint(m_radius - 1.0, noteAngle);
+				glm::vec2 top = getCirclePoint(m_radius - 0.5, noteAngle + dAngle / 2);
+				glm::vec2 bottom = getCirclePoint(m_radius - 0.5, noteAngle - dAngle / 2);
+
+				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushTriangleIndices(lanesIndices, lanesVertexCount);
+
+				if (v.at(i).getLanMod() == 0) {
+					double dAngle = asin(0.25 / (m_radius + 1.0));
+					glm::vec2 side = getCirclePoint(m_radius + 0.5, noteAngle);
+					glm::vec2 top = getCirclePoint(m_radius + 1.0, noteAngle + dAngle / 2);
+					glm::vec2 bottom = getCirclePoint(m_radius + 1.0, noteAngle - dAngle / 2);
+
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushTriangleIndices(lanesIndices, lanesVertexCount);
+				}
+			} else if (type == CF_SPIKE_C) {
+				if (v.at(i).getLanMod() == 0) {
+					double dAngle = asin(0.25 / (m_radius + 1.0));
+					glm::vec2 side = getCirclePoint(m_radius + 0.5, noteAngle);
+					glm::vec2 top = getCirclePoint(m_radius + 1.0, noteAngle + dAngle / 2);
+					glm::vec2 bottom = getCirclePoint(m_radius + 1.0, noteAngle - dAngle / 2);
+
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushTriangleIndices(lanesIndices, lanesVertexCount);
+				} else if (v.at(i).getLanMod() == 2) {
+					double dAngle = asin(0.25 / (m_radius - 1.0));
+					glm::vec2 side = getCirclePoint(m_radius - 0.5, noteAngle);
+					glm::vec2 top = getCirclePoint(m_radius - 1.0, noteAngle + dAngle / 2);
+					glm::vec2 bottom = getCirclePoint(m_radius - 1.0, noteAngle - dAngle / 2);
+
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushTriangleIndices(lanesIndices, lanesVertexCount);
+				}
+			}
+		}
+	}
+
+	for (size_t i = 1; i < cross.size(); ++i) {
+		double milli = cross.at(i).getMilli();
+		if (time + m_noteVisibleTime > milli) {
+			double dt = milli - time;
+			float clickerAngle = asin(0.25 / m_radius);
+			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+
+			int type = cross.at(i).getType();
+			int typeBefore = cross.at(i-1).getType();
+			if (type == CROSS_G && typeBefore != CROSS_G) {
+				double dAngle = asin(0.25 / (m_radius + 0.5));
+
+				glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
+				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
+				glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+
+				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushRectangleIndices(lanesIndices, lanesVertexCount);
+
+				if (typeBefore == CROSS_B) {
+					dAngle = asin(0.25 / (m_radius - 0.5));
+
+					topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
+					bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
+					bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
+					topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushRectangleIndices(lanesIndices, lanesVertexCount);
+				}
+
+			} else if (type == CROSS_B && typeBefore != CROSS_B) {
+				double dAngle = asin(0.25 / (m_radius - 0.5));
+
+				glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
+				glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+
+				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushRectangleIndices(lanesIndices, lanesVertexCount);
+
+				if (typeBefore == CROSS_G) {
+					dAngle = asin(0.25 / (m_radius + 0.5));
+
+					topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
+					bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
+					bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
+					topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushRectangleIndices(lanesIndices, lanesVertexCount);
+				}
+
+			} else if (type == CROSS_C) {
+				if (typeBefore == CROSS_G) {
+					double dAngle = asin(0.25 / (m_radius + 0.5));
+
+					glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
+					glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
+					glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
+					glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushRectangleIndices(lanesIndices, lanesVertexCount);
+				} else if (typeBefore == CROSS_B) {
+					double dAngle = asin(0.25 / (m_radius - 0.5));
+
+					glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
+					glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
+					glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
+					glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushRectangleIndices(lanesIndices, lanesVertexCount);
+				}
+			}
+		}
 	}
 	usePersProj();
 	renderColor(lanesVector, lanesIndices);
