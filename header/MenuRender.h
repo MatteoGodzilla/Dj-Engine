@@ -69,4 +69,6 @@ private:
 	double m_dTime = 0.0f;
 	double m_globalTime = 0.0f;
 	double m_pastTime = 0.0f;
+
+	glm::vec2 m_logoDimensions;
 };

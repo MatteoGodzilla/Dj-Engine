@@ -31,7 +31,7 @@ protected:
 	void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 	void pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 
-	void loadTexture(const std::string& s, unsigned int* destination);
+	glm::vec2 loadTexture(const std::string& s, unsigned int* destination);
 
 	float getTextWidth(const std::string& s, float scale);
 	float getTextHeight(const std::string& s, float scale);

@@ -97,6 +97,9 @@ void GameRender::clicker() {
 	float deltaSize = 0.05f;
 	float PosOffset = 0.025;
 
+	m_front = 0.0;
+	m_back = -0.5;
+
 	float plane = 0.0f;
 
 	//vertices data
@@ -107,135 +110,130 @@ void GameRender::clicker() {
 	//left tray object
 	glm::vec4 clickerTray = m_objectAtlas.at(CLICKER_TRAY);
 
-	pushVertexTexture(clickerVector, -1.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y);
-	pushVertexTexture(clickerVector, -1.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
-	pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
-	pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, -1.25f, plane, m_back, clickerTray.x, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, -1.25f, plane, m_front, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, -0.25f, plane, m_front, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, -0.25f, plane, m_back, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
 	//right tray object
 
-	pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y);
-	pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
-	pushVertexTexture(clickerVector, 1.25f, plane, 0.0f, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
-	pushVertexTexture(clickerVector, 1.25f, plane, -0.5f, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, 0.25f, plane, m_back, clickerTray.x, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, 0.25f, plane, m_front, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y);
+	pushVertexTexture(clickerVector, 1.25f, plane, m_front, clickerTray.x + clickerTray.z, 1.0 - clickerTray.y - clickerTray.w);
+	pushVertexTexture(clickerVector, 1.25f, plane, m_back, clickerTray.x, 1.0 - clickerTray.y - clickerTray.w);
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
 	glm::vec4 clickerRedInfo = m_objectAtlas.at(CLICKER_RED);
 
 	if (m_red) {
 		//red pressed clicker
-		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, -0.5f + deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
-		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, 0.0f - deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
-		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, 0.0f - deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
-		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, -0.5f + deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, m_back + deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f + deltaSize, plane, m_front - deltaSize + PosOffset, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, m_front - deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f - deltaSize, plane, m_back + deltaSize + PosOffset, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
 	} else {
 		//red normal clicker
-		pushVertexTexture(clickerVector, -0.25f, plane, -0.5f, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
-		pushVertexTexture(clickerVector, -0.25f, plane, 0.0f, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
-		pushVertexTexture(clickerVector, 0.25f, plane, 0.0f, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
-		pushVertexTexture(clickerVector, 0.25f, plane, -0.5f, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f, plane, m_back, clickerRedInfo.x, 1.0 - clickerRedInfo.y);
+		pushVertexTexture(clickerVector, -0.25f, plane, m_front, clickerRedInfo.x, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f, plane, m_front, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y - clickerRedInfo.w);
+		pushVertexTexture(clickerVector, 0.25f, plane, m_back, clickerRedInfo.x + clickerRedInfo.z, 1.0 - clickerRedInfo.y);
 	}
 	pushRectangleIndices(clickerIndices, clickerVertexCount);
 
-	float greenLeft = 0.0;
-	float greenRight = 0.0;
-	float blueLeft = 0.0;
-	float blueRight = 0.0;
-
 	if (m_playerCross == 0) {
-		greenLeft = -1.25;
-		greenRight = -0.75;
-		blueLeft = 0.25;
-		blueRight = 0.75;
+		m_greenLeft = -1.25;
+		m_greenRight = -0.75;
+		m_blueLeft = 0.25;
+		m_blueRight = 0.75;
 
 		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 		if (greenToCenter.isEnabled()) {
 			float d = greenToCenter.getPercent() * 0.5f;
-			greenLeft = -0.75 - d;
-			greenRight = -0.25 - d;
+			m_greenLeft = -0.75 - d;
+			m_greenRight = -0.25 - d;
 		}
 
 		if (blueToCenter.isEnabled()) {
 			float d = blueToCenter.getPercent() * -0.5f;
-			blueLeft = 0.75 + d;
-			blueRight = 1.25 + d;
+			m_blueLeft = 0.75 + d;
+			m_blueRight = 1.25 + d;
 		}
 
 	} else if (m_playerCross == 1) {
-		greenLeft = -0.75;
-		greenRight = -0.25;
-		blueLeft = 0.25;
-		blueRight = 0.75;
+		m_greenLeft = -0.75;
+		m_greenRight = -0.25;
+		m_blueLeft = 0.25;
+		m_blueRight = 0.75;
 
 		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
 		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 		if (greenToCenter.isEnabled()) {
 			float d = greenToCenter.getPercent() * 0.5f;
-			greenLeft = -1.25 + d;
-			greenRight = -0.75 + d;
+			m_greenLeft = -1.25 + d;
+			m_greenRight = -0.75 + d;
 		}
 
 		if (blueToCenter.isEnabled()) {
 			float d = blueToCenter.getPercent() * -0.5f;
-			blueLeft = 0.75 + d;
-			blueRight = 1.25 + d;
+			m_blueLeft = 0.75 + d;
+			m_blueRight = 1.25 + d;
 		}
 
 	} else {
-		greenLeft = -0.75;
-		greenRight = -0.25;
-		blueLeft = 0.75;
-		blueRight = 1.25;
+		m_greenLeft = -0.75;
+		m_greenRight = -0.25;
+		m_blueLeft = 0.75;
+		m_blueRight = 1.25;
 
 		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
 		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 		if (greenToCenter.isEnabled()) {
 			float d = greenToCenter.getPercent() * 0.5f;
-			greenLeft = -1.25 + d;
-			greenRight = -0.75 + d;
+			m_greenLeft = -1.25 + d;
+			m_greenRight = -0.75 + d;
 		}
 
 		if (blueToCenter.isEnabled()) {
 			float d = blueToCenter.getPercent() * 0.5f;
-			blueLeft = 0.25 + d;
-			blueRight = 0.75 + d;
+			m_blueLeft = 0.25 + d;
+			m_blueRight = 0.75 + d;
 		}
 	}
 
 	glm::vec4 clickerGreenInfo = m_objectAtlas.at(CLICKER_GREEN);
 
 	if (m_green) {
-		pushVertexTexture(clickerVector, greenLeft + deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
-		pushVertexTexture(clickerVector, greenLeft + deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
-		pushVertexTexture(clickerVector, greenRight - deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
-		pushVertexTexture(clickerVector, greenRight - deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, m_greenLeft + deltaSize, plane, m_back + deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, m_greenLeft + deltaSize, plane, m_front - deltaSize + PosOffset, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, m_greenRight - deltaSize, plane, m_front - deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, m_greenRight - deltaSize, plane, m_back + deltaSize + PosOffset, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	} else {
-		pushVertexTexture(clickerVector, greenLeft, plane, -0.5, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
-		pushVertexTexture(clickerVector, greenLeft, plane, 0.0, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
-		pushVertexTexture(clickerVector, greenRight, plane, 0.0, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
-		pushVertexTexture(clickerVector, greenRight, plane, -0.5, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_back, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_front, clickerGreenInfo.x, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_front, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y - clickerGreenInfo.w);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_back, clickerGreenInfo.x + clickerGreenInfo.z, 1.0 - clickerGreenInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
 	glm::vec4 clickerBlueInfo = m_objectAtlas.at(CLICKER_BLUE);
 
 	if (m_blue) {
-		pushVertexTexture(clickerVector, blueLeft + deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
-		pushVertexTexture(clickerVector, blueLeft + deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
-		pushVertexTexture(clickerVector, blueRight - deltaSize, plane, 0.0 - deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
-		pushVertexTexture(clickerVector, blueRight - deltaSize, plane, -0.5 + deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, m_blueLeft + deltaSize, plane, m_back + deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, m_blueLeft + deltaSize, plane, m_front - deltaSize + PosOffset, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, m_blueRight - deltaSize, plane, m_front - deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, m_blueRight - deltaSize, plane, m_back + deltaSize + PosOffset, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	} else {
-		pushVertexTexture(clickerVector, blueLeft, plane, -0.5, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
-		pushVertexTexture(clickerVector, blueLeft, plane, 0.0, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
-		pushVertexTexture(clickerVector, blueRight, plane, 0.0, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
-		pushVertexTexture(clickerVector, blueRight, plane, -0.5, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_back, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_front, clickerBlueInfo.x, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_front, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y - clickerBlueInfo.w);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_back, clickerBlueInfo.x + clickerBlueInfo.z, 1.0 - clickerBlueInfo.y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 	usePersProj();
@@ -1563,6 +1561,11 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool redAnimEnabled = p.m_redAnimation;
 	bool blueAnimEnabled = p.m_blueAnimation;
 
+	bool centerToGreen = p.m_cfCenterToGreen;
+	bool centerToBlue = p.m_cfCenterToBlue;
+	bool greenToCenter = p.m_cfGreenToCenter;
+	bool blueToCenter = p.m_cfBlueToCenter;
+
 	if (p.m_pastCross >= 1 && p.m_cross == 0) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
 		if (p.m_pastCross == 2) {
@@ -1595,8 +1598,8 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
 		p.m_blueAnimation = false;
 	}
-	/*if (centerToGreen) {
-		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+	if (centerToGreen) {
+		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
 		p.m_cfCenterToGreen = false;
 	}if (centerToBlue) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
@@ -1604,15 +1607,14 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	}if (greenToCenter) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
 		p.m_cfGreenToCenter = false;
-	}if (centerToGreen) {
+	}if (blueToCenter) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
 		p.m_cfBlueToCenter = false;
-	}*/
+	}
 	rendr_InvertedX = m_isButtonsRight;
 }
 
 void GameRender::clickerAnimation() {
-	/*
 	float plane = 0.0;
 	std::vector<float>clickerVector = {};
 	std::vector<unsigned int>clickerIndices = {};
@@ -1629,10 +1631,10 @@ void GameRender::clickerAnimation() {
 		float y = 1.0f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenBack, (float)x, y);
-		pushVertexTexture(clickerVector, m_greenLeft, plane, m_greenFront, (float)x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenFront, (float)x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, m_greenRight, plane, m_greenBack, (float)x + 0.1f, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_back, (float)x, y);
+		pushVertexTexture(clickerVector, m_greenLeft, plane, m_front, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_front, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_greenRight, plane, m_back, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
@@ -1643,10 +1645,10 @@ void GameRender::clickerAnimation() {
 		float y = 0.75f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.6f, (float)x, y);
-		pushVertexTexture(clickerVector, -0.15f, plane, 3.9f, (float)x, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.9f, (float)x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, 0.15f, plane, 3.6f, (float)x + 0.1f, y);
+		pushVertexTexture(clickerVector, -0.25 ,plane, m_back, (float)x, y);
+		pushVertexTexture(clickerVector, -0.25, plane, m_front, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.25, plane, m_front, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, 0.25, plane, m_back, (float)x + 0.1f, y);
 
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
@@ -1657,16 +1659,15 @@ void GameRender::clickerAnimation() {
 		float y = 0.5f;
 		if (m_renderEuActive)y = 0.25f;
 
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueBack, (float)x, y);
-		pushVertexTexture(clickerVector, m_blueLeft, plane, m_blueFront, (float)x, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueFront, (float)x + 0.1f, y - 0.25f);
-		pushVertexTexture(clickerVector, m_blueRight, plane, m_blueBack, (float)x + 0.1f, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_back, (float)x, y);
+		pushVertexTexture(clickerVector, m_blueLeft, plane, m_front, (float)x, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_front, (float)x + 0.1f, y - 0.25f);
+		pushVertexTexture(clickerVector, m_blueRight, plane, m_back, (float)x + 0.1f, y);
 		pushRectangleIndices(clickerIndices, clickerVertexCount);
 	}
 
 	usePersProj();
 	renderTexture(clickerVector, clickerIndices, m_clickerAnimation);
-	*/
 }
 
 void GameRender::reset() {

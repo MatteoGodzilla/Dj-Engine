@@ -78,6 +78,7 @@ MenuNavigator::MenuNavigator() {
 	MenuNode speed("Set Deck Speed", SPEED_ID);
 	MenuNode bot("Toggle Bot", BOT_ID);
 	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
+	MenuNode refreshList("Refresh song list", REFRESH_ID);
 
 	options.push(scratches);
 	options.push(latency);
@@ -85,6 +86,7 @@ MenuNavigator::MenuNavigator() {
 	options.push(bot);
 	options.push(speed);
 	options.push(debug);
+	options.push(refreshList);
 
 	m_root.push(play);
 	m_root.push(options);
@@ -440,6 +442,11 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 			std::cout << "Menu Message: Enabled debug informations" << std::endl;
 			m_game->m_debugView = true;
 		}
+	}else if(id == REFRESH_ID){
+		std::vector<MenuNode> emptyList;
+		m_root.getChildrens().at(0).getChildrens().clear();
+		m_songList.clear();
+		scan();
 	} else if (id == SONG_GENERAL_ID) {
 		index = findIndex(menu, parent);
 		m_active = false;
@@ -469,14 +476,12 @@ void MenuNavigator::scan() {
 			text = entry.s1;
 		}
 		MenuNode song(text, SONG_GENERAL_ID);
-		std::vector<MenuNode> list = m_root.getChildrens();
-		list.at(0).push(song);
-		m_root.updateChildrens(list);
+		m_root.getChildrens().at(0).push(song);
 	}
 }
 
 void MenuNavigator::resetMenu() {
-	m_selection.erase(m_selection.begin(), m_selection.end());
+	m_selection.clear();
 	m_selection.push_back(0);
 	m_viewOffset = 0;
 	m_popupId = -1;

@@ -310,7 +310,6 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					found = true;
-					m_greenAnimation = true; //start animation
 					break;
 				}
 			}
@@ -351,7 +350,6 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					found = true;
-					m_blueAnimation = true; //start animation
 					break;
 				}
 			}
@@ -559,7 +557,6 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
-					m_greenAnimation = true;
 					break;
 				} else if (type == CF_SPIKE_B) {
 					found = true;
@@ -606,7 +603,6 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					found = true;
-					m_blueAnimation = true;
 					break;
 				} else if (type == CF_SPIKE_G) {
 					found = true;
@@ -627,18 +623,25 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (v.at(i).getMilli() < time && !v.at(i).getTouched()) {
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
-					m_greenAnimation = true;
+					m_cfGreenToCenter = true;
+					if(m_cross == 2){
+						m_cfCenterToBlue = true;
+					}
 					break;
 				} else if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
-					m_blueAnimation = true;
+					m_cfBlueToCenter = true;
+					if(m_cross == 0){
+						m_cfCenterToGreen = true;
+					}
 					break;
 				} else if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
-					if (m_cross == 0)
-						m_greenAnimation = true;
-					else if (m_cross == 2)
-						m_blueAnimation = true;
+					if (m_cross == 0) {
+						m_cfCenterToGreen = true;
+					} else if (m_cross == 2) {
+						m_cfCenterToBlue = true;
+					}
 					break;
 				}
 			}
@@ -715,6 +718,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_greenAnimation = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
+					break;
 				} else if (type == SCR_B_UP || type == SCR_B_DOWN) {
 					v.at(i).click(time);
 					m_blueAnimation = true;
@@ -726,22 +730,29 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_blueAnimation = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
+					break;
 				}
 
 				else if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
-					m_greenAnimation = true;
+					m_cfGreenToCenter = true;
+					if(m_cross == 2){
+						m_cfCenterToBlue = true;
+					}
 					break;
 				} else if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
-					m_blueAnimation = true;
+					m_cfBlueToCenter = true;
+					if(m_cross == 0){
+						m_cfCenterToGreen = true;
+					}
 					break;
 				} else if (type == CF_SPIKE_C) {
 					v.at(i).click(time);
 					if (m_cross == 0) {
-						m_greenAnimation = true;
+						m_cfCenterToGreen = true;
 					} else if (m_cross == 2) {
-						m_blueAnimation = true;
+						m_cfCenterToBlue = true;
 					}
 					break;
 				}

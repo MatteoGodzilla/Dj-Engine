@@ -26,7 +26,8 @@ enum actions {
 	LR_BUTTONS_ID,
 	SPEED_ID,
 	BOT_ID,
-	DEBUG_ID
+	DEBUG_ID,
+	REFRESH_ID
 };
 
 class MenuNavigator {

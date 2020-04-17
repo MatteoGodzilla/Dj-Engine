@@ -19,7 +19,7 @@ int MenuNode::getId() {
 	return m_id;
 }
 
-std::vector<MenuNode> MenuNode::getChildrens() {
+std::vector<MenuNode>& MenuNode::getChildrens() {
 	return m_childrens;
 }
 

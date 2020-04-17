@@ -15,7 +15,7 @@ void MenuRender::init(GLFWwindow* w) {
 	setTextColor(0.9f, 0.9f, 0.9f, 1.0f);
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 	loadTexture("res/buttons.png", &m_buttonTexture);
-	loadTexture("res/splashArt.png", &m_splashTexture);
+	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);
 	loadTexture("res/calibration.png", &m_calibrationTex);
 
 	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
@@ -806,14 +806,14 @@ void MenuRender::splashArt() {
 	std::vector<unsigned int> indices;
 	unsigned int indexCount = 0;
 
-	float scale = 1.2f;
-
-	float x = 1280.0f / 2.0f;
-	float y = 360.0f - 200.0f * scale / 2;
+	float width = 700.0;
+	float height = width * (m_logoDimensions.y / m_logoDimensions.x);
+	float x = 1280.0 / 5 * 2;
+	float y = (720.0 - height) / 2;
 	pushVertexTexture(vector, x, y, 0.0, 0.0, 1.0);
-	pushVertexTexture(vector, x, y + 200.0f * scale, 0.0, 0.0, 0.0);
-	pushVertexTexture(vector, x + 500.0f * scale, y + 200.0f * scale, 0.0, 1.0, 0.0);
-	pushVertexTexture(vector, x + 500.0f * scale, y, 0.0, 1.0, 1.0);
+	pushVertexTexture(vector, x, y + height, 0.0, 0.0, 0.0);
+	pushVertexTexture(vector, x + width, y + height, 0.0, 1.0, 0.0);
+	pushVertexTexture(vector, x + width, y, 0.0, 1.0, 1.0);
 	pushRectangleIndices(indices, indexCount);
 
 	useOrthoProj();
