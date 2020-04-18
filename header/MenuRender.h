@@ -30,6 +30,7 @@ public:
 	void scratches(Player* player);
 	void calibration(Game* game, double time);
 	void setDeckSpeed(Game* game);
+	void setLaneColors(Game* game);
 	void splashArt();
 	GLFWwindow* getWindowPtr();
 	void doneEditing();

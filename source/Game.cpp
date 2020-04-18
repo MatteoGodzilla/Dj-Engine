@@ -32,6 +32,68 @@ void Game::init(GLFWwindow* w) {
 		m_isButtonsRight = token == "true" ? true : false;
 		input >> token;
 		m_debugView = token == "true" ? true : false;
+
+		float r,g,b,a;
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_greenLaneActiveColor = glm::vec4(r,g,b,a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_greenLaneInactiveColor = glm::vec4(r,g,b,a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_blueLaneActiveColor = glm::vec4(r,g,b,a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_blueLaneInactiveColor = glm::vec4(r,g,b,a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_redLaneActiveColor = glm::vec4(r,g,b,a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_euphoriaLaneColor = glm::vec4(r,g,b,a);
+
 		m_player.readMappingFile();
 	} else {
 		std::cerr << "Game Error: Cannot open config file" << std::endl;
@@ -190,8 +252,38 @@ void Game::writeConfig() {
 		output << m_audioLatency << std::endl;
 		output << m_deckSpeed << std::endl;
 		output << m_isButtonsRight << std::endl;
-		output << m_debugView << std::endl
-			   << std::endl;
+		output << m_debugView << std::endl ;
+
+		output << m_render.m_greenLaneActiveColor.r << std::endl;
+		output << m_render.m_greenLaneActiveColor.g << std::endl;
+		output << m_render.m_greenLaneActiveColor.b << std::endl;
+		output << m_render.m_greenLaneActiveColor.a << std::endl;
+
+		output << m_render.m_greenLaneInactiveColor.r << std::endl;
+		output << m_render.m_greenLaneInactiveColor.g << std::endl;
+		output << m_render.m_greenLaneInactiveColor.b << std::endl;
+		output << m_render.m_greenLaneInactiveColor.a << std::endl;
+
+		output << m_render.m_blueLaneActiveColor.r << std::endl;
+		output << m_render.m_blueLaneActiveColor.g << std::endl;
+		output << m_render.m_blueLaneActiveColor.b << std::endl;
+		output << m_render.m_blueLaneActiveColor.a << std::endl;
+
+		output << m_render.m_blueLaneInactiveColor.r << std::endl;
+		output << m_render.m_blueLaneInactiveColor.g << std::endl;
+		output << m_render.m_blueLaneInactiveColor.b << std::endl;
+		output << m_render.m_blueLaneInactiveColor.a << std::endl;
+
+		output << m_render.m_redLaneActiveColor.r << std::endl;
+		output << m_render.m_redLaneActiveColor.g << std::endl;
+		output << m_render.m_redLaneActiveColor.b << std::endl;
+		output << m_render.m_redLaneActiveColor.a << std::endl;
+
+		output << m_render.m_euphoriaLaneColor.r << std::endl;
+		output << m_render.m_euphoriaLaneColor.g << std::endl;
+		output << m_render.m_euphoriaLaneColor.b << std::endl;
+		output << m_render.m_euphoriaLaneColor.a << std::endl;
+		output << std::endl;
 
 		std::cout << "Game Message: updated engine values in config file." << std::endl;
 		output.close();

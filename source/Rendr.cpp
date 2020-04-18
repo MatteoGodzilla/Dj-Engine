@@ -280,10 +280,10 @@ glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 		else
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		std::cout << "Rendr Msg: successfully loaded texture at " << s << std::endl;
-		return glm::vec2(width,height);
+		return glm::vec2(width, height);
 	} else {
 		std::cerr << "Rendr Err: cannot load texture. Does the file at " << s << " exist?" << std::endl;
-		return glm::vec2(0.0,0.0);
+		return glm::vec2(0.0, 0.0);
 	}
 }
 

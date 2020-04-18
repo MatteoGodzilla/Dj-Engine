@@ -62,6 +62,14 @@ public:
 	bool m_isButtonsRight = false;
 	float m_noteVisibleTime = 1.0;
 
+	//lane colors
+	glm::vec4 m_greenLaneActiveColor = {0.0, 1.0, 0.0, 1.0};
+	glm::vec4 m_greenLaneInactiveColor = {0.0, 0.5, 0.0, 1.0};
+	glm::vec4 m_blueLaneActiveColor = {0.0, 0.0, 1.0, 1.0};
+	glm::vec4 m_blueLaneInactiveColor = {0.0, 0.0, 0.5, 1.0};
+	glm::vec4 m_redLaneActiveColor = {1.0, 0.0, 0.0, 1.0};
+	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
+
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	glm::vec2 getCirclePoint(double radius, double angle);

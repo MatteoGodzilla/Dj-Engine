@@ -600,10 +600,13 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	std::vector<unsigned int> lanesIndices = {};
 	unsigned int lanesVertexCount = 0;
 
-	std::vector<float> greenColor = {0.0, 1.0, 0.0, 1.0};
-	std::vector<float> redColor = {1.0, 0.0, 0.0, 1.0};
-	std::vector<float> blueColor = {0.0, 0.0, 1.0, 1.0};
-	std::vector<float> euphoriaColor = {1.0, 1.0, 1.0, 1.0};
+	//copying into local variables for overwite protection
+	glm::vec4 greenActiveColor = m_greenLaneActiveColor;
+	glm::vec4 greenInactiveColor = m_greenLaneInactiveColor;
+	glm::vec4 blueActiveColor = m_blueLaneActiveColor;
+	glm::vec4 blueInactiveColor = m_blueLaneInactiveColor;
+	glm::vec4 redColor = m_redLaneActiveColor;
+	glm::vec4 euphoriaColor = m_euphoriaLaneColor;
 
 	/*
 	startImGuiFrame("test",ImGuiBackendFlags_None);
@@ -615,9 +618,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	*/
 
 	if (m_renderEuActive) {
-		greenColor = euphoriaColor;
+		greenActiveColor = euphoriaColor;
 		redColor = euphoriaColor;
-		blueColor = euphoriaColor;
+		blueActiveColor = euphoriaColor;
 	}
 
 	float size = 0.05;
@@ -651,18 +654,32 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 		glm::vec2 greenOuter;
 		glm::vec2 greenInner;
-		if (getCrossAtTime(angleTime, cross) >= 1) {
-			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
-			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
-		} else {
+		if (getCrossAtTime(angleTime, cross) == 0) {
 			greenOuter = getCirclePoint((double)m_radius + 1.0 + size, (double)angle);
 			greenInner = getCirclePoint((double)m_radius + 1.0 - size, (double)angle);
+
+			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+		} else if (getCrossAtTime(angleTime, cross) == 2) {
+			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
+			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
+
+			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
+			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
+			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
+			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
+		} else {
+			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
+			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
+
+			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 		}
 
-		pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-		pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
 		pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 		greenBeforeOuter = greenOuter;
@@ -672,18 +689,32 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 		glm::vec2 blueOuter;
 		glm::vec2 blueInner;
-		if (getCrossAtTime(angleTime, cross) <= 1) {
+		if (getCrossAtTime(angleTime, cross) == 0) {
 			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
 			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
-		} else {
+
+			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
+			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
+			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
+			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
+		} else if (getCrossAtTime(angleTime, cross) == 2) {
 			blueOuter = getCirclePoint((double)m_radius - 1.0 + size, (double)angle);
 			blueInner = getCirclePoint((double)m_radius - 1.0 - size, (double)angle);
+
+			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+		} else {
+			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
+			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
+
+			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 		}
 
-		pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-		pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-		pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-		pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
 		pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 		blueBeforeOuter = blueOuter;
@@ -703,9 +734,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				glm::vec2 top = getCirclePoint(m_radius + 0.5, noteAngle + dAngle / 2);
 				glm::vec2 bottom = getCirclePoint(m_radius + 0.5, noteAngle - dAngle / 2);
 
-				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 				pushTriangleIndices(lanesIndices, lanesVertexCount);
 
 				if (v.at(i).getLanMod() == 2) {
@@ -714,9 +745,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 top = getCirclePoint(m_radius - 1.0, noteAngle + dAngle / 2);
 					glm::vec2 bottom = getCirclePoint(m_radius - 1.0, noteAngle - dAngle / 2);
 
-					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushTriangleIndices(lanesIndices, lanesVertexCount);
 				}
 			} else if (type == CF_SPIKE_B) {
@@ -725,9 +756,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				glm::vec2 top = getCirclePoint(m_radius - 0.5, noteAngle + dAngle / 2);
 				glm::vec2 bottom = getCirclePoint(m_radius - 0.5, noteAngle - dAngle / 2);
 
-				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+				pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+				pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 				pushTriangleIndices(lanesIndices, lanesVertexCount);
 
 				if (v.at(i).getLanMod() == 0) {
@@ -736,9 +767,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 top = getCirclePoint(m_radius + 1.0, noteAngle + dAngle / 2);
 					glm::vec2 bottom = getCirclePoint(m_radius + 1.0, noteAngle - dAngle / 2);
 
-					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushTriangleIndices(lanesIndices, lanesVertexCount);
 				}
 			} else if (type == CF_SPIKE_C) {
@@ -748,9 +779,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 top = getCirclePoint(m_radius + 1.0, noteAngle + dAngle / 2);
 					glm::vec2 bottom = getCirclePoint(m_radius + 1.0, noteAngle - dAngle / 2);
 
-					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushTriangleIndices(lanesIndices, lanesVertexCount);
 				} else if (v.at(i).getLanMod() == 2) {
 					double dAngle = asin(0.25 / (m_radius - 1.0));
@@ -758,9 +789,9 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 top = getCirclePoint(m_radius - 1.0, noteAngle + dAngle / 2);
 					glm::vec2 bottom = getCirclePoint(m_radius - 1.0, noteAngle - dAngle / 2);
 
-					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -side.x + center.x, plane, -side.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -top.x + center.x, plane, -top.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottom.x + center.x, plane, -bottom.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushTriangleIndices(lanesIndices, lanesVertexCount);
 				}
 			}
@@ -775,7 +806,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
 
 			int type = cross.at(i).getType();
-			int typeBefore = cross.at(i-1).getType();
+			int typeBefore = cross.at(i - 1).getType();
 			if (type == CROSS_G && typeBefore != CROSS_G) {
 				double dAngle = asin(0.25 / (m_radius + 0.5));
 
@@ -784,10 +815,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
 				glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
 
-				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 				pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 				if (typeBefore == CROSS_B) {
@@ -798,10 +829,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
 					topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
 
-					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushRectangleIndices(lanesIndices, lanesVertexCount);
 				}
 
@@ -813,10 +844,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
 				glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
 
-				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+				pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+				pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 				pushRectangleIndices(lanesIndices, lanesVertexCount);
 
 				if (typeBefore == CROSS_G) {
@@ -827,10 +858,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
 					topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
 
-					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushRectangleIndices(lanesIndices, lanesVertexCount);
 				}
 
@@ -843,10 +874,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
 					glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
 
-					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
-					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenColor[0], greenColor[1], greenColor[2], greenColor[3]);
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushRectangleIndices(lanesIndices, lanesVertexCount);
 				} else if (typeBefore == CROSS_B) {
 					double dAngle = asin(0.25 / (m_radius - 0.5));
@@ -856,10 +887,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
 					glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
 
-					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
-					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueColor[0], blueColor[1], blueColor[2], blueColor[3]);
+					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -bottomRight.x + center.x, plane, -bottomRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+					pushVertexColor(lanesVector, -topRight.x + center.x, plane, -topRight.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushRectangleIndices(lanesIndices, lanesVertexCount);
 				}
 			}
@@ -1601,13 +1632,16 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	if (centerToGreen) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
 		p.m_cfCenterToGreen = false;
-	}if (centerToBlue) {
+	}
+	if (centerToBlue) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
 		p.m_cfCenterToBlue = false;
-	}if (greenToCenter) {
+	}
+	if (greenToCenter) {
 		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
 		p.m_cfGreenToCenter = false;
-	}if (blueToCenter) {
+	}
+	if (blueToCenter) {
 		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
 		p.m_cfBlueToCenter = false;
 	}
@@ -1616,8 +1650,8 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 
 void GameRender::clickerAnimation() {
 	float plane = 0.0;
-	std::vector<float>clickerVector = {};
-	std::vector<unsigned int>clickerIndices = {};
+	std::vector<float> clickerVector = {};
+	std::vector<unsigned int> clickerIndices = {};
 	unsigned int clickerVertexCount = 0;
 
 	Animation greenAnim = m_animManager.getAnimById(AN_GREEN_CLICKER);
@@ -1629,7 +1663,8 @@ void GameRender::clickerAnimation() {
 		x = floor(x * 10) / 10;
 
 		float y = 1.0f;
-		if (m_renderEuActive)y = 0.25f;
+		if (m_renderEuActive)
+			y = 0.25f;
 
 		pushVertexTexture(clickerVector, m_greenLeft, plane, m_back, (float)x, y);
 		pushVertexTexture(clickerVector, m_greenLeft, plane, m_front, (float)x, y - 0.25f);
@@ -1643,9 +1678,10 @@ void GameRender::clickerAnimation() {
 		x = floor(x * 10) / 10;
 
 		float y = 0.75f;
-		if (m_renderEuActive)y = 0.25f;
+		if (m_renderEuActive)
+			y = 0.25f;
 
-		pushVertexTexture(clickerVector, -0.25 ,plane, m_back, (float)x, y);
+		pushVertexTexture(clickerVector, -0.25, plane, m_back, (float)x, y);
 		pushVertexTexture(clickerVector, -0.25, plane, m_front, (float)x, y - 0.25f);
 		pushVertexTexture(clickerVector, 0.25, plane, m_front, (float)x + 0.1f, y - 0.25f);
 		pushVertexTexture(clickerVector, 0.25, plane, m_back, (float)x + 0.1f, y);
@@ -1657,7 +1693,8 @@ void GameRender::clickerAnimation() {
 		x = floor(x * 10) / 10;
 
 		float y = 0.5f;
-		if (m_renderEuActive)y = 0.25f;
+		if (m_renderEuActive)
+			y = 0.25f;
 
 		pushVertexTexture(clickerVector, m_blueLeft, plane, m_back, (float)x, y);
 		pushVertexTexture(clickerVector, m_blueLeft, plane, m_front, (float)x, y - 0.25f);

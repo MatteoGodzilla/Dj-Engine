@@ -943,6 +943,50 @@ void MenuRender::setDeckSpeed(Game* game) {
 	renderImGuiFrame();
 }
 
+void MenuRender::setLaneColors(Game* game) {
+	useOrthoProj();
+
+	ImGuiBackendFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+	glm::vec4& greenActiveVector = game->getGameRender()->m_greenLaneActiveColor;
+	glm::vec4& greenInactiveVector = game->getGameRender()->m_greenLaneInactiveColor;
+	glm::vec4& blueActiveVector = game->getGameRender()->m_blueLaneActiveColor;
+	glm::vec4& blueInactiveVector = game->getGameRender()->m_blueLaneInactiveColor;
+	glm::vec4& redActiveVector = game->getGameRender()->m_redLaneActiveColor;
+	glm::vec4& euphoriaActiveVector = game->getGameRender()->m_euphoriaLaneColor;
+
+	static float greenActiveArray[4] = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
+	static float greenInactiveArray[4] = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
+	static float blueActiveArray[4] = {blueActiveVector.r, blueActiveVector.g, blueActiveVector.b, blueActiveVector.a};
+	static float blueInactiveArray[4] = {blueInactiveVector.r, blueInactiveVector.g, blueInactiveVector.b, blueInactiveVector.a};
+	static float redActiveArray[4] = {redActiveVector.r, redActiveVector.g, redActiveVector.b, redActiveVector.a};
+	static float euphoriaActiveArray[4] = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
+
+	startImGuiFrame("Set Deck Speed", flags);
+	ImGui::Text("Here you can edit for each lane what color it is");
+	ImGui::Text("For green and blue lane you can also pick active and inactive colors");
+	ImGui::ColorEdit4("Green Lane when active", greenActiveArray);
+	ImGui::ColorEdit4("Green Lane when inactive", greenInactiveArray);
+	ImGui::ColorEdit4("Blue Lane when active", blueActiveArray);
+	ImGui::ColorEdit4("Blue Lane when inactive", blueInactiveArray);
+	ImGui::ColorEdit4("Red Lane color", redActiveArray);
+	ImGui::ColorEdit4("Euphoria Lane color", euphoriaActiveArray);
+	if(ImGui::Button("Close popup")){
+		m_shouldClose = true;
+	}
+	renderImGuiFrame();
+
+	game->getGameRender()->m_greenLaneActiveColor = glm::vec4(greenActiveArray[0], greenActiveArray[1], greenActiveArray[2], greenActiveArray[3]);
+	game->getGameRender()->m_greenLaneInactiveColor = glm::vec4(greenInactiveArray[0], greenInactiveArray[1], greenInactiveArray[2], greenInactiveArray[3]);
+	game->getGameRender()->m_blueLaneActiveColor = glm::vec4(blueActiveArray[0], blueActiveArray[1], blueActiveArray[2], blueActiveArray[3]);
+	game->getGameRender()->m_blueLaneInactiveColor = glm::vec4(blueInactiveArray[0], blueInactiveArray[1], blueInactiveArray[2], blueInactiveArray[3]);
+	game->getGameRender()->m_redLaneActiveColor = glm::vec4(redActiveArray[0], redActiveArray[1], redActiveArray[2], redActiveArray[3]);
+	game->getGameRender()->m_euphoriaLaneColor = glm::vec4(euphoriaActiveArray[0], euphoriaActiveArray[1], euphoriaActiveArray[2], euphoriaActiveArray[3]);
+}
+
 void MenuRender::editingAxisController(int action) {
 	m_editingKey = false;
 	m_editingAxis = true;

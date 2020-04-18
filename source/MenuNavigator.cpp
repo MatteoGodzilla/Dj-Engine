@@ -76,17 +76,19 @@ MenuNavigator::MenuNavigator() {
 	MenuNode latency("Calibrate latency", LATENCY_ID);
 	MenuNode flipButtons("Toggle Buttons Right/Left", LR_BUTTONS_ID);
 	MenuNode speed("Set Deck Speed", SPEED_ID);
-	MenuNode bot("Toggle Bot", BOT_ID);
-	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
 	MenuNode refreshList("Refresh song list", REFRESH_ID);
+	MenuNode bot("Toggle Bot", BOT_ID);
+	MenuNode color("Change lanes color", COLOR_ID);
+	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
 
 	options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
-	options.push(bot);
 	options.push(speed);
-	options.push(debug);
 	options.push(refreshList);
+	options.push(bot);
+	options.push(color);
+	options.push(debug);
 
 	m_root.push(play);
 	m_root.push(options);
@@ -177,6 +179,9 @@ void MenuNavigator::pollInput() {
 
 	if (m_wasBackPressed && !m_isBackPressed) {
 		if (m_popupId != -1) {
+			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
+				writeConfigFile();
+			}
 			m_popupId = -1;
 			m_debounce = true;
 		} else {
@@ -194,7 +199,7 @@ void MenuNavigator::pollInput() {
 
 	if (m_render.m_shouldClose) {
 		if (m_popupId != -1) {
-			if (m_popupId == 0) {
+			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
 				writeConfigFile();
 			}
 			m_popupId = -1;
@@ -395,8 +400,10 @@ void MenuNavigator::render(double dt) {
 			m_render.calibration(m_game, dt);
 		}
 		if (m_popupId != -1) {
-			if (m_popupId == 0) {
+			if (m_popupId == HIGHWAY_SPEED) {
 				m_render.setDeckSpeed(m_game);
+			} else if (m_popupId == LANE_COLORS) {
+				m_render.setLaneColors(m_game);
 			}
 		}
 	}
@@ -425,7 +432,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		}
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
-		m_popupId = 0;
+		m_popupId = HIGHWAY_SPEED;
 	} else if (id == BOT_ID) {
 		if (m_game->getPlayer()->m_botEnabled) {
 			std::cout << "Menu Message: disabled bot" << std::endl;
@@ -442,11 +449,13 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 			std::cout << "Menu Message: Enabled debug informations" << std::endl;
 			m_game->m_debugView = true;
 		}
-	}else if(id == REFRESH_ID){
+	} else if (id == REFRESH_ID) {
 		std::vector<MenuNode> emptyList;
 		m_root.getChildrens().at(0).getChildrens().clear();
 		m_songList.clear();
 		scan();
+	} else if (id == COLOR_ID) {
+		m_popupId = LANE_COLORS;
 	} else if (id == SONG_GENERAL_ID) {
 		index = findIndex(menu, parent);
 		m_active = false;

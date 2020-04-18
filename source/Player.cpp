@@ -624,14 +624,14 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					m_cfGreenToCenter = true;
-					if(m_cross == 2){
+					if (m_cross == 2) {
 						m_cfCenterToBlue = true;
 					}
 					break;
 				} else if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					m_cfBlueToCenter = true;
-					if(m_cross == 0){
+					if (m_cross == 0) {
 						m_cfCenterToGreen = true;
 					}
 					break;
@@ -736,14 +736,14 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				else if (type == CF_SPIKE_G) {
 					v.at(i).click(time);
 					m_cfGreenToCenter = true;
-					if(m_cross == 2){
+					if (m_cross == 2) {
 						m_cfCenterToBlue = true;
 					}
 					break;
 				} else if (type == CF_SPIKE_B) {
 					v.at(i).click(time);
 					m_cfBlueToCenter = true;
-					if(m_cross == 0){
+					if (m_cross == 0) {
 						m_cfCenterToGreen = true;
 					}
 					break;

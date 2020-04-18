@@ -27,7 +27,13 @@ enum actions {
 	SPEED_ID,
 	BOT_ID,
 	DEBUG_ID,
-	REFRESH_ID
+	REFRESH_ID,
+	COLOR_ID
+};
+
+enum popupId {
+	HIGHWAY_SPEED,
+	LANE_COLORS
 };
 
 class MenuNavigator {
