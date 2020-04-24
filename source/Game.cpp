@@ -33,7 +33,7 @@ void Game::init(GLFWwindow* w) {
 		input >> token;
 		m_debugView = token == "true" ? true : false;
 
-		float r,g,b,a;
+		float r, g, b, a;
 		input >> token;
 		r = std::stof(token);
 		input >> token;
@@ -42,7 +42,7 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_greenLaneActiveColor = glm::vec4(r,g,b,a);
+		m_render.m_greenLaneActiveColor = glm::vec4(r, g, b, a);
 
 		input >> token;
 		r = std::stof(token);
@@ -52,7 +52,7 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_greenLaneInactiveColor = glm::vec4(r,g,b,a);
+		m_render.m_greenLaneInactiveColor = glm::vec4(r, g, b, a);
 
 		input >> token;
 		r = std::stof(token);
@@ -62,7 +62,7 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_blueLaneActiveColor = glm::vec4(r,g,b,a);
+		m_render.m_blueLaneActiveColor = glm::vec4(r, g, b, a);
 
 		input >> token;
 		r = std::stof(token);
@@ -72,7 +72,7 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_blueLaneInactiveColor = glm::vec4(r,g,b,a);
+		m_render.m_blueLaneInactiveColor = glm::vec4(r, g, b, a);
 
 		input >> token;
 		r = std::stof(token);
@@ -82,7 +82,7 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_redLaneActiveColor = glm::vec4(r,g,b,a);
+		m_render.m_redLaneActiveColor = glm::vec4(r, g, b, a);
 
 		input >> token;
 		r = std::stof(token);
@@ -92,7 +92,27 @@ void Game::init(GLFWwindow* w) {
 		b = std::stof(token);
 		input >> token;
 		a = std::stof(token);
-		m_render.m_euphoriaLaneColor = glm::vec4(r,g,b,a);
+		m_render.m_euphoriaLaneColor = glm::vec4(r, g, b, a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_greenScratchColor = glm::vec4(r, g, b, a);
+
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_blueScratchColor = glm::vec4(r, g, b, a);
 
 		m_player.readMappingFile();
 	} else {
@@ -164,8 +184,8 @@ void Game::render() {
 			m_render.bpmTicks(m_global_time, m_bpm_arr);
 			m_render.meters(m_global_time);
 
-			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.clicker();
+			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.lanes(m_global_time, m_note_arr, m_cross_arr);
 			m_render.notes(m_global_time, m_note_arr, m_cross_arr);
 
@@ -173,8 +193,9 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			if (m_debugView)
+			if (m_debugView){
 				m_render.debug(m_deltaTime, m_note_arr, m_event_arr, m_cross_arr);
+			}
 		} else if (m_mode == 1) {
 			m_render.result(m_player, m_gen);
 		}
@@ -252,7 +273,7 @@ void Game::writeConfig() {
 		output << m_audioLatency << std::endl;
 		output << m_deckSpeed << std::endl;
 		output << m_isButtonsRight << std::endl;
-		output << m_debugView << std::endl ;
+		output << m_debugView << std::endl;
 
 		output << m_render.m_greenLaneActiveColor.r << std::endl;
 		output << m_render.m_greenLaneActiveColor.g << std::endl;
@@ -283,6 +304,16 @@ void Game::writeConfig() {
 		output << m_render.m_euphoriaLaneColor.g << std::endl;
 		output << m_render.m_euphoriaLaneColor.b << std::endl;
 		output << m_render.m_euphoriaLaneColor.a << std::endl;
+
+		output << m_render.m_greenScratchColor.r << std::endl;
+		output << m_render.m_greenScratchColor.g << std::endl;
+		output << m_render.m_greenScratchColor.b << std::endl;
+		output << m_render.m_greenScratchColor.a << std::endl;
+
+		output << m_render.m_blueScratchColor.r << std::endl;
+		output << m_render.m_blueScratchColor.g << std::endl;
+		output << m_render.m_blueScratchColor.b << std::endl;
+		output << m_render.m_blueScratchColor.a << std::endl;
 		output << std::endl;
 
 		std::cout << "Game Message: updated engine values in config file." << std::endl;

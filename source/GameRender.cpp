@@ -255,8 +255,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double milli = v.at(i).getMilli();
 		if (time + m_noteVisibleTime > milli) {
 			double dt = milli - time;
-			float clickerAngle = asin(0.25 / m_radius);
-			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+			double noteAngle = getAngleFromDT(dt);
 
 			int type = v.at(i).getType();
 
@@ -461,12 +460,12 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				pushRectangleIndices(noteIndices, noteVertexCount);
 
 			} else if (type == SCR_G_ANY) {
-				double dAngle = asin(0.5 / (m_radius + 0.5));
-				double timeBetween = dAngle * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+				double dAngle = asin(0.75 / (m_radius + 0.5));
+				double timeBetween = getDTFromAngle(dAngle);
 
 				for (double j = milli; j < milli + v.at(i).getLength(); j += timeBetween) {
 					if (j >= time && j <= time + m_noteVisibleTime) {
-						double spriteAngle = (j - time) * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+						double spriteAngle = getAngleFromDT(j - time);
 
 						glm::vec2 topLeft = getCirclePoint(m_radius + 0.75, spriteAngle + dAngle / 2);
 						glm::vec2 bottomLeft = getCirclePoint(m_radius + 0.75, spriteAngle - dAngle / 2);
@@ -537,14 +536,13 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				pushRectangleIndices(noteIndices, noteVertexCount);
 
 			} else if (type == SCR_B_ANY) {
-				double dAngle = asin(0.5 / (m_radius + 0.5));
-				double timeBetween = dAngle * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+				double dAngle = asin(0.75 / (m_radius - 0.5));
+				double timeBetween = getDTFromAngle(dAngle);
 
 				for (double j = milli; j < milli + v.at(i).getLength(); j += timeBetween) {
 					if (j >= time && j <= time + m_noteVisibleTime) {
-						double spriteAngle = (j - time) * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+						double spriteAngle = getAngleFromDT(j - time);
 
-						double dAngle = asin(0.5 / (m_radius - 0.5));
 						glm::vec2 topLeft = getCirclePoint(m_radius - 0.25, spriteAngle + dAngle / 2);
 						glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.25, spriteAngle - dAngle / 2);
 						glm::vec2 topRight = getCirclePoint(m_radius - 0.75, spriteAngle + dAngle / 2);
@@ -636,7 +634,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	glm::vec2 blueBeforeInner = getCirclePoint((double)m_radius - 0.5 - size, startAngle);
 
 	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
-		float angleTime = time + angle * m_noteVisibleTime / (m_maxAngle - startAngle);
+		float angleTime = time + getDTFromAngle(angle);
 
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
 		glm::vec2 redInner = getCirclePoint((double)m_radius - size, (double)angle);
@@ -724,8 +722,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double milli = v.at(i).getMilli();
 		if (time + m_noteVisibleTime > milli) {
 			double dt = milli - time;
-			float clickerAngle = asin(0.25 / m_radius);
-			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+			double noteAngle = getAngleFromDT(dt);
 
 			int type = v.at(i).getType();
 			if (type == CF_SPIKE_G) {
@@ -802,18 +799,17 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 		double milli = cross.at(i).getMilli();
 		if (time + m_noteVisibleTime > milli) {
 			double dt = milli - time;
-			float clickerAngle = asin(0.25 / m_radius);
-			double noteAngle = dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+			double noteAngle = getAngleFromDT(dt);
 
 			int type = cross.at(i).getType();
 			int typeBefore = cross.at(i - 1).getType();
 			if (type == CROSS_G && typeBefore != CROSS_G) {
 				double dAngle = asin(0.25 / (m_radius + 0.5));
 
-				glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
-				glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
-				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
-				glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+				glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle + dAngle / 2);
 
 				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
@@ -824,10 +820,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				if (typeBefore == CROSS_B) {
 					dAngle = asin(0.25 / (m_radius - 0.5));
 
-					topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
-					bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
-					bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
-					topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+					topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle / 2);
+					bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle + dAngle / 2);
 
 					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
@@ -839,10 +835,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 			} else if (type == CROSS_B && typeBefore != CROSS_B) {
 				double dAngle = asin(0.25 / (m_radius - 0.5));
 
-				glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
-				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
-				glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
-				glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+				glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle + dAngle / 2);
+				glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle / 2);
+				glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle / 2);
+				glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle + dAngle / 2);
 
 				pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 				pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
@@ -853,10 +849,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				if (typeBefore == CROSS_G) {
 					dAngle = asin(0.25 / (m_radius + 0.5));
 
-					topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
-					bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
-					bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
-					topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+					topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle + dAngle / 2);
+					bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle / 2);
+					bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle / 2);
+					topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle + dAngle / 2);
 
 					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
@@ -869,10 +865,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				if (typeBefore == CROSS_G) {
 					double dAngle = asin(0.25 / (m_radius + 0.5));
 
-					glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle);
-					glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle);
-					glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle);
-					glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle);
+					glm::vec2 topLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle + dAngle / 2);
+					glm::vec2 bottomLeft = getCirclePoint(m_radius + 1.0 + size, noteAngle - dAngle / 2);
+					glm::vec2 bottomRight = getCirclePoint(m_radius + 0.5 - size, noteAngle - dAngle / 2);
+					glm::vec2 topRight = getCirclePoint(m_radius + 0.5 - size, noteAngle + dAngle / 2);
 
 					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
 					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
@@ -882,10 +878,10 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 				} else if (typeBefore == CROSS_B) {
 					double dAngle = asin(0.25 / (m_radius - 0.5));
 
-					glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle);
-					glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle);
-					glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle);
-					glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle);
+					glm::vec2 topLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle + dAngle / 2);
+					glm::vec2 bottomLeft = getCirclePoint(m_radius - 0.5 + size, noteAngle - dAngle / 2);
+					glm::vec2 bottomRight = getCirclePoint(m_radius - 1.0 - size, noteAngle - dAngle / 2);
+					glm::vec2 topRight = getCirclePoint(m_radius - 1.0 - size, noteAngle + dAngle / 2);
 
 					pushVertexColor(lanesVector, -topLeft.x + center.x, plane, -topLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
 					pushVertexColor(lanesVector, -bottomLeft.x + center.x, plane, -bottomLeft.y + center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
@@ -937,7 +933,6 @@ void GameRender::bpmTicks(double time, std::vector<double>& bpmArr) {
 }
 
 void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& cross) {
-	/*
 	float plane = 0.0;
 	float transparency = 0.35f; // euphoria transparency
 
@@ -952,161 +947,103 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 		double hitWindow = ev.at(i).hitWindow;
 		int type = ev.at(i).getType();
 		double percent = (ev.at(i).getMilli() - time) / m_noteVisibleTime;
+		double length = ev.at(i).getLength();
 
-		if (type == SCR_G_ZONE) {
-			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
-			int num = 0;
-			int lastVisible = -1;
-			float z;
-			for (size_t i = 0; i < cfChanges.size(); ++i) {
-				double cfMilli = cfChanges.at(i).getMilli();
-				double cfPercent = (cfMilli - time) / m_noteVisibleTime;
-				int cfType = cfChanges.at(i).getType();
-				if (cfMilli <= time + m_noteVisibleTime) {
-					z = (float)(3.75 - 3.75 * cfPercent);
-					if (cfType == CROSS_G) {
-						if (num % 4 != 0) {
-							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							num += 2;
-						}
-						else {
-							pushVertexColor(eventsVector, -0.85f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.55f, plane, z, 0.0f, 1.0f, 0.0f);
-							num += 2;
-						}
-						lastVisible = CROSS_G;
-					}
-					else if (cfType == CROSS_C) {
-						if (num % 4 != 0) {
-							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-							num += 2;
-						}
-						else {
-							pushVertexColor(eventsVector, -0.5f, plane, z, 0.0f, 1.0f, 0.0f);
-							pushVertexColor(eventsVector, -0.2f, plane, z, 0.0f, 1.0f, 0.0f);
-							num += 2;
-						}
-						lastVisible = CROSS_C;
-					}
-					if (num > 0 && num % 4 == 0) {
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-				}
-			}
-			if (num % 4 != 0) {
-				if (lastVisible == CROSS_G) {
-					pushVertexColor(eventsVector, -0.55f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.85f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else if (lastVisible == CROSS_C) {
-					pushVertexColor(eventsVector, -0.2f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushVertexColor(eventsVector, -0.5f, plane, 0.0f, 0.0f, 1.0f, 0.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-			}
-		}
-		else if (type == SCR_B_ZONE) {
-			std::vector<Note> cfChanges = getCrossInsideNote(ev.at(i), cross);
-			int num = 0;
-			int lastVisible = -1;
-			float z;
-			for (size_t i = 0; i < cfChanges.size(); ++i) {
-				double cfMilli = cfChanges.at(i).getMilli();
-				double cfPercent = (cfMilli - time) / m_noteVisibleTime;
-				int cfType = cfChanges.at(i).getType();
-				if (cfMilli <= time + m_noteVisibleTime) {
-					z = (float)(3.75 - 3.75 * cfPercent);
-					if (cfType == CROSS_B) {
-						if (num % 4 != 0) {
-							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							num += 2;
-						}
-						else {
-							pushVertexColor(eventsVector, 0.55f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.85f, plane, z, 0.0f, 0.0f, 1.0f);
-							num += 2;
-						}
-						lastVisible = CROSS_B;
-					}
-					else if (cfType == CROSS_C) {
-						if (num % 4 != 0) {
-							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-							num += 2;
-						}
-						else {
-							pushVertexColor(eventsVector, 0.2f, plane, z, 0.0f, 0.0f, 1.0f);
-							pushVertexColor(eventsVector, 0.5f, plane, z, 0.0f, 0.0f, 1.0f);
-							num += 2;
-						}
-						lastVisible = CROSS_C;
-					}
-					if (num > 0 && num % 4 == 0) {
-						pushRectangleIndices(eventsIndices, eventsVertexCount);
-					}
-				}
-			}
-			if (num % 4 != 0) {
-				if (lastVisible == CROSS_B) {
-					pushVertexColor(eventsVector, 0.85f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.55f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-				else if (lastVisible == CROSS_C) {
-					pushVertexColor(eventsVector, 0.5f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushVertexColor(eventsVector, 0.2f, plane, 0.0f, 0.0f, 0.0f, 1.0f);
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
-				}
-			}
-		}
-		else if (type == EU_ZONE) {
-			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
-			double endPercent = (endTime - time) / m_noteVisibleTime;
-			bool start_eu = false;
-			//if euphoria start is in the middle of the highway
-			if (percent >= 0.0 && percent < 1.0) {
-				float z = (float)(3.75 - 3.75 * percent);
-				pushVertexColor(eventsVector, -1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
-				pushVertexColor(eventsVector, 1.0f, plane, z, 1.0f, 1.0f, 1.0f, transparency);
-				start_eu = true;
-			}
-			//if euphoria start has already passed the clicker
-			else if (percent < 0.0) {
-				//if (m_renderEuZone) {
-				pushVertexColor(eventsVector, -1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
-				pushVertexColor(eventsVector, 1.0, plane, 3.75, 1.0, 1.0, 1.0, transparency);
-				start_eu = true;
-				//}
-			}
-			//if the render has successfully added the start
-			if (start_eu) {
-				//if euphoria end is in the middle of the highway
-				if (endPercent >= 0.0 && endPercent < 1.0) {
-					float z = 3.75f - (3.75f * (float)endPercent);
-					pushVertexColor(eventsVector, 1.0, plane, z, 1.0, 1.0, 1.0, transparency);
-					pushVertexColor(eventsVector, -1.0, plane, z, 1.0, 1.0, 1.0, transparency);
+		if (time + m_noteVisibleTime > milli) {
+			if (type == SCR_G_ZONE) {
+				double start = std::max(milli, time);
+				double end = std::min(milli + length, time + m_noteVisibleTime);
 
+				double startAngle = getAngleFromDT(start - time);
+				double endAngle = getAngleFromDT(end - time);
+				glm::vec2 center = {m_radius, 0.0};
+
+				glm::vec2 beforeOuter = getCirclePoint((double)m_radius + 0.75, startAngle);
+				glm::vec2 beforeInner = getCirclePoint((double)m_radius + 0.25, startAngle);
+
+				if (ev.at(i).getLanMod() == 0) {
+					beforeOuter = getCirclePoint((double)m_radius + 1.25, startAngle);
+					beforeInner = getCirclePoint((double)m_radius + 0.75, startAngle);
 				}
-				//if euphoria end is beyond the visible highway
-				else {
-					pushVertexColor(eventsVector, 1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
-					pushVertexColor(eventsVector, -1.0, plane, 0.0, 1.0, 1.0, 1.0, transparency);
+				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+					double cycleTime = getDTFromAngle(cycleAngle);
+
+					glm::vec2 outer = getCirclePoint(m_radius + 0.75, cycleAngle);
+					glm::vec2 inner = getCirclePoint(m_radius + 0.25, cycleAngle);
+
+					if(getCrossAtTime(time + cycleTime,cross) == 0){
+						outer = getCirclePoint(m_radius + 1.25, cycleAngle);
+						inner = getCirclePoint(m_radius + 0.75, cycleAngle);
+					}
+
+					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+					beforeOuter = outer;
+					beforeInner = inner;
 				}
-				pushRectangleIndices(eventsIndices, eventsVertexCount);
+			} else if (type == SCR_B_ZONE) {
+				double start = std::max(milli, time);
+				double end = std::min(milli + length, time + m_noteVisibleTime);
+
+				double startAngle = getAngleFromDT(start - time);
+				double endAngle = getAngleFromDT(end - time);
+				glm::vec2 center = {m_radius, 0.0};
+
+				glm::vec2 beforeOuter = getCirclePoint((double)m_radius - 0.75, startAngle);
+				glm::vec2 beforeInner = getCirclePoint((double)m_radius - 0.25, startAngle);
+
+				if (ev.at(i).getLanMod() == 2) {
+					beforeOuter = getCirclePoint((double)m_radius - 1.25, startAngle);
+					beforeInner = getCirclePoint((double)m_radius - 0.75, startAngle);
+				}
+				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+					double cycleTime = getDTFromAngle(cycleAngle);
+
+					glm::vec2 outer = getCirclePoint(m_radius - 0.75, cycleAngle);
+					glm::vec2 inner = getCirclePoint(m_radius - 0.25, cycleAngle);
+
+					if(getCrossAtTime(time + cycleTime,cross) == 2){
+						outer = getCirclePoint(m_radius - 1.25, cycleAngle);
+						inner = getCirclePoint(m_radius - 0.75, cycleAngle);
+					}
+
+					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+					beforeOuter = outer;
+					beforeInner = inner;
+				}
+			} else if (type == EU_ZONE) {
 			}
 		}
 
-		if (milli > time + m_noteVisibleTime) {
-			ev.at(i).setLanMod(m_renderCross);
+		else if (milli > time + m_noteVisibleTime && ev.at(i).getLanMod() == -1) {
+			int position = 1;
+			for (size_t j = 0; j < cross.size(); ++j) {
+				if (cross.at(j).getMilli() <= milli) {
+					if (cross.at(j).getType() == CROSS_G) {
+						position = 0;
+					} else if (cross.at(j).getType() == CROSS_C) {
+						position = 1;
+					} else if (cross.at(j).getType() == CROSS_B) {
+						position = 2;
+					}
+				}
+			}
+			ev.at(i).setLanMod(position);
 		}
 	}
 	usePersProj();
 	renderColor(eventsVector, eventsIndices);
-	*/
 }
 
 void GameRender::meters(double time) {
@@ -1597,26 +1534,6 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool greenToCenter = p.m_cfGreenToCenter;
 	bool blueToCenter = p.m_cfBlueToCenter;
 
-	if (p.m_pastCross >= 1 && p.m_cross == 0) {
-		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
-		if (p.m_pastCross == 2) {
-			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
-		}
-	} else if (p.m_pastCross <= 1 && p.m_cross == 2) {
-		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
-		if (p.m_pastCross == 0) {
-			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-		}
-	}
-
-	if (p.m_cross == 1) {
-		if (p.m_pastCross == 0) {
-			m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
-		} else if (p.m_pastCross == 2) {
-			m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
-		}
-	}
-
 	if (greenAnimEnabled) {
 		m_animManager.triggerAnimation(AN_GREEN_CLICKER, time);
 		p.m_greenAnimation = false;
@@ -1784,6 +1701,16 @@ int GameRender::getCrossAtTime(double time, std::vector<Note> crossArr) {
 	} else {
 		return 2;
 	}
+}
+
+double GameRender::getAngleFromDT(double dt) {
+	double clickerAngle = asin(0.25 / m_radius);
+	return dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
+}
+
+double GameRender::getDTFromAngle(double angle) {
+	double clickerAngle = asin(0.25 / m_radius);
+	return (angle - clickerAngle) * m_noteVisibleTime / (m_maxAngle - clickerAngle);
 }
 
 GameRender::~GameRender() {

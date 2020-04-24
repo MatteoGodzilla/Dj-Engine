@@ -70,10 +70,15 @@ public:
 	glm::vec4 m_redLaneActiveColor = {1.0, 0.0, 0.0, 1.0};
 	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
 
+	glm::vec4 m_greenScratchColor = {0.0, 0.7, 0.0, 1.0};
+	glm::vec4 m_blueScratchColor = {0.0, 0.0, 0.7, 1.0};
+
 private:
 	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	glm::vec2 getCirclePoint(double radius, double angle);
 	int getCrossAtTime(double time, std::vector<Note> crossArr);
+	double getAngleFromDT(double dt);
+	double getDTFromAngle(double angle);
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;

@@ -22,8 +22,9 @@ public:
 	Animation getAnimById(int id);
 	void updateAnimation(int id, Animation a);
 	void triggerAnimation(int id, double time);
+	void disableAnimation(int id);
 	~AnimationManager();
 
 private:
-	std::vector<Animation> m_animLisit;
+	std::vector<Animation> m_animList;
 };
