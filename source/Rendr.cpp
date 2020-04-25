@@ -146,7 +146,7 @@ void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned in
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_textureProgram);
-	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -163,7 +163,7 @@ void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>&
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_textProgram);
-	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, (void*)0);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -178,7 +178,7 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
 	glUseProgram(m_colorProgram);
-	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
 }
@@ -292,7 +292,7 @@ void Rendr::startImGuiFrame(std::string winName, ImGuiBackendFlags flags) {
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin(winName.c_str(), NULL, flags);
+	ImGui::Begin(winName.c_str(), nullptr, flags);
 }
 
 void Rendr::renderImGuiFrame() {
@@ -402,11 +402,11 @@ void Rendr::init(GLFWwindow* w) {
 		fShaderText = glCreateShader(GL_FRAGMENT_SHADER);
 
 		//upload shader source data (see above)
-		glShaderSource(vShaderTexture, 1, &vTextureSource, NULL);
-		glShaderSource(fShaderTexture, 1, &fTextureSource, NULL);
-		glShaderSource(vShaderColor, 1, &vColorSource, NULL);
-		glShaderSource(fShaderColor, 1, &fColorSource, NULL);
-		glShaderSource(fShaderText, 1, &fTextSource, NULL);
+		glShaderSource(vShaderTexture, 1, &vTextureSource, nullptr);
+		glShaderSource(fShaderTexture, 1, &fTextureSource, nullptr);
+		glShaderSource(vShaderColor, 1, &vColorSource, nullptr);
+		glShaderSource(fShaderColor, 1, &fColorSource, nullptr);
+		glShaderSource(fShaderText, 1, &fTextSource, nullptr);
 
 		//compile shaders (hoping that they don't fail)
 		glCompileShader(vShaderTexture);
@@ -420,27 +420,27 @@ void Rendr::init(GLFWwindow* w) {
 		char infolog[512];
 		glGetShaderiv(vShaderTexture, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderTexture, 512, NULL, infolog);
+			glGetShaderInfoLog(vShaderTexture, 512, nullptr, infolog);
 			std::cerr << "error compiling vertex texture shader:" << infolog << std::endl;
 		}
 		glGetShaderiv(fShaderTexture, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderTexture, 512, NULL, infolog);
+			glGetShaderInfoLog(fShaderTexture, 512, nullptr, infolog);
 			std::cerr << "error compiling fragment texture shader:" << infolog << std::endl;
 		}
 		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderColor, 512, NULL, infolog);
+			glGetShaderInfoLog(vShaderColor, 512, nullptr, infolog);
 			std::cerr << "error compiling vertex color shader:" << infolog << std::endl;
 		}
 		glGetShaderiv(fShaderColor, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderColor, 512, NULL, infolog);
+			glGetShaderInfoLog(fShaderColor, 512, nullptr, infolog);
 			std::cerr << "error compiling fragment color shader:" << infolog << std::endl;
 		}
 		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderText, 512, NULL, infolog);
+			glGetShaderInfoLog(fShaderText, 512, nullptr, infolog);
 			std::cerr << "error compiling fragment text shader:" << infolog << std::endl;
 		}
 		//create shader programs
@@ -464,7 +464,7 @@ void Rendr::init(GLFWwindow* w) {
 		char log[512];
 		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
 		if (!linked) {
-			glGetProgramInfoLog(m_textProgram, 512, NULL, log);
+			glGetProgramInfoLog(m_textProgram, 512, nullptr, log);
 			std::cerr << "error linking program:" << log << std::endl;
 		}
 
@@ -515,7 +515,7 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
 			//Vertex: x,y,z, u,v
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
@@ -538,7 +538,7 @@ void Rendr::init(GLFWwindow* w) {
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
 
 			//Vertex: x,y,z, r,g,b,a
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), 0);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), nullptr);
 			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
@@ -580,7 +580,6 @@ void Rendr::init(GLFWwindow* w) {
 			// store Character data for later use
 			Character character = {
 				texture,
-
 				(float)m_font->glyph->bitmap_left,
 				(float)m_font->glyph->bitmap_top,
 				(float)m_font->glyph->bitmap.width,

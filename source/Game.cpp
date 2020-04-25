@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() {}
+//Game::Game() {}
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
@@ -18,20 +18,13 @@ void Game::init(GLFWwindow* w) {
 		std::cout << "Game Message: loading from config file" << std::endl;
 		std::string token;
 		input >> token;
-
-		/*
-		output << m_audioLatency << std::endl;
-		output << m_deckSpeed << std::endl;
-		output << m_isButtonsRight << std::endl << std::endl;
-		*/
-
 		m_audioLatency = std::stof(token);
 		input >> token;
 		m_deckSpeed = std::stof(token);
 		input >> token;
-		m_isButtonsRight = token == "true" ? true : false;
+		m_isButtonsRight = token == "true";
 		input >> token;
-		m_debugView = token == "true" ? true : false;
+		m_debugView = token == "true";
 
 		float r, g, b, a;
 		input >> token;
@@ -141,7 +134,7 @@ void Game::pollInput() {
 	}
 }
 
-void Game::tick(double dt) {
+void Game::tick() {
 	if (m_active) {
 		if (m_mode == 0) {
 			m_render.m_noteVisibleTime = m_deckSpeed;
@@ -193,7 +186,7 @@ void Game::render() {
 			m_render.clickerAnimation();
 
 			//debug
-			if (m_debugView){
+			if (m_debugView) {
 				m_render.debug(m_deltaTime, m_note_arr, m_event_arr, m_cross_arr);
 			}
 		} else if (m_mode == 1) {
@@ -247,7 +240,7 @@ void Game::setButtonPos(bool value) {
 	m_player.m_isButtonsRight = value;
 }
 
-void Game::start(SongEntry entry) {
+void Game::start(const SongEntry& entry) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
 	//glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);

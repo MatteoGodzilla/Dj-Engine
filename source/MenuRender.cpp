@@ -766,10 +766,6 @@ void MenuRender::credits() {
 	float y = 0.0;
 	float x = 10.0f;
 
-	drawText("Thanks to MexicanPB for the Logo", x, y, fontsize / 1000.0f);
-	y += fontsize; //new line
-	y += fontsize; //new line
-
 	drawText("Thanks to everyone in the Dj Hero Fan Server ", x, y, fontsize / 1000.0f);
 	y += fontsize; //new line
 

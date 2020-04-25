@@ -1,9 +1,6 @@
 #include "AnimationManager.h"
 
-AnimationManager::AnimationManager() {
-}
-
-void AnimationManager::init(double time) {
+void AnimationManager::init() {
 	Animation anim1(AN_CROSS_GREEN_TO_LEFT, 0.100);
 	Animation anim2(AN_CROSS_GREEN_TO_CENTER, 0.100);
 	Animation anim3(AN_CROSS_BLUE_TO_RIGHT, 0.100);
@@ -23,8 +20,8 @@ void AnimationManager::init(double time) {
 }
 
 void AnimationManager::tick(double time) {
-	for (size_t i = 0; i < m_animList.size(); ++i) {
-		m_animList.at(i).tick(time);
+	for (auto& anim : m_animList) {
+		anim.tick(time);
 	}
 }
 
@@ -33,9 +30,9 @@ std::vector<Animation> AnimationManager::getAnimList() {
 }
 
 Animation AnimationManager::getAnimById(int id) {
-	for (size_t i = 0; i < m_animList.size(); ++i) {
-		if (m_animList.at(i).getId() == id) {
-			return m_animList.at(i);
+	for (auto& anim : m_animList) {
+		if (anim.getId() == id) {
+			return anim;
 		}
 	}
 	std::cerr << "Animation Manager Error : Animation not found" << std::endl;
@@ -43,31 +40,28 @@ Animation AnimationManager::getAnimById(int id) {
 }
 
 void AnimationManager::updateAnimation(int id, Animation a) {
-	for (size_t i = 0; i < m_animList.size(); ++i) {
-		if (m_animList.at(i).getId() == id) {
-			m_animList.at(i) = a;
+	for (auto& anim : m_animList) {
+		if (anim.getId() == id) {
+			anim = a;
 			break;
 		}
 	}
 }
 
 void AnimationManager::triggerAnimation(int id, double time) {
-	for (size_t i = 0; i < m_animList.size(); ++i) {
-		if (m_animList.at(i).getId() == id) {
-			m_animList.at(i).enable(time);
-			m_animList.at(i).reset();
+	for (auto& anim : m_animList) {
+		if (anim.getId() == id) {
+			anim.enable(time);
+			anim.reset();
 		}
 	}
 }
 
-void AnimationManager::disableAnimation(int id){
-	for (size_t i = 0; i < m_animList.size(); ++i) {
-		if (m_animList.at(i).getId() == id) {
-			m_animList.at(i).disable();
-			m_animList.at(i).reset();
+void AnimationManager::disableAnimation(int id) {
+	for (auto& anim : m_animList) {
+		if (anim.getId() == id) {
+			anim.disable();
+			anim.reset();
 		}
 	}
-}
-
-AnimationManager::~AnimationManager() {
 }

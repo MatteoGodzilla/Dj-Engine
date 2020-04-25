@@ -2,7 +2,7 @@
 class Animation {
 public:
 	Animation();
-	Animation(int id, double dutation, bool looping = false);
+	Animation(int id, double duration, bool looping = false);
 	void tick(double time);
 	void setDuration(double time);
 	void setLooping(bool looping);
@@ -15,7 +15,6 @@ public:
 	double getDuration();
 	bool isLooping();
 	bool isEnabled();
-	~Animation();
 
 private:
 	int m_id = 0;

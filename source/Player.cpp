@@ -664,9 +664,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_lastCrossTime = cross.at(i).getMilli();
 					break;
 				} else if (type == CROSS_C) {
-					if(m_cross == 0){
+					if (m_cross == 0) {
 						m_cfGreenToCenter = true;
-					}else{
+					} else {
 						m_cfBlueToCenter = true;
 					}
 					m_cross = 1;
@@ -776,10 +776,10 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			int type = cross.at(i).getType();
 			if (cross.at(i).getMilli() < time && cross.at(i).getMilli() > m_lastCrossTime && !cross.at(i).getTouched()) {
 				if (type == CROSS_G) {
-					if(m_cross != 0){
+					if (m_cross != 0) {
 						m_cfCenterToGreen = true;
 					}
-					if(m_cross == 2){
+					if (m_cross == 2) {
 						m_cfBlueToCenter = true;
 					}
 					m_cross = 0;
@@ -789,9 +789,9 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_lastCrossTime = cross.at(i).getMilli();
 					break;
 				} else if (type == CROSS_C) {
-					if(m_cross == 0){
+					if (m_cross == 0) {
 						m_cfGreenToCenter = true;
-					}else if (m_cross == 2){
+					} else if (m_cross == 2) {
 						m_cfBlueToCenter = true;
 					}
 					m_cross = 1;
@@ -801,10 +801,10 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_lastCrossTime = cross.at(i).getMilli();
 					break;
 				} else if (type == CROSS_B) {
-					if(m_cross != 2){
+					if (m_cross != 2) {
 						m_cfCenterToBlue = true;
 					}
-					if(m_cross == 0){
+					if (m_cross == 0) {
 						m_cfGreenToCenter = true;
 					}
 					m_cross = 2;

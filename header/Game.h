@@ -12,10 +12,10 @@
 
 class Game {
 public:
-	Game();
+	//Game();
 	void init(GLFWwindow* w);
 	void render();
-	void tick(double dt);
+	void tick();
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
@@ -23,7 +23,7 @@ public:
 	Player* getPlayer();
 	Audio* getAudio();
 	GameRender* getGameRender();
-	void start(SongEntry entry);
+	void start(const SongEntry& entry);
 	void setButtonPos(bool value);
 	void writeConfig();
 	~Game();

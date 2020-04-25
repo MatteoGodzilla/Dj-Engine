@@ -4,6 +4,7 @@
 #include "AL/alc.h"
 #include "vorbis/vorbisfile.h"
 
+#include <array>
 #include <iostream>
 #include <vector>
 

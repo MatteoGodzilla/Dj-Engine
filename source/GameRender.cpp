@@ -6,7 +6,7 @@ GameRender::GameRender() {
 
 void GameRender::init(GLFWwindow* w) {
 	Rendr::init(w);
-	m_animManager.init(-1000.0);
+	m_animManager.init();
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -971,7 +971,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					glm::vec2 outer = getCirclePoint(m_radius + 0.75, cycleAngle);
 					glm::vec2 inner = getCirclePoint(m_radius + 0.25, cycleAngle);
 
-					if(getCrossAtTime(time + cycleTime,cross) == 0){
+					if (getCrossAtTime(time + cycleTime, cross) == 0) {
 						outer = getCirclePoint(m_radius + 1.25, cycleAngle);
 						inner = getCirclePoint(m_radius + 0.75, cycleAngle);
 					}
@@ -1007,7 +1007,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					glm::vec2 outer = getCirclePoint(m_radius - 0.75, cycleAngle);
 					glm::vec2 inner = getCirclePoint(m_radius - 0.25, cycleAngle);
 
-					if(getCrossAtTime(time + cycleTime,cross) == 2){
+					if (getCrossAtTime(time + cycleTime, cross) == 2) {
 						outer = getCirclePoint(m_radius - 1.25, cycleAngle);
 						inner = getCirclePoint(m_radius - 0.75, cycleAngle);
 					}

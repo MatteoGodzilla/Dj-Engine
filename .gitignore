@@ -13,3 +13,7 @@ songs/*
 
 # Vim
 *.swp
+
+# local log files
+error.txt
+log.txt
