@@ -7,6 +7,7 @@
 
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <array>
 #include <map>
 
 struct menuinputs {
@@ -22,13 +23,12 @@ struct menuinputs {
 
 class MenuRender : public Rendr {
 public:
-	MenuRender();
 	void init(GLFWwindow* w);
 	void tick();
-	void render(MenuNode node, int selected, unsigned int vOffset);
+	void render(MenuNode node, int selected, int vOffset);
 	void remapping(Game* game, menuinputs input);
 	void scratches(Player* player);
-	void calibration(Game* game, double time);
+	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
 	void setLaneColors(Game* game);
 	void splashArt();
@@ -49,8 +49,6 @@ public:
 	double m_timeBeforeAnimating = 3.0f;
 	double m_currentIdleTime = 0.0f;
 	float m_selectionDX = 0.0f;
-
-	~MenuRender();
 
 private:
 	double m_cbPlayingTime = 0.0f;

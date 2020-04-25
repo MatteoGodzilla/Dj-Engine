@@ -24,11 +24,8 @@ enum indices {
 class Player {
 public:
 	Player();
-
 	void pollInput(GLFWwindow* window);
 	void hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
-
-	virtual ~Player();
 
 	bool getRedClicker();
 	bool getGreenClicker();

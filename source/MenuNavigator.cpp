@@ -3,8 +3,9 @@
 size_t findIndex(MenuNode& element, MenuNode& parent) {
 	std::vector<MenuNode> list = parent.getChildrens();
 	for (size_t i = 0; i < list.size(); i++) {
-		if (list.at(i).getText() == element.getText())
+		if (list.at(i).getText() == element.getText()){
 			return i;
+		}
 	}
 	return 0xffffffff;
 }
@@ -132,29 +133,11 @@ void MenuNavigator::pollInput() {
 		if (glfwJoystickPresent(m_game->getPlayer()->m_gamepadId)) {
 			updateGamepadState();
 
-			if (m_gpState.size() > 0) {
-				if (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD)) {
-					m_isUpPressed = true;
-				} else
-					m_isUpPressed = false;
-
-				if (m_gpState.at(DOWN_GAMEPAD) >= m_gpDead.at(DOWN_GAMEPAD)) {
-					m_isDownPressed = true;
-				} else {
-					m_isDownPressed = false;
-				}
-
-				if (m_gpState.at(SELECT_GAMEPAD) >= m_gpDead.at(SELECT_GAMEPAD)) {
-					m_isSelectPressed = true;
-				} else {
-					m_isSelectPressed = false;
-				}
-
-				if (m_gpState.at(BACK_GAMEPAD) >= m_gpDead.at(BACK_GAMEPAD)) {
-					m_isBackPressed = true;
-				} else {
-					m_isBackPressed = false;
-				}
+			if (!m_gpState.empty()) {
+				m_isUpPressed = (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD));
+				m_isDownPressed = (m_gpState.at(DOWN_GAMEPAD) >= m_gpDead.at(DOWN_GAMEPAD));
+				m_isSelectPressed = (m_gpState.at(SELECT_GAMEPAD) >= m_gpDead.at(SELECT_GAMEPAD));
+				m_isBackPressed = (m_gpState.at(BACK_GAMEPAD) >= m_gpDead.at(BACK_GAMEPAD));
 			}
 		}
 	}

@@ -96,7 +96,7 @@ private:
 	bool m_wasTabPressed = false;
 	bool m_isTabPressed = false;
 
-	unsigned int m_viewOffset = 0;
+	int m_viewOffset = 0;
 	bool m_shouldClose = false;
 	bool m_active = false;
 

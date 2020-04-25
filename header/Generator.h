@@ -10,8 +10,7 @@
 
 class Generator {
 public:
-	Generator();
-	void init(SongEntry entry);
+	void init(const SongEntry& entry);
 	void tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
@@ -54,7 +53,7 @@ private:
 	int m_scr_tick = 0;
 	double m_initialCrossfade = -2.0;
 
-	const int TICKS_PER_BEAT = 4;
+	const float TICKS_PER_BEAT = 4.0f;
 
 	bool m_firstSpikeGenerated = false;
 	double m_firstSpikeMilli = 0.0;

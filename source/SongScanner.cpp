@@ -4,8 +4,8 @@
 namespace fs = std::filesystem;
 
 //recursive scan inside folders to find songs
-void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
-	for (const fs::directory_entry entry : fs::directory_iterator(p)) {
+void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
+	for (const fs::directory_entry& entry : fs::directory_iterator(p)) {
 		//if there's a sub-directory, repeat the scan inside that sub-directory
 		if (fs::is_directory(entry)) {
 			checkFolder(entry.path(), list, duplicates);
@@ -17,17 +17,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 			std::ifstream stream(file);
 			nlohmann::json root = nlohmann::json::parse(stream);
 
-			std::string s1 = root["song"]["first"]["name"].get<std::string>();
-			std::string s2 = root["song"]["second"]["name"].get<std::string>();
-			std::string a1 = root["song"]["first"]["artist"].get<std::string>();
-			std::string a2 = root["song"]["second"]["artist"].get<std::string>();
-			std::string charter = root["song"]["charter"].get<std::string>();
-			std::string mixer = root["song"]["dj"].get<std::string>();
-			float bpm = root["difficulty"]["bpm"].get<float>();
-			int dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
-			int dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
-			int dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
-			int dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
+			auto s1 = root["song"]["first"]["name"].get<std::string>();
+			auto s2 = root["song"]["second"]["name"].get<std::string>();
+			auto a1 = root["song"]["first"]["artist"].get<std::string>();
+			auto a2 = root["song"]["second"]["artist"].get<std::string>();
+			auto charter = root["song"]["charter"].get<std::string>();
+			auto mixer = root["song"]["dj"].get<std::string>();
+			auto bpm = root["difficulty"]["bpm"].get<float>();
+			auto dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
+			auto dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
+			auto dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
+			auto dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
 
 			dTrack = std::min(dTrack, 100);
 			dTrack = std::max(dTrack, 0);
@@ -50,7 +50,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 			}
 
 			for (SongEntry& entry : list) {
-				if (entry.s1.compare(s1) == 0) {
+				if (entry.s1 == s1) {
 					//found same text
 					if (duplicates.find(s1) == duplicates.end()) {
 						//duplicate not found in dictionary
@@ -141,7 +141,7 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 				}
 
 				for (SongEntry& entry : list) {
-					if (entry.s1.compare(s1) == 0) {
+					if (entry.s1 == s1) {
 						//found same text
 						if (duplicates.find(s1) == duplicates.end()) {
 							//duplicate not found in dictionary
@@ -182,26 +182,29 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 	}
 }
 
-bool compareSongEntries(SongEntry a, SongEntry b) {
-	std::string a1, a2, b1, b2;
+bool compareSongEntries(const SongEntry& a, const SongEntry& b) {
+	std::string a1;
+	std::string a2;
+	std::string b1;
+	std::string b2;
 
-	for (size_t i = 0; i < a.s1.size(); ++i) {
-		a1 += std::toupper(a.s1.at(i));
+	for (char c : a.s1) {
+		a1 += std::toupper(c);
 	}
 
-	for (size_t i = 0; i < b.s1.size(); ++i) {
-		b1 += std::toupper(b.s1.at(i));
+	for(char c : b.s1){
+		b1 += std::toupper(c);
 	}
 
 	if (!a.s2.empty()) {
-		for (size_t i = 0; i < a.s2.size(); ++i) {
-			a2 += std::toupper(a.s2.at(i));
+		for (char c : a.s2) {
+			a2 += std::toupper(c);
 		}
 	}
 
 	if (!b.s2.empty()) {
-		for (size_t i = 0; i < b.s2.size(); ++i) {
-			b2 += std::toupper(b.s2.at(i));
+		for (char c : b.s2) {
+			b2 += std::toupper(c);
 		}
 	}
 	int res = a1.compare(b1);

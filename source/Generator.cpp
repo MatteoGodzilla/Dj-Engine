@@ -20,10 +20,7 @@ void readToFloat(std::ifstream& stream, float* f) {
 	}
 }
 
-Generator::Generator() {
-}
-
-void Generator::init(SongEntry entry) {
+void Generator::init(const SongEntry& entry) {
 	m_songEntry = entry;
 	m_allCross.push_back(Note(m_initialCrossfade, CROSS_C, 0.0f, true)); //Do not remove
 	m_bpm = entry.bpm;
@@ -148,7 +145,7 @@ void Generator::initialLoad() {
 				m_baseScore += 400;
 				m_allTaps.push_back(Note(time, SCR_B_ANY, length, false));
 				float end = time + length;
-				float betweenTicks = 60.0f / ((float)m_bpm * TICKS_PER_BEAT);
+				float betweenTicks = 60.0f / (m_bpm * TICKS_PER_BEAT);
 				time += betweenTicks;
 				while (time < end) {
 					m_baseScore += 100;
@@ -174,9 +171,9 @@ void Generator::initialLoad() {
 				m_allCross.push_back(Note(time, CROSS_G, 0.0, true));
 			} else if (type == 15) {
 				m_allEvents.push_back(Note(time, EU_ZONE, length, true));
-			} else if (type == 20) {
+			} else if (type == 20 || type == 48) {
 				m_allEvents.push_back(Note(time, SCR_G_ZONE, length, true));
-			} else if (type == 21) {
+			} else if (type == 21 || type == 49) {
 				m_allEvents.push_back(Note(time, SCR_B_ZONE, length, true));
 			} else if (type == 27) {
 				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
@@ -203,15 +200,9 @@ void Generator::initialLoad() {
 			} else if (type == 29) {
 				m_allTaps.push_back(Note(time, CF_SPIKE_C, 0.0, false));
 				//pushNote((double)time, CF_SPIKE_C, 0.0);
-			} else if (type == 48) {
-				m_allEvents.push_back(Note(time, SCR_G_ZONE, length, true));
-
-				//pushEvent((double)time, SCR_G_ZONE, (double)length);
-			} else if (type == 49) {
-				m_allEvents.push_back(Note(time, SCR_B_ZONE, length, true));
-
-				//pushEvent((double)time, SCR_B_ZONE, (double)length);
-			} else if (type == 0x0B000001) {
+			}
+			/*
+			else if (type == 0x0B000001) {
 				//bpm marker
 			} else if (type == 0x0B000002) {
 				m_bpm = extra;
@@ -219,6 +210,7 @@ void Generator::initialLoad() {
 			} else if (type == 0xFFFFFFFF) {
 				//chart start
 			}
+			*/
 			//else std::cerr << "error parsing entry: " << time << "\t"<< type << "\t"<< length << "\t"<< extra<<std::endl;
 		}
 		if (m_chart.eof() && !m_placedFinalCF) {
@@ -323,7 +315,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 				//start eu zone check when the event is on the clicker
 				if (ev.at(i).getHit() && !ev.at(i).getTouched()) {
 					m_eu_start = true;
-					ev.at(i).click(time);
+					ev.at(i).click();
 				}
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				//set signal for player
@@ -396,7 +388,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			double t;
 			m_chart >> token;
 
-			/*
+
 			depending by the tokens, add note/event to 'cache'
 
 
@@ -548,15 +540,15 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 */
 
 void Generator::addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
-	while (v.size() < 100 && m_allTaps.size() > 0) {
+	while (v.size() < 100 && !m_allTaps.empty()) {
 		v.push_back(m_allTaps.front());
 		m_allTaps.pop_front();
 	}
-	while (ev.size() < 100 && m_allEvents.size() > 0) {
+	while (ev.size() < 100 && !m_allEvents.empty()) {
 		ev.push_back(m_allEvents.front());
 		m_allEvents.pop_front();
 	}
-	while (cross.size() < 100 && m_allCross.size() > 0) {
+	while (cross.size() < 100 && !m_allCross.empty()) {
 		cross.push_back(m_allCross.front());
 		m_allCross.pop_front();
 	}

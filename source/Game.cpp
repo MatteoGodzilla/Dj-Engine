@@ -26,7 +26,11 @@ void Game::init(GLFWwindow* w) {
 		input >> token;
 		m_debugView = token == "true";
 
-		float r, g, b, a;
+		float r;
+		float g;
+		float b;
+		float a;
+
 		input >> token;
 		r = std::stof(token);
 		input >> token;

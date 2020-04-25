@@ -27,8 +27,7 @@ enum note {
 class Note {
 public:
 	Note(double milli, int ty, double length, bool ev = false);
-	virtual ~Note();
-	void click(double time);
+	void click();
 	void tick(double time);
 	double getMilli();
 	double getLength();

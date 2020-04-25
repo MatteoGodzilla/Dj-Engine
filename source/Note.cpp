@@ -10,14 +10,11 @@ Note::Note(double milli, int ty, double length, bool ev) {
 }
 
 //when the player clicks the corrisponding button
-void Note::click(double time) {
+void Note::click() {
 	if (m_firstClick) {
 		if (m_hittable) {
-			//std::cout << "Hit :" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
 			m_touched = true;
 			m_hittable = false;
-		} else {
-			//std::cout << "Miss:" << m_isEvent << "\\" << m_type << " at " << time << std::endl;
 		}
 		m_firstClick = false;
 	}
@@ -27,9 +24,9 @@ void Note::click(double time) {
 void Note::tick(double time) {
 	if (m_milli - time <= m_hit_window && time - m_milli <= m_hit_window) {
 		m_hittable = true;
-	} else
+	} else{
 		m_hittable = false;
-
+	}
 	if (time > m_milli + m_hit_window + m_length && !m_isEvent) {
 		m_dead = true;
 	}
@@ -71,7 +68,4 @@ int Note::getLanMod() {
 }
 void Note::setLanMod(int i) {
 	m_lan_mod = i;
-}
-
-Note::~Note() {
 }

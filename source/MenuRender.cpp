@@ -1,8 +1,5 @@
 #include "MenuRender.h"
 
-MenuRender::MenuRender() {
-}
-
 void MenuRender::init(GLFWwindow* w) {
 	Rendr::init(w);
 
@@ -29,7 +26,7 @@ void MenuRender::tick() {
 	m_pastTime = nowTime;
 }
 
-void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
+void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	//enable exit from remapping menu
 	m_shouldClose = false;
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -51,10 +48,10 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	int heightIndex = 0;
 	float selHeight = 0.0f;
 
-	std::vector<MenuNode> list = menu.getChildrens();
-	if (menu.getChildCount() > 0) {
+	std::vector<MenuNode> list = node.getChildrens();
+	if (node.getChildCount() > 0) {
 		MenuNode m = list.at(selected);
-		right = getTextWidth(m.getText().c_str(), scale);
+		right = getTextWidth(m.getText(), scale);
 		heightIndex = selected - vOffset;
 		selHeight = getTextHeight(list.at(selected).getText(), scale);
 	}
@@ -64,48 +61,48 @@ void MenuRender::render(MenuNode menu, int selected, unsigned int vOffset) {
 	if (10.0f - m_selectionDX + right > 1270.0f) {
 		m_currentIdleTime += m_dTime;
 		if (m_currentIdleTime > m_timeBeforeAnimating) {
-			m_selectionDX = 150.0 * (m_currentIdleTime - m_timeBeforeAnimating);
+			m_selectionDX = 150.0f * (float)(m_currentIdleTime - m_timeBeforeAnimating);
 		}
 	}
 
-	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0 * scale * heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0f * scale * (float)heightIndex + selHeight, 0.0f, r, g, b);
+	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f, r, g, b);
 	pushRectangleIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
-	if (menu.getChildCount() > 0) {
+	if (node.getChildCount() > 0) {
 		//draw every child from node
 
-		if (menu.getChildCount() < VISIBLE_ENTRIES) {
-			for (size_t i = 0; i < menu.getChildCount(); i++) {
+		if (node.getChildCount() < VISIBLE_ENTRIES) {
+			for (size_t i = 0; i < node.getChildCount(); i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating) {
-					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
+					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
 				} else {
-					drawText(list.at(i).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
+					drawText(list.at(i).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
 				}
 			}
 		} else {
 			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
 				if (m_currentIdleTime > m_timeBeforeAnimating && i + vOffset == selected) {
-					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0 * scale * i + 200.0f, scale);
+					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
 				} else {
-					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0 * scale * i + 200.0f, scale);
+					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
 				}
 				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 	}
-	drawText(menu.getText(), 10.0f, 100.0f, 0.05f);
+	drawText(node.getText(), 10.0f, 100.0f, 0.05f);
 
-	if (menu.getChildCount() > VISIBLE_ENTRIES) {
+	if (node.getChildCount() > VISIBLE_ENTRIES) {
 		if (vOffset > 0) {
 			drawText("^", 10.0f, 150.0f, scale);
 		}
-		if (vOffset < menu.getChildCount() - VISIBLE_ENTRIES) {
+		if (vOffset < node.getChildCount() - VISIBLE_ENTRIES) {
 			float h = getTextHeight("v", scale);
-			drawText("v", 10.0f, 700.0 - h, scale);
+			drawText("v", 10.0f, 700.0f - h, scale);
 		}
 	}
 }
@@ -122,7 +119,8 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	startImGuiFrame("Remapper Window", flags);
 	ImGui::SetWindowPos({0.0f, 0.0f});
 
-	int width, height;
+	int width;
+	int height;
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({(float)width, (float)height});
 
@@ -135,7 +133,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			m_inputSelection = "Keyboard";
 		}
 		for (int i = 0; i < 16; ++i) {
-			std::string name = "";
+			std::string name;
 			if (glfwJoystickPresent(i)) {
 				name = glfwGetJoystickName(i);
 			} else {
@@ -196,7 +194,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		}
 	}
 
-	if (game->getPlayer()->m_gpState.size() > 0) {
+	if (!game->getPlayer()->m_gpState.empty()) {
 		ImGui::Columns(colnum, "mycolumns3", false); // 3-ways, no border
 
 		ImGui::Text("Action");
@@ -794,7 +792,6 @@ void MenuRender::credits() {
 	y += fontsize; //new line
 
 	drawText("on twitter (@MatteoGodzilla) with '#truedj')", x, y, fontsize / 1000.0f);
-	y += fontsize; //new line
 }
 
 void MenuRender::splashArt() {
@@ -804,8 +801,8 @@ void MenuRender::splashArt() {
 
 	float width = 700.0;
 	float height = width * (m_logoDimensions.y / m_logoDimensions.x);
-	float x = 1280.0 / 5 * 2;
-	float y = (720.0 - height) / 2;
+	float x = 1280.0f / 5 * 2;
+	float y = (720.0f - height) / 2;
 	pushVertexTexture(vector, x, y, 0.0, 0.0, 1.0);
 	pushVertexTexture(vector, x, y + height, 0.0, 0.0, 0.0);
 	pushVertexTexture(vector, x + width, y + height, 0.0, 1.0, 0.0);
@@ -826,7 +823,7 @@ void MenuRender::splashArt() {
 	drawText(discord2, 1270.0f - getTextWidth(discord2, textScale), 30.0f, textScale);
 
 	std::string remap = std::string("Press spacebar to enter Remapping screen");
-	drawText(remap, (1280.0 - getTextWidth(remap, 0.03f)) / 2.0, 680.0f, 0.03f);
+	drawText(remap, (1280.0f - getTextWidth(remap, 0.03f)) / 2.0f, 680.0f, 0.03f);
 }
 
 void MenuRender::scratches(Player* player) {
@@ -858,7 +855,8 @@ void MenuRender::calibration(Game* game, double dt) {
 	startImGuiFrame("Calibration Window", flags);
 	ImGui::SetWindowPos({0.0f, 0.0f});
 
-	int width, height;
+	int width;
+	int height;
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({(float)width, (float)height});
 
@@ -956,28 +954,28 @@ void MenuRender::setLaneColors(Game* game) {
 	glm::vec4& greenScratchVector = game->getGameRender()->m_greenScratchColor;
 	glm::vec4& blueScratchVector = game->getGameRender()->m_blueScratchColor;
 
-	static float greenActiveArray[4] = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
-	static float greenInactiveArray[4] = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
-	static float blueActiveArray[4] = {blueActiveVector.r, blueActiveVector.g, blueActiveVector.b, blueActiveVector.a};
-	static float blueInactiveArray[4] = {blueInactiveVector.r, blueInactiveVector.g, blueInactiveVector.b, blueInactiveVector.a};
-	static float redActiveArray[4] = {redActiveVector.r, redActiveVector.g, redActiveVector.b, redActiveVector.a};
-	static float euphoriaActiveArray[4] = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
-	static float greenScratchArray[4] = {greenScratchVector.r, greenScratchVector.g, greenScratchVector.b, greenScratchVector.a};
-	static float blueScratchArray[4] = {blueScratchVector.r, blueScratchVector.g, blueScratchVector.b, blueScratchVector.a};
+	static std::array<float,4> greenActiveArray = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
+	static std::array<float,4> greenInactiveArray = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
+	static std::array<float,4> blueActiveArray = {blueActiveVector.r, blueActiveVector.g, blueActiveVector.b, blueActiveVector.a};
+	static std::array<float,4> blueInactiveArray = {blueInactiveVector.r, blueInactiveVector.g, blueInactiveVector.b, blueInactiveVector.a};
+	static std::array<float,4> redActiveArray = {redActiveVector.r, redActiveVector.g, redActiveVector.b, redActiveVector.a};
+	static std::array<float,4> euphoriaActiveArray = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
+	static std::array<float,4> greenScratchArray = {greenScratchVector.r, greenScratchVector.g, greenScratchVector.b, greenScratchVector.a};
+	static std::array<float,4> blueScratchArray = {blueScratchVector.r, blueScratchVector.g, blueScratchVector.b, blueScratchVector.a};
 
 	startImGuiFrame("Set Deck Speed", flags);
 	ImGui::Text("Here you can edit for each lane what color it is");
 	ImGui::Text("For green and blue lane you can also pick active and inactive colors");
-	ImGui::ColorEdit4("Green Lane when active", greenActiveArray);
-	ImGui::ColorEdit4("Green Lane when inactive", greenInactiveArray);
-	ImGui::ColorEdit4("Green Scratch Zone color", greenScratchArray);
+	ImGui::ColorEdit4("Green Lane when active", greenActiveArray.data());
+	ImGui::ColorEdit4("Green Lane when inactive", greenInactiveArray.data());
+	ImGui::ColorEdit4("Green Scratch Zone color", greenScratchArray.data());
 	ImGui::Text(" ");
-	ImGui::ColorEdit4("Blue Lane when active", blueActiveArray);
-	ImGui::ColorEdit4("Blue Lane when inactive", blueInactiveArray);
-	ImGui::ColorEdit4("Blue Scratch Zone color", blueScratchArray);
+	ImGui::ColorEdit4("Blue Lane when active", blueActiveArray.data());
+	ImGui::ColorEdit4("Blue Lane when inactive", blueInactiveArray.data());
+	ImGui::ColorEdit4("Blue Scratch Zone color", blueScratchArray.data());
 	ImGui::Text(" ");
-	ImGui::ColorEdit4("Red Lane color", redActiveArray);
-	ImGui::ColorEdit4("Euphoria Lane color", euphoriaActiveArray);
+	ImGui::ColorEdit4("Red Lane color", redActiveArray.data());
+	ImGui::ColorEdit4("Euphoria Lane color", euphoriaActiveArray.data());
 	if (ImGui::Button("Close popup")) {
 		m_shouldClose = true;
 	}
@@ -993,17 +991,17 @@ void MenuRender::setLaneColors(Game* game) {
 	game->getGameRender()->m_blueScratchColor = glm::vec4(blueScratchArray[0], blueScratchArray[1], blueScratchArray[2], blueScratchArray[3]);
 }
 
-void MenuRender::editingAxisController(int action) {
+void MenuRender::editingAxisController(int axis) {
 	m_editingKey = false;
 	m_editingAxis = true;
-	m_ActionToChange = action;
+	m_ActionToChange = axis;
 }
 
-void MenuRender::editingAxisKBAM(int action) {
+void MenuRender::editingAxisKBAM(int axis) {
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	m_editingKey = true;
 	m_editingAxis = false;
-	m_ActionToChange = action;
+	m_ActionToChange = axis;
 }
 
 void MenuRender::doneEditing() {
@@ -1015,7 +1013,4 @@ void MenuRender::doneEditing() {
 
 GLFWwindow* MenuRender::getWindowPtr() {
 	return m_window;
-}
-
-MenuRender::~MenuRender() {
 }

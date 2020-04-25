@@ -42,10 +42,12 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 
 //utility function
 void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) {
-	if (rendr_InvertedX)
+	if (rendr_InvertedX){
 		v.push_back(-x);
-	else
+	}
+	else{
 		v.push_back(x);
+	}
 	v.push_back(y);
 	v.push_back(z);
 	v.push_back(s);
@@ -261,7 +263,9 @@ float Rendr::getTextHeight(const std::string& s, float scale) {
 }
 
 glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
-	int width, height, channels;
+	int width;
+	int height;
+	int channels;
 
 	//using stb_image to actually load textures
 	unsigned char* data = stbi_load(s.c_str(), &width, &height, &channels, 0);
@@ -275,11 +279,14 @@ glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		//upload texture data
-		if (channels == 4)
+		if (channels == 4){
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		else
+		}
+		else{
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		}
 		std::cout << "Rendr Msg: successfully loaded texture at " << s << std::endl;
+		stbi_image_free(data);
 		return glm::vec2(width, height);
 	} else {
 		std::cerr << "Rendr Err: cannot load texture. Does the file at " << s << " exist?" << std::endl;
@@ -287,7 +294,7 @@ glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 	}
 }
 
-void Rendr::startImGuiFrame(std::string winName, ImGuiBackendFlags flags) {
+void Rendr::startImGuiFrame(const std::string& winName, ImGuiBackendFlags flags) {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
@@ -300,10 +307,6 @@ void Rendr::renderImGuiFrame() {
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-}
-
-Rendr::Rendr() {
-	//ctor
 }
 
 void Rendr::init(GLFWwindow* w) {
@@ -390,8 +393,10 @@ void Rendr::init(GLFWwindow* w) {
 			"}\n";
 
 		//shader ids
-		unsigned int vShaderTexture, fShaderTexture;
-		unsigned int vShaderColor, fShaderColor;
+		unsigned int vShaderTexture;
+		unsigned int fShaderTexture;
+		unsigned int vShaderColor;
+		unsigned int fShaderColor;
 		unsigned int fShaderText;
 
 		//create shaders
@@ -417,31 +422,31 @@ void Rendr::init(GLFWwindow* w) {
 
 		//example compile status check
 		int success;
-		char infolog[512];
+		std::array<char,512> infolog;
 		glGetShaderiv(vShaderTexture, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderTexture, 512, nullptr, infolog);
-			std::cerr << "error compiling vertex texture shader:" << infolog << std::endl;
+			glGetShaderInfoLog(vShaderTexture, 512, nullptr, infolog.data());
+			std::cerr << "error compiling vertex texture shader:" << infolog.data() << std::endl;
 		}
 		glGetShaderiv(fShaderTexture, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderTexture, 512, nullptr, infolog);
-			std::cerr << "error compiling fragment texture shader:" << infolog << std::endl;
+			glGetShaderInfoLog(fShaderTexture, 512, nullptr, infolog.data());
+			std::cerr << "error compiling fragment texture shader:" << infolog.data() << std::endl;
 		}
 		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderColor, 512, nullptr, infolog);
-			std::cerr << "error compiling vertex color shader:" << infolog << std::endl;
+			glGetShaderInfoLog(vShaderColor, 512, nullptr, infolog.data());
+			std::cerr << "error compiling vertex color shader:" << infolog.data() << std::endl;
 		}
 		glGetShaderiv(fShaderColor, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderColor, 512, nullptr, infolog);
-			std::cerr << "error compiling fragment color shader:" << infolog << std::endl;
+			glGetShaderInfoLog(fShaderColor, 512, nullptr, infolog.data());
+			std::cerr << "error compiling fragment color shader:" << infolog.data() << std::endl;
 		}
 		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderText, 512, nullptr, infolog);
-			std::cerr << "error compiling fragment text shader:" << infolog << std::endl;
+			glGetShaderInfoLog(fShaderText, 512, nullptr, infolog.data());
+			std::cerr << "error compiling fragment text shader:" << infolog.data() << std::endl;
 		}
 		//create shader programs
 		m_textureProgram = glCreateProgram();
@@ -461,11 +466,11 @@ void Rendr::init(GLFWwindow* w) {
 
 		//example program linking check
 		int linked;
-		char log[512];
+		std::array<char,512> log;
 		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
 		if (!linked) {
-			glGetProgramInfoLog(m_textProgram, 512, nullptr, log);
-			std::cerr << "error linking program:" << log << std::endl;
+			glGetProgramInfoLog(m_textProgram, 512, nullptr, log.data());
+			std::cerr << "error linking program:" << log.data() << std::endl;
 		}
 
 		//delete shader object files
@@ -480,7 +485,7 @@ void Rendr::init(GLFWwindow* w) {
 	//projection init
 	{
 		//m_persProj = main perspective projection
-		float angle = glm::quarter_pi<float>();
+		auto angle = glm::quarter_pi<float>();
 
 		float zOffset = -1.160f;
 
@@ -595,7 +600,4 @@ void Rendr::init(GLFWwindow* w) {
 
 GLFWwindow* Rendr::getWindowPtr() {
 	return m_window;
-}
-
-Rendr::~Rendr() {
 }
