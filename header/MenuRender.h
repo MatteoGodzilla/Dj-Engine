@@ -6,8 +6,8 @@
 #include "SongScanner.h"
 
 #include <GLFW/glfw3.h>
-#include <iostream>
 #include <array>
+#include <iostream>
 #include <map>
 
 struct menuinputs {

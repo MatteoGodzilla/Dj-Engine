@@ -954,14 +954,14 @@ void MenuRender::setLaneColors(Game* game) {
 	glm::vec4& greenScratchVector = game->getGameRender()->m_greenScratchColor;
 	glm::vec4& blueScratchVector = game->getGameRender()->m_blueScratchColor;
 
-	static std::array<float,4> greenActiveArray = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
-	static std::array<float,4> greenInactiveArray = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
-	static std::array<float,4> blueActiveArray = {blueActiveVector.r, blueActiveVector.g, blueActiveVector.b, blueActiveVector.a};
-	static std::array<float,4> blueInactiveArray = {blueInactiveVector.r, blueInactiveVector.g, blueInactiveVector.b, blueInactiveVector.a};
-	static std::array<float,4> redActiveArray = {redActiveVector.r, redActiveVector.g, redActiveVector.b, redActiveVector.a};
-	static std::array<float,4> euphoriaActiveArray = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
-	static std::array<float,4> greenScratchArray = {greenScratchVector.r, greenScratchVector.g, greenScratchVector.b, greenScratchVector.a};
-	static std::array<float,4> blueScratchArray = {blueScratchVector.r, blueScratchVector.g, blueScratchVector.b, blueScratchVector.a};
+	static std::array<float, 4> greenActiveArray = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
+	static std::array<float, 4> greenInactiveArray = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
+	static std::array<float, 4> blueActiveArray = {blueActiveVector.r, blueActiveVector.g, blueActiveVector.b, blueActiveVector.a};
+	static std::array<float, 4> blueInactiveArray = {blueInactiveVector.r, blueInactiveVector.g, blueInactiveVector.b, blueInactiveVector.a};
+	static std::array<float, 4> redActiveArray = {redActiveVector.r, redActiveVector.g, redActiveVector.b, redActiveVector.a};
+	static std::array<float, 4> euphoriaActiveArray = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
+	static std::array<float, 4> greenScratchArray = {greenScratchVector.r, greenScratchVector.g, greenScratchVector.b, greenScratchVector.a};
+	static std::array<float, 4> blueScratchArray = {blueScratchVector.r, blueScratchVector.g, blueScratchVector.b, blueScratchVector.a};
 
 	startImGuiFrame("Set Deck Speed", flags);
 	ImGui::Text("Here you can edit for each lane what color it is");

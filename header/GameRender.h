@@ -42,22 +42,20 @@ enum AtlasIndices {
 
 class GameRender : public Rendr {
 public:
-	GameRender();
 	void init(GLFWwindow* w);
 	void highway(double time);
 	void clicker();
 	void notes(double time, std::vector<Note>& v, std::vector<Note>& cross);
 	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
-	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev);
-	void bpmTicks(double time, std::vector<double>& bpm_arr);
+	void lanes(double time, std::vector<Note>& v, std::vector<Note>& cross);
+	void bpmTicks(double time, std::vector<double>& bpmArr);
 	void clickerAnimation();
 	void result(Player& player, Generator& generator);
 	void meters(double time);
 	void pollState(double time, Player& p, Generator& g);
 	void updateAnimations(double time);
-	void debug(double deltaTime, std::vector<Note>& note, std::vector<Note>& ev, std::vector<Note>& c);
+	void debug(double deltaTime, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
-	virtual ~GameRender();
 
 	bool m_isButtonsRight = false;
 	float m_noteVisibleTime = 1.0;
@@ -74,9 +72,9 @@ public:
 	glm::vec4 m_blueScratchColor = {0.0, 0.0, 0.7, 1.0};
 
 private:
-	std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
-	glm::vec2 getCirclePoint(double radius, double angle);
-	int getCrossAtTime(double time, std::vector<Note> crossArr);
+	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
+	static glm::vec2 getCirclePoint(double radius, double angle);
+	static int getCrossAtTime(double time, std::vector<Note> crossArr);
 	double getAngleFromDT(double dt);
 	double getDTFromAngle(double angle);
 

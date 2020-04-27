@@ -42,10 +42,9 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 
 //utility function
 void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) {
-	if (rendr_InvertedX){
+	if (rendr_InvertedX) {
 		v.push_back(-x);
-	}
-	else{
+	} else {
 		v.push_back(x);
 	}
 	v.push_back(y);
@@ -200,31 +199,27 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 	y += maxBearing;
 
 	for (char c : s) {
-		if (c < 128) {
-			Character temp = ChMap[c];
-			std::vector<float> textVector;
-			std::vector<unsigned int> textIndices;
-			unsigned int textVertexCount = 0;
+		Character temp = ChMap[c];
+		std::vector<float> textVector;
+		std::vector<unsigned int> textIndices;
+		unsigned int textVertexCount = 0;
 
-			//scale by scl every value inside temp (Character utility struct)
-			temp.bx *= scl;
-			temp.by *= scl;
-			temp.width *= scl;
-			temp.height *= scl;
-			temp.advance *= scl;
+		//scale by scl every value inside temp (Character utility struct)
+		temp.bx *= scl;
+		temp.by *= scl;
+		temp.width *= scl;
+		temp.height *= scl;
+		temp.advance *= scl;
 
-			pushVertexTexture(textVector, x + temp.bx, y - temp.by, 0.0f, 0.0f, 0.0f);
-			pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
-			pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
-			pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
-			pushRectangleIndices(textIndices, textVertexCount);
+		pushVertexTexture(textVector, x + temp.bx, y - temp.by, 0.0f, 0.0f, 0.0f);
+		pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
+		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
+		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
+		pushRectangleIndices(textIndices, textVertexCount);
 
-			useOrthoProj();
-			renderText(textVector, textIndices, temp.TextureID);
-			x += temp.advance / 64;
-		} else {
-			std::cerr << "Rendr error:Char not supported: " << c << std::endl;
-		}
+		useOrthoProj();
+		renderText(textVector, textIndices, temp.TextureID);
+		x += temp.advance / 64;
 	}
 	rendr_InvertedX = old;
 }
@@ -279,10 +274,9 @@ glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 		//upload texture data
-		if (channels == 4){
+		if (channels == 4) {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-		}
-		else{
+		} else {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		}
 		std::cout << "Rendr Msg: successfully loaded texture at " << s << std::endl;
@@ -422,7 +416,7 @@ void Rendr::init(GLFWwindow* w) {
 
 		//example compile status check
 		int success;
-		std::array<char,512> infolog;
+		std::array<char, 512> infolog;
 		glGetShaderiv(vShaderTexture, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vShaderTexture, 512, nullptr, infolog.data());
@@ -466,7 +460,7 @@ void Rendr::init(GLFWwindow* w) {
 
 		//example program linking check
 		int linked;
-		std::array<char,512> log;
+		std::array<char, 512> log;
 		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
 		if (!linked) {
 			glGetProgramInfoLog(m_textProgram, 512, nullptr, log.data());

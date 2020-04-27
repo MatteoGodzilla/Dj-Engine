@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 
-unsigned int WIDTH = 1280;
-unsigned int HEIGHT = 720;
+int WIDTH = 1280;
+int HEIGHT = 720;
 
 std::string VERSION = "alpha v1.4";
 

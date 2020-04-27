@@ -3,7 +3,7 @@
 size_t findIndex(MenuNode& element, MenuNode& parent) {
 	std::vector<MenuNode> list = parent.getChildrens();
 	for (size_t i = 0; i < list.size(); i++) {
-		if (list.at(i).getText() == element.getText()){
+		if (list.at(i).getText() == element.getText()) {
 			return i;
 		}
 	}
@@ -222,7 +222,7 @@ void MenuNavigator::update() {
 				} else if (m_selection.back() == 0) {
 					m_selection.back() = m_activeNode.getChildCount() - 1;
 					if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-						m_viewOffset = m_activeNode.getChildCount() - m_render.VISIBLE_ENTRIES;
+						m_viewOffset = (int)(m_activeNode.getChildCount() - m_render.VISIBLE_ENTRIES);
 					}
 				}
 				if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {

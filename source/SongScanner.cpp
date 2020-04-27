@@ -192,7 +192,7 @@ bool compareSongEntries(const SongEntry& a, const SongEntry& b) {
 		a1 += std::toupper(c);
 	}
 
-	for(char c : b.s1){
+	for (char c : b.s1) {
 		b1 += std::toupper(c);
 	}
 
@@ -208,17 +208,11 @@ bool compareSongEntries(const SongEntry& a, const SongEntry& b) {
 		}
 	}
 	int res = a1.compare(b1);
-	if (res > 0) {
-		return false;
-	} else if (res == 0) {
-		int res2 = a2.compare(b2);
-		if (res2 >= 0) {
-			return false;
-		} else {
-			return true;
-		}
+	if (res != 0) {
+		return res < 0;
 	} else {
-		return true;
+		int res2 = a2.compare(b2);
+		return res2 < 0;
 	}
 }
 

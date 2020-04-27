@@ -22,11 +22,7 @@ void Note::click() {
 
 //updating note every frame
 void Note::tick(double time) {
-	if (m_milli - time <= m_hit_window && time - m_milli <= m_hit_window) {
-		m_hittable = true;
-	} else{
-		m_hittable = false;
-	}
+	m_hittable = (m_milli - time <= m_hit_window && time - m_milli <= m_hit_window);
 	if (time > m_milli + m_hit_window + m_length && !m_isEvent) {
 		m_dead = true;
 	}

@@ -41,11 +41,7 @@ void Player::pollInput(GLFWwindow* window) {
 
 			if (!m_gpState.empty()) {
 				//value * sensitivity >= deadzone
-				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
-					m_isGreenPressed = true;
-				} else{
-					m_isGreenPressed = false;
-				}
+				m_isGreenPressed = (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX));
 			}
 		}
 	}
@@ -69,30 +65,11 @@ void Player::pollInput(GLFWwindow* window) {
 
 		if (!m_gpState.empty()) {
 			//value * sensitivity >= deadzone
-			if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
-				m_isGreenPressed = true;
-			} else{
-				m_isGreenPressed = false;
-			}
-			//value * sensitivity >= deadzone
-			if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
-				m_isRedPressed = true;
-			} else{
-				m_isRedPressed = false;
-			}
-			//value * sensitivity >= deadzone
-			if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
-				m_isBluePressed = true;
-			} else {
-				m_isBluePressed = false;
-			}
-			//value * sensitivity >= deadzone
-			if (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX)) {
-				m_isEuPressed = true;
-			} else {
-				m_isEuPressed = false;
-			}
-			//value * sensitivity >= deadzone
+			m_isGreenPressed = (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX));
+			m_isRedPressed = (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX));
+			m_isBluePressed = (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX));
+			m_isEuPressed = (m_gpState.at(EU_INDEX) * m_gpMult.at(EU_INDEX) >= m_gpDead.at(EU_INDEX));
+
 			if (m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX) >= m_gpDead.at(CF_LEFT_INDEX)) {
 				m_isCfGreenPressed = true;
 				m_isCfBluePressed = false;
@@ -658,8 +635,12 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			int type = c.getType();
 			if (c.getMilli() < time && c.getMilli() > m_lastCrossTime && !c.getTouched()) {
 				if (type == CROSS_G) {
-					m_cfCenterToGreen = true;
-
+					if (m_cross != 0) {
+						m_cfCenterToGreen = true;
+					}
+					if (m_cross == 2) {
+						m_cfBlueToCenter = true;
+					}
 					m_cross = 0;
 					c.click();
 					m_score += 100 * m_mult;
@@ -669,7 +650,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				} else if (type == CROSS_C) {
 					if (m_cross == 0) {
 						m_cfGreenToCenter = true;
-					} else {
+					} else if (m_cross == 2) {
 						m_cfBlueToCenter = true;
 					}
 					m_cross = 1;
@@ -679,8 +660,12 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 					m_lastCrossTime = c.getMilli();
 					break;
 				} else if (type == CROSS_B) {
-					m_cfCenterToBlue = true;
-
+					if (m_cross != 2) {
+						m_cfCenterToBlue = true;
+					}
+					if (m_cross == 0) {
+						m_cfGreenToCenter = true;
+					}
 					m_cross = 2;
 					c.click();
 					m_score += 100 * m_mult;
@@ -942,7 +927,8 @@ void Player::writeMappingFile() {
 		output << CROSS_L_CODE << std::endl;
 		output << CROSS_R_CODE << std::endl;
 		output << SCRATCH_UP << std::endl;
-		output << SCRATCH_DOWN << std::endl << std::endl;
+		output << SCRATCH_DOWN << std::endl
+			   << std::endl;
 
 		output << GREEN_GAMEPAD << std::endl;
 		output << RED_GAMEPAD << std::endl;
@@ -955,7 +941,7 @@ void Player::writeMappingFile() {
 		output << SCR_UP_GAMEPAD << std::endl;
 		output << SCR_DOWN_GAMEPAD << std::endl;
 
-		for(float f : m_gpMult){
+		for (float f : m_gpMult) {
 			output << f << std::endl;
 		}
 		output << std::endl;
