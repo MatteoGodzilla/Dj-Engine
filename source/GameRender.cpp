@@ -55,6 +55,11 @@ void GameRender::init(GLFWwindow* w) {
 		m_objectAtlas.insert(std::make_pair(SCRATCH_UP, glm::vec4(1 * colSize, 5 * rowSize, colSize, rowSize)));
 		m_objectAtlas.insert(std::make_pair(SCRATCH_DOWN, glm::vec4(2 * colSize, 5 * rowSize, colSize, rowSize)));
 	}
+
+	framerate = std::ofstream("log.txt");
+	if(framerate.is_open()){
+		framerate << "time,fps,note,event,cross," << std::endl;
+	}
 }
 
 void GameRender::highway(double time) {
@@ -1533,6 +1538,10 @@ void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>
 	drawText(baseScore, 940.0f, 370.0f, 0.03f);
 
 	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
+
+	if(framerate.is_open()){
+		framerate << deltaTime << "," << 1/deltaTime << "," << v.size() << "," << ev.size() << "," << c.size() << "," << std::endl;
+	}
 }
 
 void GameRender::pollState(double time, Player& p, Generator& g) {
@@ -1738,4 +1747,8 @@ double GameRender::getAngleFromDT(double dt) {
 double GameRender::getDTFromAngle(double angle) {
 	double clickerAngle = asin(0.25 / m_radius);
 	return (angle - clickerAngle) * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+}
+
+GameRender::~GameRender(){
+	framerate.close();
 }

@@ -42,6 +42,7 @@ enum AtlasIndices {
 
 class GameRender : public Rendr {
 public:
+	~GameRender();
 	void init(GLFWwindow* w);
 	void highway(double time);
 	void clicker();
@@ -72,6 +73,9 @@ public:
 	glm::vec4 m_redLaneActiveColor = {1.0, 0.0, 0.0, 1.0};
 	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
 	glm::vec4 m_euphoriaZoneColor = {1.0, 1.0, 1.0, 0.2};
+
+	//DEBUG
+	std::ofstream framerate;
 
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
