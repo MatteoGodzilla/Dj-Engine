@@ -37,7 +37,7 @@ void errorCallback(int code, const char* description) {
 	std::cerr << "GLFW ERROR:(" << code << ")," << description << std::endl;
 }
 
-int main() {
+int main(int argc, char** argv) {
 	std::cout << "Dj-Engine " << VERSION << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
@@ -48,6 +48,18 @@ int main() {
 		return -1;
 	}
 	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
+
+	bool MSAActive = false;
+	if(argc > 1){
+		for(int i = 0; i < argc-1; ++i){
+			if(strcmp(argv[i],"--msaa") == 0){
+				int factor = std::stoi(argv[i+1]);
+				std::cout << "Engine Message: Creating window with MSAA x" << factor << std::endl;
+				glfwWindowHint(GLFW_SAMPLES,factor);
+				MSAActive = true;
+			}
+		}
+	}
 
 	//GLFW init functions (window and callbacks)
 	std::string title = std::string("Dj-Engine ") + VERSION;
@@ -65,6 +77,10 @@ int main() {
 	}
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
+
+	if(MSAActive){
+		glEnable(GL_MULTISAMPLE);
+	}
 
 	//imgui init
 	IMGUI_CHECKVERSION();

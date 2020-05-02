@@ -953,6 +953,7 @@ void MenuRender::setLaneColors(Game* game) {
 	glm::vec4& euphoriaActiveVector = game->getGameRender()->m_euphoriaLaneColor;
 	glm::vec4& greenScratchVector = game->getGameRender()->m_greenScratchColor;
 	glm::vec4& blueScratchVector = game->getGameRender()->m_blueScratchColor;
+	glm::vec4& euphoriaZoneVector = game->getGameRender()->m_euphoriaZoneColor;
 
 	static std::array<float, 4> greenActiveArray = {greenActiveVector.r, greenActiveVector.g, greenActiveVector.b, greenActiveVector.a};
 	static std::array<float, 4> greenInactiveArray = {greenInactiveVector.r, greenInactiveVector.g, greenInactiveVector.b, greenInactiveVector.a};
@@ -962,6 +963,7 @@ void MenuRender::setLaneColors(Game* game) {
 	static std::array<float, 4> euphoriaActiveArray = {euphoriaActiveVector.r, euphoriaActiveVector.g, euphoriaActiveVector.b, euphoriaActiveVector.a};
 	static std::array<float, 4> greenScratchArray = {greenScratchVector.r, greenScratchVector.g, greenScratchVector.b, greenScratchVector.a};
 	static std::array<float, 4> blueScratchArray = {blueScratchVector.r, blueScratchVector.g, blueScratchVector.b, blueScratchVector.a};
+	static std::array<float, 4> euphoriaZoneArray = {euphoriaZoneVector.r, euphoriaZoneVector.g, euphoriaZoneVector.b, euphoriaZoneVector.a};
 
 	startImGuiFrame("Set Deck Speed", flags);
 	ImGui::Text("Here you can edit for each lane what color it is");
@@ -976,6 +978,7 @@ void MenuRender::setLaneColors(Game* game) {
 	ImGui::Text(" ");
 	ImGui::ColorEdit4("Red Lane color", redActiveArray.data());
 	ImGui::ColorEdit4("Euphoria Lane color", euphoriaActiveArray.data());
+	ImGui::ColorEdit4("Euphoria Zone color", euphoriaZoneArray.data());
 	if (ImGui::Button("Close popup")) {
 		m_shouldClose = true;
 	}
@@ -989,6 +992,7 @@ void MenuRender::setLaneColors(Game* game) {
 	game->getGameRender()->m_euphoriaLaneColor = glm::vec4(euphoriaActiveArray[0], euphoriaActiveArray[1], euphoriaActiveArray[2], euphoriaActiveArray[3]);
 	game->getGameRender()->m_greenScratchColor = glm::vec4(greenScratchArray[0], greenScratchArray[1], greenScratchArray[2], greenScratchArray[3]);
 	game->getGameRender()->m_blueScratchColor = glm::vec4(blueScratchArray[0], blueScratchArray[1], blueScratchArray[2], blueScratchArray[3]);
+	game->getGameRender()->m_euphoriaZoneColor = glm::vec4(euphoriaZoneArray[0], euphoriaZoneArray[1], euphoriaZoneArray[2], euphoriaZoneArray[3]);
 }
 
 void MenuRender::editingAxisController(int axis) {

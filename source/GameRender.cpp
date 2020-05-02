@@ -945,7 +945,9 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 
 		if (time + m_noteVisibleTime > milli) {
 			if (type == SCR_G_ZONE) {
-				double start = std::max(milli, time);
+				double startOffset = getDTFromAngle(asin(0.5 / (m_radius + 0.5)));
+
+				double start = std::max(milli - startOffset, time);
 				double end = std::min(milli + length, time + m_noteVisibleTime);
 
 				double startAngle = getAngleFromDT(start - time);
@@ -981,7 +983,9 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					beforeInner = inner;
 				}
 			} else if (type == SCR_B_ZONE) {
-				double start = std::max(milli, time);
+				double startOffset = getDTFromAngle(asin(0.5 / (m_radius - 0.5)));
+
+				double start = std::max(milli - startOffset, time);
 				double end = std::min(milli + length, time + m_noteVisibleTime);
 
 				double startAngle = getAngleFromDT(start - time);
@@ -1017,6 +1021,32 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					beforeInner = inner;
 				}
 			} else if (type == EU_ZONE) {
+				double start = std::max(milli, time);
+				double end = std::min(milli + length, time + m_noteVisibleTime);
+
+				double startAngle = getAngleFromDT(start - time);
+				double endAngle = getAngleFromDT(end - time);
+				glm::vec2 center = {m_radius, 0.0};
+
+				glm::vec2 beforeOuter = getCirclePoint((double)m_radius + m_deltaRadius, startAngle);
+				glm::vec2 beforeInner = getCirclePoint((double)m_radius - m_deltaRadius, startAngle);
+
+				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+					double cycleTime = getDTFromAngle(cycleAngle);
+
+					glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, cycleAngle);
+					glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, cycleAngle);
+
+					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+
+					pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+					beforeOuter = outer;
+					beforeInner = inner;
+				}
 			}
 		}
 

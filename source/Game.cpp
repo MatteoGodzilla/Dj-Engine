@@ -111,6 +111,15 @@ void Game::init(GLFWwindow* w) {
 		a = std::stof(token);
 		m_render.m_blueScratchColor = glm::vec4(r, g, b, a);
 
+		input >> token;
+		r = std::stof(token);
+		input >> token;
+		g = std::stof(token);
+		input >> token;
+		b = std::stof(token);
+		input >> token;
+		a = std::stof(token);
+		m_render.m_euphoriaZoneColor = glm::vec4(r, g, b, a);
 		m_player.readMappingFile();
 	} else {
 		std::cerr << "Game Error: Cannot open config file" << std::endl;
@@ -182,8 +191,8 @@ void Game::render() {
 			m_render.meters(m_global_time);
 
 			m_render.clicker();
-			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.lanes(m_global_time, m_note_arr, m_cross_arr);
+			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.notes(m_global_time, m_note_arr, m_cross_arr);
 
 			m_render.updateAnimations(m_global_time);
@@ -311,6 +320,11 @@ void Game::writeConfig() {
 		output << m_render.m_blueScratchColor.g << std::endl;
 		output << m_render.m_blueScratchColor.b << std::endl;
 		output << m_render.m_blueScratchColor.a << std::endl;
+
+		output << m_render.m_euphoriaZoneColor.r << std::endl;
+		output << m_render.m_euphoriaZoneColor.g << std::endl;
+		output << m_render.m_euphoriaZoneColor.b << std::endl;
+		output << m_render.m_euphoriaZoneColor.a << std::endl;
 		output << std::endl;
 
 		std::cout << "Game Message: updated engine values in config file." << std::endl;
