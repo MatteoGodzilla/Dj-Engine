@@ -28,6 +28,8 @@ struct SongEntry {
 class SongScanner {
 public:
 	void load(const std::string& root, std::vector<SongEntry>& list);
+	static void writeCache(std::vector<SongEntry>& list);
+	static void readCache(std::vector<SongEntry>& list);
 
 private:
 	std::map<std::string, int> m_duplicates;

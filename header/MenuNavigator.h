@@ -46,7 +46,7 @@ public:
 	void setActive(bool active);
 	bool getActive();
 	void activate(MenuNode& menu, MenuNode& parent);
-	void scan();
+	void scan(bool useCache = true);
 	bool getShouldClose();
 	~MenuNavigator();
 

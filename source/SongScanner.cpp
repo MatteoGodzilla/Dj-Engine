@@ -232,3 +232,104 @@ void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list
 		std::cerr << "SongScanner error: Root path is not a folder" << std::endl;
 	}
 }
+
+void SongScanner::writeCache(std::vector<SongEntry>& list) {
+	std::ofstream cache("songs/songCache.txt");
+	if (cache.is_open()) {
+		std::cout << "SongScanner Message: Writing to cache" << std::endl;
+		cache << list.size() << std::endl;
+		for (SongEntry& entry : list) {
+			cache << (!entry.path.empty() ? entry.path : std::string("NULL")) << std::endl;
+			cache << (!entry.s1.empty() ? entry.s1 : std::string("NULL")) << std::endl;
+			cache << (!entry.s2.empty() ? entry.s2 : std::string("NULL")) << std::endl;
+			cache << (!entry.a1.empty() ? entry.a1 : std::string("NULL")) << std::endl;
+			cache << (!entry.a2.empty() ? entry.a2 : std::string("NULL")) << std::endl;
+			cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << std::endl;
+			cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << std::endl;
+			cache << (entry.bpm != -1 ? entry.bpm : -1) << std::endl;
+			cache << (entry.dTrack != -1 ? entry.dTrack : -1) << std::endl;
+			cache << (entry.dTap != -1 ? entry.dTap : -1) << std::endl;
+			cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << std::endl;
+			cache << (entry.dScratch != -1 ? entry.dScratch : -1) << std::endl;
+		}
+		std::cout << "SongScanner Message: updated song cache" << std::endl;
+	}
+}
+
+void SongScanner::readCache(std::vector<SongEntry>& list) {
+	std::ifstream cache("songs/songCache.txt");
+	if (cache.is_open()) {
+		list.clear();
+		int n;
+		std::string token;
+		std::getline(cache, token);
+		n = stoi(token);
+		for (int i = 0; i < n; ++i) {
+			std::string path;
+			std::string s1;
+			std::string s2;
+			std::string a1;
+			std::string a2;
+			std::string charter;
+			std::string mixer;
+			float bpm;
+			int dTrack;
+			int dTap;
+			int dCrossfade;
+			int dScratch;
+
+			std::getline(cache, token);
+			path = token;
+			std::getline(cache, token);
+			s1 = token;
+			std::getline(cache, token);
+			s2 = token;
+			std::getline(cache, token);
+			a1 = token;
+			std::getline(cache, token);
+			a2 = token;
+			std::getline(cache, token);
+			charter = token;
+			std::getline(cache, token);
+			mixer = token;
+			std::getline(cache, token);
+			bpm = std::stof(token);
+			std::getline(cache, token);
+			dTrack = std::stoi(token);
+			std::getline(cache, token);
+			dTap = std::stoi(token);
+			std::getline(cache, token);
+			dCrossfade = std::stoi(token);
+			std::getline(cache, token);
+			dScratch = std::stoi(token);
+
+			if (s2 == std::string("NULL")) {
+				s2.clear();
+			}
+
+			if (a2 == std::string("NULL")) {
+				a2.clear();
+			}
+
+			SongEntry t = {
+				path,
+				s1,
+				s2,
+				a1,
+				a2,
+				charter,
+				mixer,
+				bpm,
+				dTrack,
+				dTap,
+				dCrossfade,
+				dScratch,
+			};
+			list.push_back(t);
+		}
+		cache.close();
+		std::cout << "SongScanner Message: loaded songs from cache" << std::endl;
+	} else {
+		std::cerr << "SongScanner Error: corrupted cache" << std::endl;
+	}
+}

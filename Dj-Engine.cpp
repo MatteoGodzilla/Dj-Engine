@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "MenuNavigator.h"
 
+#include "stb_image.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
@@ -70,6 +71,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetWindowAspectRatio(window,WIDTH,HEIGHT);
 	glfwSetErrorCallback(&errorCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported()) {
@@ -77,6 +79,12 @@ int main(int argc, char** argv) {
 	}
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
+
+	int w,h,n;
+	unsigned char* data = stbi_load("res/GameIcon.png",&w,&h,&n,0);
+
+	GLFWimage image = {w,h,data};
+	glfwSetWindowIcon(window,1,&image);
 
 	if(MSAActive){
 		glEnable(GL_MULTISAMPLE);
@@ -129,9 +137,6 @@ int main(int argc, char** argv) {
 			game.tick();
 			game.render();
 		}
-
-		//add delta time to m_global_time
-
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);

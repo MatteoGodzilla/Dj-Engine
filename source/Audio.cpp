@@ -42,7 +42,7 @@ void Audio::load(const char* filename) {
 			alSourceQueueBuffers(m_source, 1, &b);
 
 			//remove temporary buffer
-			alDeleteBuffers(1, &b);
+			//alDeleteBuffers(1, &b);
 
 			alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
 		}

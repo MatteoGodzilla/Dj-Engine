@@ -436,7 +436,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		std::vector<MenuNode> emptyList;
 		m_root.getChildrens().at(0).getChildrens().clear();
 		m_songList.clear();
-		scan();
+		scan(false);
 	} else if (id == COLOR_ID) {
 		m_popupId = LANE_COLORS;
 	} else if (id == SONG_GENERAL_ID) {
@@ -457,9 +457,14 @@ void MenuNavigator::remap() {
 	m_scene = REMAPPING;
 }
 
-void MenuNavigator::scan() {
+void MenuNavigator::scan(bool useCache) {
 	SongScanner scanner = SongScanner();
-	scanner.load("./songs", m_songList);
+	if (!useCache) {
+		scanner.load("./songs", m_songList);
+		scanner.writeCache(m_songList);
+	} else {
+		scanner.readCache(m_songList);
+	}
 	for (const SongEntry& entry : m_songList) {
 		std::string text;
 		if (!entry.s2.empty()) {

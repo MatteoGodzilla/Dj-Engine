@@ -74,9 +74,6 @@ public:
 	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
 	glm::vec4 m_euphoriaZoneColor = {1.0, 1.0, 1.0, 0.2};
 
-	//DEBUG
-	std::ofstream framerate;
-
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
 	static glm::vec2 getCirclePoint(double radius, double angle);
