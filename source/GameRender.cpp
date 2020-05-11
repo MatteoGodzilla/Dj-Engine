@@ -1071,7 +1071,6 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 }
 
 void GameRender::meters(double time) {
-	/*
 	float yPlane = 0.1f;
 
 	//vertices data
@@ -1079,6 +1078,7 @@ void GameRender::meters(double time) {
 	std::vector<unsigned int> metersIndices;
 	unsigned int metersVertexCount = 0;
 
+	/*
 	//multiplier display
 	if (m_playerMult == 2) {
 		//render a 'x2'
@@ -1270,52 +1270,43 @@ void GameRender::meters(double time) {
 	}
 	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
-
 	metersVector.clear();
 	metersIndices.clear();
 	metersVertexCount = 0;
+	*/
+
+	//push the old state for later
+	bool oldButtonsPos = rendr_InvertedX;
+	rendr_InvertedX = false;
+
 	//progress bar
 	std::string s = std::to_string(m_playerScore);
 	std::string scoreDisplay("00000000");
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
 
-	float scale = 0.05f;
-	float x = 0.0;
-	float width = 200.0f;
-	x = (float)m_playerScore / (float)m_genBaseScore;
-	float y = 20.0f;
+	glm::vec2 scorePosition{140.0f,310.0f};
+	glm::vec2 scoreSize{200.0f,20.0f};
+	glm::vec2 scoreOuterPadding{10.0f,10.0f};
+	float starSideLength = scoreSize.y + 6*scoreOuterPadding.y;
 
-	if (m_isButtonsRight) {
-		pushVertexTexture(metersVector, -940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
-		pushVertexTexture(metersVector, -940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
-		pushVertexTexture(metersVector, -940.0f - width - 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
-		pushVertexTexture(metersVector, -940.0f - width - 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-
-		pushVertexTexture(metersVector, -940.0f - width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
-		pushVertexTexture(metersVector, -940.0f - width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
-		pushVertexTexture(metersVector, -940.0f - width - 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
-		pushVertexTexture(metersVector, -940.0f - width - 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else {
-		pushVertexTexture(metersVector, 940.0f, 310.0f, 0.0f, 0.0f, 0.5f);
-		pushVertexTexture(metersVector, 940.0f, 310.0f + y + 20.0, 0.0f, 0.0f, 0.0f);
-		pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f + y + 20.0, 0.0f, 220.0f / 300.0f, 0.0f);
-		pushVertexTexture(metersVector, 940.0f + width + 20.0, 310.0f, 0.0f, 220.0f / 300.0f, 0.5f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-
-		pushVertexTexture(metersVector, 940.0f + width, 280.0f, 0.0f, 221.0f / 300.0f, 1.0f);
-		pushVertexTexture(metersVector, 940.0f + width, 280.0f + 80.0, 0.0f, 221.0f / 300.0f, 0.0f);
-		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f + 80.0, 0.0f, 1.0f, 0.0f);
-		pushVertexTexture(metersVector, 940.0f + width + 80.0, 280.0f, 0.0f, 1.0f, 1.0f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-
+	if(oldButtonsPos){
+		//if m_isButtonRight was true move meter to the right
+		scorePosition.x = 1280.0f - scorePosition.x - scoreSize.x;
 	}
 
-
-
+	//base meter
+	pushVertexTexture(metersVector, scorePosition.x - scoreOuterPadding.x, scorePosition.y - scoreOuterPadding.y, 0.0f, 0.0f, 0.5f);
+	pushVertexTexture(metersVector, scorePosition.x - scoreOuterPadding.x, scorePosition.y + scoreOuterPadding.y + scoreSize.y, 0.0f, 0.0f, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x, scorePosition.y + scoreOuterPadding.y + scoreSize.y, 0.0f, 220.0f / 300.0f, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x, scorePosition.y - scoreOuterPadding.y, 0.0f, 220.0f / 300.0f, 0.5f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
+	//star
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x, scorePosition.y + scoreSize.y / 2 - starSideLength / 2, 0.0f, 221.0f / 300.0f, 1.0f);
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x, scorePosition.y + scoreSize.y / 2 + starSideLength / 2, 0.0f, 221.0f / 300.0f, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x + starSideLength, scorePosition.y + scoreSize.y / 2 + starSideLength / 2, 0.0f, 1.0f, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + scoreOuterPadding.x + scoreSize.x + starSideLength, scorePosition.y + scoreSize.y / 2 - starSideLength / 2, 0.0f, 1.0f, 1.0f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
 
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarFrame);
@@ -1323,74 +1314,70 @@ void GameRender::meters(double time) {
 	metersIndices.clear();
 	metersVertexCount = 0;
 
-	float textX = 960.0f + width + 3.0f;
-	float textY = 305.0f;
+	float scale = 0.05f;
+	float x = 0.0;
+	x = (float)m_playerScore / (float)m_genBaseScore;
+
+	float textX = scorePosition.x + scoreSize.x + 3.5 * scoreOuterPadding.x;
+	float textY = scorePosition.y - scoreOuterPadding.y;
 
 	if (x < 0.1) {
 		x = x / 0.1;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else if (x < 0.2) {
 		drawText("1", textX, textY, scale);
 		x = (x - 0.1) / 0.1;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else if (x < 0.3) {
 		drawText("2", textX, textY, scale);
 		x = (x - 0.2) / 0.1;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else if (x < 0.4) {
 		drawText("3", textX, textY, scale);
 		x = (x - 0.3) / 0.1;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else if (x < 0.5) {
 		drawText("4", textX - 2.0f, textY, scale);
 		x = (x - 0.40) / 0.10;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else if (x < 0.7) {
 		drawText("5", textX, textY, scale);
 		x = (x - 0.50) / 0.20;
-		x *= width;
+		x *= scoreSize.x;
 	}
 	else {
 		drawText("5", textX, textY, scale);
-		x = width;
+		x = scoreSize.x;
 	}
 
-	float ratio = x / y;
+	float ratio = x / scoreSize.y;
 	float toffset = time * -1;
 
-	if (m_isButtonsRight) {
-		pushVertexTexture(metersVector, -950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
-		pushVertexTexture(metersVector, -950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
-		pushVertexTexture(metersVector, -950.0f - x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
-		pushVertexTexture(metersVector, -950.0f - x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else {
-		pushVertexTexture(metersVector, 950.0f, 320.0f, 0.0f, 0.0f + toffset, 1.0f);
-		pushVertexTexture(metersVector, 950.0f, 320.0f + y, 0.0f, 0.0f + toffset, 0.0f);
-		pushVertexTexture(metersVector, 950.0f + x, 320.0f + y, 0.0f, 0.0f + ratio + toffset, 0.0f);
-		pushVertexTexture(metersVector, 950.0f + x, 320.0f, 0.0f, 0.0f + ratio + toffset, 1.0f);
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
+	//inner meter thing
+	pushVertexTexture(metersVector, scorePosition.x, scorePosition.y, 0.0f, 0.0f + toffset, 1.0f);
+	pushVertexTexture(metersVector, scorePosition.x, scorePosition.y + scoreSize.y, 0.0f, 0.0f + toffset, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + x, scorePosition.y + scoreSize.y, 0.0f, 0.0f + ratio + toffset, 0.0f);
+	pushVertexTexture(metersVector, scorePosition.x + x, scorePosition.y, 0.0f, 0.0f + ratio + toffset, 1.0f);
+	pushRectangleIndices(metersIndices, metersVertexCount);
 
 	useOrthoProj();
 	renderTexture(metersVector, metersIndices, m_pgBarInside);
 
 	//score meter
-
-	drawText(scoreDisplay, 940.0f, 230.0f, scale);
+	drawText(scoreDisplay, scorePosition.x, scorePosition.y - scoreOuterPadding.y - 80.0f, scale);
 
 	//combo meter
 	if (m_playerCombo >= 15) {
 		std::string c = std::to_string(m_playerCombo);
-		drawText(c, 940.0f, 280.0f, 0.03f);
+		drawText(c, scorePosition.x, scorePosition.y - scoreOuterPadding.y - 30.0f, 0.03f);
 	}
-	*/
+	//pop back the old inverted state
+	rendr_InvertedX = oldButtonsPos;
 }
 
 void GameRender::result(Player& player, Generator& generator) {
@@ -1738,8 +1725,4 @@ double GameRender::getAngleFromDT(double dt) {
 double GameRender::getDTFromAngle(double angle) {
 	double clickerAngle = asin(0.25 / m_radius);
 	return (angle - clickerAngle) * m_noteVisibleTime / (m_maxAngle - clickerAngle);
-}
-
-GameRender::~GameRender() {
-	framerate.close();
 }

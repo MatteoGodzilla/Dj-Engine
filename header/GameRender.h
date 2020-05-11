@@ -42,7 +42,6 @@ enum AtlasIndices {
 
 class GameRender : public Rendr {
 public:
-	~GameRender();
 	void init(GLFWwindow* w);
 	void highway(double time);
 	void clicker();
