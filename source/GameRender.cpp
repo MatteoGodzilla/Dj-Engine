@@ -1074,9 +1074,14 @@ void GameRender::meters(double time) {
 	float yPlane = 0.1f;
 
 	//vertices data
-	std::vector<float>metersVector;
+	std::vector<float> metersVector;
 	std::vector<unsigned int> metersIndices;
 	unsigned int metersVertexCount = 0;
+
+	float radiusDistance = 0.1f;
+
+	glm::vec2 center = {m_radius, 0};
+	float meterRadius = m_radius - m_deltaRadius - radiusDistance;
 
 	/*
 	//multiplier display
@@ -1160,53 +1165,84 @@ void GameRender::meters(double time) {
 		}
 
 		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
+	}*/
 
 	//combo tickmarks
-	for (int i = 0; i < 8; i++) {
-		if (m_playerCombo == 0) {
-			//add inactive tick
-			pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
-			pushRectangleIndices(metersIndices, metersVertexCount);
-		}
-		else if (m_playerCombo >= 24) {
-			//add active tick
-			pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
-			pushRectangleIndices(metersIndices, metersVertexCount);
-		}
-		//if the multiplier is growing
-		else {
-			//find the last tick to be active
-			int limit = m_playerCombo % 8;
-			if (limit == 0)limit = 9;
+	double tickWidth = 0.25;
+	double tickHeightAngle = asin(tickWidth / (2 * meterRadius));
+	double startTicksAngle = tickHeightAngle * 2;
+	double endTicksAngle = tickHeightAngle * 10;
 
-			if (i < limit) {
-				//add active tick
-				pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
-				pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 0.0f);
-				pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 0.0f);
-				pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
-				pushRectangleIndices(metersIndices, metersVertexCount);
+	for (int i = 0; i < 8; i++) {
+		int limit = 0;
+		if (m_playerCombo > 0 && m_playerCombo < 24) {
+			limit = m_playerCombo % 8;
+			if (limit == 0) {
+				limit = 8;
 			}
-			else {
-				//add inactive tick
-				pushVertexTexture(metersVector, 1.0f, yPlane, 3.6f - 0.11f * i, 400.0f / 1000.0f, 400.0f / 1200.0f);
-				pushVertexTexture(metersVector, 1.0f, yPlane, 3.7f - 0.11f * i, 400.0f / 1000.0f, 200.0f / 1200.0f);
-				pushVertexTexture(metersVector, 1.2f, yPlane, 3.7f - 0.11f * i, 800.0f / 1000.0f, 200.0f / 1200.0f);
-				pushVertexTexture(metersVector, 1.2f, yPlane, 3.6f - 0.11f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
-				pushRectangleIndices(metersIndices, metersVertexCount);
-			}
+		} else if (m_playerCombo >= 24) {
+			limit = 8;
 		}
+
+		glm::vec2 topLeft;
+		glm::vec2 topRight;
+		glm::vec2 bottomLeft;
+		glm::vec2 bottomRight;
+
+		topLeft = getCirclePoint(m_radius - m_deltaRadius - radiusDistance, startTicksAngle + tickHeightAngle * (i + 1));
+		topRight = getCirclePoint(m_radius - m_deltaRadius - radiusDistance - tickWidth, startTicksAngle + tickHeightAngle * (i + 1));
+		bottomLeft = getCirclePoint(m_radius - m_deltaRadius - radiusDistance, startTicksAngle + tickHeightAngle * i);
+		bottomRight = getCirclePoint(m_radius - m_deltaRadius - radiusDistance - tickWidth, startTicksAngle + tickHeightAngle * i);
+
+		glm::vec4 spriteRect;
+
+		if (i < limit) {
+			//active at position i
+			spriteRect = {400.0f / 1000.0f, 200.0f / 1200.0f, 400.0f / 1000.0f, 200.0f / 1200.0f};
+		} else {
+			//inactive at position i
+			spriteRect = {400.0f / 1000.0f, 400.0f / 1200.0f, 400.0f / 1000.0f, 200.0f / 1200.0f};
+		}
+
+		pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, spriteRect.x, spriteRect.y);
+		pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, spriteRect.x, spriteRect.y - spriteRect.w);
+		pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, spriteRect.x + spriteRect.z, spriteRect.y - spriteRect.w);
+		pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, spriteRect.x + spriteRect.z, spriteRect.y);
+		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
+
+	//multiplier display
+	glm::vec4 multiplierSprite;
+	if (m_playerMult == 2) {
+		multiplierSprite = {0.0f / 1000.0f, 400.0f / 1200.0f, 400.0f / 1000.0f, 400.0f / 1200.0f};
+	} else if (m_playerMult == 3) {
+		multiplierSprite = {400.0f / 1000.0f, 400.0f / 1200.0f, 400.0f / 1000.0f, 400.0f / 1200.0f};
+	} else if (m_playerMult == 4) {
+		multiplierSprite = {0.0f / 1000.0f, 800.0f / 1200.0f, 400.0f / 1000.0f, 400.0f / 1200.0f};
+	} else if (m_playerMult == 6) {
+		multiplierSprite = {0.0f / 1000.0f, 0.0f / 1200.0f, 400.0f / 1000.0f, 400.0f / 1200.0f};
+	} else if (m_playerMult == 8) {
+		multiplierSprite = {400.0f / 1000.0f, 0.0f / 1200.0f, 400.0f / 1000.0f, 400.0f / 1200.0f};
+	} else {
+		multiplierSprite = {0.0f / 1000.0f, 0.0f / 1200.0f, 0.0f / 1000.0f, 0.0f / 1200.0f};
+	}
+
+	if (m_isButtonsRight) {
+		multiplierSprite = {multiplierSprite.x + multiplierSprite.z, multiplierSprite.y, -multiplierSprite.z, multiplierSprite.w};
+	}
+
+	glm::vec2 size = {0.3, 0.3};
+	glm::vec2 bottomLeft = getCirclePoint(meterRadius, endTicksAngle);
+
+	pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane + size.y, -center.y - bottomLeft.y, multiplierSprite.x, 1200.0f - multiplierSprite.y);
+	pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, multiplierSprite.x, 1200.0f - multiplierSprite.y - multiplierSprite.w);
+	pushVertexTexture(metersVector, center.x - bottomLeft.x + size.x, yPlane, -center.y - bottomLeft.y, multiplierSprite.x + multiplierSprite.z, 1200.0f - multiplierSprite.y - multiplierSprite.w);
+	pushVertexTexture(metersVector, center.x - bottomLeft.x + size.x, yPlane + size.y, -center.y - bottomLeft.y, multiplierSprite.x + multiplierSprite.z, 1200.0f - multiplierSprite.y);
+	pushRectangleIndices(metersIndices, metersVertexCount);
 
 	//euphoria meter
 	//empty indicator
+	/*
 	for (int i = 0; i < 3; i++) {
 		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f - 0.35f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
 		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f - 0.35f * i, 1.0f, 400.0f / 1200.0f);
@@ -1257,8 +1293,7 @@ void GameRender::meters(double time) {
 				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f - 0.35f * z, 1.0, 400.0f / 1200.0f);
 				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
 				pushRectangleIndices(metersIndices, metersVertexCount);
-			}
-			else {
+			} else {
 				//add full third indicator
 				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 0.0f);
 				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 0.0f);
@@ -1268,12 +1303,14 @@ void GameRender::meters(double time) {
 			}
 		}
 	}
+
+	*/
+
 	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
 	metersVector.clear();
 	metersIndices.clear();
 	metersVertexCount = 0;
-	*/
 
 	//push the old state for later
 	bool oldButtonsPos = rendr_InvertedX;
@@ -1285,12 +1322,12 @@ void GameRender::meters(double time) {
 	scoreDisplay.resize(scoreDisplay.length() - s.length());
 	scoreDisplay.append(s);
 
-	glm::vec2 scorePosition{140.0f,310.0f};
-	glm::vec2 scoreSize{200.0f,20.0f};
-	glm::vec2 scoreOuterPadding{10.0f,10.0f};
-	float starSideLength = scoreSize.y + 6*scoreOuterPadding.y;
+	glm::vec2 scorePosition {140.0f, 310.0f};
+	glm::vec2 scoreSize {200.0f, 20.0f};
+	glm::vec2 scoreOuterPadding {10.0f, 10.0f};
+	float starSideLength = scoreSize.y + 6 * scoreOuterPadding.y;
 
-	if(oldButtonsPos){
+	if (oldButtonsPos) {
 		//if m_isButtonRight was true move meter to the right
 		scorePosition.x = 1280.0f - scorePosition.x - scoreSize.x;
 	}
@@ -1318,45 +1355,39 @@ void GameRender::meters(double time) {
 	float x = 0.0;
 	x = (float)m_playerScore / (float)m_genBaseScore;
 
-	float textX = scorePosition.x + scoreSize.x + 3.5 * scoreOuterPadding.x;
+	float textX = scorePosition.x + scoreSize.x + 3.5f * scoreOuterPadding.x;
 	float textY = scorePosition.y - scoreOuterPadding.y;
 
-	if (x < 0.1) {
-		x = x / 0.1;
+	if (x < 0.1f) {
+		x = x / 0.1f;
 		x *= scoreSize.x;
-	}
-	else if (x < 0.2) {
+	} else if (x < 0.2f) {
 		drawText("1", textX, textY, scale);
-		x = (x - 0.1) / 0.1;
+		x = (x - 0.1f) / 0.1f;
 		x *= scoreSize.x;
-	}
-	else if (x < 0.3) {
+	} else if (x < 0.3f) {
 		drawText("2", textX, textY, scale);
-		x = (x - 0.2) / 0.1;
+		x = (x - 0.2f) / 0.1f;
 		x *= scoreSize.x;
-	}
-	else if (x < 0.4) {
+	} else if (x < 0.4f) {
 		drawText("3", textX, textY, scale);
-		x = (x - 0.3) / 0.1;
+		x = (x - 0.3f) / 0.1f;
 		x *= scoreSize.x;
-	}
-	else if (x < 0.5) {
+	} else if (x < 0.5f) {
 		drawText("4", textX - 2.0f, textY, scale);
-		x = (x - 0.40) / 0.10;
+		x = (x - 0.40f) / 0.10f;
 		x *= scoreSize.x;
-	}
-	else if (x < 0.7) {
+	} else if (x < 0.7f) {
 		drawText("5", textX, textY, scale);
-		x = (x - 0.50) / 0.20;
+		x = (x - 0.50f) / 0.20f;
 		x *= scoreSize.x;
-	}
-	else {
+	} else {
 		drawText("5", textX, textY, scale);
 		x = scoreSize.x;
 	}
 
 	float ratio = x / scoreSize.y;
-	float toffset = time * -1;
+	float toffset = (float)time * -1.0f;
 
 	//inner meter thing
 	pushVertexTexture(metersVector, scorePosition.x, scorePosition.y, 0.0f, 0.0f + toffset, 1.0f);
@@ -1517,7 +1548,11 @@ void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>
 	baseScore.append(std::to_string((float)m_playerScore / (float)m_genBaseScore));
 	baseScore.append("|");
 	baseScore.append(std::to_string(m_genBaseScore));
-	drawText(baseScore, 940.0f, 370.0f, 0.03f);
+	if (m_isButtonsRight) {
+		drawText(baseScore, 940.0f, 370.0f, 0.03f);
+	} else {
+		drawText(baseScore, 140.0f, 370.0f, 0.03f);
+	}
 
 	drawText(std::to_string(m_renderEuValue), 200.0, 500.0f, 0.03f);
 }

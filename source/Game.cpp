@@ -135,7 +135,7 @@ void Game::pollInput() {
 			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_T)) {
 				std::cout << m_global_time << std::endl;
 			}
-			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_F1)) {
+			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_ESCAPE)) {
 				m_mode = 1;
 			}
 		} else {

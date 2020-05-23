@@ -461,9 +461,9 @@ void MenuNavigator::scan(bool useCache) {
 	SongScanner scanner = SongScanner();
 	if (!useCache) {
 		scanner.load("./songs", m_songList);
-		scanner.writeCache(m_songList);
+		SongScanner::writeCache(m_songList);
 	} else {
-		scanner.readCache(m_songList);
+		SongScanner::readCache(m_songList);
 	}
 	for (const SongEntry& entry : m_songList) {
 		std::string text;

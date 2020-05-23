@@ -80,7 +80,9 @@ int main(int argc, char** argv) {
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
 
-	int w,h,n;
+	int w;
+	int h;
+	int n;
 	unsigned char* data = stbi_load("res/GameIcon.png",&w,&h,&n,0);
 
 	GLFWimage image = {w,h,data};

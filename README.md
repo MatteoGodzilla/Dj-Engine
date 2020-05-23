@@ -1,6 +1,6 @@
 # Dj-Engine, A Dj Hero Clone :)
 
-![Dj-Engine logo](https://i.imgur.com/P0uGXwY.png)
+![Dj-Engine logo](res/splashArt.png)
 
 Recreation of the Dj-Hero™ 2 engine, made by FreeStyleGames®, for pc.
 
