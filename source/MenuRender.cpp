@@ -819,8 +819,12 @@ void MenuRender::splashArt() {
 
 	std::string discord = "For any questions, ask on the Dj Hero Discord";
 	std::string discord2 = "https://discord.gg/HZ82gKR";
+	std::string donation = "If you want to support the development, you can donate at";
+	std::string donation2 = "paypal.me/MatteoGodzilla";
 	drawText(discord, 1270.0f - getTextWidth(discord, textScale), 10.0f, textScale);
 	drawText(discord2, 1270.0f - getTextWidth(discord2, textScale), 30.0f, textScale);
+	drawText(donation, 1270.0f - getTextWidth(donation, textScale), 50.0f, textScale);
+	drawText(donation2, 1270.0f - getTextWidth(donation2, textScale), 70.0f, textScale);
 
 	std::string remap = std::string("Press spacebar to enter Remapping screen");
 	drawText(remap, (1280.0f - getTextWidth(remap, 0.03f)) / 2.0f, 680.0f, 0.03f);

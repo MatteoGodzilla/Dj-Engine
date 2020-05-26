@@ -15,6 +15,10 @@ std::string MenuNode::getText() {
 	return m_text;
 }
 
+void MenuNode::setText(const std::string& text) {
+	m_text = text;
+}
+
 int MenuNode::getId() {
 	return m_id;
 }

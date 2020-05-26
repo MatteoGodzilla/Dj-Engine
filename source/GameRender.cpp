@@ -622,19 +622,17 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	float greenRadius = m_radius + 0.5f;
 	float blueRadius = m_radius - 0.5f;
 
-	float startRedAngle = asin(0.25f / m_radius);
-	float startGreenAngle = asin(0.25f / greenRadius);
-	float startBlueAngle = asin(0.25f / blueRadius);
+	float startAngle = asin(0.25f / m_radius);
 
 	glm::vec2 center = {m_radius, 0.0};
-	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startRedAngle);
-	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startRedAngle);
-	glm::vec2 greenBeforeOuter = getCirclePoint((double)greenRadius + size, startGreenAngle);
-	glm::vec2 greenBeforeInner = getCirclePoint((double)greenRadius - size, startGreenAngle);
-	glm::vec2 blueBeforeOuter = getCirclePoint((double)blueRadius + size, startBlueAngle);
-	glm::vec2 blueBeforeInner = getCirclePoint((double)blueRadius - size, startBlueAngle);
+	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startAngle);
+	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startAngle);
+	glm::vec2 greenBeforeOuter = getCirclePoint((double)greenRadius + size, startAngle);
+	glm::vec2 greenBeforeInner = getCirclePoint((double)greenRadius - size, startAngle);
+	glm::vec2 blueBeforeOuter = getCirclePoint((double)blueRadius + size, startAngle);
+	glm::vec2 blueBeforeInner = getCirclePoint((double)blueRadius - size, startAngle);
 
-	for (float angle = startRedAngle; angle < m_maxAngle; angle += m_deltaAngle) {
+	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
 		auto angleTime = (float)(time + getDTFromAngle(angle));
 
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);

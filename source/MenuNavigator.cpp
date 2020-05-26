@@ -66,7 +66,13 @@ void MenuNavigator::readConfigFile() {
 	}
 }
 
-MenuNavigator::MenuNavigator() {
+void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
+	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
+	m_pastKBMState = gameptr->getPlayer()->getKBMValues(w);
+	//std::cout << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << std::endl;
+	m_game = gameptr;
+	m_render.init(w);
+
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
 	MenuNode options("Options", OPTIONS_ID);
@@ -75,12 +81,18 @@ MenuNavigator::MenuNavigator() {
 
 	MenuNode scratches("Test Scratches", SCRATCHES_ID);
 	MenuNode latency("Calibrate latency", LATENCY_ID);
-	MenuNode flipButtons("Toggle Buttons Right/Left", LR_BUTTONS_ID);
-	MenuNode speed("Set Deck Speed", SPEED_ID);
+	MenuNode flipButtons("Toggle Buttons Right/Left:", LR_BUTTONS_ID);
+	MenuNode speed("Set Deck Speed:", SPEED_ID);
 	MenuNode refreshList("Refresh song list", REFRESH_ID);
-	MenuNode bot("Toggle Bot", BOT_ID);
+	MenuNode bot("Toggle Bot:", BOT_ID);
 	MenuNode color("Change lanes color", COLOR_ID);
-	MenuNode debug("Toggle Debug Informations", DEBUG_ID);
+	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
+
+	//add values to text after:
+	flipButtons.setText(flipButtons.getText() + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
+	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
+	bot.setText(bot.getText() + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
+	debug.setText(debug.getText() + (m_game->m_debugView == 1 ? "true" : "false"));
 
 	options.push(scratches);
 	options.push(latency);
@@ -104,14 +116,7 @@ MenuNavigator::MenuNavigator() {
 		m_gpDead.push_back(0.5);
 	}
 	readConfigFile();
-}
 
-void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
-	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
-	m_pastKBMState = gameptr->getPlayer()->getKBMValues(w);
-	//std::cout << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << std::endl;
-	m_game = gameptr;
-	m_render.init(w);
 	render(0.0f);
 	scan();
 }
@@ -406,32 +411,18 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	} else if (id == LATENCY_ID) {
 		m_scene = CALIBRATION;
 	} else if (id == LR_BUTTONS_ID) {
-		if (m_game->getPlayer()->m_isButtonsRight) {
-			std::cout << "Menu message: Changed Buttons to Right" << std::endl;
-			m_game->setButtonPos(false);
-		} else {
-			std::cout << "Menu message: Changed Buttons to Left" << std::endl;
-			m_game->setButtonPos(true);
-		}
+		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
+		//update options node text
+		m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Toggle Buttons Right/Left:") + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
 	} else if (id == BOT_ID) {
-		if (m_game->getPlayer()->m_botEnabled) {
-			std::cout << "Menu Message: disabled bot" << std::endl;
-			m_game->getPlayer()->m_botEnabled = false;
-		} else {
-			std::cout << "Menu Message: enabled bot" << std::endl;
-			m_game->getPlayer()->m_botEnabled = true;
-		}
+		m_game->getPlayer()->m_botEnabled = !m_game->getPlayer()->m_botEnabled;
+		m_root.getChildrens().at(1).getChildrens().at(5).setText(std::string("Toggle Bot:") + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
-		if (m_game->m_debugView) {
-			std::cout << "Menu Message: Disabled debug informations" << std::endl;
-			m_game->m_debugView = false;
-		} else {
-			std::cout << "Menu Message: Enabled debug informations" << std::endl;
-			m_game->m_debugView = true;
-		}
+		m_game->m_debugView = !m_game->m_debugView;
+		m_root.getChildrens().at(1).getChildrens().at(7).setText(std::string("Toggle Debug Informations:") + (m_game->m_debugView == 1 ? "true" : "false"));
 	} else if (id == REFRESH_ID) {
 		std::vector<MenuNode> emptyList;
 		m_root.getChildrens().at(0).getChildrens().clear();
@@ -445,7 +436,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		m_game->start(m_songList.at(index));
 		resetMenu();
 	} else if (menu.getChildCount() == 0) {
-		if (menu.getId() == 1) {
+		if (menu.getId() == PLAY_ID) {
 			std::cout << "Menu Message: No songs found in the install path." << std::endl;
 		} else {
 			std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
@@ -523,8 +514,4 @@ bool MenuNavigator::getShouldClose() {
 
 bool MenuNavigator::getActive() {
 	return m_active;
-}
-
-MenuNavigator::~MenuNavigator() {
-	m_render.~MenuRender();
 }

@@ -38,7 +38,6 @@ enum popupId {
 
 class MenuNavigator {
 public:
-	MenuNavigator();
 	void init(GLFWwindow* w, Game* gameptr);
 	void pollInput();
 	void update();
@@ -48,7 +47,6 @@ public:
 	void activate(MenuNode& menu, MenuNode& parent);
 	void scan(bool useCache = true);
 	bool getShouldClose();
-	~MenuNavigator();
 
 	//switch between keyboard and gamepad
 	bool m_useKeyboardInput = true;
