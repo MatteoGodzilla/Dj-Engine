@@ -619,17 +619,22 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 	float size = 0.05;
 
-	float startAngle = asin(0.25f / m_radius);
+	float greenRadius = m_radius + 0.5f;
+	float blueRadius = m_radius - 0.5f;
+
+	float startRedAngle = asin(0.25f / m_radius);
+	float startGreenAngle = asin(0.25f / greenRadius);
+	float startBlueAngle = asin(0.25f / blueRadius);
 
 	glm::vec2 center = {m_radius, 0.0};
-	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startAngle);
-	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startAngle);
-	glm::vec2 greenBeforeOuter = getCirclePoint((double)m_radius + 0.5 + size, startAngle);
-	glm::vec2 greenBeforeInner = getCirclePoint((double)m_radius + 0.5 - size, startAngle);
-	glm::vec2 blueBeforeOuter = getCirclePoint((double)m_radius - 0.5 + size, startAngle);
-	glm::vec2 blueBeforeInner = getCirclePoint((double)m_radius - 0.5 - size, startAngle);
+	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startRedAngle);
+	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startRedAngle);
+	glm::vec2 greenBeforeOuter = getCirclePoint((double)greenRadius + size, startGreenAngle);
+	glm::vec2 greenBeforeInner = getCirclePoint((double)greenRadius - size, startGreenAngle);
+	glm::vec2 blueBeforeOuter = getCirclePoint((double)blueRadius + size, startBlueAngle);
+	glm::vec2 blueBeforeInner = getCirclePoint((double)blueRadius - size, startBlueAngle);
 
-	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
+	for (float angle = startRedAngle; angle < m_maxAngle; angle += m_deltaAngle) {
 		auto angleTime = (float)(time + getDTFromAngle(angle));
 
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
@@ -1078,100 +1083,17 @@ void GameRender::meters(double time) {
 	std::vector<unsigned int> metersIndices;
 	unsigned int metersVertexCount = 0;
 
-	float radiusDistance = 0.1f;
+	float radiusTicksDistance = 0.2f;
 
 	glm::vec2 center = {m_radius, 0};
-	float meterRadius = m_radius - m_deltaRadius - radiusDistance;
-
-	/*
-	//multiplier display
-	if (m_playerMult == 2) {
-		//render a 'x2'
-		if (m_isButtonsRight) {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
-		}
-		else {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-		}
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else if (m_playerMult == 3) {
-		//render a 'x3'
-		if (m_isButtonsRight) {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-		}
-		else {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 800.0f / 1200.0f);
-		}
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else if (m_playerMult == 4) {
-		//render a 'x4'
-		if (m_isButtonsRight) {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
-		}
-		else {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 400.0f / 1200.0f);
-		}
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else if (m_playerMult == 6) {
-		//render a 'x6'
-		if (m_isButtonsRight) {
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 0.0f, 1.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
-		}
-		else {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 0.0f, 1.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 0.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
-		}
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}
-	else if (m_playerMult == 8) {
-		//render a 'x8'
-		if (m_isButtonsRight) {
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
-		}
-		else {
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.5f, 400.0f / 1000.0f, 1.0f);
-			pushVertexTexture(metersVector, 1.0f, yPlane, 2.7f, 400.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.7f, 800.0f / 1000.0f, 800.0f / 1200.0f);
-			pushVertexTexture(metersVector, 1.2f, yPlane, 2.5f, 800.0f / 1000.0f, 1.0f);
-		}
-
-		pushRectangleIndices(metersIndices, metersVertexCount);
-	}*/
+	float meterRadius = m_radius - m_deltaRadius - radiusTicksDistance;
 
 	//combo tickmarks
 	double tickWidth = 0.25;
 	double tickHeightAngle = asin(tickWidth / (2 * meterRadius));
 	double startTicksAngle = tickHeightAngle * 2;
 	double endTicksAngle = tickHeightAngle * 10;
+	float radiusTicks = m_radius - m_deltaRadius - radiusTicksDistance;
 
 	for (int i = 0; i < 8; i++) {
 		int limit = 0;
@@ -1189,10 +1111,10 @@ void GameRender::meters(double time) {
 		glm::vec2 bottomLeft;
 		glm::vec2 bottomRight;
 
-		topLeft = getCirclePoint(m_radius - m_deltaRadius - radiusDistance, startTicksAngle + tickHeightAngle * (i + 1));
-		topRight = getCirclePoint(m_radius - m_deltaRadius - radiusDistance - tickWidth, startTicksAngle + tickHeightAngle * (i + 1));
-		bottomLeft = getCirclePoint(m_radius - m_deltaRadius - radiusDistance, startTicksAngle + tickHeightAngle * i);
-		bottomRight = getCirclePoint(m_radius - m_deltaRadius - radiusDistance - tickWidth, startTicksAngle + tickHeightAngle * i);
+		topLeft = getCirclePoint(radiusTicks + tickWidth / 2, startTicksAngle + tickHeightAngle * (i + 1));
+		topRight = getCirclePoint(radiusTicks - tickWidth / 2, startTicksAngle + tickHeightAngle * (i + 1));
+		bottomLeft = getCirclePoint(radiusTicks + tickWidth / 2, startTicksAngle + tickHeightAngle * i);
+		bottomRight = getCirclePoint(radiusTicks - tickWidth / 2, startTicksAngle + tickHeightAngle * i);
 
 		glm::vec4 spriteRect;
 
@@ -1232,79 +1154,150 @@ void GameRender::meters(double time) {
 	}
 
 	glm::vec2 size = {0.3, 0.3};
-	glm::vec2 bottomLeft = getCirclePoint(meterRadius, endTicksAngle);
+	double displayAngle = asin(size.y / radiusTicks);
 
-	pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane + size.y, -center.y - bottomLeft.y, multiplierSprite.x, 1200.0f - multiplierSprite.y);
-	pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, multiplierSprite.x, 1200.0f - multiplierSprite.y - multiplierSprite.w);
-	pushVertexTexture(metersVector, center.x - bottomLeft.x + size.x, yPlane, -center.y - bottomLeft.y, multiplierSprite.x + multiplierSprite.z, 1200.0f - multiplierSprite.y - multiplierSprite.w);
-	pushVertexTexture(metersVector, center.x - bottomLeft.x + size.x, yPlane + size.y, -center.y - bottomLeft.y, multiplierSprite.x + multiplierSprite.z, 1200.0f - multiplierSprite.y);
+	glm::vec2 topLeft = getCirclePoint(radiusTicks + size.x / 2, endTicksAngle + displayAngle);
+	glm::vec2 bottomLeft = getCirclePoint(radiusTicks + size.x / 2, endTicksAngle);
+	glm::vec2 bottomRight = getCirclePoint(radiusTicks - size.x / 2, endTicksAngle);
+	glm::vec2 topRight = getCirclePoint(radiusTicks - size.x / 2, endTicksAngle + displayAngle);
+
+	//multiplier number
+	pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, multiplierSprite.x, 1.0f - multiplierSprite.y);
+	pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, multiplierSprite.x, 1.0f - multiplierSprite.y - multiplierSprite.w);
+	pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, multiplierSprite.x + multiplierSprite.z, 1.0f - multiplierSprite.y - multiplierSprite.w);
+	pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, multiplierSprite.x + multiplierSprite.z, 1.0f - multiplierSprite.y);
 	pushRectangleIndices(metersIndices, metersVertexCount);
 
 	//euphoria meter
 	//empty indicator
-	/*
+
+	glm::vec4 euEmptySprite = {800.0f / 1000.0f, 400.0f / 1200.0f, 200.0f / 1000.0f, 400.0f / 1200.0f};
+	glm::vec4 euFullSprite = {800.0f / 1000.0f, 800.0f / 1200.0f, 200.0f / 1000.0f, 400.0f / 1200.0f};
+
+	float radiusEuphoria = m_radius + m_deltaRadius + 0.2f;
+	glm::vec2 slotSize = {0.0666, 0.5};
+	double heightAngle = asin(slotSize.y / radiusEuphoria);
+	double startEuphoriaAngle = getAngleHorizontal(startTicksAngle, radiusTicks, radiusEuphoria);
+
 	for (int i = 0; i < 3; i++) {
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f - 0.35f * i, 800.0f / 1000.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f - 0.35f * i, 1.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f - 0.35f * i, 1.0f, 800.0f / 1200.0f);
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f - 0.35f * i, 800.0f / 1000.0f, 800.0f / 1200.0f);
+		glm::vec2 topLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (i + 1));
+		glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * i);
+		glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * i);
+		glm::vec2 topRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (i + 1));
+
+		pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euEmptySprite.x, 1.0f - euEmptySprite.y);
+		pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euEmptySprite.x, 1.0f - euEmptySprite.y - euEmptySprite.w);
+		pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euEmptySprite.x + euEmptySprite.z, 1.0f - euEmptySprite.y - euEmptySprite.w);
+		pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euEmptySprite.x + euEmptySprite.z, 1.0f - euEmptySprite.y);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 
 	//if only the first indicator needs to change
 	if (m_renderEuValue > 0.0 && m_renderEuValue < 1.0) {
-		float z = (float)m_renderEuValue;
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f, 800.0f / 1000.0f, 0.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f, 1.0f, 0.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f - 0.35f * z, 1.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
+		glm::vec2 topLeftTarget = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (0 + 1));
+		glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 0);
+		glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 0);
+		glm::vec2 topRightTarget = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (0 + 1));
+
+		glm::vec2 leftSide = topLeftTarget - bottomLeft;
+		glm::vec2 rightSide = topRightTarget - bottomRight;
+
+		float euValueoffset = 0.0f;
+
+		glm::vec2 topLeft = {bottomLeft.x + leftSide.x * (m_renderEuValue - euValueoffset), bottomLeft.y + leftSide.y * (m_renderEuValue - euValueoffset)};
+		glm::vec2 topRight = {bottomRight.x + rightSide.x * (m_renderEuValue - euValueoffset), bottomRight.y + rightSide.y * (m_renderEuValue - euValueoffset)};
+
+		pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+		pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+		pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+		pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 		pushRectangleIndices(metersIndices, metersVertexCount);
 	}
 	//if more indicators need to change (two or three)
 	else if (m_renderEuValue >= 1.0) {
 		//add first full indicator
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.75f, 800.0f / 1000.0f, 0.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.75f, 1.0f, 0.0f);
-		pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 400.0f / 1200.0f);
-		pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+		glm::vec2 topLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (0 + 1));
+		glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 0);
+		glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 0);
+		glm::vec2 topRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (0 + 1));
+
+		pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+		pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+		pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+		pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 		pushRectangleIndices(metersIndices, metersVertexCount);
+
 		//if only the second indicator needs to change
 		if (m_renderEuValue < 2.0) {
-			float z = (float)m_renderEuValue - 1.0f;
-			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 0.0f);
-			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f - 0.35f * z, 1.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
+			glm::vec2 topLeftTarget = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (1 + 1));
+			glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 1);
+			glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 1);
+			glm::vec2 topRightTarget = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (1 + 1));
+
+			glm::vec2 leftSide = topLeftTarget - bottomLeft;
+			glm::vec2 rightSide = topRightTarget - bottomRight;
+
+			float euValueoffset = 1.0f;
+
+			glm::vec2 topLeft = {bottomLeft.x + leftSide.x * (m_renderEuValue - euValueoffset), bottomLeft.y + leftSide.y * (m_renderEuValue - euValueoffset)};
+			glm::vec2 topRight = {bottomRight.x + rightSide.x * (m_renderEuValue - euValueoffset), bottomRight.y + rightSide.y * (m_renderEuValue - euValueoffset)};
+
+			pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+			pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+			pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+			pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 			pushRectangleIndices(metersIndices, metersVertexCount);
 		}
 		//if more indicators need to change (all three)
 		else if (m_renderEuValue >= 2.0) {
 			//add full second indicator
-			pushVertexTexture(metersVector, -1.1f, yPlane, 3.4f, 800.0f / 1000.0f, 0.0f);
-			pushVertexTexture(metersVector, -1.0f, yPlane, 3.4f, 1.0f, 0.0f);
-			pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 400.0f / 1200.0f);
-			pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+			glm::vec2 topLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (1 + 1));
+			glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 1);
+			glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 1);
+			glm::vec2 topRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (1 + 1));
+
+			pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+			pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+			pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+			pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 			pushRectangleIndices(metersIndices, metersVertexCount);
+
 			//if the euphoria value is below full
 			if (m_renderEuValue < 3.0) {
-				float z = (float)m_renderEuValue - 2.0f;
-				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 0.0f);
-				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 0.0f);
-				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f - 0.35f * z, 1.0, 400.0f / 1200.0f);
-				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f - 0.35f * z, 800.0f / 1000.0f, 400.0f / 1200.0f);
+				glm::vec2 topLeftTarget = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (2 + 1));
+				glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 2);
+				glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 2);
+				glm::vec2 topRightTarget = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (2 + 1));
+
+				glm::vec2 leftSide = topLeftTarget - bottomLeft;
+				glm::vec2 rightSide = topRightTarget - bottomRight;
+
+				float euValueoffset = 2.0f;
+
+				glm::vec2 topLeft = {bottomLeft.x + leftSide.x * (m_renderEuValue - euValueoffset), bottomLeft.y + leftSide.y * (m_renderEuValue - euValueoffset)};
+				glm::vec2 topRight = {bottomRight.x + rightSide.x * (m_renderEuValue - euValueoffset), bottomRight.y + rightSide.y * (m_renderEuValue - euValueoffset)};
+
+				pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+				pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+				pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+				pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			} else {
 				//add full third indicator
-				pushVertexTexture(metersVector, -1.1f, yPlane, 3.05f, 800.0f / 1000.0f, 0.0f);
-				pushVertexTexture(metersVector, -1.0f, yPlane, 3.05f, 1.0f, 0.0f);
-				pushVertexTexture(metersVector, -1.0f, yPlane, 2.7f, 1.0f, 400.0f / 1200.0f);
-				pushVertexTexture(metersVector, -1.1f, yPlane, 2.7f, 800.0f / 1000.0f, 400.0f / 1200.0f);
+
+				glm::vec2 topLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * (2 + 1));
+				glm::vec2 bottomLeft = getCirclePoint(radiusEuphoria + slotSize.x, startEuphoriaAngle + heightAngle * 2);
+				glm::vec2 bottomRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * 2);
+				glm::vec2 topRight = getCirclePoint(radiusEuphoria - slotSize.x, startEuphoriaAngle + heightAngle * (2 + 1));
+
+				pushVertexTexture(metersVector, center.x - topLeft.x, yPlane, -center.y - topLeft.y, euFullSprite.x, 1.0f - euFullSprite.y);
+				pushVertexTexture(metersVector, center.x - bottomLeft.x, yPlane, -center.y - bottomLeft.y, euFullSprite.x, 1.0f - euFullSprite.y - euFullSprite.w);
+				pushVertexTexture(metersVector, center.x - bottomRight.x, yPlane, -center.y - bottomRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y - euFullSprite.w);
+				pushVertexTexture(metersVector, center.x - topRight.x, yPlane, -center.y - topRight.y, euFullSprite.x + euFullSprite.z, 1.0f - euFullSprite.y);
 				pushRectangleIndices(metersIndices, metersVertexCount);
 			}
 		}
 	}
-
-	*/
 
 	usePersProj();
 	renderTexture(metersVector, metersIndices, m_metersTexture);
@@ -1760,4 +1753,8 @@ double GameRender::getAngleFromDT(double dt) {
 double GameRender::getDTFromAngle(double angle) {
 	double clickerAngle = asin(0.25 / m_radius);
 	return (angle - clickerAngle) * m_noteVisibleTime / (m_maxAngle - clickerAngle);
+}
+
+double GameRender::getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius) {
+	return asin(sin(innerAngle) * innerRadius / outerRadius);
 }

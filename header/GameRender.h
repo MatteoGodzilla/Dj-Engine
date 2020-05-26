@@ -79,6 +79,7 @@ private:
 	static int getCrossAtTime(double time, std::vector<Note> crossArr);
 	double getAngleFromDT(double dt);
 	double getDTFromAngle(double angle);
+	static double getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius);
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;
