@@ -1172,8 +1172,8 @@ void GameRender::meters(double time) {
 	glm::vec4 euEmptySprite = {800.0f / 1000.0f, 400.0f / 1200.0f, 200.0f / 1000.0f, 400.0f / 1200.0f};
 	glm::vec4 euFullSprite = {800.0f / 1000.0f, 800.0f / 1200.0f, 200.0f / 1000.0f, 400.0f / 1200.0f};
 
-	float radiusEuphoria = m_radius + m_deltaRadius + 0.2f;
-	glm::vec2 slotSize = {0.0666, 0.5};
+	float radiusEuphoria = m_radius - m_deltaRadius - 0.4f;
+	glm::vec2 slotSize = {0.05, 0.3333};
 	double heightAngle = asin(slotSize.y / radiusEuphoria);
 	double startEuphoriaAngle = getAngleHorizontal(startTicksAngle, radiusTicks, radiusEuphoria);
 
