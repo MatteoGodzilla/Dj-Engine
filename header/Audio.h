@@ -1,13 +1,14 @@
 #pragma once
 
-#include "openal-soft/include/AL/al.h"
-#include "openal-soft/include/AL/alc.h"
-#include "vorbis/include/vorbis/vorbisfile.h"
+#include "AL/al.h"
+#include "AL/alc.h"
+#include "vorbis/vorbisfile.h"
+
+#include <array>
 #include <iostream>
 #include <vector>
 
-class Audio
-{
+class Audio {
 public:
 	Audio();
 	~Audio();
@@ -18,6 +19,7 @@ public:
 	void reset();
 	bool isActive(double time);
 	bool isPlaying();
+
 private:
 	ALCdevice* m_device;
 	ALCcontext* m_context;

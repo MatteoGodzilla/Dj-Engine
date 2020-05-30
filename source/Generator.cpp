@@ -20,12 +20,9 @@ void readToFloat(std::ifstream& stream, float* f) {
 	}
 }
 
-Generator::Generator() {
-}
-
-void Generator::init(SongEntry entry) {
+void Generator::init(const SongEntry& entry) {
 	m_songEntry = entry;
-	m_allCross.push_back(Note(m_initialCrossfade, CROSS_C, 0.0f, true));//Do not remove
+	m_allCross.emplace_back(m_initialCrossfade, CROSS_C, 0.0f, true); //Do not remove
 	m_bpm = entry.bpm;
 	std::string textPath = entry.path + std::string("/chart.txt");
 	m_chart.open(textPath);
@@ -37,8 +34,7 @@ void Generator::init(SongEntry entry) {
 		m_chart >> version;
 		std::cout << "Generator msg: Chart Version: " << version << std::endl;
 		initialLoad();
-	}
-	else {
+	} else {
 		std::cout << "Generator msg: text chart not found, opening fgsmub" << std::endl;
 		std::string chartPath = entry.path + std::string("/chart.fsgmub");
 		m_chart.open(chartPath, std::ios::binary);
@@ -56,8 +52,7 @@ void Generator::init(SongEntry entry) {
 
 			std::cout << "version: " << version << std::endl;
 			initialLoad();
-		}
-		else {
+		} else {
 			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
 			std::string chartPath = entry.path + std::string("/chart.xmk");
 			m_chart.open(chartPath, std::ios::binary);
@@ -74,8 +69,7 @@ void Generator::init(SongEntry entry) {
 				readToInt(m_chart, &dummy);
 
 				std::cout << "version: " << version << std::endl;
-			}
-			else {
+			} else {
 				std::cerr << "Generator Error: could not load chart file" << std::endl;
 			}
 			initialLoad();
@@ -83,7 +77,7 @@ void Generator::init(SongEntry entry) {
 	}
 }
 
-void Generator::initialLoad(){
+void Generator::initialLoad() {
 	/*
 	read the chart IF there are less than 100 notes
 	and less than 100 events on screen.
@@ -116,146 +110,117 @@ void Generator::initialLoad(){
 			//decode type from entry
 			if (type == 0) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, TAP_G, 0.0, false));
-			}
-			else if (type == 1) {
+				m_allTaps.emplace_back(time, TAP_G, 0.0, false);
+			} else if (type == 1) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, TAP_B, 0.0, false));
-			}
-			else if (type == 2) {
+				m_allTaps.emplace_back(time, TAP_B, 0.0, false);
+			} else if (type == 2) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, TAP_R, 0.0, false));
-			}
-			else if (type == 3) {
+				m_allTaps.emplace_back(time, TAP_R, 0.0, false);
+			} else if (type == 3) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_G_UP, 0.0, false));
-			}
-			else if (type == 4) {
+				m_allTaps.emplace_back(time, SCR_G_UP, 0.0, false);
+			} else if (type == 4) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_B_UP, 0.0, false));
-			}
-			else if (type == 5) {
+				m_allTaps.emplace_back(time, SCR_B_UP, 0.0, false);
+			} else if (type == 5) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_G_DOWN, 0.0, false));
-			}
-			else if (type == 6) {
+				m_allTaps.emplace_back(time, SCR_G_DOWN, 0.0, false);
+			} else if (type == 6) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_B_DOWN, 0.0, false));
-			}
-			else if (type == 7) {
+				m_allTaps.emplace_back(time, SCR_B_DOWN, 0.0, false);
+			} else if (type == 7) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_G_ANY, length, false));
-				
+				m_allTaps.emplace_back(time, SCR_G_ANY, length, false);
+
 				float end = time + length;
 				float betweenTicks = 60.0f / ((float)m_bpm * TICKS_PER_BEAT);
 				time += betweenTicks;
 				while (time < end) {
 					m_baseScore += 100;
-					m_allTaps.push_back(Note(time, SCR_G_TICK, length, false));
+					m_allTaps.emplace_back(time, SCR_G_TICK, length, false);
 					time += betweenTicks;
 				}
-			}
-			else if (type == 8) {
+			} else if (type == 8) {
 				m_baseScore += 400;
-				m_allTaps.push_back(Note(time, SCR_B_ANY, length, false));
+				m_allTaps.emplace_back(time, SCR_B_ANY, length, false);
 				float end = time + length;
-				float betweenTicks = 60.0f / ((float)m_bpm * TICKS_PER_BEAT);
+				float betweenTicks = 60.0f / (m_bpm * TICKS_PER_BEAT);
 				time += betweenTicks;
 				while (time < end) {
 					m_baseScore += 100;
-					m_allTaps.push_back(Note(time, SCR_B_TICK, length, false));
+					m_allTaps.emplace_back(time, SCR_B_TICK, length, false);
 					time += betweenTicks;
 				}
-			}
-			else if (type == 9) {
+			} else if (type == 9) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
-				m_allCross.push_back(Note(time, CROSS_B, 0.0, true));
-			}
-			else if (type == 10) {
+				m_allCross.emplace_back(time, CROSS_B, 0.0, true);
+			} else if (type == 10) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				if (time > 0.0) {
 					m_baseScore += 400;
-					m_allCross.push_back(Note(time, CROSS_C, 0.0, true));
+					m_allCross.emplace_back(time, CROSS_C, 0.0, true);
 				}
-			}
-			else if (type == 11) {
+			} else if (type == 11) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
-				m_allCross.push_back(Note(time, CROSS_G, 0.0, true));
-			}
-			else if (type == 15) {
-				m_allEvents.push_back(Note(time, EU_ZONE, length, true));
-			}
-			else if (type == 20) {
-				m_allEvents.push_back(Note(time, SCR_G_ZONE, length, true));
-			}
-			else if (type == 21) {
-				m_allEvents.push_back(Note(time, SCR_B_ZONE, length, true));
-			}
-			else if (type == 27) {
+				m_allCross.emplace_back(time, CROSS_G, 0.0, true);
+			} else if (type == 15) {
+				m_allEvents.emplace_back(time, EU_ZONE, length, true);
+			} else if (type == 20 || type == 48) {
+				m_allEvents.emplace_back(time, SCR_G_ZONE, length, true);
+			} else if (type == 21 || type == 49) {
+				m_allEvents.emplace_back(time, SCR_B_ZONE, length, true);
+			} else if (type == 27) {
 				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
 					m_addedCrossCenter = true;
-					m_allCross.push_back(Note(m_firstSpikeMilli, CROSS_C, 0.0, true));
+					m_allCross.emplace_back(m_firstSpikeMilli, CROSS_C, 0.0, true);
 					m_firstSpikeMilli = 0.0;
-				}
-				else {
+				} else {
 					m_firstSpikeGenerated = true;
 					m_firstSpikeMilli = time;
 				}
-				m_allTaps.push_back(Note(time, CF_SPIKE_G, 0.0, false));
+				m_allTaps.emplace_back(time, CF_SPIKE_G, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_G, 0.0);
-			}
-			else if (type == 28) {
+			} else if (type == 28) {
 				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
 					m_addedCrossCenter = true;
-					m_allCross.push_back(Note(m_firstSpikeMilli, CROSS_C, 0.0, true));
+					m_allCross.emplace_back(m_firstSpikeMilli, CROSS_C, 0.0, true);
 					m_firstSpikeMilli = 0.0;
-				}
-				else {
+				} else {
 					m_firstSpikeGenerated = true;
 					m_firstSpikeMilli = time;
 				}
-				m_allTaps.push_back(Note(time, CF_SPIKE_B, 0.0, false));
+				m_allTaps.emplace_back(time, CF_SPIKE_B, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_B, 0.0);
-			}
-			else if (type == 29) {
-				m_allTaps.push_back(Note(time, CF_SPIKE_C, 0.0, false));
+			} else if (type == 29) {
+				m_allTaps.emplace_back(time, CF_SPIKE_C, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_C, 0.0);
 			}
-			else if (type == 48) {
-				m_allEvents.push_back(Note(time, SCR_G_ZONE, length, true));
-
-				//pushEvent((double)time, SCR_G_ZONE, (double)length);
-			}
-			else if (type == 49) {
-				m_allEvents.push_back(Note(time, SCR_B_ZONE, length, true));
-
-				//pushEvent((double)time, SCR_B_ZONE, (double)length);
-			}
+			/*
 			else if (type == 0x0B000001) {
 				//bpm marker
-			}
-			else if (type == 0x0B000002) {
+			} else if (type == 0x0B000002) {
 				m_bpm = extra;
-			}
-			else if (type == 0x0AFFFFFF) {}
-			else if (type == 0xFFFFFFFF) {
+			} else if (type == 0x0AFFFFFF) {
+			} else if (type == 0xFFFFFFFF) {
 				//chart start
 			}
+			*/
 			//else std::cerr << "error parsing entry: " << time << "\t"<< type << "\t"<< length << "\t"<< extra<<std::endl;
 		}
 		if (m_chart.eof() && !m_placedFinalCF) {
 			m_placedFinalCF = true;
 
 			//place a crossfade center at the 100 hour mark
-			//seems impossible to reach it for me 
+			//seems impossible to reach it for me
 			//but then, there is always someone that does the impossible
 			//pushCross(360000.0f, CROSS_C, 0.0f);
-			m_allCross.push_back(Note(360000.0, CROSS_C, 0.0f, true));
+			m_allCross.emplace_back(360000.0, CROSS_C, 0.0f, true);
 		}
 	}
 }
@@ -320,8 +285,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 						m_scr_tick++;
 					}
 					m_notesHit++;
-				}
-				else {
+				} else {
 					m_combo_reset = true;
 				}
 				m_notesTotal++;
@@ -351,15 +315,14 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 				//start eu zone check when the event is on the clicker
 				if (ev.at(i).getHit() && !ev.at(i).getTouched()) {
 					m_eu_start = true;
-					ev.at(i).click(time);
+					ev.at(i).click();
 				}
 				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				//set signal for player
 				if (endTime < time) {
 					m_eu_check = true;
 					ev.erase(ev.begin() + i);
-				}
-				else if (m_combo_reset) {
+				} else if (m_combo_reset) {
 					//remove event if misclick
 					if (ev.at(i).getMilli() + ev.at(i).hitWindow < time) {
 						ev.erase(ev.begin() + i);
@@ -378,8 +341,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			if (next_time + 0.15 <= time) {
 				if (cross.at(i).getTouched()) {
 					m_notesHit++;
-				}
-				else {
+				} else {
 					m_combo_reset = true;
 				}
 				m_notesTotal++;
@@ -426,7 +388,7 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 			double t;
 			m_chart >> token;
 
-			/*
+
 			depending by the tokens, add note/event to 'cache'
 
 
@@ -578,15 +540,15 @@ void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
 */
 
 void Generator::addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
-	while (v.size() < 100 && m_allTaps.size() > 0) {
+	while (v.size() < 100 && !m_allTaps.empty()) {
 		v.push_back(m_allTaps.front());
 		m_allTaps.pop_front();
 	}
-	while (ev.size() < 100 && m_allEvents.size() > 0) {
+	while (ev.size() < 100 && !m_allEvents.empty()) {
 		ev.push_back(m_allEvents.front());
 		m_allEvents.pop_front();
 	}
-	while (cross.size() < 100 && m_allCross.size() > 0) {
+	while (cross.size() < 100 && !m_allCross.empty()) {
 		cross.push_back(m_allCross.front());
 		m_allCross.pop_front();
 	}
@@ -636,12 +598,11 @@ int Generator::getNotesHit() {
 	return m_notesHit;
 }
 
-SongEntry Generator::getSongEntry()
-{
+SongEntry Generator::getSongEntry() {
 	return m_songEntry;
 }
 
-//utility functions 
+//utility functions
 
 Generator::~Generator() {
 	m_chart.close();

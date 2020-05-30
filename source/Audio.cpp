@@ -1,11 +1,10 @@
 #include "Audio.h"
 
 Audio::Audio() {
-	m_device = alcOpenDevice(NULL);
-	if (m_device != NULL) {
-		m_context = alcCreateContext(m_device, NULL);
-		if (m_context != NULL) {
-
+	m_device = alcOpenDevice(nullptr);
+	if (m_device != nullptr) {
+		m_context = alcCreateContext(m_device, nullptr);
+		if (m_context != nullptr) {
 			//initialize audio
 			alcMakeContextCurrent(m_context);
 			alGenSources(1, &m_source);
@@ -23,14 +22,14 @@ void Audio::load(const char* filename) {
 
 		unsigned int b = 0; //pointer never used
 		int processed = 0;
-		char bufferData[4096];
+		std::array<char, 4096> bufferData;
 		int bytesRead = 0;
 		vorbis_info* info;
 
 		info = ov_info(&m_oggFile, -1);
 		m_frequency = info->rate;
 		m_songLength = ov_time_total(&m_oggFile, -1);
-		
+
 		int buffers = 0;
 		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
 		while (buffers < 50) {
@@ -38,18 +37,17 @@ void Audio::load(const char* filename) {
 			alGenBuffers(1, &b);
 
 			//read and upload
-			bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
-			alBufferData(b, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
+			bytesRead = ov_read(&m_oggFile, bufferData.data(), 4096, 0, 2, 1, &m_currentSection);
+			alBufferData(b, AL_FORMAT_STEREO16, bufferData.data(), bytesRead, m_frequency);
 			alSourceQueueBuffers(m_source, 1, &b);
 
 			//remove temporary buffer
-			alDeleteBuffers(1, &b);
+			//alDeleteBuffers(1, &b);
 
 			alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
 		}
 		buffer();
-	}
-	else {
+	} else {
 		std::cerr << "Audio Error: Cannot load 'song.ogg'" << std::endl;
 	}
 }
@@ -57,20 +55,19 @@ void Audio::load(const char* filename) {
 void Audio::buffer() {
 	unsigned int bufferRemoved = 0;
 	int processed = 0;
-	char bufferData[4096];
+	std::array<char, 4096> bufferData;
 	int bytesRead = 0;
 
 	//get already processed buffers
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
-	
+
 	//upload buffers until all are processed
 	while (processed > 0) {
-
 		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
 
 		//read and upload
-		bytesRead = ov_read(&m_oggFile, bufferData, 4096, 0, 2, 1, &m_currentSection);
-		alBufferData(bufferRemoved, AL_FORMAT_STEREO16, bufferData, bytesRead, m_frequency);
+		bytesRead = ov_read(&m_oggFile, bufferData.data(), 4096, 0, 2, 1, &m_currentSection);
+		alBufferData(bufferRemoved, AL_FORMAT_STEREO16, bufferData.data(), bytesRead, m_frequency);
 		alSourceQueueBuffers(m_source, 1, &bufferRemoved);
 
 		processed--;
@@ -108,7 +105,7 @@ void Audio::stop() {
 }
 
 bool Audio::isActive(double time) {
-	return time < m_songLength ? true : false;
+	return time < m_songLength;
 }
 
 Audio::~Audio() {

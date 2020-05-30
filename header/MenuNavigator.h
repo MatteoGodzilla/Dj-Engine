@@ -1,24 +1,45 @@
 #pragma once
-#include "MenuRender.h"
 #include "MenuNode.h"
+#include "MenuRender.h"
+#include "SimpleIni.h"
 #include "SongScanner.h"
-#include "GLFW/include/GLFW/glfw3.h"
 
-#include <iostream>
+#include <GLFW/glfw3.h>
+#include <algorithm>
 #include <fstream>
+#include <iostream>
 
 enum scenes {
-	MAIN_SCENE, REMAPPING, CREDITS, SCRATCHES, CALIBRATION
+	MAIN_SCENE,
+	REMAPPING,
+	CREDITS,
+	SCRATCHES,
+	CALIBRATION
 };
 
 enum actions {
-	SONG_GENERAL_ID, PLAY_ID, OPTIONS_ID, CREDITS_ID, EXIT_ID, SCRATCHES_ID, LATENCY_ID,
-	LR_BUTTONS_ID, SPEED_ID, BOT_ID, DEBUG_ID
+	SONG_GENERAL_ID,
+	PLAY_ID,
+	OPTIONS_ID,
+	CREDITS_ID,
+	EXIT_ID,
+	SCRATCHES_ID,
+	LATENCY_ID,
+	LR_BUTTONS_ID,
+	SPEED_ID,
+	BOT_ID,
+	DEBUG_ID,
+	REFRESH_ID,
+	COLOR_ID
+};
+
+enum popupId {
+	HIGHWAY_SPEED,
+	LANE_COLORS
 };
 
 class MenuNavigator {
 public:
-	MenuNavigator();
 	void init(GLFWwindow* w, Game* gameptr);
 	void pollInput();
 	void update();
@@ -26,9 +47,8 @@ public:
 	void setActive(bool active);
 	bool getActive();
 	void activate(MenuNode& menu, MenuNode& parent);
-	void scan();
+	void scan(bool useCache = true);
 	bool getShouldClose();
-	~MenuNavigator();
 
 	//switch between keyboard and gamepad
 	bool m_useKeyboardInput = true;
@@ -76,7 +96,7 @@ private:
 	bool m_wasTabPressed = false;
 	bool m_isTabPressed = false;
 
-	unsigned int m_viewOffset = 0;
+	int m_viewOffset = 0;
 	bool m_shouldClose = false;
 	bool m_active = false;
 

@@ -1,15 +1,15 @@
-#include <iostream>
-#include <vector>
-
 #include "Game.h"
 #include "MenuNavigator.h"
 
-#include "GLFW/include/GLFW/glfw3.h"
+#include "stb_image.h"
+#include <GLFW/glfw3.h>
+#include <iostream>
+#include <vector>
 
-unsigned int WIDTH = 1280;
-unsigned int HEIGHT = 720;
+int WIDTH = 1280;
+int HEIGHT = 720;
 
-std::string VERSION = "alpha v1.3";
+std::string VERSION = "alpha v1.4";
 
 Game game;
 MenuNavigator menu;
@@ -24,7 +24,7 @@ double now = 0.0f;
 double deltaTime = 0.0f;
 
 //utility function to handle resizing
-void resizeCallback(GLFWwindow* w,int width,int height) {
+void resizeCallback(GLFWwindow* w, int width, int height) {
 	glViewport(0, 0, width, height);
 }
 
@@ -34,7 +34,11 @@ void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
 	game.getPlayer()->m_changedScroll = true;
 }
 
-int main() {
+void errorCallback(int code, const char* description) {
+	std::cerr << "GLFW ERROR:(" << code << ")," << description << std::endl;
+}
+
+int main(int argc, char** argv) {
 	std::cout << "Dj-Engine " << VERSION << std::endl;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
@@ -46,6 +50,18 @@ int main() {
 	}
 	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
 
+	bool MSAActive = false;
+	if(argc > 1){
+		for(int i = 0; i < argc-1; ++i){
+			if(strcmp(argv[i],"--msaa") == 0){
+				int factor = std::stoi(argv[i+1]);
+				std::cout << "Engine Message: Creating window with MSAA x" << factor << std::endl;
+				glfwWindowHint(GLFW_SAMPLES,factor);
+				MSAActive = true;
+			}
+		}
+	}
+
 	//GLFW init functions (window and callbacks)
 	std::string title = std::string("Dj-Engine ") + VERSION;
 	window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
@@ -55,10 +71,26 @@ int main() {
 		return -1;
 	}
 	glfwSetWindowSizeCallback(window, resizeCallback);
+	glfwSetWindowAspectRatio(window,WIDTH,HEIGHT);
+	glfwSetErrorCallback(&errorCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	if (glfwRawMouseMotionSupported())glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	if (glfwRawMouseMotionSupported()) {
+		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+	}
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwMakeContextCurrent(window);
+
+	int w;
+	int h;
+	int n;
+	unsigned char* data = stbi_load("res/GameIcon.png",&w,&h,&n,0);
+
+	GLFWimage image = {w,h,data};
+	glfwSetWindowIcon(window,1,&image);
+
+	if(MSAActive){
+		glEnable(GL_MULTISAMPLE);
+	}
 
 	//imgui init
 	IMGUI_CHECKVERSION();
@@ -70,14 +102,13 @@ int main() {
 
 	//setting up menu and game
 	game.init(window);
-	menu.init(window,&game);
+	menu.init(window, &game);
 	game.setActive(false);
 	menu.setActive(true);
 
 	while (!glfwWindowShouldClose(window)) {
-		
 		glfwPollEvents();
-		
+
 		now = glfwGetTime();
 		deltaTime = now - pastTick;
 		pastTick = now;
@@ -95,24 +126,19 @@ int main() {
 			menu.pollInput();
 			menu.update();
 			menu.render(deltaTime);
-		}
-		else if (scene == 1) {
+		} else if (scene == 1) {
 			//change scene if not active
 			if (!game.getActive()) {
 				scene = 0;
 				menu.setActive(true);
 			}
 			//render/update game
-			glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			game.pollInput();
-			game.tick(deltaTime);
+			game.tick();
 			game.render();
 		}
-
-		//add delta time to m_global_time
-		
-		
 		glfwSwapBuffers(window);
 		if (menu.getShouldClose()) {
 			glfwSetWindowShouldClose(window, true);

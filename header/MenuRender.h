@@ -1,13 +1,12 @@
 #pragma once
-#include "Rendr.h"
-
+#include "Game.h"
 #include "Graphics.h"
 #include "MenuNode.h"
+#include "Rendr.h"
 #include "SongScanner.h"
 
-#include "Game.h"
-
-#include "GLFW/include/GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
+#include <array>
 #include <iostream>
 #include <map>
 
@@ -24,14 +23,14 @@ struct menuinputs {
 
 class MenuRender : public Rendr {
 public:
-	MenuRender();
 	void init(GLFWwindow* w);
 	void tick();
-	void render(MenuNode node, int selected, unsigned int vOffset);
+	void render(MenuNode node, int selected, int vOffset);
 	void remapping(Game* game, menuinputs input);
 	void scratches(Player* player);
-	void calibration(Game* game, double time);
+	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
+	void setLaneColors(Game* game);
 	void splashArt();
 	GLFWwindow* getWindowPtr();
 	void doneEditing();
@@ -51,7 +50,6 @@ public:
 	double m_currentIdleTime = 0.0f;
 	float m_selectionDX = 0.0f;
 
-	~MenuRender();
 private:
 	double m_cbPlayingTime = 0.0f;
 	bool m_isCalibrating = false;
@@ -71,4 +69,5 @@ private:
 	double m_globalTime = 0.0f;
 	double m_pastTime = 0.0f;
 
+	glm::vec2 m_logoDimensions;
 };

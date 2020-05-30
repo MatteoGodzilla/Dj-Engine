@@ -1,70 +1,85 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.11)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 project("Dj-Engine")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
+	"${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(warnings "-Wall -Werror -Wextra")
+endif()
+
 include_directories("header")
 
-include_directories("lib")
+AUX_SOURCE_DIRECTORY(source SRCFOLDER)
+add_executable(${CMAKE_PROJECT_NAME}
+	"Dj-Engine.cpp"
+	${SRCFOLDER}
+)
 
+set(CMAKE_CXX_CLANG_TIDY "")
+
+# Freetype
+find_package(Freetype REQUIRED)
+include_directories(${FREETYPE_INCLUDE_DIRS})
+target_link_libraries(${CMAKE_PROJECT_NAME} Freetype::Freetype)
+
+# GLEW
+find_package(GLEW REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} GLEW::GLEW)
+
+# GLFW
+find_package(glfw3 3.3 REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} glfw)
+
+# GLM
+set(glm_DIR ${CMAKE_SOURCE_DIR}/lib/glm/cmake/glm/)
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+
+# IMGUI
 include_directories("lib/IMGUI")
-
-include_directories("lib/GLEW/include")
-
-include_directories("lib/ogg/include")
-
-include_directories("lib/freetype/include/")
-
-include_directories("lib/glm")
-
 add_library("ImGui" STATIC
 	"lib/IMGUI/imgui.cpp"
-	"lib/IMGUI/imgui_demo.cpp"
 	"lib/IMGUI/imgui_draw.cpp"
 	"lib/IMGUI/imgui_impl_glfw.cpp"
 	"lib/IMGUI/imgui_impl_opengl3.cpp"
 	"lib/IMGUI/imgui_widgets.cpp"
 )
-
-set(OGG_INCLUDE_DIRS "lib/ogg/include")
-
-add_subdirectory("lib/vorbis")
-
-add_subdirectory("lib/openal-soft")
-
-add_subdirectory("lib/freetype")
-
-add_subdirectory("lib/GLFW")
-
-add_subdirectory("lib/GLEW/build/cmake")
-
-add_executable(${CMAKE_PROJECT_NAME} 
-	"Dj-Engine.cpp" 
-	"source/Audio.cpp"
-	"source/Game.cpp"
-	"source/GameRender.cpp"
-	"source/Generator.cpp"
-	"source/Graphics.cpp"
-	"source/MenuNavigator.cpp"
-	"source/MenuNode.cpp"
-	"source/MenuRender.cpp"
-	"source/Note.cpp"
-	"source/Player.cpp"
-	"source/Rendr.cpp"
-	"source/SongScanner.cpp"
-
-	"lib/vorbis/lib/vorbisfile.c"
-)
-
-target_link_libraries(${CMAKE_PROJECT_NAME} "glfw")
-
-target_link_libraries(${CMAKE_PROJECT_NAME} "freetype")
-
+target_link_libraries("ImGui" glfw GLEW::GLEW)
 target_link_libraries(${CMAKE_PROJECT_NAME} "ImGui")
 
-target_link_libraries(${CMAKE_PROJECT_NAME} "glew")
+# JSON
+include_directories("lib/nlohmann")
 
-target_link_libraries(${CMAKE_PROJECT_NAME} "OpenAL")
+# OpenAL
+find_package(OpenAL REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENAL_LIBRARY})
 
-target_link_libraries(${CMAKE_PROJECT_NAME} "vorbis")
+# OpenGL
+if (MSYS)
+	find_library(OPENGL_gl_LIBRARY opengl32)
+	target_link_libraries(${CMAKE_PROJECT_NAME} opengl32)
+else()
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(${CMAKE_PROJECT_NAME} OpenGL::GL)
+endif()
 
-target_link_libraries(${CMAKE_PROJECT_NAME} "stdc++fs")
+# SimpleINI
+include_directories("lib/SimpleINI")
+add_library("SimpleINI" STATIC "lib/SimpleINI/ConvertUTF.c")
+target_link_libraries(${CMAKE_PROJECT_NAME} "SimpleINI")
+
+# stb_image
+include_directories("lib/stb")
+
+# Vorbis
+find_library(VORBISFILE_LIBRARY vorbisfile)
+if (VORBISFILE_LIBRARY)
+	message(STATUS "Found VorbisFile: ${VORBISFILE_LIBRARY}")
+else()
+	message(FATAL_ERROR "Could NOT find VorbisFile library")
+endif()
+target_link_libraries(${CMAKE_PROJECT_NAME} ${VORBISFILE_LIBRARY})

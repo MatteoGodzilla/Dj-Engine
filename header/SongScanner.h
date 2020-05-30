@@ -1,15 +1,14 @@
 #pragma once
-#include "SimpleINI/SimpleIni.h"
-#include "nlohmann/json.hpp"
-#include <iostream>
-//remove visual studio warning
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
-#include <fstream>
-#include <string>
-#include <map>
-#include <list>
+#include "SimpleIni.h"
+#include "json.hpp"
+
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <list>
+#include <map>
+#include <string>
 
 struct SongEntry {
 	std::string path;
@@ -26,11 +25,12 @@ struct SongEntry {
 	int dScratch;
 };
 
-class SongScanner
-{
+class SongScanner {
 public:
 	void load(const std::string& root, std::vector<SongEntry>& list);
+	static void writeCache(std::vector<SongEntry>& list);
+	static void readCache(std::vector<SongEntry>& list);
+
 private:
 	std::map<std::string, int> m_duplicates;
 };
-

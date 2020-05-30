@@ -1,35 +1,41 @@
 #pragma once
 
 #include "Graphics.h"
-#include "GLFW/include/GLFW/glfw3.h"
 
-#include <vector>
+#include <GLFW/glfw3.h>
 #include <iostream>
-#include <string>
 #include <map>
+#include <string>
+#include <vector>
 
 class Rendr {
 public:
-	Rendr();
 	void init(GLFWwindow* w);
 	GLFWwindow* getWindowPtr();
-	virtual ~Rendr();
 
 protected:
-	void renderTexture(std::vector<float>& vArr, std::vector<unsigned int>& iArr, unsigned int t);
-	void renderColor(std::vector<float>& vArr, std::vector<unsigned int>& iArr);
-	void renderText(std::vector<float>& vArr, std::vector<unsigned int>& iArr, unsigned int t);
+	void renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture);
+	void renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr);
+	void renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture);
 	void drawText(const std::string& s, float x, float y, float scl);
+
 	void usePersProj();
 	void useOrthoProj();
 	void setTextColor(float r, float g, float b, float a);
-	void checkError();
+	static void checkError();
+
 	void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a = 1.0);
 	void pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s = 0.0, float t = 0.0);
-	void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value);
-	void loadTexture(const std::string& s, unsigned int* destination);
-	float getTextWidth(const std::string& s,float scale);
-	float getTextHeight(const std::string& s, float scale);
+	static void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value);
+	static void pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value);
+
+	static glm::vec2 loadTexture(const std::string& s, unsigned int* destination);
+
+	static float getTextWidth(const std::string& s, float scale);
+	static float getTextHeight(const std::string& s, float scale);
+
+	static void startImGuiFrame(const std::string& winName, ImGuiBackendFlags flags);
+	static void renderImGuiFrame();
 
 	GLFWwindow* m_window = nullptr;
 
@@ -49,6 +55,4 @@ protected:
 	FT_Face m_font;
 
 	bool rendr_InvertedX = false;
-
 };
-

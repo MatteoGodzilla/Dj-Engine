@@ -1,11 +1,11 @@
 #include "SongScanner.h"
 
 //alias to make code shorter (and easier to read)
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
-//recursive scan inside folders to find songs 
-void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
-	for (const fs::directory_entry entry : fs::directory_iterator(p)) {
+//recursive scan inside folders to find songs
+void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::string, int>& duplicates) {
+	for (const fs::directory_entry& entry : fs::directory_iterator(p)) {
 		//if there's a sub-directory, repeat the scan inside that sub-directory
 		if (fs::is_directory(entry)) {
 			checkFolder(entry.path(), list, duplicates);
@@ -17,17 +17,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 			std::ifstream stream(file);
 			nlohmann::json root = nlohmann::json::parse(stream);
 
-			std::string s1 = root["song"]["first"]["name"].get<std::string>();
-			std::string s2 = root["song"]["second"]["name"].get<std::string>();
-			std::string a1 = root["song"]["first"]["artist"].get<std::string>();
-			std::string a2 = root["song"]["second"]["artist"].get<std::string>();
-			std::string charter = root["song"]["charter"].get<std::string>();
-			std::string mixer = root["song"]["dj"].get<std::string>();
-			float bpm = root["difficulty"]["bpm"].get<float>();
-			int dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
-			int dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
-			int dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
-			int dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
+			auto s1 = root["song"]["first"]["name"].get<std::string>();
+			auto s2 = root["song"]["second"]["name"].get<std::string>();
+			auto a1 = root["song"]["first"]["artist"].get<std::string>();
+			auto a2 = root["song"]["second"]["artist"].get<std::string>();
+			auto charter = root["song"]["charter"].get<std::string>();
+			auto mixer = root["song"]["dj"].get<std::string>();
+			auto bpm = root["difficulty"]["bpm"].get<float>();
+			auto dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
+			auto dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
+			auto dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
+			auto dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
 
 			dTrack = std::min(dTrack, 100);
 			dTrack = std::max(dTrack, 0);
@@ -50,13 +50,12 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 			}
 
 			for (SongEntry& entry : list) {
-				if (entry.s1.compare(s1) == 0) {
+				if (entry.s1 == s1) {
 					//found same text
 					if (duplicates.find(s1) == duplicates.end()) {
 						//duplicate not found in dictionary
 						duplicates[s1] = 1;
-					}
-					else {
+					} else {
 						//duplicate found in the dictionary
 						duplicates[s1]++;
 					}
@@ -70,19 +69,23 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 
 			SongEntry t = {
 				p.generic_string(),
-				s1, s2,
-				a1, a2,
-				charter, mixer,
+				s1,
+				s2,
+				a1,
+				a2,
+				charter,
+				mixer,
 				bpm,
-				dTrack, dTap,
-				dCrossfade, dScratch
+				dTrack,
+				dTap,
+				dCrossfade,
+				dScratch,
 			};
 
 			list.push_back(t);
 			std::cout << "found " << file << std::endl;
 			break;
-		}
-		else {
+		} else {
 			file = p.generic_string() + std::string("/info.ini");
 			if (fs::exists(fs::path(file))) {
 				//found info.ini
@@ -138,13 +141,12 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 				}
 
 				for (SongEntry& entry : list) {
-					if (entry.s1.compare(s1) == 0) {
+					if (entry.s1 == s1) {
 						//found same text
 						if (duplicates.find(s1) == duplicates.end()) {
 							//duplicate not found in dictionary
 							duplicates[s1] = 1;
-						}
-						else {
+						} else {
 							//duplicate found in the dictionary
 							duplicates[s1]++;
 						}
@@ -159,12 +161,17 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 
 				SongEntry t = {
 					p.generic_string(),
-					s1, s2,
-					a1, a2,
-					charter, mixer,
+					s1,
+					s2,
+					a1,
+					a2,
+					charter,
+					mixer,
 					bpm,
-					dTrack, dTap,
-					dCrossfade, dScratch
+					dTrack,
+					dTap,
+					dCrossfade,
+					dScratch,
 				};
 
 				list.push_back(t);
@@ -175,36 +182,38 @@ void checkFolder(fs::path p, std::vector<SongEntry>& list, std::map<std::string,
 	}
 }
 
-bool compareSongEntries(SongEntry a, SongEntry b) {
-	std::string a1, a2, b1, b2;
+bool compareSongEntries(const SongEntry& a, const SongEntry& b) {
+	std::string a1;
+	std::string a2;
+	std::string b1;
+	std::string b2;
 
-	for (size_t i = 0; i < a.s1.size(); ++i) {
-		a1 += std::toupper(a.s1.at(i));
+	for (char c : a.s1) {
+		a1 += std::toupper(c);
 	}
 
-	for (size_t i = 0; i < b.s1.size(); ++i) {
-		b1 += std::toupper(b.s1.at(i));
+	for (char c : b.s1) {
+		b1 += std::toupper(c);
 	}
 
 	if (!a.s2.empty()) {
-		for (size_t i = 0; i < a.s2.size(); ++i) {
-			a2 += std::toupper(a.s2.at(i));
+		for (char c : a.s2) {
+			a2 += std::toupper(c);
 		}
 	}
 
 	if (!b.s2.empty()) {
-		for (size_t i = 0; i < b.s2.size(); ++i) {
-			b2 += std::toupper(b.s2.at(i));
+		for (char c : b.s2) {
+			b2 += std::toupper(c);
 		}
 	}
 	int res = a1.compare(b1);
-	if (res > 0)return false;
-	else if (res == 0) {
+	if (res != 0) {
+		return res < 0;
+	} else {
 		int res2 = a2.compare(b2);
-		if (res2 >= 0) return false;
-		else return true;
+		return res2 < 0;
 	}
-	else return true;
 }
 
 void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list) {
@@ -219,8 +228,108 @@ void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list
 		}
 		*/
 		std::sort(list.begin(), list.end(), compareSongEntries);
-	}
-	else {
+	} else {
 		std::cerr << "SongScanner error: Root path is not a folder" << std::endl;
+	}
+}
+
+void SongScanner::writeCache(std::vector<SongEntry>& list) {
+	std::ofstream cache("songs/songCache.txt");
+	if (cache.is_open()) {
+		std::cout << "SongScanner Message: Writing to cache" << std::endl;
+		cache << list.size() << std::endl;
+		for (SongEntry& entry : list) {
+			cache << (!entry.path.empty() ? entry.path : std::string("NULL")) << std::endl;
+			cache << (!entry.s1.empty() ? entry.s1 : std::string("NULL")) << std::endl;
+			cache << (!entry.s2.empty() ? entry.s2 : std::string("NULL")) << std::endl;
+			cache << (!entry.a1.empty() ? entry.a1 : std::string("NULL")) << std::endl;
+			cache << (!entry.a2.empty() ? entry.a2 : std::string("NULL")) << std::endl;
+			cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << std::endl;
+			cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << std::endl;
+			cache << (entry.bpm != -1 ? entry.bpm : -1) << std::endl;
+			cache << (entry.dTrack != -1 ? entry.dTrack : -1) << std::endl;
+			cache << (entry.dTap != -1 ? entry.dTap : -1) << std::endl;
+			cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << std::endl;
+			cache << (entry.dScratch != -1 ? entry.dScratch : -1) << std::endl;
+		}
+		std::cout << "SongScanner Message: updated song cache" << std::endl;
+	}
+}
+
+void SongScanner::readCache(std::vector<SongEntry>& list) {
+	std::ifstream cache("songs/songCache.txt");
+	if (cache.is_open()) {
+		list.clear();
+		int n;
+		std::string token;
+		std::getline(cache, token);
+		n = stoi(token);
+		for (int i = 0; i < n; ++i) {
+			std::string path;
+			std::string s1;
+			std::string s2;
+			std::string a1;
+			std::string a2;
+			std::string charter;
+			std::string mixer;
+			float bpm;
+			int dTrack;
+			int dTap;
+			int dCrossfade;
+			int dScratch;
+
+			std::getline(cache, token);
+			path = token;
+			std::getline(cache, token);
+			s1 = token;
+			std::getline(cache, token);
+			s2 = token;
+			std::getline(cache, token);
+			a1 = token;
+			std::getline(cache, token);
+			a2 = token;
+			std::getline(cache, token);
+			charter = token;
+			std::getline(cache, token);
+			mixer = token;
+			std::getline(cache, token);
+			bpm = std::stof(token);
+			std::getline(cache, token);
+			dTrack = std::stoi(token);
+			std::getline(cache, token);
+			dTap = std::stoi(token);
+			std::getline(cache, token);
+			dCrossfade = std::stoi(token);
+			std::getline(cache, token);
+			dScratch = std::stoi(token);
+
+			if (s2 == std::string("NULL")) {
+				s2.clear();
+			}
+
+			if (a2 == std::string("NULL")) {
+				a2.clear();
+			}
+
+			SongEntry t = {
+				path,
+				s1,
+				s2,
+				a1,
+				a2,
+				charter,
+				mixer,
+				bpm,
+				dTrack,
+				dTap,
+				dCrossfade,
+				dScratch,
+			};
+			list.push_back(t);
+		}
+		cache.close();
+		std::cout << "SongScanner Message: loaded songs from cache" << std::endl;
+	} else {
+		std::cerr << "SongScanner Error: corrupted cache" << std::endl;
 	}
 }

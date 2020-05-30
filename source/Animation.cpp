@@ -69,7 +69,3 @@ double Animation::getPercent() {
 double Animation::getDuration() {
 	return m_duration;
 }
-
-Animation::~Animation() {
-
-}

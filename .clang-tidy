@@ -1,0 +1,12 @@
+Checks: '
+bugprone-*,
+misc-*,
+modernize-*,
+-modernize-use-trailing-return-type,
+performance-*,
+readability-*,
+-readability-else-after-return,
+-readability-implicit-bool-conversion,
+-readability-magic-numbers,
+-readability-uppercase-literal-suffix,
+'

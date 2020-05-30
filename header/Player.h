@@ -1,38 +1,45 @@
 #pragma once
-#include "GLFW/include/GLFW/glfw3.h"
-#include <vector>
-#include <fstream>
-#include <algorithm>
 #include "Generator.h"
+#include "SimpleIni.h"
+
+#include <GLFW/glfw3.h>
+#include <algorithm>
+#include <fstream>
+#include <vector>
 
 enum indices {
-	GREEN_INDEX,RED_INDEX,BLUE_INDEX,EU_INDEX,
-	CF_LEFT_INDEX,CF_RIGHT_INDEX,
-	SCR_UP_INDEX,SCR_DOWN_INDEX,
-	MENU_UP,MENU_DOWN,MENU_SELECT,MENU_BACK
+	GREEN_INDEX,
+	RED_INDEX,
+	BLUE_INDEX,
+	EU_INDEX,
+	CF_LEFT_INDEX,
+	CF_RIGHT_INDEX,
+	SCR_UP_INDEX,
+	SCR_DOWN_INDEX,
+	MENU_UP,
+	MENU_DOWN,
+	MENU_SELECT,
+	MENU_BACK
 };
 
 class Player {
 public:
-    Player();
-
+	Player();
 	void pollInput(GLFWwindow* window);
-	void hit(double time,std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
-
-    virtual ~Player();
+	void hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 
 	bool getRedClicker();
 	bool getGreenClicker();
 	bool getBlueClicker();
 	int getCross();
-    int getScore();
-    int getCombo();
+	int getScore();
+	int getCombo();
 	int getHighCombo();
-    int getMult();
+	int getMult();
 	double getEuValue();
 	bool getEuActive();
 	bool getEuZoneActive();
-    void pollState(Generator &g);
+	void pollState(Generator& g);
 	void readMappingFile();
 	void writeMappingFile();
 	void updateGamepadState();
@@ -96,7 +103,7 @@ public:
 	bool m_redAnimation = false;
 	bool m_blueAnimation = false;
 	bool m_cfCenterToGreen = false;
-	bool m_cfCenterToBlue= false;
+	bool m_cfCenterToBlue = false;
 	bool m_cfGreenToCenter = false;
 	bool m_cfBlueToCenter = false;
 
@@ -107,17 +114,17 @@ public:
 	double m_scrollX;
 	double m_scrollY;
 	bool m_changedScroll = false;
-	
+
 	bool m_isButtonsRight = false;
 	bool m_botEnabled;
-protected:
 
+protected:
 private:
-    int m_score = 0;
-    int m_mult = 1;
-    int m_combo = 0;
-    int m_scr_tick = 0;
-    double m_past_tap = -1;
+	int m_score = 0;
+	int m_mult = 1;
+	int m_combo = 0;
+	int m_scr_tick = 0;
+	double m_past_tap = -1;
 	double m_eu_value = 0;
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;

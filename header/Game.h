@@ -1,21 +1,22 @@
 #pragma once
-#include "GameRender.h"
-#include "Note.h"
-#include "Generator.h"
-#include "Player.h"
-#include "Audio.h"
 #include "Animation.h"
-#include <vector>
+#include "Audio.h"
+#include "GameRender.h"
+#include "Generator.h"
+#include "Note.h"
+#include "Player.h"
+#include "SimpleIni.h"
+
 #include <iostream>
 #include <string>
+#include <vector>
 
-class Game
-{
+class Game {
 public:
-	Game();
+	//Game();
 	void init(GLFWwindow* w);
 	void render();
-	void tick(double dt);
+	void tick();
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
@@ -23,7 +24,7 @@ public:
 	Player* getPlayer();
 	Audio* getAudio();
 	GameRender* getGameRender();
-	void start(SongEntry entry);
+	void start(const SongEntry& entry);
 	void setButtonPos(bool value);
 	void writeConfig();
 	~Game();
@@ -33,9 +34,11 @@ public:
 
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
+	double m_deltaTime = 0.0;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
 	bool m_debugView = false;
+
 private:
 	double m_pastTime = 0.0;
 	bool firstRun = true;
@@ -47,4 +50,3 @@ private:
 	int m_mode = 0;
 	bool m_isButtonsRight = false;
 };
-
