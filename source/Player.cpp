@@ -850,111 +850,81 @@ void Player::tick(double time) {
 }
 
 void Player::readMappingFile() {
-	std::ifstream input("config.txt");
-	std::string s;
-	while (s != "{Game}") {
-		std::getline(input, s);
-		if (input.eof()) {
-			std::cerr << "Player Error: found config file, but not {Game} marker.";
-			std::cerr << "Stopped loading of config file" << std::endl;
-			return;
-		}
-	}
-	if (input.is_open()) {
-		std::cout << "Player Message: loading config from file" << std::endl;
-		std::string token;
-		input >> token;
-		GREEN_CODE = std::stoi(token);
-		input >> token;
-		RED_CODE = std::stoi(token);
-		input >> token;
-		BLUE_CODE = std::stoi(token);
-		input >> token;
-		EUPHORIA = std::stoi(token);
-		input >> token;
-		CROSS_L_CODE = std::stoi(token);
-		input >> token;
-		CROSS_R_CODE = std::stoi(token);
-		input >> token;
-		SCRATCH_UP = std::stoi(token);
-		input >> token;
-		SCRATCH_DOWN = std::stoi(token);
+	CSimpleIniA ini;
+	const char* section = "Game Mappings";
+	ini.LoadFile("profile.ini");
 
-		input >> token;
-		GREEN_GAMEPAD = std::stoi(token);
-		input >> token;
-		RED_GAMEPAD = std::stoi(token);
-		input >> token;
-		BLUE_GAMEPAD = std::stoi(token);
-		input >> token;
-		EU_GAMEPAD = std::stoi(token);
-		input >> token;
-		m_useSingleCfAxis = token == "true";
-		input >> token;
-		CF_LEFT_GAMEPAD = std::stoi(token);
-		input >> token;
-		CF_RIGHT_GAMEPAD = std::stoi(token);
-		input >> token;
-		m_useSingleScrAxis = token == "true";
-		input >> token;
-		SCR_UP_GAMEPAD = std::stoi(token);
-		input >> token;
-		SCR_DOWN_GAMEPAD = std::stoi(token);
+	GREEN_CODE = ini.GetLongValue(section, "KB_green", 0);
+	RED_CODE = ini.GetLongValue(section, "KB_red", 0);
+	BLUE_CODE = ini.GetLongValue(section, "KB_blue", 0);
+	EUPHORIA = ini.GetLongValue(section, "KB_euphoria", 0);
+	CROSS_L_CODE = ini.GetLongValue(section, "KB_crossLeft", 0);
+	CROSS_R_CODE = ini.GetLongValue(section, "KB_crossRight", 0);
+	SCRATCH_UP = ini.GetLongValue(section, "KB_scratchUp", 0);
+	SCRATCH_DOWN = ini.GetLongValue(section, "KB_scratchDown", 0);
 
-		for (int i = 0; i < 8; ++i) {
-			input >> token;
-			m_gpMult.at(i) = std::stof(token);
-		}
-		for (int i = 0; i < 8; ++i) {
-			input >> token;
-			m_gpDead.at(i) = std::stof(token);
-		}
-	} else {
-		std::cerr << "Player Error: cannot open config file" << std::endl;
+	GREEN_GAMEPAD = ini.GetLongValue(section, "GP_green", 0);
+	RED_GAMEPAD = ini.GetLongValue(section, "GP_red", 0);
+	BLUE_GAMEPAD = ini.GetLongValue(section, "GP_blue", 0);
+	EU_GAMEPAD = ini.GetLongValue(section, "GP_euphoria", 0);
+	m_useSingleCfAxis = ini.GetBoolValue(section, "GP_sameAxisForCrossfade", false);
+	CF_LEFT_GAMEPAD = ini.GetLongValue(section, "GP_crossLeft", 0);
+	CF_RIGHT_GAMEPAD = ini.GetLongValue(section, "GP_crossRight", 0);
+	m_useSingleScrAxis = ini.GetBoolValue(section, "GP_sameAxisForScratch", false);
+	SCR_UP_GAMEPAD = ini.GetLongValue(section, "GP_scratchUp", 0);
+	SCR_DOWN_GAMEPAD = ini.GetLongValue(section, "GP_scratchDown", 0);
+
+	const char* sensitivityKey = "MULT_";
+	for (size_t i = 0; i < m_gpMult.size(); i++) {
+		std::string key = std::string(sensitivityKey) + std::to_string(i);
+		m_gpMult.at(i) = ini.GetDoubleValue(section, key.c_str(), 0.0);
 	}
-	input.close();
+
+	const char* deadzoneKey = "DEAD_";
+	for (size_t i = 0; i < m_gpDead.size(); i++) {
+		std::string key = std::string(deadzoneKey) + std::to_string(i);
+		m_gpDead.at(i) = ini.GetDoubleValue(section, key.c_str(), 0.0);
+	}
 }
 
 void Player::writeMappingFile() {
-	std::ofstream output("config.txt", std::ios::app);
-	if (output.is_open()) {
-		output << "{Game}" << std::endl;
-		output << std::boolalpha;
-		output << GREEN_CODE << std::endl;
-		output << RED_CODE << std::endl;
-		output << BLUE_CODE << std::endl;
-		output << EUPHORIA << std::endl;
-		output << CROSS_L_CODE << std::endl;
-		output << CROSS_R_CODE << std::endl;
-		output << SCRATCH_UP << std::endl;
-		output << SCRATCH_DOWN << std::endl
-			   << std::endl;
+	CSimpleIniA ini;
+	const char* section = "Game Mappings";
 
-		output << GREEN_GAMEPAD << std::endl;
-		output << RED_GAMEPAD << std::endl;
-		output << BLUE_GAMEPAD << std::endl;
-		output << EU_GAMEPAD << std::endl;
-		output << m_useSingleCfAxis << std::endl;
-		output << CF_LEFT_GAMEPAD << std::endl;
-		output << CF_RIGHT_GAMEPAD << std::endl;
-		output << m_useSingleScrAxis << std::endl;
-		output << SCR_UP_GAMEPAD << std::endl;
-		output << SCR_DOWN_GAMEPAD << std::endl;
+	ini.SetLongValue(section, "KB_green", GREEN_CODE);
+	ini.SetLongValue(section, "KB_red", RED_CODE);
+	ini.SetLongValue(section, "KB_blue", BLUE_CODE);
+	ini.SetLongValue(section, "KB_euphoria", EUPHORIA);
+	ini.SetLongValue(section, "KB_crossLeft", CROSS_L_CODE);
+	ini.SetLongValue(section, "KB_crossRight", CROSS_R_CODE);
+	ini.SetLongValue(section, "KB_scratchUp", SCRATCH_UP);
+	ini.SetLongValue(section, "KB_scratchDown", SCRATCH_DOWN);
 
-		for (float f : m_gpMult) {
-			output << f << std::endl;
-		}
-		output << std::endl;
-		for (float f : m_gpDead) {
-			output << f << std::endl;
-		}
-		output << std::endl;
+	ini.SetLongValue(section, "GP_green", GREEN_GAMEPAD);
+	ini.SetLongValue(section, "GP_red", RED_GAMEPAD);
+	ini.SetLongValue(section, "GP_blue", BLUE_GAMEPAD);
+	ini.SetLongValue(section, "GP_euphoria", EU_GAMEPAD);
+	ini.SetBoolValue(section, "GP_sameAxisForCrossfade", m_useSingleCfAxis);
+	ini.SetLongValue(section, "GP_crossLeft", CF_LEFT_GAMEPAD);
+	ini.SetLongValue(section, "GP_crossRight", CF_RIGHT_GAMEPAD);
+	ini.SetBoolValue(section, "GP_sameAxisForScratch", m_useSingleScrAxis);
+	ini.SetLongValue(section, "GP_scratchUp", SCR_UP_GAMEPAD);
+	ini.SetLongValue(section, "GP_scratchDown", SCR_DOWN_GAMEPAD);
 
-		std::cout << "Player Message: Written config to file" << std::endl;
-	} else {
-		std::cerr << "Player Error: couldn't create 'config.txt'" << std::endl;
+	const char* sensitivityKey = "MULT_";
+	for (size_t i = 0; i < m_gpMult.size(); i++) {
+		std::string key = std::string(sensitivityKey) + std::to_string(i);
+		ini.SetDoubleValue(section, key.c_str(), m_gpMult.at(i));
 	}
-	output.close();
+
+	const char* deadzoneKey = "DEAD_";
+	for (size_t i = 0; i < m_gpDead.size(); i++) {
+		std::string key = std::string(deadzoneKey) + std::to_string(i);
+		ini.SetDoubleValue(section, key.c_str(), m_gpDead.at(i));
+	}
+
+	ini.SaveFile("profile.ini");
+	std::cout << "Player Message: written game mappings to 'profile.ini'" << std::endl;
 }
 
 void Player::updateKBMState(GLFWwindow* w) {

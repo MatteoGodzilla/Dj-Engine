@@ -1,9 +1,11 @@
 #pragma once
 #include "MenuNode.h"
 #include "MenuRender.h"
+#include "SimpleIni.h"
 #include "SongScanner.h"
 
 #include <GLFW/glfw3.h>
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 

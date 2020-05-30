@@ -13,57 +13,45 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 void MenuNavigator::writeConfigFile() {
 	m_game->writeConfig();
 
-	std::ofstream output("config.txt", std::ios::app);
-	if (output.is_open()) {
-		output << "{Menu}" << std::endl;
-		output << UP_CODE << std::endl;
-		output << DOWN_CODE << std::endl;
-		output << SELECT_CODE << std::endl;
-		output << BACK_CODE << "\n\n";
+	CSimpleIniA ini;
+	const char* section = "Menu Mappings";
+	ini.SetLongValue(section, "KB_up", UP_CODE);
+	ini.SetLongValue(section, "KB_down", DOWN_CODE);
+	ini.SetLongValue(section, "KB_select", SELECT_CODE);
+	ini.SetLongValue(section, "KB_back", BACK_CODE);
 
-		output << UP_GAMEPAD << std::endl;
-		output << DOWN_GAMEPAD << std::endl;
-		output << SELECT_GAMEPAD << std::endl;
-		output << BACK_GAMEPAD << std::endl
-			   << std::endl;
-		std::cout << "MenuNavigator Message: wrote mapping file" << std::endl;
-		output.close();
+	ini.SetLongValue(section, "GP_up", UP_GAMEPAD);
+	ini.SetLongValue(section, "GP_down", DOWN_GAMEPAD);
+	ini.SetLongValue(section, "GP_select", SELECT_GAMEPAD);
+	ini.SetLongValue(section, "GP_back", BACK_GAMEPAD);
+
+	std::string mappings;
+	ini.Save(mappings);
+
+	std::ofstream output("profile.ini", std::ios::app | std::ios::binary);
+	if (output.is_open()) {
+		output << std::endl
+			   << mappings;
+		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'";
 	}
 }
 
 void MenuNavigator::readConfigFile() {
-	std::ifstream input("config.txt");
-	std::string s;
-	while (s != std::string("{Menu}")) {
-		std::getline(input, s);
-		if (input.eof()) {
-			std::cerr << "MenuNavigator Error: found config file, but not {Menu} marker.";
-			std::cerr << "Stopped loading of config file" << std::endl;
-			return;
-		}
-	}
-	if (input.is_open()) {
-		std::cout << "MenuNavigator Message: loading config from file" << std::endl;
-		std::string token;
-		input >> token;
-		UP_CODE = std::stoi(token);
-		input >> token;
-		DOWN_CODE = std::stoi(token);
-		input >> token;
-		SELECT_CODE = std::stoi(token);
-		input >> token;
-		BACK_CODE = std::stoi(token);
-		input >> token;
-		UP_GAMEPAD = std::stoi(token);
-		input >> token;
-		DOWN_GAMEPAD = std::stoi(token);
-		input >> token;
-		SELECT_GAMEPAD = std::stoi(token);
-		input >> token;
-		BACK_GAMEPAD = std::stoi(token);
-	} else {
-		std::cerr << "MenuNavigator Error: Cannot open config file" << std::endl;
-	}
+	CSimpleIniA ini;
+	ini.LoadFile("profile.ini");
+	const char* section = "Menu Mappings";
+
+	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
+
+	UP_CODE = ini.GetLongValue(section, "KB_up", 0);
+	DOWN_CODE = ini.GetLongValue(section, "KB_down", 0);
+	SELECT_CODE = ini.GetLongValue(section, "KB_select", 0);
+	BACK_CODE = ini.GetLongValue(section, "KB_back", 0);
+
+	UP_GAMEPAD = ini.GetLongValue(section, "GP_up", 0);
+	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_down", 0);
+	SELECT_GAMEPAD = ini.GetLongValue(section, "GP_select", 0);
+	BACK_GAMEPAD = ini.GetLongValue(section, "GP_back", 0);
 }
 
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {

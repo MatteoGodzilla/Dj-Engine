@@ -5,6 +5,7 @@
 #include "Generator.h"
 #include "Note.h"
 #include "Player.h"
+#include "SimpleIni.h"
 
 #include <iostream>
 #include <string>

@@ -1,5 +1,6 @@
 #pragma once
 #include "Generator.h"
+#include "SimpleIni.h"
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
