@@ -21,42 +21,30 @@ void Audio::load(const char* filename) {
 		//initial song load to kickstart the streaming
 
 		unsigned int b = 0; //pointer never used
-		int processed = 0;
-		std::array<char, 4096> bufferData;
-		int bytesRead = 0;
 		vorbis_info* info;
 
 		info = ov_info(&m_oggFile, -1);
 		m_frequency = info->rate;
 		m_songLength = ov_time_total(&m_oggFile, -1);
 
-		int buffers = 0;
-		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
-		while (buffers < 50) {
-			//temporary buffer
-			alGenBuffers(1, &b);
-
-			//read and upload
-			bytesRead = ov_read(&m_oggFile, bufferData.data(), 4096, 0, 2, 1, &m_currentSection);
-			alBufferData(b, AL_FORMAT_STEREO16, bufferData.data(), bytesRead, m_frequency);
-			alSourceQueueBuffers(m_source, 1, &b);
-
-			//remove temporary buffer
-			//alDeleteBuffers(1, &b);
-
-			alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
-		}
-		buffer();
+		setupBuffers();
+		buffer(0.0);
 	} else {
 		std::cerr << "Audio Error: Cannot load 'song.ogg'" << std::endl;
 	}
 }
 
-void Audio::buffer() {
+void Audio::buffer(double time) {
 	unsigned int bufferRemoved = 0;
 	int processed = 0;
 	std::array<char, 4096> bufferData;
 	int bytesRead = 0;
+
+	if(time > ov_time_tell(&m_oggFile)){
+		ov_time_seek_lap(&m_oggFile,time);
+		removeBuffers();
+		setupBuffers();
+	}
 
 	//get already processed buffers
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
@@ -74,8 +62,37 @@ void Audio::buffer() {
 	}
 }
 
+void Audio::setupBuffers(){
+	int buffers = 0;
+	unsigned int b;
+	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+	while (buffers < 50) {
+		//temporary buffer
+		alGenBuffers(1, &b);
+		//upload
+		alBufferData(b, AL_FORMAT_STEREO16, nullptr, 0, m_frequency);
+		alSourceQueueBuffers(m_source, 1, &b);
+		//remove temporary buffer
+		//alDeleteBuffers(1, &b);
+		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+	}
+}
+
+void Audio::removeBuffers(){
+	int queue;
+	unsigned int bufferPointer;
+	alGetSourcei(m_source,AL_BUFFERS_PROCESSED,&queue);
+	while(queue > 0){
+		alSourceUnqueueBuffers(m_source,1,&bufferPointer);
+		alDeleteBuffers(1,&bufferPointer);
+
+		alGetSourcei(m_source,AL_BUFFERS_PROCESSED,&queue);
+	}
+}
+
 void Audio::reset() {
 	stop();
+	removeBuffers();
 	firstRun = true;
 	m_frequency = 0;
 	m_currentSection = 0;
@@ -88,7 +105,9 @@ void Audio::reset() {
 }
 
 void Audio::play() {
-	if (firstRun) {
+	int state;
+	alGetSourcei(m_source,AL_SOURCE_STATE,&state);
+	if(state == AL_STOPPED || firstRun){
 		alSourcePlay(m_source);
 		firstRun = false;
 	}

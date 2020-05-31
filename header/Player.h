@@ -39,6 +39,7 @@ public:
 	double getEuValue();
 	bool getEuActive();
 	bool getEuZoneActive();
+	bool getBrokeOnce();
 	void pollState(Generator& g);
 	void readMappingFile();
 	void writeMappingFile();
@@ -120,6 +121,8 @@ public:
 
 protected:
 private:
+	void breakCombo(double time);
+
 	int m_score = 0;
 	int m_mult = 1;
 	int m_combo = 0;
@@ -143,4 +146,5 @@ private:
 	double m_nowMouseY = 0.0;
 
 	int m_highestCombo = 0;
+	bool m_hasPlayerBrokeOnce = false;
 };

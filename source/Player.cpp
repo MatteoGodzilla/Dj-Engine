@@ -148,8 +148,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break the combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true; //start animation
 			}
@@ -198,8 +197,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		} else {
 			m_redAnimation = true; //start animation
 		}
@@ -231,8 +229,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true; // start animation
 			}
@@ -297,8 +294,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	//cross right pressed/moved
@@ -339,8 +335,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	//up pressed
@@ -373,8 +368,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true;
 			}
@@ -406,8 +400,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true;
 			}
@@ -443,8 +436,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true;
 			}
@@ -475,8 +467,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true;
 			}
@@ -550,8 +541,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't an event in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	if (m_wasCfBluePressed && !m_isCfBluePressed) {
@@ -597,8 +587,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't an event in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	if (m_euphoria_active) {
@@ -849,6 +838,14 @@ void Player::tick(double time) {
 	}
 }
 
+void Player::breakCombo(double time){
+	if(time > 0){
+		m_combo = 0;
+		m_eu_zone_active = false;
+		m_hasPlayerBrokeOnce = true;
+	}
+}
+
 void Player::readMappingFile() {
 	CSimpleIniA ini;
 	const char* section = "Game Mappings";
@@ -1062,6 +1059,7 @@ void Player::reset() {
 
 	m_cross = 1;
 	m_pastCross = 1;
+	m_hasPlayerBrokeOnce = false;
 
 	m_score = 0;
 	m_mult = 1;
@@ -1081,8 +1079,7 @@ void Player::reset() {
 //poll reset signals from generator
 void Player::pollState(Generator& g) {
 	if (g.m_combo_reset) {
-		m_combo = 0;
-		m_eu_zone_active = false;
+		breakCombo(1.0);
 	}
 	if (g.m_eu_start) {
 		m_eu_zone_active = true;
@@ -1163,6 +1160,10 @@ int Player::getMult() {
 
 int Player::getCross() {
 	return m_cross;
+}
+
+bool Player::getBrokeOnce(){
+	return m_hasPlayerBrokeOnce;
 }
 
 bool Player::getRedClicker() {

@@ -37,6 +37,7 @@ public:
 	double m_deltaTime = 0.0;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
+	bool m_isButtonsRight = false;
 	bool m_debugView = false;
 
 private:
@@ -48,5 +49,4 @@ private:
 	Audio m_audio;
 	bool m_active = false;
 	int m_mode = 0;
-	bool m_isButtonsRight = false;
 };

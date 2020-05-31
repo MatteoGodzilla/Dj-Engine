@@ -15,12 +15,14 @@ public:
 	void play();
 	void load(const char* filename);
 	void stop();
-	void buffer();
+	void buffer(double time);
 	void reset();
 	bool isActive(double time);
 	bool isPlaying();
 
 private:
+	void setupBuffers();
+	void removeBuffers();
 	ALCdevice* m_device;
 	ALCcontext* m_context;
 	unsigned int m_source;

@@ -61,6 +61,12 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_game = gameptr;
 	m_render.init(w);
 
+	readConfigFile();
+
+	std::ifstream available("config.ini");
+	if(!available.is_open()) writeConfigFile();
+
+
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
 	MenuNode options("Options", OPTIONS_ID);
@@ -77,10 +83,10 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
 
 	//add values to text after:
-	flipButtons.setText(flipButtons.getText() + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
+	flipButtons.setText(flipButtons.getText() + std::string(m_game->m_isButtonsRight ? "true" : "false"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
-	bot.setText(bot.getText() + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
-	debug.setText(debug.getText() + (m_game->m_debugView == 1 ? "true" : "false"));
+	bot.setText(bot.getText() + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
+	debug.setText(debug.getText() + std::string(m_game->m_debugView ? "true" : "false"));
 
 	options.push(scratches);
 	options.push(latency);
@@ -103,7 +109,6 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	for (int i = 0; i < 15 + 6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
-	readConfigFile();
 
 	render(0.0f);
 	scan();
@@ -157,6 +162,9 @@ void MenuNavigator::pollInput() {
 		if (m_popupId != -1) {
 			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
 				writeConfigFile();
+				if(m_popupId == HIGHWAY_SPEED){
+					m_root.getChildrens().at(1).getChildrens().at(3).setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+				}
 			}
 			m_popupId = -1;
 			m_debounce = true;
@@ -167,8 +175,9 @@ void MenuNavigator::pollInput() {
 				if (m_scene != 1) {
 					m_shouldClose = true;
 				}
-			} else if (m_scene == CREDITS) {
+			} else if (m_scene == CREDITS || m_scene == SCRATCHES) {
 				m_scene = MAIN_SCENE;
+				resetMenu();
 			}
 		}
 	}
@@ -177,6 +186,9 @@ void MenuNavigator::pollInput() {
 		if (m_popupId != -1) {
 			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
 				writeConfigFile();
+				if(m_popupId == HIGHWAY_SPEED){
+					m_root.getChildrens().at(1).getChildrens().at(3).setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+				}
 			}
 			m_popupId = -1;
 			m_debounce = true;
@@ -399,18 +411,19 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	} else if (id == LATENCY_ID) {
 		m_scene = CALIBRATION;
 	} else if (id == LR_BUTTONS_ID) {
-		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
+		m_game->setButtonPos(!m_game->m_isButtonsRight);
 		//update options node text
-		m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Toggle Buttons Right/Left:") + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
+		m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
 	} else if (id == BOT_ID) {
 		m_game->getPlayer()->m_botEnabled = !m_game->getPlayer()->m_botEnabled;
-		m_root.getChildrens().at(1).getChildrens().at(5).setText(std::string("Toggle Bot:") + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
+		m_root.getChildrens().at(1).getChildrens().at(5).setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
 		m_game->m_debugView = !m_game->m_debugView;
-		m_root.getChildrens().at(1).getChildrens().at(7).setText(std::string("Toggle Debug Informations:") + (m_game->m_debugView == 1 ? "true" : "false"));
+		m_root.getChildrens().at(1).getChildrens().at(7).setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView? "true" : "false"));
+		writeConfigFile();
 	} else if (id == REFRESH_ID) {
 		std::vector<MenuNode> emptyList;
 		m_root.getChildrens().at(0).getChildrens().clear();

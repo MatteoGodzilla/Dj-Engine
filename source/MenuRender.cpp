@@ -873,7 +873,7 @@ void MenuRender::calibration(Game* game, double dt) {
 		game->getAudio()->play();
 	}
 	if (game->getAudio()->isPlaying()) {
-		game->getAudio()->buffer();
+		game->getAudio()->buffer(0.0);
 		m_cbPlayingTime += dt;
 	} else {
 		game->getAudio()->reset();
