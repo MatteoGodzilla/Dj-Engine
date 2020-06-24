@@ -66,7 +66,6 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	std::ifstream available("config.ini");
 	if(!available.is_open()) writeConfigFile();
 
-
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
 	MenuNode options("Options", OPTIONS_ID);
@@ -83,7 +82,7 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
 
 	//add values to text after:
-	flipButtons.setText(flipButtons.getText() + std::string(m_game->m_isButtonsRight ? "true" : "false"));
+	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
 	bot.setText(bot.getText() + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	debug.setText(debug.getText() + std::string(m_game->m_debugView ? "true" : "false"));
@@ -411,7 +410,7 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	} else if (id == LATENCY_ID) {
 		m_scene = CALIBRATION;
 	} else if (id == LR_BUTTONS_ID) {
-		m_game->setButtonPos(!m_game->m_isButtonsRight);
+		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
 		//update options node text
 		m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 		writeConfigFile();

@@ -108,7 +108,6 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 }
 
 void MenuRender::remapping(Game* game, menuinputs input) {
-	game->getPlayer()->pollInput(m_window);
 	int colnum = 5;
 
 	ImGuiBackendFlags flags = 0;
@@ -151,6 +150,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	}
 
 	if (!game->getPlayer()->m_useKeyboardInput) {
+		game->getPlayer()->updateGamepadState();
 		ImGui::SameLine();
 		if (ImGui::Button("Axis viewer")) {
 			ImGui::OpenPopup("raw viewer");
@@ -171,7 +171,8 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			ImGui::Columns();
 			ImGui::EndPopup();
 		}
-	} else if (game->getPlayer()->m_useKeyboardInput) {
+	} else {
+		game->getPlayer()->updateKBMState(game->getGameRender()->getWindowPtr());
 		ImGui::SameLine();
 		if (ImGui::Button("Axis viewer")) {
 			ImGui::OpenPopup("raw viewer");
@@ -194,7 +195,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		}
 	}
 
-	if (!game->getPlayer()->m_gpState.empty()) {
+	if (game->getPlayer()->m_gpState.size() >= 8 && game->getPlayer()->m_gpMult.size() >= 8 && game->getPlayer()->m_gpDead.size() >= 8) {
 		ImGui::Columns(colnum, "mycolumns3", false); // 3-ways, no border
 
 		ImGui::Text("Action");
@@ -834,7 +835,7 @@ void MenuRender::scratches(Player* player) {
 	useOrthoProj();
 	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
 
-	player->pollInput(m_window);
+	//player->pollInput(m_window);
 	if (player->m_isUpPressed && !player->m_wasUpPressed) {
 		m_testBuffer.push_back('^');
 	}
@@ -873,7 +874,7 @@ void MenuRender::calibration(Game* game, double dt) {
 		game->getAudio()->play();
 	}
 	if (game->getAudio()->isPlaying()) {
-		game->getAudio()->buffer(0.0);
+		game->getAudio()->buffer(m_cbPlayingTime);
 		m_cbPlayingTime += dt;
 	} else {
 		game->getAudio()->reset();

@@ -1686,7 +1686,7 @@ void GameRender::updateAnimations(double time) {
 	m_animManager.tick(time);
 }
 
-std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note> cross) {
+std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note>& cross) {
 	std::vector<Note> result = {};
 	double start = note.getMilli();
 	double end = start + note.getLength();
@@ -1728,7 +1728,7 @@ glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
 	return {x, y};
 }
 
-int GameRender::getCrossAtTime(double time, std::vector<Note> crossArr) {
+int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr) {
 	int index = 0;
 	for (size_t i = 0; i < crossArr.size(); ++i) {
 		if (crossArr.at(i).getMilli() > time) {

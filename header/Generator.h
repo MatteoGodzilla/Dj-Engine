@@ -13,7 +13,7 @@ public:
 	void init(const SongEntry& entry);
 	void tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
-	void addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
+	void addNotesToBuffers(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void initialLoad();
 	void bpm(double time, std::vector<double>& arr);
 	int getNotesTotal();

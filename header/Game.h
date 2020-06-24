@@ -7,8 +7,10 @@
 #include "Player.h"
 #include "SimpleIni.h"
 
+#include <chrono>
 #include <iostream>
 #include <string>
+#include <thread>
 #include <vector>
 
 class Game {
@@ -17,10 +19,12 @@ public:
 	void init(GLFWwindow* w);
 	void render();
 	void tick();
+	static void inputThreadFun(Game* gameptr);
 	void pollInput();
 	bool getActive();
 	void setActive(bool active);
 	void reset();
+	void stopThread();
 	Player* getPlayer();
 	Audio* getAudio();
 	GameRender* getGameRender();
@@ -37,7 +41,6 @@ public:
 	double m_deltaTime = 0.0;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
-	bool m_isButtonsRight = false;
 	bool m_debugView = false;
 
 private:
@@ -49,4 +52,8 @@ private:
 	Audio m_audio;
 	bool m_active = false;
 	int m_mode = 0;
+	bool m_isButtonsRight = false;
+	std::thread m_inputThread;
+	bool m_inputThreadRunning = true;
+	int m_inputThreadPollRate = 240;
 };

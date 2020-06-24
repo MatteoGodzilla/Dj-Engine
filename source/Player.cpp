@@ -18,6 +18,217 @@ Player::Player() {
 	m_pastKBMState.resize(400);
 }
 
+void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteArr, std::vector<Note>& eventArr, std::vector<Note>& crossArr) {
+	m_pastMouseX = m_nowMouseX;
+	m_pastMouseY = m_nowMouseY;
+
+	//mouse movement
+	glfwGetCursorPos(window, &m_nowMouseX, &m_nowMouseY);
+	if (m_deltaMouse) {
+		int w;
+		int h;
+		glfwGetWindowSize(window, &w, &h);
+		glfwSetCursorPos(window, (double)w / 2.0, (double)h / 2.0);
+	}
+
+	if (m_useKeyboardInput) {
+		updateKBMState(window);
+	} else {
+		if (glfwJoystickPresent(m_gamepadId)) {
+			updateGamepadState();
+		}
+	}
+
+	if (m_gpState.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+		if (getRisingEdge(GREEN_INDEX)) {
+			if (getHittableNote(TAP_G, noteArr)) {
+				hit(time, TAP_G, noteArr);
+			} else if (!getHittableNote(SCR_G_ZONE, eventArr)) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+		}
+		if (getRisingEdge(RED_INDEX)) {
+			hit(time, TAP_R, noteArr);
+		}
+		if (getRisingEdge(BLUE_INDEX)) {
+			if (getHittableNote(TAP_B, noteArr)) {
+				hit(time, TAP_B, noteArr);
+			} else if (!getHittableNote(SCR_B_ZONE, eventArr)) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+		}
+		if (getRisingEdge(EU_INDEX)) {
+			if (m_eu_value > 0.0) {
+				m_euphoria_active = true;
+			}
+		}
+
+		if (getFallingZero(SCR_UP_INDEX)) {
+			if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
+				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX))
+					hit(time, SCR_G_UP, noteArr);
+				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX))
+					hit(time, SCR_B_UP, noteArr);
+			} else {
+				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce)
+					hit(time, SCR_G_UP, noteArr);
+				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce)
+					hit(time, SCR_B_UP, noteArr);
+			}
+		}
+		if (getFallingZero(SCR_DOWN_INDEX)) {
+			if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
+				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX))
+					hit(time, SCR_G_DOWN, noteArr);
+				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX))
+					hit(time, SCR_B_DOWN, noteArr);
+			} else {
+				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce)
+					hit(time, SCR_G_DOWN, noteArr);
+				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce)
+					hit(time, SCR_B_DOWN, noteArr);
+			}
+		}
+
+		if (m_cross == 0) {
+			if (m_baseMove == 0) {
+				if (getRisingEdge(CF_RIGHT_INDEX)) {
+					m_secondMove = 2;
+					m_cross = 2;
+					m_cfGreenToCenter = true;
+					m_cfCenterToBlue = true;
+					if (getHittableNote(CF_SPIKE_B, noteArr))
+						hit(time, CF_SPIKE_B, noteArr);
+					else
+						hit(time, CROSS_B, crossArr);
+				} else if (getFallingEdge(CF_LEFT_INDEX)) {
+					m_baseMove = 1;
+					m_cross = 1;
+					m_cfGreenToCenter = true;
+					if (getHittableNote(CF_SPIKE_C, noteArr))
+						hit(time, CF_SPIKE_C, noteArr);
+					else if (!getHittableNote(CF_SPIKE_B, noteArr) && !getHittableNote(CROSS_B, crossArr))
+						hit(time, CROSS_C, crossArr);
+				}
+			} else if (m_baseMove == 2) {
+				if (getFallingEdge(CF_LEFT_INDEX)) {
+					m_secondMove = 1;
+					m_cross = 2;
+					m_cfGreenToCenter = true;
+					m_cfCenterToBlue = true;
+					hit(time, CROSS_B, crossArr);
+				} else if (getFallingEdge(CF_RIGHT_INDEX)) {
+					m_secondMove = 1;
+					m_baseMove = 0;
+				}
+			}
+		} else if (m_cross == 1) {
+			if (getRisingEdge(CF_LEFT_INDEX)) {
+				m_baseMove = 0;
+				m_cross = 0;
+				m_cfCenterToGreen = true;
+				if (getHittableNote(CF_SPIKE_G, noteArr))
+					hit(time, CF_SPIKE_G, noteArr);
+				else
+					hit(time, CROSS_G, crossArr);
+			}
+
+			if (getRisingEdge(CF_RIGHT_INDEX)) {
+				m_baseMove = 2;
+				m_cross = 2;
+				m_cfCenterToBlue = true;
+				if (getHittableNote(CF_SPIKE_B, noteArr))
+					hit(time, CF_SPIKE_B, noteArr);
+				else
+					hit(time, CROSS_B, crossArr);
+			}
+		} else if (m_cross == 2) {
+			if (m_baseMove == 2) {
+				if (getRisingEdge(CF_LEFT_INDEX)) {
+					m_secondMove = 0;
+					m_cross = 0;
+					m_cfBlueToCenter = true;
+					m_cfCenterToGreen = true;
+					if (getHittableNote(CF_SPIKE_G, noteArr))
+						hit(time, CF_SPIKE_G, noteArr);
+					else
+						hit(time, CROSS_G, crossArr);
+				} else if (getFallingEdge(CF_RIGHT_INDEX)) {
+					m_baseMove = 1;
+					m_cross = 1;
+					m_cfBlueToCenter = true;
+					if (getHittableNote(CF_SPIKE_C, noteArr))
+						hit(time, CF_SPIKE_C, noteArr);
+					else if (!getHittableNote(CF_SPIKE_G, noteArr) && !getHittableNote(CROSS_G, crossArr))
+						hit(time, CROSS_C, crossArr);
+				}
+			} else if (m_baseMove == 0) {
+				if (getFallingEdge(CF_RIGHT_INDEX)) {
+					m_secondMove = 1;
+					m_cross = 0;
+					m_cfBlueToCenter = true;
+					m_cfCenterToGreen = true;
+					hit(time, CROSS_G, crossArr);
+				} else if (getFallingEdge(CF_LEFT_INDEX)) {
+					m_secondMove = 1;
+					m_baseMove = 2;
+				}
+			}
+		}
+	}
+	m_gpHistory.push_back(m_gpState);
+	if (m_gpHistory.size() > m_historyLength) {
+		m_gpHistory.pop_front();
+	}
+}
+
+void Player::hit(double time, int noteType, std::vector<Note>& array) {
+	bool found = false;
+	//loop for every note
+	for (auto& note : array) {
+		//if there is a note in the clicker, add score
+		if (note.getHit() && !note.getTouched() && note.getType() == noteType) {
+			found = true;
+			if (noteType == TAP_G || noteType == TAP_R || noteType == TAP_B) {
+				m_score += 100 * m_mult;
+				//check for chords (i.e multiple taps in the same time)
+				if (note.getMilli() != m_past_tap) {
+					m_combo++;
+					m_past_tap = note.getMilli();
+				}
+			} else if (noteType == CROSS_G || noteType == CROSS_C || noteType == CROSS_B) {
+				m_score += 100 * m_mult;
+				m_combo++;
+			} else if (noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_B_UP || noteType == SCR_B_DOWN) {
+				m_score += 100 * m_mult;
+				m_combo++;
+
+				m_pastScratch = note.getMilli();
+			} else if (noteType == SCR_G_TICK || noteType == SCR_B_TICK) {
+				m_score += 25 * m_mult;
+				m_scr_tick++;
+			}
+			note.click();
+
+			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_TICK)
+				m_greenAnimation = true;
+			else if (noteType == TAP_R)
+				m_redAnimation = true;
+			else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_TICK)
+				m_blueAnimation = true;
+
+			break;
+		}
+	}
+	//if there isn't a note in the clicker, break combo
+	if (!found) {
+		breakCombo(time);
+	}
+}
+
+	/*
 void Player::pollInput(GLFWwindow* window) {
 	m_pastCross = m_cross;
 	m_pastMouseX = m_nowMouseX;
@@ -795,9 +1006,10 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 	}
 }
+*/
 
-//update combo/multiplier for every frame
-void Player::tick(double time) {
+	//update combo/multiplier for every frame
+	void Player::tick(double time) {
 	if (m_combo >= 24) {
 		m_mult = 4;
 	} else if (m_combo >= 16 && m_combo < 24) {
@@ -926,33 +1138,18 @@ void Player::writeMappingFile() {
 
 void Player::updateKBMState(GLFWwindow* w) {
 	std::vector<float> KBMState = getKBMValues(w);
-	m_gpState.clear();
+	std::vector<float> localState;
 
-	m_gpState.push_back(KBMState.at(GREEN_CODE));
-	m_gpState.push_back(KBMState.at(RED_CODE));
-	m_gpState.push_back(KBMState.at(BLUE_CODE));
-	m_gpState.push_back(KBMState.at(EUPHORIA));
-	m_gpState.push_back(KBMState.at(CROSS_L_CODE));
-	m_gpState.push_back(KBMState.at(CROSS_R_CODE));
-	m_gpState.push_back(KBMState.at(SCRATCH_UP));
-	m_gpState.push_back(KBMState.at(SCRATCH_DOWN));
+	localState.push_back(KBMState.at(GREEN_CODE));
+	localState.push_back(KBMState.at(RED_CODE));
+	localState.push_back(KBMState.at(BLUE_CODE));
+	localState.push_back(KBMState.at(EUPHORIA));
+	localState.push_back(KBMState.at(CROSS_L_CODE));
+	localState.push_back(KBMState.at(CROSS_R_CODE));
+	localState.push_back(KBMState.at(SCRATCH_UP));
+	localState.push_back(KBMState.at(SCRATCH_DOWN));
 
-	/*if (glfwGetKey(w, GREEN_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, RED_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, BLUE_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, EUPHORIA))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, CROSS_L_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, CROSS_R_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, SCRATCH_UP))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, SCRATCH_DOWN))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);*/
+	m_gpState = localState;
 }
 
 void Player::updateGamepadState() {
@@ -960,77 +1157,67 @@ void Player::updateGamepadState() {
 		int count;
 		const unsigned char* buttons = glfwGetJoystickButtons(m_gamepadId, &count);
 
-		std::vector<float> localGamepadState;
+		std::vector<float> gamepadAxes;
+		std::vector<float> localState;
 
 		for (int i = 0; i < count; ++i) {
 			if (buttons[i] == '\0') {
-				localGamepadState.push_back(0.0f);
+				gamepadAxes.push_back(0.0f);
 			} else {
-				localGamepadState.push_back(1.0f);
+				gamepadAxes.push_back(1.0f);
 			}
 		}
 		const float* axes = glfwGetJoystickAxes(m_gamepadId, &count);
 
 		for (int i = 0; i < count; ++i) {
-			localGamepadState.push_back(axes[i]);
+			gamepadAxes.push_back(axes[i]);
 		}
 
 		if (count > 0) {
-			m_gpState.clear();
 			GREEN_GAMEPAD = std::max(GREEN_GAMEPAD, 0);
-			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
+			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(GREEN_GAMEPAD));
 			RED_GAMEPAD = std::max(RED_GAMEPAD, 0);
-			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
+			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(RED_GAMEPAD));
 			BLUE_GAMEPAD = std::max(BLUE_GAMEPAD, 0);
-			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
+			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(BLUE_GAMEPAD));
 			EU_GAMEPAD = std::max(EU_GAMEPAD, 0);
-			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
+			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(EU_GAMEPAD));
 
 			if (m_useSingleCfAxis) {
 				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
-				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
-				m_gpState.push_back(-value);
-				m_gpState.push_back(value);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				float value = gamepadAxes.at(CF_LEFT_GAMEPAD);
+				localState.push_back(-value);
+				localState.push_back(value);
 			} else {
 				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(CF_LEFT_GAMEPAD));
 				CF_RIGHT_GAMEPAD = std::max(CF_RIGHT_GAMEPAD, 0);
-				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
+				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(CF_RIGHT_GAMEPAD));
 			}
 
 			if (m_useSingleScrAxis) {
 				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
-				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
-				m_gpState.push_back(value);
-				m_gpState.push_back(-value);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)gamepadAxes.size() - 1);
+				float value = gamepadAxes.at(SCR_DOWN_GAMEPAD);
+				localState.push_back(value);
+				localState.push_back(-value);
 			} else {
 				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(SCR_DOWN_GAMEPAD));
 				SCR_UP_GAMEPAD = std::max(SCR_UP_GAMEPAD, 0);
-				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
+				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(SCR_UP_GAMEPAD));
 			}
 
-			//debug
-			/*
-			std::cout << m_gpState.at(GREEN_GAMEPAD) * m_gpMult.at(GREEN_GAMEPAD) << "|";
-			std::cout << m_gpState.at(RED_GAMEPAD) * m_gpMult.at(RED_GAMEPAD) << "|";
-			std::cout << m_gpState.at(BLUE_GAMEPAD) * m_gpMult.at(BLUE_GAMEPAD) << "|";
-			std::cout << m_gpState.at(EU_GAMEPAD) * m_gpMult.at(EU_GAMEPAD) << "|";
-			std::cout << m_gpState.at(CF_LEFT_GAMEPAD) * m_gpMult.at(CF_LEFT_GAMEPAD) << "|";
-			std::cout << m_gpState.at(CF_RIGHT_GAMEPAD-1) * m_gpMult.at(CF_RIGHT_GAMEPAD) << "|";
-			std::cout << m_gpState.at(SCR_UP_GAMEPAD) * m_gpMult.at(SCR_UP_GAMEPAD) << "|";
-			std::cout << m_gpState.at(SCR_DOWN_GAMEPAD-1) * m_gpMult.at(SCR_DOWN_GAMEPAD) << std::endl;
-			*/
+			m_gpState = localState;
 		}
 	}
 }
@@ -1058,7 +1245,6 @@ void Player::reset() {
 	m_blueAnimation = false;
 
 	m_cross = 1;
-	m_pastCross = 1;
 	m_hasPlayerBrokeOnce = false;
 
 	m_score = 0;
@@ -1140,6 +1326,70 @@ std::vector<float> Player::getKBMValues(GLFWwindow* w) {
 		localState.at(i + 4) = glfwGetMouseButton(w, i);
 	}
 	return localState;
+}
+
+bool Player::getRisingEdge(int index) {
+	bool complete = true;
+	for (auto& vec : m_gpHistory) {
+		if (vec.size() < 8) {
+			complete = false;
+			break;
+		}
+	}
+	if (m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpDead.size() >= 8 && m_gpHistory.size() >= m_historyLength && complete) {
+		float val = m_gpState.at(index) * m_gpMult.at(index);
+		float prev = m_gpHistory.back().at(index) * m_gpMult.at(index);
+		float deadzone = m_gpDead.at(index);
+		return (prev < deadzone && val >= deadzone);
+	} else
+		return false;
+}
+
+bool Player::getFallingEdge(int index) {
+	if (!m_gpState.empty() && !m_gpMult.empty() && !m_gpDead.empty() && !m_gpHistory.empty()) {
+		float val = m_gpState.at(index) * m_gpMult.at(index);
+		float prev = m_gpHistory.back().at(index) * m_gpMult.at(index);
+		float deadzone = m_gpDead.at(index);
+		return (prev > deadzone && val <= deadzone);
+	} else
+		return false;
+}
+
+bool Player::getFallingZero(int index) {
+	bool complete = true;
+	for (auto& vec : m_gpHistory) {
+		if (vec.size() < 8) {
+			complete = false;
+			break;
+		}
+	}
+	if (complete && m_gpState.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+		float minVelocity = -2.0;
+		std::vector<float> averages;
+		size_t i;
+		for (i = 0; i <= m_gpHistory.size() - 3; ++i) {
+			averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpHistory.at(i + 2).at(index)) / 3);
+		}
+		averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpState.at(index)) / 3);
+
+		for (size_t i = averages.size() - 1; i >= 2; i++) {
+			float v2 = averages.at(i) - averages.at(i - 1);
+			float v1 = averages.at(i - 1) - averages.at(i - 2);
+			return (v1 >= 0 && v2 < 0 && (v2 - v1) >= minVelocity);
+		}
+	} else
+		return false;
+}
+
+bool Player::getHittableNote(int noteType, std::vector<Note>& array) {
+	bool found = false;
+	for (auto& note : array) {
+		if (note.getHit() && !note.getTouched() && note.getType() == noteType) {
+			found = true;
+			break;
+		}
+	}
+	return found;
 }
 
 int Player::getScore() {

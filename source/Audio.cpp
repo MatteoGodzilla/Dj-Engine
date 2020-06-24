@@ -130,4 +130,5 @@ bool Audio::isActive(double time) {
 Audio::~Audio() {
 	alSourceStop(m_source);
 	ov_clear(&m_oggFile);
+	alcCloseDevice(m_device);
 }

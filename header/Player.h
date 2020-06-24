@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <fstream>
 #include <vector>
+#include <deque>
 
 enum indices {
 	GREEN_INDEX,
@@ -25,8 +26,8 @@ enum indices {
 class Player {
 public:
 	Player();
-	void pollInput(GLFWwindow* window);
-	void hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
+	void pollInput(GLFWwindow* window, double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
+	void hit(double time, int noteType, std::vector<Note>& array);
 
 	bool getRedClicker();
 	bool getGreenClicker();
@@ -47,6 +48,10 @@ public:
 	void updateKBMState(GLFWwindow* w);
 	std::vector<float> getGamepadValues();
 	std::vector<float> getKBMValues(GLFWwindow* w);
+	bool getRisingEdge(int index);
+	bool getFallingEdge(int index);
+	bool getFallingZero(int index);
+	bool getHittableNote(int noteType, std::vector<Note>& array);
 	void tick(double time);
 	void reset();
 
@@ -81,6 +86,8 @@ public:
 	std::vector<float> m_gpDead;
 	std::vector<bool> m_gpInvertDead;
 
+	std::deque<std::vector<float>> m_gpHistory;
+	size_t m_historyLength = 4;
 	std::vector<float> m_pastKBMState;
 
 	bool m_isRedPressed = false;
@@ -109,7 +116,9 @@ public:
 	bool m_cfBlueToCenter = false;
 
 	int m_cross = 1;
-	int m_pastCross = 1;
+
+	int m_baseMove = 1;
+	int m_secondMove = 1;
 
 	bool m_deltaMouse = false;
 	double m_scrollX;
@@ -128,6 +137,8 @@ private:
 	int m_combo = 0;
 	int m_scr_tick = 0;
 	double m_past_tap = -1;
+	double m_pastScratch = -1;
+	double m_scratchDebounce = 0.10;
 	double m_eu_value = 0;
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;
