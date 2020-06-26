@@ -65,7 +65,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			}
 		}
 
-		if (getFallingZero(SCR_UP_INDEX)) {
+		if (getFallingZero(SCR_DOWN_INDEX)) {
 			if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
 				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX))
 					hit(time, SCR_G_UP, noteArr);
@@ -77,8 +77,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce)
 					hit(time, SCR_B_UP, noteArr);
 			}
-		}
-		if (getFallingZero(SCR_DOWN_INDEX)) {
+		} else if (getFallingZero(SCR_UP_INDEX)) {
 			if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
 				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX))
 					hit(time, SCR_G_DOWN, noteArr);
@@ -86,9 +85,31 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 					hit(time, SCR_B_DOWN, noteArr);
 			} else {
 				if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce)
-					hit(time, SCR_G_DOWN, noteArr);
+					breakCombo(time);
 				else if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce)
-					hit(time, SCR_B_DOWN, noteArr);
+					breakCombo(time);
+			}
+		}
+
+		if (m_gpHistory.back().at(SCR_UP_INDEX) != m_gpState.at(SCR_UP_INDEX)) {
+			//platter moved in general
+			if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+				if (getHittableNote(SCR_G_ANY, noteArr)) {
+					hit(time, SCR_G_ANY, noteArr);
+				} else if (getHittableNote(SCR_G_TICK, noteArr)) {
+					hit(time, SCR_G_TICK, noteArr);
+				} else if (time - m_pastScratch > m_scratchDebounce) {
+					breakCombo(time);
+				}
+			}
+			if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+				if (getHittableNote(SCR_B_ANY, noteArr)) {
+					hit(time, SCR_B_ANY, noteArr);
+				} else if (getHittableNote(SCR_B_TICK, noteArr)) {
+					hit(time, SCR_B_TICK, noteArr);
+				} else if (time - m_pastScratch > m_scratchDebounce) {
+					breakCombo(time);
+				}
 			}
 		}
 
@@ -177,6 +198,11 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				}
 			}
 		}
+
+		//variables for GameRender
+		m_isRedPressed = (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX));
+		m_isGreenPressed = (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX));
+		m_isBluePressed = (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX));
 	}
 	m_gpHistory.push_back(m_gpState);
 	if (m_gpHistory.size() > m_historyLength) {
@@ -201,7 +227,7 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			} else if (noteType == CROSS_G || noteType == CROSS_C || noteType == CROSS_B) {
 				m_score += 100 * m_mult;
 				m_combo++;
-			} else if (noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_B_UP || noteType == SCR_B_DOWN) {
+			} else if (noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
 				m_score += 100 * m_mult;
 				m_combo++;
 
@@ -212,11 +238,11 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			}
 			note.click();
 
-			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_TICK)
+			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK)
 				m_greenAnimation = true;
 			else if (noteType == TAP_R)
 				m_redAnimation = true;
-			else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_TICK)
+			else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK)
 				m_blueAnimation = true;
 
 			break;
@@ -228,7 +254,7 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 	}
 }
 
-	/*
+/*
 void Player::pollInput(GLFWwindow* window) {
 	m_pastCross = m_cross;
 	m_pastMouseX = m_nowMouseX;
@@ -1008,8 +1034,8 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 }
 */
 
-	//update combo/multiplier for every frame
-	void Player::tick(double time) {
+//update combo/multiplier for every frame
+void Player::tick(double time) {
 	if (m_combo >= 24) {
 		m_mult = 4;
 	} else if (m_combo >= 16 && m_combo < 24) {
@@ -1050,8 +1076,8 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 	}
 }
 
-void Player::breakCombo(double time){
-	if(time > 0){
+void Player::breakCombo(double time) {
+	if (time > 0) {
 		m_combo = 0;
 		m_eu_zone_active = false;
 		m_hasPlayerBrokeOnce = true;
@@ -1226,19 +1252,6 @@ void Player::reset() {
 	m_isRedPressed = false;
 	m_isGreenPressed = false;
 	m_isBluePressed = false;
-	m_isUpPressed = false;
-	m_isDownPressed = false;
-	m_isCfGreenPressed = false;
-	m_isCfBluePressed = false;
-	m_isEuPressed = false;
-
-	m_wasRedPressed = false;
-	m_wasGreenPressed = false;
-	m_wasBluePressed = false;
-	m_wasUpPressed = false;
-	m_wasDownPressed = false;
-	m_wasCfGreenPressed = false;
-	m_wasCfBluePressed = false;
 
 	m_greenAnimation = false;
 	m_redAnimation = false;
@@ -1363,20 +1376,22 @@ bool Player::getFallingZero(int index) {
 			break;
 		}
 	}
-	if (complete && m_gpState.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
-		float minVelocity = -2.0;
+	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+		float minVelocity = -1.0;
 		std::vector<float> averages;
 		size_t i;
-		for (i = 0; i <= m_gpHistory.size() - 3; ++i) {
-			averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpHistory.at(i + 2).at(index)) / 3);
+		for (i = 0; i < m_gpHistory.size() - 2; ++i) {
+			averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpHistory.at(i + 2).at(index)) * m_gpMult.at(index) / 3);
 		}
-		averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpState.at(index)) / 3);
-
-		for (size_t i = averages.size() - 1; i >= 2; i++) {
+		//i is now 2
+		averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpState.at(index)) * m_gpMult.at(index) / 3);
+		for (size_t i = averages.size() - 1; i >= 2; --i) {
 			float v2 = averages.at(i) - averages.at(i - 1);
 			float v1 = averages.at(i - 1) - averages.at(i - 2);
-			return (v1 >= 0 && v2 < 0 && (v2 - v1) >= minVelocity);
+			if (v1 >= 0 && v2 < 0 && (v2 - v1) >= minVelocity)
+				return true;
 		}
+		return false;
 	} else
 		return false;
 }
@@ -1412,7 +1427,7 @@ int Player::getCross() {
 	return m_cross;
 }
 
-bool Player::getBrokeOnce(){
+bool Player::getBrokeOnce() {
 	return m_hasPlayerBrokeOnce;
 }
 

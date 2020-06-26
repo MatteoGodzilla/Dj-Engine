@@ -40,8 +40,8 @@ void Audio::buffer(double time) {
 	std::array<char, 4096> bufferData;
 	int bytesRead = 0;
 
-	if(time > ov_time_tell(&m_oggFile)){
-		ov_time_seek_lap(&m_oggFile,time);
+	if (time > ov_time_tell(&m_oggFile)) {
+		ov_time_seek_lap(&m_oggFile, time);
 		removeBuffers();
 		setupBuffers();
 	}
@@ -62,7 +62,7 @@ void Audio::buffer(double time) {
 	}
 }
 
-void Audio::setupBuffers(){
+void Audio::setupBuffers() {
 	int buffers = 0;
 	unsigned int b;
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
@@ -78,15 +78,15 @@ void Audio::setupBuffers(){
 	}
 }
 
-void Audio::removeBuffers(){
+void Audio::removeBuffers() {
 	int queue;
 	unsigned int bufferPointer;
-	alGetSourcei(m_source,AL_BUFFERS_PROCESSED,&queue);
-	while(queue > 0){
-		alSourceUnqueueBuffers(m_source,1,&bufferPointer);
-		alDeleteBuffers(1,&bufferPointer);
+	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &queue);
+	while (queue > 0) {
+		alSourceUnqueueBuffers(m_source, 1, &bufferPointer);
+		alDeleteBuffers(1, &bufferPointer);
 
-		alGetSourcei(m_source,AL_BUFFERS_PROCESSED,&queue);
+		alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &queue);
 	}
 }
 
@@ -106,8 +106,8 @@ void Audio::reset() {
 
 void Audio::play() {
 	int state;
-	alGetSourcei(m_source,AL_SOURCE_STATE,&state);
-	if(state == AL_STOPPED || firstRun){
+	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
+	if (state == AL_STOPPED || firstRun) {
 		alSourcePlay(m_source);
 		firstRun = false;
 	}

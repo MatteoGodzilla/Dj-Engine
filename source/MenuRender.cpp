@@ -14,6 +14,7 @@ void MenuRender::init(GLFWwindow* w) {
 	loadTexture("res/buttons.png", &m_buttonTexture);
 	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);
 	loadTexture("res/calibration.png", &m_calibrationTex);
+	loadTexture("res/pgBar-frame.png", &m_pgBarFrame);
 
 	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
 	m_pastTime = glfwGetTime();
@@ -135,15 +136,13 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			std::string name;
 			if (glfwJoystickPresent(i)) {
 				name = glfwGetJoystickName(i);
-			} else {
-				name = "No Controller detected";
-			}
-			std::string t = "Id " + std::to_string(i) + ":" + name;
-			if (ImGui::Selectable(t.c_str())) {
-				game->getPlayer()->m_useKeyboardInput = false;
-				game->getPlayer()->m_gamepadId = i;
-				m_input = false;
-				m_inputSelection = t;
+				std::string t = "Id " + std::to_string(i) + ":" + name;
+				if (ImGui::Selectable(t.c_str())) {
+					game->getPlayer()->m_useKeyboardInput = false;
+					game->getPlayer()->m_gamepadId = i;
+					m_input = false;
+					m_inputSelection = t;
+				}
 			}
 		}
 		ImGui::EndCombo();
@@ -795,6 +794,105 @@ void MenuRender::credits() {
 	drawText("on twitter (@MatteoGodzilla) with '#truedj')", x, y, fontsize / 1000.0f);
 }
 
+void MenuRender::result(Game* game) {
+	std::vector<float> resultVector;
+	std::vector<unsigned int> resultIndices;
+	unsigned int resultVertexCount = 0;
+
+	useOrthoProj();
+	float y = 50.0f;
+	float scale = 0.05f;
+
+	int all = game->getGenerator()->getNotesTotal();
+	int hit = game->getGenerator()->getNotesHit();
+	int score = game->getPlayer()->getScore();
+	int combo = game->getPlayer()->getHighCombo();
+	bool brokeOnce = game->getPlayer()->getBrokeOnce();
+
+	std::string firstSong = std::string(game->getGenerator()->getSongEntry().s1);
+	std::string secondSong = std::string(game->getGenerator()->getSongEntry().s2);
+	std::string completeName = firstSong;
+	if (!secondSong.empty()) {
+		completeName += " vs ";
+		completeName += secondSong;
+	}
+	std::string hitString = std::string("Number of notes hit:") + std::to_string(hit);
+	std::string totalString = std::string("Number of total notes:") + std::to_string(all);
+	std::string scoreString = std::string("Score:") + std::to_string(score);
+	std::string comboString = std::string("Max Combo:") + std::to_string(combo);
+
+	drawText(completeName, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText("Result:", 10.0f, y, scale);
+	float x = getTextWidth("Result:", scale);
+	if (game->getPlayer()->m_botEnabled) {
+		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
+	} else {
+		float stars = (float)game->getPlayer()->getScore() / (float)game->getGenerator()->m_baseScore;
+		if (stars >= 0.1) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (stars >= 0.2) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (stars >= 0.3) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (stars >= 0.4) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (stars >= 0.5) {
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y, 0.0f, 1.0f, 1.0f);
+			pushRectangleIndices(resultIndices, resultVertexCount);
+		}
+		if (!resultVector.empty()) {
+			useOrthoProj();
+			renderTexture(resultVector, resultIndices, m_pgBarFrame);
+		}
+	}
+	y += scale * 1000.0f;
+	drawText(hitString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(totalString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(comboString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+	drawText(scoreString, 10.0f, y, scale);
+	y += scale * 1000.0f;
+
+	if (all > 0) {
+		std::string percent = std::string("Percent:") + std::to_string((float)hit / (float)all * 100.0f) + std::string("%");
+		drawText(percent, 10.0f, y, scale);
+	}
+	if (!brokeOnce) {
+		std::string t = "Wow! a Full Combo";
+		float x = 1270.0f - getTextWidth(t, scale);
+		drawText(t, x, 100.0f, scale);
+	}
+
+	std::string exit("Press menu Back to Exit");
+	drawText(exit, 10.0f, 710 - getTextHeight(exit, scale), scale);
+}
+
 void MenuRender::splashArt() {
 	std::vector<float> vector;
 	std::vector<unsigned int> indices;
@@ -835,16 +933,24 @@ void MenuRender::scratches(Player* player) {
 	useOrthoProj();
 	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
 
-	//player->pollInput(m_window);
-	if (player->m_isUpPressed && !player->m_wasUpPressed) {
+	/*
+	if(player->m_useKeyboardInput){
+		player->updateKBMState(m_window);
+	}
+	else{
+		player->updateGamepadState();
+	}
+	if (player->getFallingZero(SCR_UP_INDEX)) {
 		m_testBuffer.push_back('^');
 	}
-	if (player->m_isDownPressed && !player->m_wasDownPressed) {
+	if (player->getFallingZero(SCR_DOWN_INDEX)) {
 		m_testBuffer.push_back('v');
 	}
 	if (m_testBuffer.size() > 20) {
 		m_testBuffer.erase(0, 1);
 	}
+*/
+
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
 	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
 }
@@ -998,6 +1104,28 @@ void MenuRender::setLaneColors(Game* game) {
 	game->getGameRender()->m_greenScratchColor = glm::vec4(greenScratchArray[0], greenScratchArray[1], greenScratchArray[2], greenScratchArray[3]);
 	game->getGameRender()->m_blueScratchColor = glm::vec4(blueScratchArray[0], blueScratchArray[1], blueScratchArray[2], blueScratchArray[3]);
 	game->getGameRender()->m_euphoriaZoneColor = glm::vec4(euphoriaZoneArray[0], euphoriaZoneArray[1], euphoriaZoneArray[2], euphoriaZoneArray[3]);
+}
+
+void MenuRender::setPollRate(Game* game) {
+	useOrthoProj();
+
+	ImGuiBackendFlags flags = 0;
+	flags |= ImGuiWindowFlags_NoResize;
+	flags |= ImGuiWindowFlags_NoCollapse;
+	flags |= ImGuiWindowFlags_AlwaysAutoResize;
+
+	startImGuiFrame("Set Poll Rate", flags);
+	ImGui::Text("Set the poll rate using the slider below.");
+	ImGui::Text("The value represents how many times the inputs are read in Hz.");
+	ImGui::Text("For a smooth experience it is recommended to have it at least x2 the framerate");
+	ImGui::Text("Note: increasing too much WILL increase the cpu usage A LOT");
+	ImGui::Text("Note: you have been warned");
+	ImGui::SliderInt("HZ", &(game->m_inputThreadPollRate), 128, 1000);
+	if (ImGui::Button("Close")) {
+		m_shouldClose = true;
+	}
+
+	renderImGuiFrame();
 }
 
 void MenuRender::editingAxisController(int axis) {

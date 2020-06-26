@@ -944,138 +944,138 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 	unsigned int eventsVertexCount = 0;
 
 	//loop for every event inside event vector
-	if(!ev.empty()){
-	for (int i = ev.size()-1; i >= 0; i--) {
-		Note& event = ev.at(i);
-		double milli = event.getMilli();
-		int type = event.getType();
-		double length = event.getLength();
+	if (!ev.empty()) {
+		for (int i = ev.size() - 1; i >= 0; i--) {
+			Note& event = ev.at(i);
+			double milli = event.getMilli();
+			int type = event.getType();
+			double length = event.getLength();
 
-		if (time + m_noteVisibleTime > milli) {
-			if (type == SCR_G_ZONE) {
-				double startOffset = getDTFromAngle(asin(0.5 / (m_radius + 0.5)));
+			if (time + m_noteVisibleTime > milli) {
+				if (type == SCR_G_ZONE) {
+					double startOffset = getDTFromAngle(asin(0.5 / (m_radius + 0.5)));
 
-				double start = std::max(milli - startOffset, time);
-				double end = std::min(milli + length, time + m_noteVisibleTime);
+					double start = std::max(milli - startOffset, time);
+					double end = std::min(milli + length, time + m_noteVisibleTime);
 
-				double startAngle = getAngleFromDT(start - time);
-				double endAngle = getAngleFromDT(end - time);
-				glm::vec2 center = {m_radius, 0.0};
+					double startAngle = getAngleFromDT(start - time);
+					double endAngle = getAngleFromDT(end - time);
+					glm::vec2 center = {m_radius, 0.0};
 
-				glm::vec2 beforeOuter = getCirclePoint((double)m_radius + 0.75, startAngle);
-				glm::vec2 beforeInner = getCirclePoint((double)m_radius + 0.25, startAngle);
+					glm::vec2 beforeOuter = getCirclePoint((double)m_radius + 0.75, startAngle);
+					glm::vec2 beforeInner = getCirclePoint((double)m_radius + 0.25, startAngle);
 
-				if (event.getLanMod() == 0) {
-					beforeOuter = getCirclePoint((double)m_radius + 1.25, startAngle);
-					beforeInner = getCirclePoint((double)m_radius + 0.75, startAngle);
-				}
-				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
-					double cycleTime = getDTFromAngle(cycleAngle);
-
-					glm::vec2 outer = getCirclePoint(m_radius + 0.75, cycleAngle);
-					glm::vec2 inner = getCirclePoint(m_radius + 0.25, cycleAngle);
-
-					if (getCrossAtTime(time + cycleTime, cross) == 0) {
-						outer = getCirclePoint(m_radius + 1.25, cycleAngle);
-						inner = getCirclePoint(m_radius + 0.75, cycleAngle);
+					if (event.getLanMod() == 0) {
+						beforeOuter = getCirclePoint((double)m_radius + 1.25, startAngle);
+						beforeInner = getCirclePoint((double)m_radius + 0.75, startAngle);
 					}
+					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+						double cycleTime = getDTFromAngle(cycleAngle);
 
-					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						glm::vec2 outer = getCirclePoint(m_radius + 0.75, cycleAngle);
+						glm::vec2 inner = getCirclePoint(m_radius + 0.25, cycleAngle);
 
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
+						if (getCrossAtTime(time + cycleTime, cross) == 0) {
+							outer = getCirclePoint(m_radius + 1.25, cycleAngle);
+							inner = getCirclePoint(m_radius + 0.75, cycleAngle);
+						}
 
-					beforeOuter = outer;
-					beforeInner = inner;
-				}
-			} else if (type == SCR_B_ZONE) {
-				double startOffset = getDTFromAngle(asin(0.5 / (m_radius - 0.5)));
+						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
 
-				double start = std::max(milli - startOffset, time);
-				double end = std::min(milli + length, time + m_noteVisibleTime);
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 
-				double startAngle = getAngleFromDT(start - time);
-				double endAngle = getAngleFromDT(end - time);
-				glm::vec2 center = {m_radius, 0.0};
-
-				glm::vec2 beforeOuter = getCirclePoint((double)m_radius - 0.75, startAngle);
-				glm::vec2 beforeInner = getCirclePoint((double)m_radius - 0.25, startAngle);
-
-				if (event.getLanMod() == 2) {
-					beforeOuter = getCirclePoint((double)m_radius - 1.25, startAngle);
-					beforeInner = getCirclePoint((double)m_radius - 0.75, startAngle);
-				}
-				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
-					double cycleTime = getDTFromAngle(cycleAngle);
-
-					glm::vec2 outer = getCirclePoint(m_radius - 0.75, cycleAngle);
-					glm::vec2 inner = getCirclePoint(m_radius - 0.25, cycleAngle);
-
-					if (getCrossAtTime(time + cycleTime, cross) == 2) {
-						outer = getCirclePoint(m_radius - 1.25, cycleAngle);
-						inner = getCirclePoint(m_radius - 0.75, cycleAngle);
+						beforeOuter = outer;
+						beforeInner = inner;
 					}
+				} else if (type == SCR_B_ZONE) {
+					double startOffset = getDTFromAngle(asin(0.5 / (m_radius - 0.5)));
 
-					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+					double start = std::max(milli - startOffset, time);
+					double end = std::min(milli + length, time + m_noteVisibleTime);
 
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
+					double startAngle = getAngleFromDT(start - time);
+					double endAngle = getAngleFromDT(end - time);
+					glm::vec2 center = {m_radius, 0.0};
 
-					beforeOuter = outer;
-					beforeInner = inner;
-				}
-			} else if (type == EU_ZONE) {
-				double start = std::max(milli, time);
-				double end = std::min(milli + length, time + m_noteVisibleTime);
+					glm::vec2 beforeOuter = getCirclePoint((double)m_radius - 0.75, startAngle);
+					glm::vec2 beforeInner = getCirclePoint((double)m_radius - 0.25, startAngle);
 
-				double startAngle = getAngleFromDT(start - time);
-				double endAngle = getAngleFromDT(end - time);
-				glm::vec2 center = {m_radius, 0.0};
+					if (event.getLanMod() == 2) {
+						beforeOuter = getCirclePoint((double)m_radius - 1.25, startAngle);
+						beforeInner = getCirclePoint((double)m_radius - 0.75, startAngle);
+					}
+					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+						double cycleTime = getDTFromAngle(cycleAngle);
 
-				glm::vec2 beforeOuter = getCirclePoint((double)m_radius + m_deltaRadius, startAngle);
-				glm::vec2 beforeInner = getCirclePoint((double)m_radius - m_deltaRadius, startAngle);
+						glm::vec2 outer = getCirclePoint(m_radius - 0.75, cycleAngle);
+						glm::vec2 inner = getCirclePoint(m_radius - 0.25, cycleAngle);
 
-				for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
-					double cycleTime = getDTFromAngle(cycleAngle);
+						if (getCrossAtTime(time + cycleTime, cross) == 2) {
+							outer = getCirclePoint(m_radius - 1.25, cycleAngle);
+							inner = getCirclePoint(m_radius - 0.75, cycleAngle);
+						}
 
-					glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, cycleAngle);
-					glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, cycleAngle);
+						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
 
-					pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-					pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-					pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-					pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
 
-					pushRectangleIndices(eventsIndices, eventsVertexCount);
+						beforeOuter = outer;
+						beforeInner = inner;
+					}
+				} else if (type == EU_ZONE) {
+					double start = std::max(milli, time);
+					double end = std::min(milli + length, time + m_noteVisibleTime);
 
-					beforeOuter = outer;
-					beforeInner = inner;
-				}
-			}
-		}
+					double startAngle = getAngleFromDT(start - time);
+					double endAngle = getAngleFromDT(end - time);
+					glm::vec2 center = {m_radius, 0.0};
 
-		else if (milli > time + m_noteVisibleTime && event.getLanMod() == -1) {
-			int position = 1;
-			for (auto& c : cross) {
-				if (c.getMilli() <= milli) {
-					if (c.getType() == CROSS_G) {
-						position = 0;
-					} else if (c.getType() == CROSS_C) {
-						position = 1;
-					} else if (c.getType() == CROSS_B) {
-						position = 2;
+					glm::vec2 beforeOuter = getCirclePoint((double)m_radius + m_deltaRadius, startAngle);
+					glm::vec2 beforeInner = getCirclePoint((double)m_radius - m_deltaRadius, startAngle);
+
+					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+						double cycleTime = getDTFromAngle(cycleAngle);
+
+						glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, cycleAngle);
+						glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, cycleAngle);
+
+						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+
+						pushRectangleIndices(eventsIndices, eventsVertexCount);
+
+						beforeOuter = outer;
+						beforeInner = inner;
 					}
 				}
 			}
-			event.setLanMod(position);
+
+			else if (milli > time + m_noteVisibleTime && event.getLanMod() == -1) {
+				int position = 1;
+				for (auto& c : cross) {
+					if (c.getMilli() <= milli) {
+						if (c.getType() == CROSS_G) {
+							position = 0;
+						} else if (c.getType() == CROSS_C) {
+							position = 1;
+						} else if (c.getType() == CROSS_B) {
+							position = 2;
+						}
+					}
+				}
+				event.setLanMod(position);
+			}
 		}
-	}
-	usePersProj();
-	renderColor(eventsVector, eventsIndices);
+		usePersProj();
+		renderColor(eventsVector, eventsIndices);
 	}
 }
 
@@ -1729,21 +1729,25 @@ glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
 }
 
 int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr) {
-	int index = 0;
-	for (size_t i = 0; i < crossArr.size(); ++i) {
-		if (crossArr.at(i).getMilli() > time) {
-			index = (int)i - 1;
-			break;
+	if (!crossArr.empty() && time >= 0) {
+		int index = -1;
+		for (size_t i = 0; i < crossArr.size(); ++i) {
+			if (crossArr.at(i).getMilli() <= time) {
+				index = i;
+			} else if (crossArr.at(i).getMilli() > time) {
+				break;
+			}
 		}
-	}
-	int type = crossArr.at(index).getType();
-	if (type == CROSS_G) {
-		return 0;
-	} else if (type == CROSS_C) {
-		return 1;
-	} else {
-		return 2;
-	}
+		int type = crossArr.at(index).getType();
+		if (type == CROSS_G) {
+			return 0;
+		} else if (type == CROSS_C) {
+			return 1;
+		} else {
+			return 2;
+		}
+	} else
+		return 1; // CENTER BY DEFAULT
 }
 
 double GameRender::getAngleFromDT(double dt) {

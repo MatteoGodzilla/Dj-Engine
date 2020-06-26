@@ -14,7 +14,8 @@ enum scenes {
 	REMAPPING,
 	CREDITS,
 	SCRATCHES,
-	CALIBRATION
+	CALIBRATION,
+	RESULTS
 };
 
 enum actions {
@@ -30,12 +31,14 @@ enum actions {
 	BOT_ID,
 	DEBUG_ID,
 	REFRESH_ID,
-	COLOR_ID
+	COLOR_ID,
+	POLL_ID
 };
 
 enum popupId {
 	HIGHWAY_SPEED,
-	LANE_COLORS
+	LANE_COLORS,
+	POLLRATE_CHANGE
 };
 
 class MenuNavigator {

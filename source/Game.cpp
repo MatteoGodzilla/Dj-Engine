@@ -92,19 +92,6 @@ void Game::inputThreadFun(Game* game) {
 	std::cout << "Input Thread Message: stopped" << std::endl;
 }
 
-void Game::pollInput() {
-	if (m_active) {
-		if (m_mode == 0) {
-		} else {
-			//MOVE CODE TO MENU
-			if (m_player.m_wasGreenPressed && !m_player.m_isGreenPressed) {
-				m_active = false;
-				reset();
-			}
-		}
-	}
-}
-
 void Game::tick() {
 	if (m_active) {
 		if (m_mode == 0) {
@@ -126,6 +113,7 @@ void Game::tick() {
 		if (!m_audio.isActive(m_global_time)) {
 			m_mode = 1;
 			m_audio.stop();
+			m_active = false;
 		}
 	}
 }
@@ -150,8 +138,6 @@ void Game::render() {
 			if (m_debugView) {
 				m_render.debug(m_deltaTime, m_note_arr, m_event_arr, m_cross_arr);
 			}
-		} else if (m_mode == 1) {
-			m_render.result(m_player, m_gen);
 		}
 	}
 }
@@ -173,26 +159,6 @@ void Game::reset() {
 	m_gen.reset();
 	m_player.reset();
 	m_audio.reset();
-}
-
-bool Game::getActive() {
-	return m_active;
-}
-
-void Game::setActive(bool active) {
-	m_active = active;
-}
-
-Player* Game::getPlayer() {
-	return &m_player;
-}
-
-Audio* Game::getAudio() {
-	return &m_audio;
-}
-
-GameRender* Game::getGameRender() {
-	return &m_render;
 }
 
 void Game::setButtonPos(bool value) {
@@ -281,6 +247,30 @@ void Game::writeConfig() {
 void Game::stopThread() {
 	m_inputThreadRunning = false;
 	m_inputThread.join();
+}
+
+bool Game::getActive() {
+	return m_active;
+}
+
+void Game::setActive(bool active) {
+	m_active = active;
+}
+
+Player* Game::getPlayer() {
+	return &m_player;
+}
+
+Audio* Game::getAudio() {
+	return &m_audio;
+}
+
+GameRender* Game::getGameRender() {
+	return &m_render;
+}
+
+Generator* Game::getGenerator() {
+	return &m_gen;
 }
 
 Game::~Game() {

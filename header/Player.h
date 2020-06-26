@@ -4,9 +4,9 @@
 
 #include <GLFW/glfw3.h>
 #include <algorithm>
+#include <deque>
 #include <fstream>
 #include <vector>
-#include <deque>
 
 enum indices {
 	GREEN_INDEX,
@@ -93,19 +93,6 @@ public:
 	bool m_isRedPressed = false;
 	bool m_isGreenPressed = false;
 	bool m_isBluePressed = false;
-	bool m_isUpPressed = false;
-	bool m_isDownPressed = false;
-	bool m_isCfGreenPressed = false;
-	bool m_isCfBluePressed = false;
-	bool m_isEuPressed = false;
-
-	bool m_wasRedPressed = false;
-	bool m_wasGreenPressed = false;
-	bool m_wasBluePressed = false;
-	bool m_wasUpPressed = false;
-	bool m_wasDownPressed = false;
-	bool m_wasCfGreenPressed = false;
-	bool m_wasCfBluePressed = false;
 
 	bool m_greenAnimation = false;
 	bool m_redAnimation = false;
