@@ -46,26 +46,26 @@ void Animation::setLooping(bool loop) {
 	m_looping = loop;
 }
 
-int Animation::getId() {
+int Animation::getId() const {
 	return m_id;
 }
 
-bool Animation::isLooping() {
+bool Animation::isLooping() const {
 	return m_looping;
 }
 
-bool Animation::isEnabled() {
+bool Animation::isEnabled() const {
 	return m_enabled;
 }
 
-double Animation::getTime() {
+double Animation::getTime() const {
 	return m_time;
 }
 
-double Animation::getPercent() {
+double Animation::getPercent() const {
 	return m_time / m_duration;
 }
 
-double Animation::getDuration() {
+double Animation::getDuration() const {
 	return m_duration;
 }

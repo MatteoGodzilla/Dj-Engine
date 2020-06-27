@@ -14,18 +14,18 @@ public:
 	GLFWwindow* getWindowPtr();
 
 protected:
-	void renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture);
-	void renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr);
-	void renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture);
+	void renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const;
+	void renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr) const;
+	void renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const;
 	void drawText(const std::string& s, float x, float y, float scl);
 
 	void usePersProj();
 	void useOrthoProj();
-	void setTextColor(float r, float g, float b, float a);
+	void setTextColor(float r, float g, float b, float a) const;
 	static void checkError();
 
-	void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a = 1.0);
-	void pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s = 0.0, float t = 0.0);
+	void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a = 1.0) const;
+	void pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s = 0.0, float t = 0.0) const;
 	static void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 	static void pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 

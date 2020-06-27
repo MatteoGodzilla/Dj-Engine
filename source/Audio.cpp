@@ -62,7 +62,7 @@ void Audio::buffer(double time) {
 	}
 }
 
-void Audio::setupBuffers() {
+void Audio::setupBuffers() const {
 	int buffers = 0;
 	unsigned int b;
 	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
@@ -78,7 +78,7 @@ void Audio::setupBuffers() {
 	}
 }
 
-void Audio::removeBuffers() {
+void Audio::removeBuffers() const {
 	int queue;
 	unsigned int bufferPointer;
 	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &queue);
@@ -113,17 +113,17 @@ void Audio::play() {
 	}
 }
 
-bool Audio::isPlaying() {
+bool Audio::isPlaying() const {
 	int result = 0;
 	alGetSourcei(m_source, AL_SOURCE_STATE, &result);
 	return result == AL_PLAYING;
 }
 
-void Audio::stop() {
+void Audio::stop() const {
 	alSourceStop(m_source);
 }
 
-bool Audio::isActive(double time) {
+bool Audio::isActive(double time) const {
 	return time < m_songLength;
 }
 

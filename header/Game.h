@@ -21,7 +21,7 @@ public:
 	void tick();
 	static void inputThreadFun(Game* gameptr);
 	void pollInput();
-	bool getActive();
+	bool getActive() const;
 	void setActive(bool active);
 	void reset();
 	void stopThread();

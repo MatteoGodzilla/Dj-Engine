@@ -29,15 +29,15 @@ public:
 	Note(double milli, int ty, double length, bool ev = false);
 	void click();
 	void tick(double time);
-	double getMilli();
-	double getLength();
-	int getType();
-	bool getHit();
-	bool getTouched();
+	double getMilli() const;
+	double getLength() const;
+	int getType() const;
+	bool getHit() const;
+	bool getTouched() const;
 	void setTouched(bool value);
-	bool getDead();
-	bool getIsEvent();
-	int getLanMod();
+	bool getDead() const;
+	bool getIsEvent() const;
+	int getLanMod() const;
 	void setLanMod(int i);
 
 	double hitWindow = 0.20;

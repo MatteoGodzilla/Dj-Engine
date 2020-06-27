@@ -249,7 +249,7 @@ void Game::stopThread() {
 	m_inputThread.join();
 }
 
-bool Game::getActive() {
+bool Game::getActive() const {
 	return m_active;
 }
 

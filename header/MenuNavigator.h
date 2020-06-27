@@ -48,10 +48,10 @@ public:
 	void update();
 	void render(double dt);
 	void setActive(bool active);
-	bool getActive();
+	bool getActive() const;
 	void activate(MenuNode& menu, MenuNode& parent);
 	void scan(bool useCache = true);
-	bool getShouldClose();
+	bool getShouldClose() const;
 
 	//switch between keyboard and gamepad
 	bool m_useKeyboardInput = true;

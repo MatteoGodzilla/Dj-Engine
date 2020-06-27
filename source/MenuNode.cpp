@@ -19,7 +19,7 @@ void MenuNode::setText(const std::string& text) {
 	m_text = text;
 }
 
-int MenuNode::getId() {
+int MenuNode::getId() const {
 	return m_id;
 }
 

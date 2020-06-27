@@ -9,12 +9,12 @@ public:
 	void enable(double time); // time is to update pastTick for time calculations
 	void reset();
 	void disable();
-	int getId();
-	double getTime();
-	double getPercent();
-	double getDuration();
-	bool isLooping();
-	bool isEnabled();
+	int getId() const;
+	double getTime() const;
+	double getPercent() const;
+	double getDuration() const;
+	bool isLooping() const;
+	bool isEnabled() const;
 
 private:
 	int m_id = 0;

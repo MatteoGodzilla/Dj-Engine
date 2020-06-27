@@ -29,22 +29,22 @@ void Note::tick(double time) {
 }
 
 //utility function to return variables
-double Note::getMilli() {
+double Note::getMilli() const {
 	return m_milli;
 }
 
-double Note::getLength() {
+double Note::getLength() const {
 	return m_length;
 }
 
-int Note::getType() {
+int Note::getType() const {
 	return m_type;
 }
 
-bool Note::getHit() {
+bool Note::getHit() const {
 	return m_hittable;
 }
-bool Note::getTouched() {
+bool Note::getTouched() const {
 	return m_touched;
 }
 
@@ -52,14 +52,14 @@ void Note::setTouched(bool value) {
 	m_touched = value;
 }
 
-bool Note::getIsEvent() {
+bool Note::getIsEvent() const {
 	return m_isEvent;
 }
-bool Note::getDead() {
+bool Note::getDead() const {
 	return m_dead;
 }
 
-int Note::getLanMod() {
+int Note::getLanMod() const {
 	return m_lan_mod;
 }
 void Note::setLanMod(int i) {

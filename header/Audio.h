@@ -14,15 +14,15 @@ public:
 	~Audio();
 	void play();
 	void load(const char* filename);
-	void stop();
+	void stop() const;
 	void buffer(double time);
 	void reset();
-	bool isActive(double time);
-	bool isPlaying();
+	bool isActive(double time) const;
+	bool isPlaying() const;
 
 private:
-	void setupBuffers();
-	void removeBuffers();
+	void setupBuffers() const;
+	void removeBuffers() const;
 	ALCdevice* m_device;
 	ALCcontext* m_context;
 	unsigned int m_source;

@@ -378,15 +378,15 @@ void Generator::reset() {
 	m_eu_check = false;
 }
 
-int Generator::getNotesTotal() {
+int Generator::getNotesTotal() const {
 	return m_notesTotal;
 }
 
-int Generator::getNotesHit() {
+int Generator::getNotesHit() const {
 	return m_notesHit;
 }
 
-SongEntry Generator::getSongEntry() {
+SongEntry Generator::getSongEntry() const {
 	return m_songEntry;
 }
 

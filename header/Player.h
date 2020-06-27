@@ -26,32 +26,33 @@ enum indices {
 class Player {
 public:
 	Player();
-	void pollInput(GLFWwindow* window, double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
+	void pollInput(GLFWwindow* window, double time, std::vector<Note>& noteArr, std::vector<Note>& eventArr, std::vector<Note>& cross);
 	void hit(double time, int noteType, std::vector<Note>& array);
 
-	bool getRedClicker();
-	bool getGreenClicker();
-	bool getBlueClicker();
-	int getCross();
-	int getScore();
-	int getCombo();
-	int getHighCombo();
-	int getMult();
-	double getEuValue();
-	bool getEuActive();
-	bool getEuZoneActive();
-	bool getBrokeOnce();
+	bool getRedClicker() const;
+	bool getGreenClicker() const;
+	bool getBlueClicker() const;
+	int getCross() const;
+	int getScore() const;
+	int getCombo() const;
+	int getHighCombo() const;
+	int getMult() const;
+	double getEuValue() const;
+	bool getEuActive() const;
+	bool getEuZoneActive() const;
+	bool getBrokeOnce() const;
 	void pollState(Generator& g);
 	void readMappingFile();
 	void writeMappingFile();
 	void updateGamepadState();
 	void updateKBMState(GLFWwindow* w);
-	std::vector<float> getGamepadValues();
+	std::vector<float> getGamepadValues() const;
 	std::vector<float> getKBMValues(GLFWwindow* w);
 	bool getRisingEdge(int index);
 	bool getFallingEdge(int index);
 	bool getFallingZero(int index);
-	bool getHittableNote(int noteType, std::vector<Note>& array);
+	static bool getHittableNote(int noteType, std::vector<Note>& array);
+	bool isAxisAboveDeadzone(int index) const;
 	void tick(double time);
 	void reset();
 

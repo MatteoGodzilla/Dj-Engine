@@ -64,8 +64,9 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	readConfigFile();
 
 	std::ifstream available("config.ini");
-	if (!available.is_open())
+	if (!available.is_open()) {
 		writeConfigFile();
+	}
 
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
@@ -528,10 +529,10 @@ void MenuNavigator::setActive(bool active) {
 	m_active = active;
 }
 
-bool MenuNavigator::getShouldClose() {
+bool MenuNavigator::getShouldClose() const {
 	return m_shouldClose;
 }
 
-bool MenuNavigator::getActive() {
+bool MenuNavigator::getActive() const {
 	return m_active;
 }

@@ -12,7 +12,7 @@ public:
 	void updateChildrens(std::vector<MenuNode> list);
 	std::string getText();
 	void setText(const std::string& text);
-	int getId();
+	int getId() const;
 	~MenuNode();
 
 private:

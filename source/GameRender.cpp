@@ -1040,8 +1040,6 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					glm::vec2 beforeInner = getCirclePoint((double)m_radius - m_deltaRadius, startAngle);
 
 					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
-						double cycleTime = getDTFromAngle(cycleAngle);
-
 						glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, cycleAngle);
 						glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, cycleAngle);
 
@@ -1746,16 +1744,17 @@ int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr) {
 		} else {
 			return 2;
 		}
-	} else
+	} else {
 		return 1; // CENTER BY DEFAULT
+	}
 }
 
-double GameRender::getAngleFromDT(double dt) {
+double GameRender::getAngleFromDT(double dt) const {
 	double clickerAngle = asin(0.25 / m_radius);
 	return dt * (m_maxAngle - clickerAngle) / m_noteVisibleTime + clickerAngle;
 }
 
-double GameRender::getDTFromAngle(double angle) {
+double GameRender::getDTFromAngle(double angle) const {
 	double clickerAngle = asin(0.25 / m_radius);
 	return (angle - clickerAngle) * m_noteVisibleTime / (m_maxAngle - clickerAngle);
 }

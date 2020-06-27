@@ -26,7 +26,7 @@ void Rendr::checkError() {
 }
 
 //utility function
-void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) {
+void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) const {
 	if (rendr_InvertedX) {
 		v.push_back(-x);
 	} else {
@@ -41,7 +41,7 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 }
 
 //utility function
-void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) {
+void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) const {
 	if (rendr_InvertedX) {
 		v.push_back(-x);
 	} else {
@@ -125,7 +125,7 @@ void Rendr::useOrthoProj() {
 	}
 }
 
-void Rendr::setTextColor(float r, float g, float b, float a) {
+void Rendr::setTextColor(float r, float g, float b, float a) const {
 	std::cout << "Rendr msg: Setting up color" << std::endl;
 	glUseProgram(m_textProgram);
 	int location = glGetUniformLocation(m_textProgram, "u_textColor");
@@ -136,7 +136,7 @@ void Rendr::setTextColor(float r, float g, float b, float a) {
 	}
 }
 
-void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const {
 	//bind texture VAO (layout and actual buffers)
 	glBindVertexArray(m_textureVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
@@ -153,7 +153,7 @@ void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned in
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) {
+void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const {
 	//bind text VAO (layout and actual buffers)
 	glBindVertexArray(m_textureVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
@@ -170,7 +170,7 @@ void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>&
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr) {
+void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr) const {
 	//bind color VAO (layout and actual buffers)
 	glBindVertexArray(m_colorVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);

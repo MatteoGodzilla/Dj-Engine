@@ -16,9 +16,9 @@ public:
 	void addNotesToBuffers(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void initialLoad();
 	void bpm(double time, std::vector<double>& arr);
-	int getNotesTotal();
-	int getNotesHit();
-	SongEntry getSongEntry();
+	int getNotesTotal() const;
+	int getNotesHit() const;
+	SongEntry getSongEntry() const;
 	void reset();
 
 	bool m_combo_reset = false;
