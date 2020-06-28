@@ -52,6 +52,7 @@ public:
 	bool getFallingEdge(int index);
 	bool getFallingZero(int index);
 	static bool getHittableNote(int noteType, std::vector<Note>& array);
+	static bool getHittableNoteAtZero(double time, int noteType, std::vector<Note>& array);
 	bool isAxisAboveDeadzone(int index) const;
 	void tick(double time);
 	void reset();
