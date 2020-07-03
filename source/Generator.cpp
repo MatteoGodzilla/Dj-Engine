@@ -229,48 +229,6 @@ void Generator::initialLoad() {
 void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	m_combo_reset = false;
 	m_eu_check = false;
-	/*
-	size_t note_s = m_note_times.size();
-
-	//note generation from 'cache' (m_note_times)
-	for (size_t i = 0; i < note_s; i++) {
-		double time = m_note_times.at(0);
-		int type = m_note_types.at(0);
-		double length = m_note_length.at(0);
-
-		Note temp(time, type, length, false);
-		v.push_back(temp);
-		m_note_times.erase(m_note_times.begin());
-		m_note_types.erase(m_note_types.begin());
-		m_note_length.erase(m_note_length.begin());
-	}
-	size_t event_s = m_event_times.size();
-
-	//event generation from 'cache' (m_event_times)
-	for (size_t i = 0; i < event_s; i++) {
-		double time = m_event_times.at(0);
-		int type = m_event_types.at(0);
-		double length = m_event_length.at(0);
-		Note e(time, type, length, true);
-		ev.push_back(e);
-		m_event_times.erase(m_event_times.begin());
-		m_event_types.erase(m_event_types.begin());
-		m_event_length.erase(m_event_length.begin());
-	}
-
-	size_t cross_s = m_cross_times.size();
-	//crossfade generation from 'cache' (m_cross_times)
-	for (size_t i = 0; i < cross_s; i++) {
-		double time = m_cross_times.at(0);
-		int type = m_cross_types.at(0);
-		double length = m_cross_length.at(0);
-		Note c(time, type, length, true);
-		cross.push_back(c);
-		m_cross_times.erase(m_cross_times.begin());
-		m_cross_types.erase(m_cross_types.begin());
-		m_cross_length.erase(m_cross_length.begin());
-	}
-	*/
 
 	if (!v.empty()) {
 		for (size_t i = v.size(); i-- > 0;) {
@@ -369,177 +327,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	*/
 }
 
-/*
-void Generator::textParser(std::vector<Note>& v, std::vector<Note>& ev) {
-	read the chart IF there are less than 100 notes
-	and less than 100 events on screen.
-
-	This limit is arbitrary and can change in the future.
-	Mostly it's there to use less amount of ram on the pc
-
-	(but really, 100 notes present on screen is ridiculous)
-
-	if (!m_isChartBinary) {
-		size_t noteBufferSize = v.size() + m_note_times.size();
-		size_t eventBufferSize = ev.size() + m_event_times.size();
-
-		while (!m_chart.eof() && noteBufferSize < 100 && eventBufferSize < 100) {
-			std::string token;
-			double t;
-			m_chart >> token;
-
-
-			depending by the tokens, add note/event to 'cache'
-
-
-			if (token == "T" || token == "t") {
-				m_chart >> token;
-				if (token == "R" || token == "r") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushNote(t, TAP_R, 0.0);
-				}
-				else if (token == "G" || token == "g") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushNote(t, TAP_G, 0.0);
-				}
-				else if (token == "B" || token == "b") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushNote(t, TAP_B, 0.0);
-				}
-				else {
-					std::cerr << "error parsing token:T " << token << std::endl;
-				}
-			}
-			else if (token == "C" || token == "c") {
-				m_chart >> token;
-				if (token == "G" || token == "g") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushEvent(t, CROSS_G, 0.0);
-				}
-				else if (token == "B" || token == "b") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushEvent(t, CROSS_B, 0.0);
-				}
-				else if (token == "C" || token == "c") {
-					m_chart >> token;
-					t = std::stod(token);
-					pushEvent(t, CROSS_C, 0.0);
-				}
-				else {
-					std::cerr << "error parsing token:C " << token << std::endl;
-				}
-			}
-			else if (token == "S" || token == "s") {
-				m_chart >> token;
-				if (token == "G" || token == "g") {
-					m_chart >> token;
-					if (token == "U" || token == "u") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_G_UP, 0.0);
-					}
-					else if (token == "D" || token == "d") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_G_DOWN, 0.0);
-					}
-					else if (token == "A" || token == "a") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_G_ANY, 0.0);
-					}
-					else if (token == "S" || token == "s") {
-						m_chart >> token;
-						t = std::stod(token);
-						double length = 0.0;
-						m_chart >> token;
-						length = std::stod(token);
-						pushEvent(t, SCR_G_ZONE, length);
-					}
-					else {
-						std::cerr << "error parsing token:S G " << token << std::endl;
-					}
-				}
-				else if (token == "B") {
-					m_chart >> token;
-					if (token == "U" || token == "u") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_B_UP, 0.0);
-					}
-					else if (token == "D" || token == "d") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_B_DOWN, 0.0);
-					}
-					else if (token == "A" || token == "a") {
-						m_chart >> token;
-						t = std::stod(token);
-						pushNote(t, SCR_B_ANY, 0.0);
-					}
-					else if (token == "S" || token == "s") {
-						m_chart >> token;
-						t = std::stod(token);
-						double length = 0.0;
-						m_chart >> token;
-						length = std::stod(token);
-						pushEvent(t, SCR_B_ZONE, length);
-					}
-					else {
-						std::cerr << "error parsing token:S B " << token << std::endl;
-					}
-				}
-				else {
-					std::cerr << "error parsing token:S " << token;
-				}
-			}
-			else if (token == "E" || token == "e") {
-				m_chart >> token;
-				if (token == "S" || token == "s") {
-					m_chart >> token;
-					t = std::stod(token);
-					double length = 0.0;
-					m_chart >> token;
-					length = std::stod(token);
-					pushEvent(t, EU_ZONE, length);
-				}
-				else {
-					std::cerr << "error parsing token:E " << token << std::endl;
-				}
-			}
-			else if (token == "BPM" || token == "bpm") {
-				m_chart >> token;
-				m_bpmChangeTime = std::stod(token);
-				m_chart >> token;
-				m_bpmChangeValue = std::stoi(token);
-			}
-			else if (token == "SET" || token == "set") {
-				m_chart >> token;
-				if (token == "TIME" || token == "time") {
-					m_chart >> token;
-					if (token == "ABS" || token == "abs") m_isChartBinary = false;
-					else if (token == "REL" || token == "rel") m_isChartBinary = true;
-					else std::cerr << "error parsing token:SET TIME" << std::endl;
-				}
-				else std::cerr << "error parsing token:SET" << std::endl;
-			}
-			else {
-				std::cerr << "unknown token:" << token << std::endl;
-			}
-
-			noteBufferSize = v.size() + m_note_times.size();
-			eventBufferSize = ev.size() + m_event_times.size();
-		}
-	}
-}
-*/
-
-void Generator::addNotesToBuffer(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
+void Generator::addNotesToBuffers(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	while (v.size() < 100 && !m_allTaps.empty()) {
 		v.push_back(m_allTaps.front());
 		m_allTaps.pop_front();
@@ -590,15 +378,15 @@ void Generator::reset() {
 	m_eu_check = false;
 }
 
-int Generator::getNotesTotal() {
+int Generator::getNotesTotal() const {
 	return m_notesTotal;
 }
 
-int Generator::getNotesHit() {
+int Generator::getNotesHit() const {
 	return m_notesHit;
 }
 
-SongEntry Generator::getSongEntry() {
+SongEntry Generator::getSongEntry() const {
 	return m_songEntry;
 }
 

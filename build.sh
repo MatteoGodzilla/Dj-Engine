@@ -35,10 +35,10 @@ done
 
 if [ $FORCE = true ]
 then
-	rm -r build-dir
+	rm -r build
 fi
-mkdir build-dir
-cd build-dir
+mkdir build
+cd build
 if [ $DEBUG = true ]
 then
 	cmake -DCMAKE_BUILD_TYPE=Debug .. && make

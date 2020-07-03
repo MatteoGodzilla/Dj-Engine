@@ -83,3 +83,6 @@ else()
 	message(FATAL_ERROR "Could NOT find VorbisFile library")
 endif()
 target_link_libraries(${CMAKE_PROJECT_NAME} ${VORBISFILE_LIBRARY})
+
+# std thread
+target_link_libraries(${CMAKE_PROJECT_NAME} pthread)

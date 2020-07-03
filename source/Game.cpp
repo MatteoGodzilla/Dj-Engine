@@ -1,9 +1,11 @@
 #include "Game.h"
 
-//Game::Game() {}
+using namespace std::chrono;
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
+
+	m_player.readMappingFile();
 
 	CSimpleIniA ini;
 	const char* section = "Engine";
@@ -15,194 +17,79 @@ void Game::init(GLFWwindow* w) {
 	m_isButtonsRight = ini.GetBoolValue(section, "buttonsRight", false);
 	m_debugView = ini.GetBoolValue(section, "debugView", false);
 
-	m_render.m_greenLaneActiveColor.r = ini.GetDoubleValue(section, "greenLaneActiveR", 0.0);
-	m_render.m_greenLaneActiveColor.g = ini.GetDoubleValue(section, "greenLaneActiveG", 0.0);
-	m_render.m_greenLaneActiveColor.b = ini.GetDoubleValue(section, "greenLaneActiveB", 0.0);
-	m_render.m_greenLaneActiveColor.a = ini.GetDoubleValue(section, "greenLaneActiveA", 0.0);
+	m_render.m_greenLaneActiveColor.r = ini.GetDoubleValue(section, "greenLaneActiveR", 0.133333);
+	m_render.m_greenLaneActiveColor.g = ini.GetDoubleValue(section, "greenLaneActiveG", 0.874510);
+	m_render.m_greenLaneActiveColor.b = ini.GetDoubleValue(section, "greenLaneActiveB", 0.180392);
+	m_render.m_greenLaneActiveColor.a = ini.GetDoubleValue(section, "greenLaneActiveA", 1.000000);
 
-	m_render.m_greenLaneInactiveColor.r = ini.GetDoubleValue(section, "greenLaneInactiveR", 0.0);
-	m_render.m_greenLaneInactiveColor.g = ini.GetDoubleValue(section, "greenLaneInactiveG", 0.0);
-	m_render.m_greenLaneInactiveColor.b = ini.GetDoubleValue(section, "greenLaneInactiveB", 0.0);
-	m_render.m_greenLaneInactiveColor.a = ini.GetDoubleValue(section, "greenLaneInactiveA", 0.0);
+	m_render.m_greenLaneInactiveColor.r = ini.GetDoubleValue(section, "greenLaneInactiveR", 0.059977);
+	m_render.m_greenLaneInactiveColor.g = ini.GetDoubleValue(section, "greenLaneInactiveG", 0.392157);
+	m_render.m_greenLaneInactiveColor.b = ini.GetDoubleValue(section, "greenLaneInactiveB", 0.083425);
+	m_render.m_greenLaneInactiveColor.a = ini.GetDoubleValue(section, "greenLaneInactiveA", 1.000000);
 
-	m_render.m_blueLaneActiveColor.r = ini.GetDoubleValue(section, "blueLaneActiveR", 0.0);
-	m_render.m_blueLaneActiveColor.g = ini.GetDoubleValue(section, "blueLaneActiveG", 0.0);
-	m_render.m_blueLaneActiveColor.b = ini.GetDoubleValue(section, "blueLaneActiveB", 0.0);
-	m_render.m_blueLaneActiveColor.a = ini.GetDoubleValue(section, "blueLaneActiveA", 0.0);
+	m_render.m_blueLaneActiveColor.r = ini.GetDoubleValue(section, "blueLaneActiveR", 0.239216);
+	m_render.m_blueLaneActiveColor.g = ini.GetDoubleValue(section, "blueLaneActiveG", 0.305882);
+	m_render.m_blueLaneActiveColor.b = ini.GetDoubleValue(section, "blueLaneActiveB", 0.745098);
+	m_render.m_blueLaneActiveColor.a = ini.GetDoubleValue(section, "blueLaneActiveA", 1.000000);
 
-	m_render.m_blueLaneInactiveColor.r = ini.GetDoubleValue(section, "blueLaneInactiveR", 0.0);
-	m_render.m_blueLaneInactiveColor.g = ini.GetDoubleValue(section, "blueLaneInactiveG", 0.0);
-	m_render.m_blueLaneInactiveColor.b = ini.GetDoubleValue(section, "blueLaneInactiveB", 0.0);
-	m_render.m_blueLaneInactiveColor.a = ini.GetDoubleValue(section, "blueLaneInactiveA", 0.0);
+	m_render.m_blueLaneInactiveColor.r = ini.GetDoubleValue(section, "blueLaneInactiveR", 0.126105);
+	m_render.m_blueLaneInactiveColor.g = ini.GetDoubleValue(section, "blueLaneInactiveG", 0.163666);
+	m_render.m_blueLaneInactiveColor.b = ini.GetDoubleValue(section, "blueLaneInactiveB", 0.392157);
+	m_render.m_blueLaneInactiveColor.a = ini.GetDoubleValue(section, "blueLaneInactiveA", 1.000000);
 
-	m_render.m_redLaneActiveColor.r = ini.GetDoubleValue(section, "redLaneActiveR", 0.0);
-	m_render.m_redLaneActiveColor.g = ini.GetDoubleValue(section, "redLaneActiveG", 0.0);
-	m_render.m_redLaneActiveColor.b = ini.GetDoubleValue(section, "redLaneActiveB", 0.0);
-	m_render.m_redLaneActiveColor.a = ini.GetDoubleValue(section, "redLaneActiveA", 0.0);
+	m_render.m_redLaneActiveColor.r = ini.GetDoubleValue(section, "redLaneActiveR", 0.823529);
+	m_render.m_redLaneActiveColor.g = ini.GetDoubleValue(section, "redLaneActiveG", 0.109804);
+	m_render.m_redLaneActiveColor.b = ini.GetDoubleValue(section, "redLaneActiveB", 0.109804);
+	m_render.m_redLaneActiveColor.a = ini.GetDoubleValue(section, "redLaneActiveA", 1.000000);
 
-	m_render.m_greenScratchColor.r = ini.GetDoubleValue(section, "greenScratchR", 0.0);
-	m_render.m_greenScratchColor.g = ini.GetDoubleValue(section, "greenScratchG", 0.0);
-	m_render.m_greenScratchColor.b = ini.GetDoubleValue(section, "greenScratchB", 0.0);
-	m_render.m_greenScratchColor.a = ini.GetDoubleValue(section, "greenScratchA", 0.0);
+	m_render.m_greenScratchColor.r = ini.GetDoubleValue(section, "greenScratchR", 0.133333);
+	m_render.m_greenScratchColor.g = ini.GetDoubleValue(section, "greenScratchG", 0.874510);
+	m_render.m_greenScratchColor.b = ini.GetDoubleValue(section, "greenScratchB", 0.180392);
+	m_render.m_greenScratchColor.a = ini.GetDoubleValue(section, "greenScratchA", 1.000000);
 
-	m_render.m_blueScratchColor.r = ini.GetDoubleValue(section, "blueScratchR", 0.0);
-	m_render.m_blueScratchColor.g = ini.GetDoubleValue(section, "blueScratchG", 0.0);
-	m_render.m_blueScratchColor.b = ini.GetDoubleValue(section, "blueScratchB", 0.0);
-	m_render.m_blueScratchColor.a = ini.GetDoubleValue(section, "blueScratchA", 0.0);
+	m_render.m_blueScratchColor.r = ini.GetDoubleValue(section, "blueScratchR", 0.239216);
+	m_render.m_blueScratchColor.g = ini.GetDoubleValue(section, "blueScratchG", 0.305882);
+	m_render.m_blueScratchColor.b = ini.GetDoubleValue(section, "blueScratchB", 0.745098);
+	m_render.m_blueScratchColor.a = ini.GetDoubleValue(section, "blueScratchA", 1.000000);
 
-	m_render.m_euphoriaLaneColor.r = ini.GetDoubleValue(section, "euphoriaLaneActiveR", 0.0);
-	m_render.m_euphoriaLaneColor.g = ini.GetDoubleValue(section, "euphoriaLaneActiveG", 0.0);
-	m_render.m_euphoriaLaneColor.b = ini.GetDoubleValue(section, "euphoriaLaneActiveB", 0.0);
-	m_render.m_euphoriaLaneColor.a = ini.GetDoubleValue(section, "euphoriaLaneActiveA", 0.0);
+	m_render.m_euphoriaLaneColor.r = ini.GetDoubleValue(section, "euphoriaLaneActiveR", 1.000000);
+	m_render.m_euphoriaLaneColor.g = ini.GetDoubleValue(section, "euphoriaLaneActiveG", 1.000000);
+	m_render.m_euphoriaLaneColor.b = ini.GetDoubleValue(section, "euphoriaLaneActiveB", 1.000000);
+	m_render.m_euphoriaLaneColor.a = ini.GetDoubleValue(section, "euphoriaLaneActiveA", 1.000000);
 
-	m_render.m_euphoriaZoneColor.r = ini.GetDoubleValue(section, "euphoriaZoneActiveR", 0.0);
-	m_render.m_euphoriaZoneColor.g = ini.GetDoubleValue(section, "euphoriaZoneActiveG", 0.0);
-	m_render.m_euphoriaZoneColor.b = ini.GetDoubleValue(section, "euphoriaZoneActiveB", 0.0);
-	m_render.m_euphoriaZoneColor.a = ini.GetDoubleValue(section, "euphoriaZoneActiveA", 0.0);
+	m_render.m_euphoriaZoneColor.r = ini.GetDoubleValue(section, "euphoriaZoneActiveR", 1.000000);
+	m_render.m_euphoriaZoneColor.g = ini.GetDoubleValue(section, "euphoriaZoneActiveG", 1.000000);
+	m_render.m_euphoriaZoneColor.b = ini.GetDoubleValue(section, "euphoriaZoneActiveB", 1.000000);
+	m_render.m_euphoriaZoneColor.a = ini.GetDoubleValue(section, "euphoriaZoneActiveA", 0.200000);
 
-	/*
-	std::ifstream input("config.txt");
-	std::string s;
-	while (s != std::string("{Engine}")) {
-		std::getline(input, s);
-		if (input.eof()) {
-			std::cerr << "Game Error: found config file, but not {Engine} marker.";
-			std::cerr << "Stopped loading of config file" << std::endl;
-			return;
-		}
-	}
-	if (input.is_open()) {
-		std::cout << "Game Message: loading from config file" << std::endl;
-		std::string token;
-		input >> token;
-		m_audioLatency = std::stof(token);
-		input >> token;
-		m_deckSpeed = std::stof(token);
-		input >> token;
-		m_isButtonsRight = token == "true";
-		input >> token;
-		m_debugView = token == "true";
-
-		float r;
-		float g;
-		float b;
-		float a;
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_greenLaneActiveColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_greenLaneInactiveColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_blueLaneActiveColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_blueLaneInactiveColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_redLaneActiveColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_euphoriaLaneColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_greenScratchColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_blueScratchColor = glm::vec4(r, g, b, a);
-
-		input >> token;
-		r = std::stof(token);
-		input >> token;
-		g = std::stof(token);
-		input >> token;
-		b = std::stof(token);
-		input >> token;
-		a = std::stof(token);
-		m_render.m_euphoriaZoneColor = glm::vec4(r, g, b, a);
-		m_player.readMappingFile();
-	} else {
-		std::cerr << "Game Error: Cannot open config file" << std::endl;
-	}
-	*/
+	m_inputThread = std::thread(inputThreadFun, this);
+	std::cout << "Game Message: started input thread" << std::endl;
+	setButtonPos(m_isButtonsRight);
 }
 
-void Game::pollInput() {
-	if (m_active) {
-		m_player.pollInput(m_render.getWindowPtr());
-		if (m_mode == 0) {
-			m_player.hit(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
-			//m_player.keyCallback(key, action, m_global_time, m_note_arr, m_event_arr,m_cross_arr);
-			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_T)) {
-				std::cout << m_global_time << std::endl;
-			}
-			if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_ESCAPE)) {
-				m_mode = 1;
-			}
-		} else {
-			if (m_player.m_wasGreenPressed && !m_player.m_isGreenPressed) {
-				m_active = false;
-				reset();
-			}
-		}
+void Game::inputThreadFun(Game* game) {
+	while (game->m_inputThreadRunning) {
+		//start timer
+		time_point<high_resolution_clock> start = high_resolution_clock::now();
+
+		game->m_gen.addNotesToBuffers(game->m_note_arr, game->m_event_arr, game->m_cross_arr);
+		game->m_gen.bpm(game->m_global_time, game->m_bpm_arr);
+		game->m_player.pollInput(game->m_render.getWindowPtr(), game->m_global_time, game->m_note_arr, game->m_event_arr, game->m_cross_arr);
+		//remove clicked notes
+		game->m_gen.tick(game->m_global_time, game->m_note_arr, game->m_event_arr, game->m_cross_arr);
+
+		//update player (combo + multiplier)
+		game->m_player.pollState(game->m_gen);
+		game->m_player.tick(game->m_global_time);
+
+		time_point<high_resolution_clock> end = high_resolution_clock::now();
+		milliseconds delta = duration_cast<milliseconds>(end - start);
+		//stop timer
+
+		std::this_thread::sleep_for(milliseconds(1000 / game->m_inputThreadPollRate) - delta);
+		//wait time before next input frame
 	}
+	std::cout << "Input Thread Message: stopped" << std::endl;
 }
 
 void Game::tick() {
@@ -211,18 +98,8 @@ void Game::tick() {
 			m_render.m_noteVisibleTime = m_deckSpeed;
 			m_gen.m_deckSpeed = m_deckSpeed;
 
-			//update notes and read chart (text or .fsgmub)
-			m_gen.tick(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
-			//m_gen.textParser(m_note_arr, m_event_arr);
-			m_gen.addNotesToBuffer(m_note_arr, m_event_arr, m_cross_arr);
-			m_gen.bpm(m_global_time, m_bpm_arr);
-
-			//update player (combo + multiplier)
-			m_player.pollState(m_gen);
-			m_player.tick(m_global_time);
-
 			m_render.pollState(m_global_time, m_player, m_gen);
-			m_audio.buffer();
+			m_audio.buffer(m_global_time);
 			if (m_global_time >= (double)-m_audioLatency) {
 				m_audio.play();
 			}
@@ -236,6 +113,7 @@ void Game::tick() {
 		if (!m_audio.isActive(m_global_time)) {
 			m_mode = 1;
 			m_audio.stop();
+			m_active = false;
 		}
 	}
 }
@@ -260,8 +138,6 @@ void Game::render() {
 			if (m_debugView) {
 				m_render.debug(m_deltaTime, m_note_arr, m_event_arr, m_cross_arr);
 			}
-		} else if (m_mode == 1) {
-			m_render.result(m_player, m_gen);
 		}
 	}
 }
@@ -283,26 +159,6 @@ void Game::reset() {
 	m_gen.reset();
 	m_player.reset();
 	m_audio.reset();
-}
-
-bool Game::getActive() {
-	return m_active;
-}
-
-void Game::setActive(bool active) {
-	m_active = active;
-}
-
-Player* Game::getPlayer() {
-	return &m_player;
-}
-
-Audio* Game::getAudio() {
-	return &m_audio;
-}
-
-GameRender* Game::getGameRender() {
-	return &m_render;
 }
 
 void Game::setButtonPos(bool value) {
@@ -386,6 +242,35 @@ void Game::writeConfig() {
 	std::cout << "Game Message: Written engine conigs to 'config.ini'" << std::endl;
 
 	m_player.writeMappingFile();
+}
+
+void Game::stopThread() {
+	m_inputThreadRunning = false;
+	m_inputThread.join();
+}
+
+bool Game::getActive() const {
+	return m_active;
+}
+
+void Game::setActive(bool active) {
+	m_active = active;
+}
+
+Player* Game::getPlayer() {
+	return &m_player;
+}
+
+Audio* Game::getAudio() {
+	return &m_audio;
+}
+
+GameRender* Game::getGameRender() {
+	return &m_render;
+}
+
+Generator* Game::getGenerator() {
+	return &m_gen;
 }
 
 Game::~Game() {

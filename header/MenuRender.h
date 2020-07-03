@@ -31,6 +31,8 @@ public:
 	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
 	void setLaneColors(Game* game);
+	void setPollRate(Game* game);
+	void result(Game* game);
 	void splashArt();
 	GLFWwindow* getWindowPtr();
 	void doneEditing();
@@ -59,6 +61,7 @@ private:
 	unsigned int m_buttonTexture = 0;
 	unsigned int m_splashTexture = 0;
 	unsigned int m_calibrationTex = 0;
+	unsigned int m_pgBarFrame = 0;
 
 	void editingAxisController(int axis);
 	void editingAxisKBAM(int axis);

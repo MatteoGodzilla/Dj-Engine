@@ -10,6 +10,23 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 	return 0xffffffff;
 }
 
+MenuNode* getNodePtrById(MenuNode* node, int id){
+	//super mega iper proud of this function
+	//and i wrote this the first time correctly lol
+	if(node->getId() == id) {
+		return node;
+	} else if(!node->getChildrens().empty()){
+		for(auto& child : node->getChildrens()){
+			MenuNode* p = getNodePtrById(&child,id);
+			if(p != nullptr){
+				return p;
+			}
+		}
+		return nullptr;
+	}
+	return nullptr;
+}
+
 void MenuNavigator::writeConfigFile() {
 	m_game->writeConfig();
 
@@ -32,7 +49,7 @@ void MenuNavigator::writeConfigFile() {
 	if (output.is_open()) {
 		output << std::endl
 			   << mappings;
-		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'";
+		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'" << std::endl;
 	}
 }
 
@@ -61,6 +78,13 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_game = gameptr;
 	m_render.init(w);
 
+	readConfigFile();
+
+	std::ifstream available("config.ini");
+	if (!available.is_open()) {
+		writeConfigFile();
+	}
+
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
 	MenuNode options("Options", OPTIONS_ID);
@@ -74,21 +98,24 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	MenuNode refreshList("Refresh song list", REFRESH_ID);
 	MenuNode bot("Toggle Bot:", BOT_ID);
 	MenuNode color("Change lanes color", COLOR_ID);
+	MenuNode pollrate("Change input poll rate:", POLL_ID);
 	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
 
 	//add values to text after:
-	flipButtons.setText(flipButtons.getText() + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
+	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
-	bot.setText(bot.getText() + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
-	debug.setText(debug.getText() + (m_game->m_debugView == 1 ? "true" : "false"));
+	bot.setText(bot.getText() + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
+	pollrate.setText(pollrate.getText() + std::to_string(m_game->m_inputThreadPollRate));
+	debug.setText(debug.getText() + std::string(m_game->m_debugView ? "true" : "false"));
 
-	options.push(scratches);
+	//options.push(scratches);
 	options.push(latency);
 	options.push(flipButtons);
 	options.push(speed);
 	options.push(refreshList);
 	options.push(bot);
 	options.push(color);
+	options.push(pollrate);
 	options.push(debug);
 
 	m_root.push(play);
@@ -103,7 +130,6 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	for (int i = 0; i < 15 + 6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
-	readConfigFile();
 
 	render(0.0f);
 	scan();
@@ -157,6 +183,11 @@ void MenuNavigator::pollInput() {
 		if (m_popupId != -1) {
 			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
 				writeConfigFile();
+				if (m_popupId == HIGHWAY_SPEED) {
+					m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+				} else if (m_popupId == POLLRATE_CHANGE) {
+					m_root.getChildrens().at(1).getChildrens().at(6).setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
+				}
 			}
 			m_popupId = -1;
 			m_debounce = true;
@@ -167,8 +198,9 @@ void MenuNavigator::pollInput() {
 				if (m_scene != 1) {
 					m_shouldClose = true;
 				}
-			} else if (m_scene == CREDITS) {
+			} else if (m_scene == CREDITS || m_scene == SCRATCHES || m_scene == RESULTS) {
 				m_scene = MAIN_SCENE;
+				resetMenu();
 			}
 		}
 	}
@@ -177,6 +209,11 @@ void MenuNavigator::pollInput() {
 		if (m_popupId != -1) {
 			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
 				writeConfigFile();
+				if (m_popupId == HIGHWAY_SPEED) {
+					getNodePtrById(&m_root,SPEED_ID)->setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+				} else if (m_popupId == POLLRATE_CHANGE) {
+					getNodePtrById(&m_root,POLL_ID)->setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
+				}
 			}
 			m_popupId = -1;
 			m_debounce = true;
@@ -193,6 +230,11 @@ void MenuNavigator::pollInput() {
 
 	if (m_render.m_input != m_useKeyboardInput) {
 		m_useKeyboardInput = m_render.m_input;
+	}
+
+	if (m_game->m_mode == 1) {
+		m_scene = RESULTS;
+		m_game->m_mode = 0;
 	}
 }
 
@@ -374,12 +416,16 @@ void MenuNavigator::render(double dt) {
 			m_render.scratches(m_game->getPlayer());
 		} else if (m_scene == CALIBRATION) {
 			m_render.calibration(m_game, dt);
+		} else if (m_scene == RESULTS) {
+			m_render.result(m_game);
 		}
 		if (m_popupId != -1) {
 			if (m_popupId == HIGHWAY_SPEED) {
 				m_render.setDeckSpeed(m_game);
 			} else if (m_popupId == LANE_COLORS) {
 				m_render.setLaneColors(m_game);
+			} else if (m_popupId == POLLRATE_CHANGE) {
+				m_render.setPollRate(m_game);
 			}
 		}
 	}
@@ -401,26 +447,30 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	} else if (id == LR_BUTTONS_ID) {
 		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
 		//update options node text
-		m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Toggle Buttons Right/Left:") + (m_game->getPlayer()->m_isButtonsRight == 1 ? "true" : "false"));
+		getNodePtrById(&m_root,LR_BUTTONS_ID)->setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
 	} else if (id == BOT_ID) {
 		m_game->getPlayer()->m_botEnabled = !m_game->getPlayer()->m_botEnabled;
-		m_root.getChildrens().at(1).getChildrens().at(5).setText(std::string("Toggle Bot:") + (m_game->getPlayer()->m_botEnabled == 1 ? "true" : "false"));
+		getNodePtrById(&m_root,BOT_ID)->setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
 		m_game->m_debugView = !m_game->m_debugView;
-		m_root.getChildrens().at(1).getChildrens().at(7).setText(std::string("Toggle Debug Informations:") + (m_game->m_debugView == 1 ? "true" : "false"));
+		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
+		writeConfigFile();
 	} else if (id == REFRESH_ID) {
 		std::vector<MenuNode> emptyList;
-		m_root.getChildrens().at(0).getChildrens().clear();
+		getNodePtrById(&m_root, PLAY_ID)->getChildrens().clear();
 		m_songList.clear();
 		scan(false);
 	} else if (id == COLOR_ID) {
 		m_popupId = LANE_COLORS;
+	} else if (id == POLL_ID) {
+		m_popupId = POLLRATE_CHANGE;
 	} else if (id == SONG_GENERAL_ID) {
 		index = findIndex(menu, parent);
 		m_active = false;
+		m_game->reset();
 		m_game->start(m_songList.at(index));
 		resetMenu();
 	} else if (menu.getChildCount() == 0) {
@@ -496,10 +546,10 @@ void MenuNavigator::setActive(bool active) {
 	m_active = active;
 }
 
-bool MenuNavigator::getShouldClose() {
+bool MenuNavigator::getShouldClose() const {
 	return m_shouldClose;
 }
 
-bool MenuNavigator::getActive() {
+bool MenuNavigator::getActive() const {
 	return m_active;
 }

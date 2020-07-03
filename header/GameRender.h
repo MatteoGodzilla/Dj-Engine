@@ -74,11 +74,11 @@ public:
 	glm::vec4 m_euphoriaZoneColor = {1.0, 1.0, 1.0, 0.2};
 
 private:
-	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note> crossArr);
+	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
 	static glm::vec2 getCirclePoint(double radius, double angle);
-	static int getCrossAtTime(double time, std::vector<Note> crossArr);
-	double getAngleFromDT(double dt);
-	double getDTFromAngle(double angle);
+	static int getCrossAtTime(double time, std::vector<Note>& crossArr);
+	double getAngleFromDT(double dt) const;
+	double getDTFromAngle(double angle) const;
 	static double getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius);
 
 	bool m_red = false, m_green = false, m_blue = false;

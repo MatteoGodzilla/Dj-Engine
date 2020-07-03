@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "MenuNavigator.h"
-
 #include "stb_image.h"
+
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <vector>
@@ -9,7 +9,7 @@
 int WIDTH = 1280;
 int HEIGHT = 720;
 
-std::string VERSION = "alpha v1.4";
+std::string VERSION = "alpha v1.4.1";
 
 Game game;
 MenuNavigator menu;
@@ -51,12 +51,12 @@ int main(int argc, char** argv) {
 	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
 
 	bool MSAActive = false;
-	if(argc > 1){
-		for(int i = 0; i < argc-1; ++i){
-			if(strcmp(argv[i],"--msaa") == 0){
-				int factor = std::stoi(argv[i+1]);
+	if (argc > 1) {
+		for (int i = 0; i < argc - 1; ++i) {
+			if (strcmp(argv[i], "--msaa") == 0) {
+				int factor = std::stoi(argv[i + 1]);
 				std::cout << "Engine Message: Creating window with MSAA x" << factor << std::endl;
-				glfwWindowHint(GLFW_SAMPLES,factor);
+				glfwWindowHint(GLFW_SAMPLES, factor);
 				MSAActive = true;
 			}
 		}
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
 		return -1;
 	}
 	glfwSetWindowSizeCallback(window, resizeCallback);
-	glfwSetWindowAspectRatio(window,WIDTH,HEIGHT);
+	glfwSetWindowAspectRatio(window, WIDTH, HEIGHT);
 	glfwSetErrorCallback(&errorCallback);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported()) {
@@ -83,12 +83,12 @@ int main(int argc, char** argv) {
 	int w;
 	int h;
 	int n;
-	unsigned char* data = stbi_load("res/GameIcon.png",&w,&h,&n,0);
+	unsigned char* data = stbi_load("res/GameIcon.png", &w, &h, &n, 0);
 
-	GLFWimage image = {w,h,data};
-	glfwSetWindowIcon(window,1,&image);
+	GLFWimage image = {w, h, data};
+	glfwSetWindowIcon(window, 1, &image);
 
-	if(MSAActive){
+	if (MSAActive) {
 		glEnable(GL_MULTISAMPLE);
 	}
 
@@ -135,7 +135,6 @@ int main(int argc, char** argv) {
 			//render/update game
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			game.pollInput();
 			game.tick();
 			game.render();
 		}
@@ -148,6 +147,8 @@ int main(int argc, char** argv) {
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
+
+	game.stopThread();
 
 	glfwTerminate();
 }

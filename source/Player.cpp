@@ -18,6 +18,386 @@ Player::Player() {
 	m_pastKBMState.resize(400);
 }
 
+void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteArr, std::vector<Note>& eventArr, std::vector<Note>& cross) {
+	m_pastMouseX = m_nowMouseX;
+	m_pastMouseY = m_nowMouseY;
+
+	//mouse movement
+	glfwGetCursorPos(window, &m_nowMouseX, &m_nowMouseY);
+	if (m_deltaMouse) {
+		int w;
+		int h;
+		glfwGetWindowSize(window, &w, &h);
+		glfwSetCursorPos(window, (double)w / 2.0, (double)h / 2.0);
+	}
+
+	if (m_useKeyboardInput) {
+		updateKBMState(window);
+	} else {
+		if (glfwJoystickPresent(m_gamepadId)) {
+			updateGamepadState();
+		}
+	}
+
+	if (m_gpState.size() >= 8 && m_gpHistory.size() >= m_historyLength && !m_botEnabled) {
+		if (getRisingEdge(GREEN_INDEX)) {
+			if (getHittableNote(TAP_G, noteArr)) {
+				hit(time, TAP_G, noteArr);
+			} else if (!getHittableNote(SCR_G_ZONE, eventArr)) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+		}
+		if (getRisingEdge(RED_INDEX)) {
+			hit(time, TAP_R, noteArr);
+		}
+		if (getRisingEdge(BLUE_INDEX)) {
+			if (getHittableNote(TAP_B, noteArr)) {
+				hit(time, TAP_B, noteArr);
+			} else if (!getHittableNote(SCR_B_ZONE, eventArr)) {
+				m_combo = 0;
+				m_eu_zone_active = false;
+			}
+		}
+		if (getRisingEdge(EU_INDEX)) {
+			if (m_eu_value > 0.0) {
+				m_euphoria_active = true;
+			}
+		}
+
+		if (getFallingZero(SCR_DOWN_INDEX)) {
+			if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
+				if (isAxisAboveDeadzone(GREEN_INDEX)) {
+					hit(time, SCR_G_UP, noteArr);
+				} else if (isAxisAboveDeadzone(BLUE_INDEX)) {
+					hit(time, SCR_B_UP, noteArr);
+				}
+			} else {
+				if (isAxisAboveDeadzone(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+					hit(time, SCR_G_UP, noteArr);
+				} else if (isAxisAboveDeadzone(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+					hit(time, SCR_B_UP, noteArr);
+				}
+			}
+		} else if (getFallingZero(SCR_UP_INDEX)) {
+			if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
+				if (isAxisAboveDeadzone(GREEN_INDEX)) {
+					hit(time, SCR_G_DOWN, noteArr);
+				} else if (isAxisAboveDeadzone(BLUE_INDEX)) {
+					hit(time, SCR_B_DOWN, noteArr);
+				}
+			} else {
+				if (time - m_pastScratch > m_scratchDebounce && (isAxisAboveDeadzone(GREEN_INDEX) || isAxisAboveDeadzone(BLUE_INDEX))) {
+					breakCombo(time);
+				}
+			}
+		}
+
+		if (m_gpHistory.back().at(SCR_UP_INDEX) != m_gpState.at(SCR_UP_INDEX)) {
+			//platter moved in general
+			if (isAxisAboveDeadzone(GREEN_INDEX)) {
+				if (getHittableNote(SCR_G_ANY, noteArr)) {
+					hit(time, SCR_G_ANY, noteArr);
+				} else if (getHittableNote(SCR_G_TICK, noteArr)) {
+					hit(time, SCR_G_TICK, noteArr);
+				} else if (time - m_pastScratch > m_scratchDebounce) {
+					breakCombo(time);
+				}
+			}
+			if (isAxisAboveDeadzone(BLUE_INDEX)) {
+				if (getHittableNote(SCR_B_ANY, noteArr)) {
+					hit(time, SCR_B_ANY, noteArr);
+				} else if (getHittableNote(SCR_B_TICK, noteArr)) {
+					hit(time, SCR_B_TICK, noteArr);
+				} else if (time - m_pastScratch > m_scratchDebounce) {
+					breakCombo(time);
+				}
+			}
+		}
+
+		if (!m_euphoria_active) {
+			//manual input by player
+			if (m_cross == 0) {
+				if (m_baseMove == 0) {
+					if (getRisingEdge(CF_RIGHT_INDEX)) {
+						m_secondMove = 2;
+						m_cross = 2;
+						m_cfGreenToCenter = true;
+						m_cfCenterToBlue = true;
+						if (getHittableNote(CF_SPIKE_B, noteArr)) {
+							hit(time, CF_SPIKE_B, noteArr);
+						} else {
+							hit(time, CROSS_B, cross);
+						}
+					} else if (getFallingEdge(CF_LEFT_INDEX)) {
+						m_baseMove = 1;
+						m_cross = 1;
+						m_cfGreenToCenter = true;
+						if (getHittableNote(CF_SPIKE_C, noteArr)) {
+							hit(time, CF_SPIKE_C, noteArr);
+						} else if (!getHittableNote(CF_SPIKE_B, noteArr) && !getHittableNote(CROSS_B, cross)) {
+							hit(time, CROSS_C, cross);
+						}
+					}
+				} else if (m_baseMove == 2) {
+					if (getFallingEdge(CF_LEFT_INDEX)) {
+						m_secondMove = 1;
+						m_cross = 2;
+						m_cfGreenToCenter = true;
+						m_cfCenterToBlue = true;
+						hit(time, CROSS_B, cross);
+					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
+						m_secondMove = 1;
+						m_baseMove = 0;
+					}
+				}
+			} else if (m_cross == 1) {
+				if (getRisingEdge(CF_LEFT_INDEX)) {
+					m_baseMove = 0;
+					m_cross = 0;
+					m_cfCenterToGreen = true;
+					if (getHittableNote(CF_SPIKE_G, noteArr)) {
+						hit(time, CF_SPIKE_G, noteArr);
+					} else {
+						hit(time, CROSS_G, cross);
+					}
+				}
+
+				if (getRisingEdge(CF_RIGHT_INDEX)) {
+					m_baseMove = 2;
+					m_cross = 2;
+					m_cfCenterToBlue = true;
+					if (getHittableNote(CF_SPIKE_B, noteArr)) {
+						hit(time, CF_SPIKE_B, noteArr);
+					} else {
+						hit(time, CROSS_B, cross);
+					}
+				}
+			} else if (m_cross == 2) {
+				if (m_baseMove == 2) {
+					if (getRisingEdge(CF_LEFT_INDEX)) {
+						m_secondMove = 0;
+						m_cross = 0;
+						m_cfBlueToCenter = true;
+						m_cfCenterToGreen = true;
+						if (getHittableNote(CF_SPIKE_G, noteArr)) {
+							hit(time, CF_SPIKE_G, noteArr);
+						} else {
+							hit(time, CROSS_G, cross);
+						}
+					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
+						m_baseMove = 1;
+						m_cross = 1;
+						m_cfBlueToCenter = true;
+						if (getHittableNote(CF_SPIKE_C, noteArr)) {
+							hit(time, CF_SPIKE_C, noteArr);
+						} else if (!getHittableNote(CF_SPIKE_G, noteArr) && !getHittableNote(CROSS_G, cross)) {
+							hit(time, CROSS_C, cross);
+						}
+					}
+				} else if (m_baseMove == 0) {
+					if (getFallingEdge(CF_RIGHT_INDEX)) {
+						m_secondMove = 1;
+						m_cross = 0;
+						m_cfBlueToCenter = true;
+						m_cfCenterToGreen = true;
+						hit(time, CROSS_G, cross);
+					} else if (getFallingEdge(CF_LEFT_INDEX)) {
+						m_secondMove = 1;
+						m_baseMove = 2;
+					}
+				}
+			}
+		} else {
+			//euphoria enabled
+
+			if (getHittableNoteAtZero(time, CROSS_G, cross)) {
+				hit(time, CROSS_G, cross);
+				if (m_cross == 2) {
+					m_cfBlueToCenter = true;
+				}
+				m_cfCenterToGreen = true;
+				m_cross = 0;
+			} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
+				hit(time, CROSS_C, cross);
+				if (m_cross == 0) {
+					m_cfGreenToCenter = true;
+				} else {
+					m_cfBlueToCenter = true;
+				}
+				m_cross = 1;
+			} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
+				hit(time, CROSS_B, cross);
+				if (m_cross == 0) {
+					m_cfGreenToCenter = true;
+				}
+				m_cfCenterToBlue = true;
+				m_cross = 2;
+			}
+
+			if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
+				hit(time, CF_SPIKE_G, noteArr);
+				if (m_cross == 2) {
+					m_cfCenterToBlue = true;
+				}
+				m_cfGreenToCenter = true;
+			} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
+				hit(time, CF_SPIKE_C, noteArr);
+				if (m_cross == 0) {
+					m_cfCenterToGreen = true;
+				} else {
+					m_cfCenterToBlue = true;
+				}
+			} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
+				hit(time, CF_SPIKE_B, noteArr);
+				if (m_cross == 0) {
+					m_cfCenterToGreen = true;
+				}
+				m_cfBlueToCenter = true;
+			}
+		}
+
+		//variables for GameRender
+		m_isRedPressed = isAxisAboveDeadzone(RED_INDEX);
+		m_isGreenPressed = isAxisAboveDeadzone(GREEN_INDEX);
+		m_isBluePressed = isAxisAboveDeadzone(BLUE_INDEX);
+	} else {
+		//bot enabled
+		if (getHittableNoteAtZero(time, TAP_G, noteArr)) {
+			hit(time, TAP_G, noteArr);
+		}
+
+		if (getHittableNoteAtZero(time, TAP_R, noteArr)) {
+			hit(time, TAP_R, noteArr);
+		}
+		if (getHittableNoteAtZero(time, TAP_B, noteArr)) {
+			hit(time, TAP_B, noteArr);
+		}
+
+		if (getHittableNoteAtZero(time, CROSS_G, cross)) {
+			hit(time, CROSS_G, cross);
+			if (m_cross == 2) {
+				m_cfBlueToCenter = true;
+			}
+			m_cfCenterToGreen = true;
+			m_cross = 0;
+		} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
+			hit(time, CROSS_C, cross);
+			if (m_cross == 0) {
+				m_cfGreenToCenter = true;
+			} else {
+				m_cfBlueToCenter = true;
+			}
+			m_cross = 1;
+		} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
+			hit(time, CROSS_B, cross);
+			if (m_cross == 0) {
+				m_cfGreenToCenter = true;
+			}
+			m_cfCenterToBlue = true;
+			m_cross = 2;
+		}
+
+		if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
+			hit(time, CF_SPIKE_G, noteArr);
+			if (m_cross == 2) {
+				m_cfCenterToBlue = true;
+			}
+			m_cfGreenToCenter = true;
+		} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
+			hit(time, CF_SPIKE_C, noteArr);
+			if (m_cross == 0) {
+				m_cfCenterToGreen = true;
+			} else {
+				m_cfCenterToBlue = true;
+			}
+		} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
+			hit(time, CF_SPIKE_B, noteArr);
+			if (m_cross == 0) {
+				m_cfCenterToGreen = true;
+			}
+			m_cfBlueToCenter = true;
+		}
+
+		if (getHittableNoteAtZero(time, SCR_G_UP, noteArr)) {
+			hit(time, SCR_G_UP, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_G_DOWN, noteArr)) {
+			hit(time, SCR_G_DOWN, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_G_ANY, noteArr)) {
+			hit(time, SCR_G_ANY, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_G_TICK, noteArr)) {
+			hit(time, SCR_G_TICK, noteArr);
+		}
+
+		if (getHittableNoteAtZero(time, SCR_B_UP, noteArr)) {
+			hit(time, SCR_B_UP, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_B_DOWN, noteArr)) {
+			hit(time, SCR_B_DOWN, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_B_ANY, noteArr)) {
+			hit(time, SCR_B_ANY, noteArr);
+		}
+		if (getHittableNoteAtZero(time, SCR_B_TICK, noteArr)) {
+			hit(time, SCR_B_TICK, noteArr);
+		}
+	}
+
+	m_gpHistory.push_back(m_gpState);
+	if (m_gpHistory.size() > m_historyLength) {
+		m_gpHistory.pop_front();
+	}
+}
+
+void Player::hit(double time, int noteType, std::vector<Note>& array) {
+	bool found = false;
+	//loop for every note
+	for (auto& note : array) {
+		//if there is a note in the clicker, add score
+		if (note.getHit() && !note.getTouched() && note.getType() == noteType) {
+			found = true;
+			if (noteType == TAP_G || noteType == TAP_R || noteType == TAP_B) {
+				m_score += 100 * m_mult;
+				//check for chords (i.e multiple taps in the same time)
+				if (note.getMilli() != m_past_tap) {
+					m_combo++;
+					m_past_tap = note.getMilli();
+				}
+			} else if (noteType == CROSS_G || noteType == CROSS_C || noteType == CROSS_B || noteType == CF_SPIKE_G || noteType == CF_SPIKE_C || noteType == CF_SPIKE_B) {
+				m_score += 100 * m_mult;
+				m_combo++;
+			} else if (noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
+				m_score += 100 * m_mult;
+				m_combo++;
+
+				m_pastScratch = note.getMilli();
+			} else if (noteType == SCR_G_TICK || noteType == SCR_B_TICK) {
+				m_score += 25 * m_mult;
+				m_scr_tick++;
+			}
+			note.click();
+
+			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
+				m_greenAnimation = true;
+			} else if (noteType == TAP_R) {
+				m_redAnimation = true;
+			} else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
+				m_blueAnimation = true;
+			}
+
+			break;
+		}
+	}
+	//if there isn't a note in the clicker, break combo
+	if (!found) {
+		breakCombo(time);
+	}
+}
+
+/*
 void Player::pollInput(GLFWwindow* window) {
 	m_pastCross = m_cross;
 	m_pastMouseX = m_nowMouseX;
@@ -148,8 +528,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break the combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true; //start animation
 			}
@@ -198,8 +577,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		} else {
 			m_redAnimation = true; //start animation
 		}
@@ -231,8 +609,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true; // start animation
 			}
@@ -297,8 +674,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	//cross right pressed/moved
@@ -339,8 +715,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't a note in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	//up pressed
@@ -373,8 +748,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true;
 			}
@@ -406,8 +780,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true;
 			}
@@ -443,8 +816,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_greenAnimation = true;
 			}
@@ -475,8 +847,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			}
 			//if there isn't a note in the clicker, break combo
 			if (!found) {
-				m_combo = 0;
-				m_eu_zone_active = false;
+				breakCombo(time);
 			} else {
 				m_blueAnimation = true;
 			}
@@ -550,8 +921,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't an event in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	if (m_wasCfBluePressed && !m_isCfBluePressed) {
@@ -597,8 +967,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 
 		//if there isn't an event in the clicker, break combo
 		if (!found) {
-			m_combo = 0;
-			m_eu_zone_active = false;
+			breakCombo(time);
 		}
 	}
 	if (m_euphoria_active) {
@@ -806,6 +1175,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		}
 	}
 }
+*/
 
 //update combo/multiplier for every frame
 void Player::tick(double time) {
@@ -846,6 +1216,14 @@ void Player::tick(double time) {
 
 	if (m_combo > m_highestCombo) {
 		m_highestCombo = m_combo;
+	}
+}
+
+void Player::breakCombo(double time) {
+	if (time > 0) {
+		m_combo = 0;
+		m_eu_zone_active = false;
+		m_hasPlayerBrokeOnce = true;
 	}
 }
 
@@ -929,33 +1307,18 @@ void Player::writeMappingFile() {
 
 void Player::updateKBMState(GLFWwindow* w) {
 	std::vector<float> KBMState = getKBMValues(w);
-	m_gpState.clear();
+	std::vector<float> localState;
 
-	m_gpState.push_back(KBMState.at(GREEN_CODE));
-	m_gpState.push_back(KBMState.at(RED_CODE));
-	m_gpState.push_back(KBMState.at(BLUE_CODE));
-	m_gpState.push_back(KBMState.at(EUPHORIA));
-	m_gpState.push_back(KBMState.at(CROSS_L_CODE));
-	m_gpState.push_back(KBMState.at(CROSS_R_CODE));
-	m_gpState.push_back(KBMState.at(SCRATCH_UP));
-	m_gpState.push_back(KBMState.at(SCRATCH_DOWN));
+	localState.push_back(KBMState.at(GREEN_CODE));
+	localState.push_back(KBMState.at(RED_CODE));
+	localState.push_back(KBMState.at(BLUE_CODE));
+	localState.push_back(KBMState.at(EUPHORIA));
+	localState.push_back(KBMState.at(CROSS_L_CODE));
+	localState.push_back(KBMState.at(CROSS_R_CODE));
+	localState.push_back(KBMState.at(SCRATCH_UP));
+	localState.push_back(KBMState.at(SCRATCH_DOWN));
 
-	/*if (glfwGetKey(w, GREEN_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, RED_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, BLUE_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, EUPHORIA))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, CROSS_L_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, CROSS_R_CODE))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, SCRATCH_UP))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);
-	if (glfwGetKey(w, SCRATCH_DOWN))m_gpState.push_back(1.0f);
-	else m_gpState.push_back(0.0f);*/
+	m_gpState = localState;
 }
 
 void Player::updateGamepadState() {
@@ -963,77 +1326,67 @@ void Player::updateGamepadState() {
 		int count;
 		const unsigned char* buttons = glfwGetJoystickButtons(m_gamepadId, &count);
 
-		std::vector<float> localGamepadState;
+		std::vector<float> gamepadAxes;
+		std::vector<float> localState;
 
 		for (int i = 0; i < count; ++i) {
 			if (buttons[i] == '\0') {
-				localGamepadState.push_back(0.0f);
+				gamepadAxes.push_back(0.0f);
 			} else {
-				localGamepadState.push_back(1.0f);
+				gamepadAxes.push_back(1.0f);
 			}
 		}
 		const float* axes = glfwGetJoystickAxes(m_gamepadId, &count);
 
 		for (int i = 0; i < count; ++i) {
-			localGamepadState.push_back(axes[i]);
+			gamepadAxes.push_back(axes[i]);
 		}
 
 		if (count > 0) {
-			m_gpState.clear();
 			GREEN_GAMEPAD = std::max(GREEN_GAMEPAD, 0);
-			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(GREEN_GAMEPAD));
+			GREEN_GAMEPAD = std::min(GREEN_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(GREEN_GAMEPAD));
 			RED_GAMEPAD = std::max(RED_GAMEPAD, 0);
-			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(RED_GAMEPAD));
+			RED_GAMEPAD = std::min(RED_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(RED_GAMEPAD));
 			BLUE_GAMEPAD = std::max(BLUE_GAMEPAD, 0);
-			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(BLUE_GAMEPAD));
+			BLUE_GAMEPAD = std::min(BLUE_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(BLUE_GAMEPAD));
 			EU_GAMEPAD = std::max(EU_GAMEPAD, 0);
-			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)localGamepadState.size() - 1);
-			m_gpState.push_back(localGamepadState.at(EU_GAMEPAD));
+			EU_GAMEPAD = std::min(EU_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(EU_GAMEPAD));
 
 			if (m_useSingleCfAxis) {
 				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
-				float value = localGamepadState.at(CF_LEFT_GAMEPAD);
-				m_gpState.push_back(-value);
-				m_gpState.push_back(value);
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				float value = gamepadAxes.at(CF_LEFT_GAMEPAD);
+				localState.push_back(-value);
+				localState.push_back(value);
 			} else {
 				CF_LEFT_GAMEPAD = std::max(CF_LEFT_GAMEPAD, 0);
-				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(CF_LEFT_GAMEPAD));
+				CF_LEFT_GAMEPAD = std::min(CF_LEFT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(CF_LEFT_GAMEPAD));
 				CF_RIGHT_GAMEPAD = std::max(CF_RIGHT_GAMEPAD, 0);
-				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(CF_RIGHT_GAMEPAD));
+				CF_RIGHT_GAMEPAD = std::min(CF_RIGHT_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(CF_RIGHT_GAMEPAD));
 			}
 
 			if (m_useSingleScrAxis) {
 				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
-				float value = localGamepadState.at(SCR_DOWN_GAMEPAD);
-				m_gpState.push_back(value);
-				m_gpState.push_back(-value);
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)gamepadAxes.size() - 1);
+				float value = gamepadAxes.at(SCR_DOWN_GAMEPAD);
+				localState.push_back(value);
+				localState.push_back(-value);
 			} else {
 				SCR_DOWN_GAMEPAD = std::max(SCR_DOWN_GAMEPAD, 0);
-				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(SCR_DOWN_GAMEPAD));
+				SCR_DOWN_GAMEPAD = std::min(SCR_DOWN_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(SCR_DOWN_GAMEPAD));
 				SCR_UP_GAMEPAD = std::max(SCR_UP_GAMEPAD, 0);
-				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)localGamepadState.size() - 1);
-				m_gpState.push_back(localGamepadState.at(SCR_UP_GAMEPAD));
+				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)gamepadAxes.size() - 1);
+				localState.push_back(gamepadAxes.at(SCR_UP_GAMEPAD));
 			}
 
-			//debug
-			/*
-			std::cout << m_gpState.at(GREEN_GAMEPAD) * m_gpMult.at(GREEN_GAMEPAD) << "|";
-			std::cout << m_gpState.at(RED_GAMEPAD) * m_gpMult.at(RED_GAMEPAD) << "|";
-			std::cout << m_gpState.at(BLUE_GAMEPAD) * m_gpMult.at(BLUE_GAMEPAD) << "|";
-			std::cout << m_gpState.at(EU_GAMEPAD) * m_gpMult.at(EU_GAMEPAD) << "|";
-			std::cout << m_gpState.at(CF_LEFT_GAMEPAD) * m_gpMult.at(CF_LEFT_GAMEPAD) << "|";
-			std::cout << m_gpState.at(CF_RIGHT_GAMEPAD-1) * m_gpMult.at(CF_RIGHT_GAMEPAD) << "|";
-			std::cout << m_gpState.at(SCR_UP_GAMEPAD) * m_gpMult.at(SCR_UP_GAMEPAD) << "|";
-			std::cout << m_gpState.at(SCR_DOWN_GAMEPAD-1) * m_gpMult.at(SCR_DOWN_GAMEPAD) << std::endl;
-			*/
+			m_gpState = localState;
 		}
 	}
 }
@@ -1042,26 +1395,13 @@ void Player::reset() {
 	m_isRedPressed = false;
 	m_isGreenPressed = false;
 	m_isBluePressed = false;
-	m_isUpPressed = false;
-	m_isDownPressed = false;
-	m_isCfGreenPressed = false;
-	m_isCfBluePressed = false;
-	m_isEuPressed = false;
-
-	m_wasRedPressed = false;
-	m_wasGreenPressed = false;
-	m_wasBluePressed = false;
-	m_wasUpPressed = false;
-	m_wasDownPressed = false;
-	m_wasCfGreenPressed = false;
-	m_wasCfBluePressed = false;
 
 	m_greenAnimation = false;
 	m_redAnimation = false;
 	m_blueAnimation = false;
 
 	m_cross = 1;
-	m_pastCross = 1;
+	m_hasPlayerBrokeOnce = false;
 
 	m_score = 0;
 	m_mult = 1;
@@ -1081,8 +1421,7 @@ void Player::reset() {
 //poll reset signals from generator
 void Player::pollState(Generator& g) {
 	if (g.m_combo_reset) {
-		m_combo = 0;
-		m_eu_zone_active = false;
+		breakCombo(1.0);
 	}
 	if (g.m_eu_start) {
 		m_eu_zone_active = true;
@@ -1100,7 +1439,7 @@ void Player::pollState(Generator& g) {
 }
 
 //utility functions
-std::vector<float> Player::getGamepadValues() {
+std::vector<float> Player::getGamepadValues() const {
 	std::vector<float> localGamepadState = {};
 	if (glfwJoystickPresent(m_gamepadId)) {
 		int count;
@@ -1145,45 +1484,138 @@ std::vector<float> Player::getKBMValues(GLFWwindow* w) {
 	return localState;
 }
 
-int Player::getScore() {
+bool Player::getRisingEdge(int index) {
+	bool complete = true;
+	for (auto& vec : m_gpHistory) {
+		if (vec.size() < 8) {
+			complete = false;
+			break;
+		}
+	}
+	if (m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpDead.size() >= 8 && m_gpHistory.size() >= m_historyLength && complete) {
+		float val = m_gpState.at(index) * m_gpMult.at(index);
+		float prev = m_gpHistory.back().at(index) * m_gpMult.at(index);
+		float deadzone = m_gpDead.at(index);
+		return (prev < deadzone && val >= deadzone);
+	} else {
+		return false;
+	}
+}
+
+bool Player::getFallingEdge(int index) {
+	if (!m_gpState.empty() && !m_gpMult.empty() && !m_gpDead.empty() && !m_gpHistory.empty()) {
+		float val = m_gpState.at(index) * m_gpMult.at(index);
+		float prev = m_gpHistory.back().at(index) * m_gpMult.at(index);
+		float deadzone = m_gpDead.at(index);
+		return (prev > deadzone && val <= deadzone);
+	} else {
+		return false;
+	}
+}
+
+bool Player::getFallingZero(int index) {
+	bool complete = true;
+	for (auto& vec : m_gpHistory) {
+		if (vec.size() < 8) {
+			complete = false;
+			break;
+		}
+	}
+	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+		float minVelocity = -1.0;
+		std::vector<float> averages;
+		size_t i;
+		for (i = 0; i < m_gpHistory.size() - 2; ++i) {
+			averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpHistory.at(i + 2).at(index)) * m_gpMult.at(index) / 3);
+		}
+		//i is now 2
+		averages.push_back((m_gpHistory.at(i).at(index) + m_gpHistory.at(i + 1).at(index) + m_gpState.at(index)) * m_gpMult.at(index) / 3);
+		for (size_t i = averages.size() - 1; i >= 2; --i) {
+			float v2 = averages.at(i) - averages.at(i - 1);
+			float v1 = averages.at(i - 1) - averages.at(i - 2);
+			if (v1 >= 0 && v2 < 0 && (v2 - v1) >= minVelocity) {
+				return true;
+			}
+		}
+		return false;
+	} else {
+		return false;
+	}
+}
+
+bool Player::getHittableNote(int noteType, std::vector<Note>& array) {
+	bool found = false;
+	for (const auto& note : array) {
+		if (note.getHit() && !note.getTouched() && note.getType() == noteType) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+bool Player::getHittableNoteAtZero(double time, int noteType, std::vector<Note>& array) {
+	bool found = false;
+	for (const auto& note : array) {
+		if (note.getMilli() < time && !note.getTouched() && note.getType() == noteType) {
+			found = true;
+			break;
+		}
+	}
+	return found;
+}
+
+bool Player::isAxisAboveDeadzone(int index) const {
+	if (m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpDead.size() >= 8) {
+		return m_gpState.at(index) * m_gpMult.at(index) >= m_gpDead.at(index);
+	} else {
+		return false;
+	}
+}
+
+int Player::getScore() const {
 	return m_score;
 }
 
-int Player::getCombo() {
+int Player::getCombo() const {
 	return m_combo;
 }
 
-int Player::getHighCombo() {
+int Player::getHighCombo() const {
 	return m_highestCombo;
 }
 
-int Player::getMult() {
+int Player::getMult() const {
 	return m_mult;
 }
 
-int Player::getCross() {
+int Player::getCross() const {
 	return m_cross;
 }
 
-bool Player::getRedClicker() {
+bool Player::getBrokeOnce() const {
+	return m_hasPlayerBrokeOnce;
+}
+
+bool Player::getRedClicker() const {
 	return m_isRedPressed;
 }
 
-bool Player::getGreenClicker() {
+bool Player::getGreenClicker() const {
 	return m_isGreenPressed;
 }
 
-bool Player::getBlueClicker() {
+bool Player::getBlueClicker() const {
 	return m_isBluePressed;
 }
 
-double Player::getEuValue() {
+double Player::getEuValue() const {
 	return m_eu_value;
 }
 
-bool Player::getEuActive() {
+bool Player::getEuActive() const {
 	return m_euphoria_active;
 }
-bool Player::getEuZoneActive() {
+bool Player::getEuZoneActive() const {
 	return m_eu_zone_active;
 }

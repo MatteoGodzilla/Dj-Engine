@@ -1,5 +1,5 @@
 # Build files and folder
-build-dir/
+build/
 *.dll
 *.exe
 Dj-Engine
@@ -16,4 +16,6 @@ songs/*
 
 # local log files
 error.txt
+error.log
 log.txt
+log.log
