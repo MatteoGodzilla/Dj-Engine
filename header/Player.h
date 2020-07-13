@@ -51,8 +51,11 @@ public:
 	bool getRisingEdge(int index);
 	bool getFallingEdge(int index);
 	bool getFallingZero(int index);
+	bool getWaveTop(int index);
+	bool getWaveRising(int index);
 	static bool getHittableNote(int noteType, std::vector<Note>& array);
 	static bool getHittableNoteAtZero(double time, int noteType, std::vector<Note>& array);
+	static bool getScratchZoneActive(double time, int zoneType, std::vector<Note>& events);
 	bool isAxisAboveDeadzone(int index) const;
 	void tick(double time);
 	void reset();
@@ -125,9 +128,10 @@ private:
 	int m_mult = 1;
 	int m_combo = 0;
 	int m_scr_tick = 0;
+	int m_cross_tick = 0;
 	double m_past_tap = -1;
 	double m_pastScratch = -1;
-	double m_scratchDebounce = 0.10;
+	double m_scratchDebounce = 0.5;
 	double m_eu_value = 0;
 	bool m_eu_zone_active = false;
 	bool m_euphoria_active = false;

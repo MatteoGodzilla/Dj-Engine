@@ -16,6 +16,7 @@ void Game::init(GLFWwindow* w) {
 	m_deckSpeed = ini.GetDoubleValue(section, "noteVisible", 1.0);
 	m_isButtonsRight = ini.GetBoolValue(section, "buttonsRight", false);
 	m_debugView = ini.GetBoolValue(section, "debugView", false);
+	m_inputThreadPollRate = ini.GetLongValue(section, "pollRate", 240);
 
 	m_render.m_greenLaneActiveColor.r = ini.GetDoubleValue(section, "greenLaneActiveR", 0.133333);
 	m_render.m_greenLaneActiveColor.g = ini.GetDoubleValue(section, "greenLaneActiveG", 0.874510);
@@ -85,6 +86,12 @@ void Game::inputThreadFun(Game* game) {
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		milliseconds delta = duration_cast<milliseconds>(end - start);
 		//stop timer
+
+		if (glfwGetKey(game->getGameRender()->getWindowPtr(), GLFW_KEY_ESCAPE)) {
+			game->m_mode = 1;
+			game->m_audio.stop();
+			game->m_active = false;
+		}
 
 		std::this_thread::sleep_for(milliseconds(1000 / game->m_inputThreadPollRate) - delta);
 		//wait time before next input frame
@@ -192,6 +199,7 @@ void Game::writeConfig() {
 	ini.SetDoubleValue(section, "noteVisible", m_deckSpeed);
 	ini.SetBoolValue(section, "buttonsRight", m_isButtonsRight);
 	ini.SetBoolValue(section, "debugView", m_debugView);
+	ini.SetLongValue(section, "pollRate", m_inputThreadPollRate);
 
 	ini.SetDoubleValue(section, "greenLaneActiveR", m_render.m_greenLaneActiveColor.r);
 	ini.SetDoubleValue(section, "greenLaneActiveG", m_render.m_greenLaneActiveColor.g);

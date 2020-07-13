@@ -19,3 +19,6 @@ error.txt
 error.log
 log.txt
 log.log
+
+#imgui config files
+imgui.ini

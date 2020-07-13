@@ -21,7 +21,9 @@ enum note {
 	SCR_B_TICK,
 	SCR_G_ZONE,
 	SCR_B_ZONE,
-	EU_ZONE
+	EU_ZONE,
+	CROSS_G_TICK,
+	CROSS_B_TICK
 };
 
 class Note {

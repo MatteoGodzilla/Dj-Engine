@@ -10,15 +10,15 @@ size_t findIndex(MenuNode& element, MenuNode& parent) {
 	return 0xffffffff;
 }
 
-MenuNode* getNodePtrById(MenuNode* node, int id){
+MenuNode* getNodePtrById(MenuNode* node, int id) {
 	//super mega iper proud of this function
 	//and i wrote this the first time correctly lol
-	if(node->getId() == id) {
+	if (node->getId() == id) {
 		return node;
-	} else if(!node->getChildrens().empty()){
-		for(auto& child : node->getChildrens()){
-			MenuNode* p = getNodePtrById(&child,id);
-			if(p != nullptr){
+	} else if (!node->getChildrens().empty()) {
+		for (auto& child : node->getChildrens()) {
+			MenuNode* p = getNodePtrById(&child, id);
+			if (p != nullptr) {
 				return p;
 			}
 		}
@@ -181,7 +181,7 @@ void MenuNavigator::pollInput() {
 
 	if (m_wasBackPressed && !m_isBackPressed) {
 		if (m_popupId != -1) {
-			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
+			if (m_popupId == HIGHWAY_SPEED || m_popupId == POLLRATE_CHANGE) {
 				writeConfigFile();
 				if (m_popupId == HIGHWAY_SPEED) {
 					m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
@@ -207,12 +207,12 @@ void MenuNavigator::pollInput() {
 
 	if (m_render.m_shouldClose) {
 		if (m_popupId != -1) {
-			if (m_popupId == HIGHWAY_SPEED || m_popupId == LANE_COLORS) {
+			if (m_popupId == HIGHWAY_SPEED || m_popupId == POLLRATE_CHANGE) {
 				writeConfigFile();
 				if (m_popupId == HIGHWAY_SPEED) {
-					getNodePtrById(&m_root,SPEED_ID)->setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+					getNodePtrById(&m_root, SPEED_ID)->setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
 				} else if (m_popupId == POLLRATE_CHANGE) {
-					getNodePtrById(&m_root,POLL_ID)->setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
+					getNodePtrById(&m_root, POLL_ID)->setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
 				}
 			}
 			m_popupId = -1;
@@ -447,13 +447,13 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 	} else if (id == LR_BUTTONS_ID) {
 		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
 		//update options node text
-		getNodePtrById(&m_root,LR_BUTTONS_ID)->setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
+		getNodePtrById(&m_root, LR_BUTTONS_ID)->setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
 	} else if (id == BOT_ID) {
 		m_game->getPlayer()->m_botEnabled = !m_game->getPlayer()->m_botEnabled;
-		getNodePtrById(&m_root,BOT_ID)->setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
+		getNodePtrById(&m_root, BOT_ID)->setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
 		m_game->m_debugView = !m_game->m_debugView;
 		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));

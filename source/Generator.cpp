@@ -110,25 +110,25 @@ void Generator::initialLoad() {
 			//decode type from entry
 			if (type == 0) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, TAP_G, 0.0, false);
+				m_allTaps.emplace_back(time, TAP_G, length, false);
 			} else if (type == 1) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, TAP_B, 0.0, false);
+				m_allTaps.emplace_back(time, TAP_B, length, false);
 			} else if (type == 2) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, TAP_R, 0.0, false);
+				m_allTaps.emplace_back(time, TAP_R, length, false);
 			} else if (type == 3) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, SCR_G_UP, 0.0, false);
+				m_allTaps.emplace_back(time, SCR_G_UP, length, false);
 			} else if (type == 4) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, SCR_B_UP, 0.0, false);
+				m_allTaps.emplace_back(time, SCR_B_UP, length, false);
 			} else if (type == 5) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, SCR_G_DOWN, 0.0, false);
+				m_allTaps.emplace_back(time, SCR_G_DOWN, length, false);
 			} else if (type == 6) {
 				m_baseScore += 400;
-				m_allTaps.emplace_back(time, SCR_B_DOWN, 0.0, false);
+				m_allTaps.emplace_back(time, SCR_B_DOWN, length, false);
 			} else if (type == 7) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_G_ANY, length, false);
@@ -157,6 +157,9 @@ void Generator::initialLoad() {
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
 				m_allCross.emplace_back(time, CROSS_B, 0.0, true);
+				for (double i = 15 / m_bpm; i < length; i += 15 / m_bpm) {
+					m_allCross.emplace_back(time + i, CROSS_B_TICK, 0.0, false);
+				}
 			} else if (type == 10) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
@@ -169,6 +172,9 @@ void Generator::initialLoad() {
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
 				m_allCross.emplace_back(time, CROSS_G, 0.0, true);
+				for (double i = 15 / m_bpm; i < length; i += 15 / m_bpm) {
+					m_allCross.emplace_back(time + i, CROSS_G_TICK, 0.0, false);
+				}
 			} else if (type == 15) {
 				m_allEvents.emplace_back(time, EU_ZONE, length, true);
 			} else if (type == 20 || type == 48) {
