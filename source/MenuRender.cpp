@@ -9,7 +9,6 @@ void MenuRender::init(GLFWwindow* w) {
 		std::cout << "GLEW INIT ERROR" << std::endl;
 		return;
 	}
-	setTextColor(0.9f, 0.9f, 0.9f, 1.0f);
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 	loadTexture("res/buttons.png", &m_buttonTexture);
 	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);

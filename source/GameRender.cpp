@@ -439,7 +439,6 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							int prevType = cfs.at(i - 1).getType();
 							int nowType = cfs.at(i).getType();
 
-							double prevMilli = cfs.at(i - 1).getMilli();
 							double nowMilli = cfs.at(i).getMilli();
 
 							if (nowMilli >= time && nowMilli < time + m_noteVisibleTime) {
