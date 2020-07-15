@@ -129,6 +129,7 @@ bool Audio::isActive(double time) const {
 
 Audio::~Audio() {
 	alSourceStop(m_source);
+	alDeleteSources(1,&m_source);
 	ov_clear(&m_oggFile);
 	alcCloseDevice(m_device);
 }

@@ -8,6 +8,17 @@
 #include <string>
 #include <vector>
 
+struct Vertex{
+	Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_);
+	Vertex(glm::vec3 pos_, glm::vec2 tex_);
+	Vertex(glm::vec3 pos_, glm::vec4 col_);
+	Vertex(glm::vec3 pos_);
+
+	glm::vec3 pos;
+	glm::vec4 col;
+	glm::vec2 tex;
+};
+
 class Rendr {
 public:
 	void init(GLFWwindow* w);
@@ -25,8 +36,9 @@ protected:
 
 	void pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a = 1.0, float s = 0.0, float t = 0.0) const;
 	void pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t, float r = 1.0, float g = 1.0, float b = 1.0, float a = 1.0) const;
-	void pushVertex(std::vector<float>& v, glm::vec3 pos, glm::vec4 color, glm::vec2 texCoords) const;
-	static void pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value);
+	void pushVertex(std::vector<float>& v, Vertex& vertex) const;
+	void pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4);
+	static void pushQuadIndices(std::vector<unsigned int>& v, unsigned int& value);
 	static void pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 
 	static glm::vec2 loadTexture(const std::string& s, unsigned int* destination);

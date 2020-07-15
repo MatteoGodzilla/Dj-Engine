@@ -87,7 +87,7 @@ void Game::inputThreadFun(Game* game) {
 		milliseconds delta = duration_cast<milliseconds>(end - start);
 		//stop timer
 
-		if (glfwGetKey(game->getGameRender()->getWindowPtr(), GLFW_KEY_ESCAPE)) {
+		if (glfwGetKey(game->getGameRender()->getWindowPtr(), GLFW_KEY_ESCAPE) && game->m_active) {
 			game->m_mode = 1;
 			game->m_audio.stop();
 			game->m_active = false;

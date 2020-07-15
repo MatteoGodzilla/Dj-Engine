@@ -299,13 +299,14 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	if (!cross.empty()) {
 		for (size_t i = 0; i < cross.size() - 1; i++) {
 			cross.at(i).tick(time);
+			int type = cross.at(i).getType();
 
 			double next_time = cross.at(i + 1).getMilli();
 			//if the next crossfader has crossed the clickers
 			if (next_time + 0.15 <= time) {
 				if (cross.at(i).getTouched()) {
 					m_notesHit++;
-				} else {
+				} else if(type != CROSS_G_TICK && type != CROSS_B_TICK){
 					m_combo_reset = true;
 				}
 				m_notesTotal++;

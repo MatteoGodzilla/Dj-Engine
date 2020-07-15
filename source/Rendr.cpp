@@ -15,6 +15,30 @@ struct CharTextureData {
 
 std::map<char, CharTextureData> ChMap;
 
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_){
+	pos = pos_;
+	col = col_;
+	tex = tex_;
+}
+
+Vertex::Vertex(glm::vec3 pos_, glm::vec2 tex_){
+	pos = pos_;
+	col = {1.0,1.0,1.0,1.0};
+	tex = tex_;
+}
+
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_){
+	pos = pos_;
+	col = col_;
+	tex = {0.0,0.0};
+}
+
+Vertex::Vertex(glm::vec3 pos_){
+	pos = pos_;
+	col = {1.0,1.0,1.0,1.0};
+	tex = {0.0,0.0};
+}
+
 void Rendr::checkError() {
 	std::cout << "started error checking" << std::endl;
 	GLenum error = glGetError();
@@ -24,6 +48,7 @@ void Rendr::checkError() {
 	}
 	std::cout << "ended error checking" << std::endl;
 }
+
 
 //utility function
 void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a, float s, float t) const {
@@ -59,24 +84,32 @@ void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, 
 	v.push_back(t);
 }
 
-void Rendr::pushVertex(std::vector<float>& v, glm::vec3 pos, glm::vec4 color, glm::vec2 texCoords) const {
+//utility function
+void Rendr::pushVertex(std::vector<float>& v, Vertex& ver) const {
 	if (rendr_InvertedX) {
-		v.push_back(-pos.x);
+		v.push_back(-ver.pos.x);
 	} else {
-		v.push_back(pos.x);
+		v.push_back(ver.pos.x);
 	}
-	v.push_back(pos.y);
-	v.push_back(pos.z);
-	v.push_back(color.r);
-	v.push_back(color.g);
-	v.push_back(color.b);
-	v.push_back(color.a);
-	v.push_back(texCoords.x);
-	v.push_back(texCoords.y);
+	v.push_back(ver.pos.y);
+	v.push_back(ver.pos.z);
+	v.push_back(ver.col.r);
+	v.push_back(ver.col.g);
+	v.push_back(ver.col.b);
+	v.push_back(ver.col.a);
+	v.push_back(ver.tex.s);
+	v.push_back(ver.tex.t);
+}
+
+void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4){
+	pushVertex(v,ver1);
+	pushVertex(v,ver2);
+	pushVertex(v,ver3);
+	pushVertex(v,ver4);
 }
 
 //utility function
-void Rendr::pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
+void Rendr::pushQuadIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
 	v.push_back(value + 2);
@@ -228,7 +261,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 		pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
-		pushRectangleIndices(textIndices, textVertexCount);
+		pushQuadIndices(textIndices, textVertexCount);
 
 		useOrthoProj();
 		renderText(textVector, textIndices, temp.TextureID);
