@@ -28,7 +28,7 @@ pacman -Su
 To install all the required tools and libraries you just have to run the following command in a MSYS2 shell.
 
 ``` bash
-pacman -S mingw-w64-x86_64-gcc cmake make mingw-w64-x86_64-clang mingw-w64-x86_64-clang-tools-extra mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-x86_64-libvorbis mingw-w64-x86_64-mesa mingw-w64-x86_64-openal
+pacman -S mingw-w64-x86_64-gcc cmake make mingw-w64-x86_64-clang mingw-w64-x86_64-clang-tools-extra mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-x86_64-libvorbis mingw-w64-x86_64-mesa mingw-w64-x86_64-portaudio
 ```
 
 (MSYS2 has some dependency problems with clang-tidy and to fix it both gcc and clang need to be installed)

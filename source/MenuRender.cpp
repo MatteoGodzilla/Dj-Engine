@@ -1003,17 +1003,16 @@ void MenuRender::calibration(Game* game, double dt) {
 
 	if (ImGui::Button("Calibrate")) {
 		m_isCalibrating = true;
-		game->getAudio()->reset();
 		m_cbPlayingTime = 0.0;
 		m_latencyHits.clear();
+		game->getAudio()->init();
 		game->getAudio()->load("res/calibration.ogg");
 		game->getAudio()->play();
 	}
 	if (game->getAudio()->isPlaying()) {
-		game->getAudio()->buffer(m_cbPlayingTime);
 		m_cbPlayingTime += dt;
 	} else {
-		game->getAudio()->reset();
+		game->getAudio()->destroy();
 		m_isCalibrating = false;
 		m_cbPlayingTime = 0.0;
 

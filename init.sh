@@ -13,7 +13,7 @@ cp /mingw64/bin/libharfbuzz-0.dll .
 cp /mingw64/bin/libiconv-2.dll .
 cp /mingw64/bin/libintl-8.dll .
 cp /mingw64/bin/libogg-0.dll . 
-cp /mingw64/bin/libopenal-1.dll . 
+cp /mingw64/bin/libportaudio-2.dll .
 cp /mingw64/bin/libpcre-1.dll . 
 cp /mingw64/bin/libpng16-16.dll . 
 cp /mingw64/bin/libstdc++-6.dll . 

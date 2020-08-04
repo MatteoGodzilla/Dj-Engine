@@ -106,9 +106,10 @@ void Game::tick() {
 			m_gen.m_deckSpeed = m_deckSpeed;
 
 			m_render.pollState(m_global_time, m_player, m_gen);
-			m_audio.buffer(m_global_time);
-			if (m_global_time >= (double)-m_audioLatency) {
+
+			if (m_global_time >= (double)-m_audioLatency && !audioStartedOnce) {
 				m_audio.play();
+				audioStartedOnce = true;
 			}
 
 			//add delta time to m_global_time
@@ -117,7 +118,7 @@ void Game::tick() {
 			m_global_time += m_deltaTime;
 			m_pastTime = nowTime;
 		}
-		if (!m_audio.isActive(m_global_time)) {
+		if (m_global_time > m_audioLength && audioStartedOnce) {
 			m_mode = 1;
 			m_audio.stop();
 			m_active = false;
@@ -157,7 +158,7 @@ void Game::reset() {
 
 	m_global_time = -2.0f;
 	m_active = false;
-	firstRun = true;
+	audioStartedOnce = false;
 	m_mode = 0;
 
 	m_player.m_deltaMouse = false;
@@ -165,7 +166,7 @@ void Game::reset() {
 	m_render.reset();
 	m_gen.reset();
 	m_player.reset();
-	m_audio.reset();
+	m_audio.destroy();
 }
 
 void Game::setButtonPos(bool value) {
@@ -183,7 +184,10 @@ void Game::start(const SongEntry& entry) {
 	m_global_time = -2.0f;
 
 	std::string audioPath = entry.path + std::string("/song.ogg");
-	m_audio.load(audioPath.c_str());
+	m_audio.init();
+	m_audio.load(audioPath);
+
+	m_audioLength = m_audio.getFileLength();
 
 	m_gen.init(entry);
 	m_bpm_arr.push_back(0.0);

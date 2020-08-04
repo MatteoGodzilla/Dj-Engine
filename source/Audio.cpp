@@ -1,135 +1,127 @@
 #include "Audio.h"
 
-Audio::Audio() {
-	m_device = alcOpenDevice(nullptr);
-	if (m_device != nullptr) {
-		m_context = alcCreateContext(m_device, nullptr);
-		if (m_context != nullptr) {
-			//initialize audio
-			alcMakeContextCurrent(m_context);
-			alGenSources(1, &m_source);
-			alGenBuffers(1, &m_buffer);
-			alListener3f(AL_POSITION, 0.0, 0.0, 0.0);
-			alSource3f(m_source, AL_POSITION, 0.0, 0.0, 0.0);
+void checkError(PaError code){
+	if(code != paNoError){
+		std::cerr << "PortAudio Error:" << Pa_GetErrorText(code) << std::endl;
+		Pa_Terminate();
+		exit(1);
+	}
+}
+
+void fillBuffer(Audio* audio){
+	size_t bufferLoad = 2048;
+	while(audio->loaderThreadRunning){
+		if(audio->getLength() + bufferLoad < MAX_SIZE){
+			float **pcm;
+			int samples = ov_read_float(&audio->file,&pcm,bufferLoad,&audio->bitstream);
+			if(samples == 0) {
+				audio->stop();
+			} else if (samples > 0){
+				for(int i = 0; i < samples; ++i){
+					/*  audio layout
+						channel = left:0, right:1
+						pcm[channel][sample_index];
+					*/
+					audio->push(pcm[0][i]);
+					audio->push(pcm[1][i]);
+				}
+			}
+			//std::cout << (audio->writeIndex < audio->readindex ? audio->writeIndex + MAX_SIZE:audio->writeIndex) - audio->readindex << "\t" << audio->getLength()<< std::endl;
 		}
 	}
+	std::cout << "Audio Message: Loader thread stopped" << std::endl;
 }
 
-void Audio::load(const char* filename) {
-	if (ov_fopen(filename, &m_oggFile) == 0 && firstRun) {
-		std::cout << "Audio msg: successfully loaded 'song.ogg'" << std::endl;
-		//initial song load to kickstart the streaming
+int PACallback(const void* input, void *output,unsigned long framecount,const PaStreamCallbackTimeInfo* timeInfo,PaStreamCallbackFlags flags, void* userdata){
+	Audio* obj = (Audio*)userdata;
+	float* out = (float*) output;
 
-		unsigned int b = 0; //pointer never used
-		vorbis_info* info;
+	for(size_t i=0; i<framecount; i++ )
+	{
+		float first = 0.0f;
+		float second = 0.0f;
+		if(obj->getLength() > 2){
+			first = obj->pop();
+			second = obj->pop();
+		}
+		*out = first;
+		out++;
+		*out = second;
+		out++;
+	}
+	//std::cout << framecount << std::endl;
+	return 0;
+}
 
-		info = ov_info(&m_oggFile, -1);
-		m_frequency = info->rate;
-		m_songLength = ov_time_total(&m_oggFile, -1);
-
-		setupBuffers();
-		buffer(0.0);
-	} else {
-		std::cerr << "Audio Error: Cannot load 'song.ogg'" << std::endl;
+void Audio::init(){
+	if(!initialized){
+		checkError(Pa_Initialize());
+		buffer.fill(0.0f);
+		initialized = true;
 	}
 }
 
-void Audio::buffer(double time) {
-	unsigned int bufferRemoved = 0;
-	int processed = 0;
-	std::array<char, 4096> bufferData;
-	int bytesRead = 0;
+void Audio::load(std::string path){
+	ov_fopen(path.c_str(),&file);
 
-	if (time > ov_time_tell(&m_oggFile)) {
-		ov_time_seek_lap(&m_oggFile, time);
-		removeBuffers();
-		setupBuffers();
-	}
+	vorbis_info *info;
+	info = ov_info(&file,-1);
 
-	//get already processed buffers
-	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &processed);
+	ov_time_seek(&file,0.0);
 
-	//upload buffers until all are processed
-	while (processed > 0) {
-		alSourceUnqueueBuffers(m_source, 1, &bufferRemoved);
+	loaderThreadRunning = true;
+	loader = std::thread(fillBuffer,this);
 
-		//read and upload
-		bytesRead = ov_read(&m_oggFile, bufferData.data(), 4096, 0, 2, 1, &m_currentSection);
-		alBufferData(bufferRemoved, AL_FORMAT_STEREO16, bufferData.data(), bytesRead, m_frequency);
-		alSourceQueueBuffers(m_source, 1, &bufferRemoved);
+	checkError(Pa_OpenDefaultStream(&audioStream,0,2,paFloat32,info->rate,paFramesPerBufferUnspecified,PACallback,this));
+}
 
-		processed--;
+void Audio::play(){
+	if(!Pa_IsStreamActive(audioStream)){
+		checkError(Pa_StartStream(audioStream));
+		playing = true;
 	}
 }
 
-void Audio::setupBuffers() const {
-	int buffers = 0;
-	unsigned int b;
-	alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
-	while (buffers < 50) {
-		//temporary buffer
-		alGenBuffers(1, &b);
-		//upload
-		alBufferData(b, AL_FORMAT_STEREO16, nullptr, 0, m_frequency);
-		alSourceQueueBuffers(m_source, 1, &b);
-		//remove temporary buffer
-		//alDeleteBuffers(1, &b);
-		alGetSourcei(m_source, AL_BUFFERS_QUEUED, &buffers);
+void Audio::stop(){
+	if(Pa_IsStreamActive(audioStream)){
+		checkError(Pa_StopStream(audioStream));
+		playing = false;
+		loaderThreadRunning = false;
 	}
 }
 
-void Audio::removeBuffers() const {
-	int queue;
-	unsigned int bufferPointer;
-	alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &queue);
-	while (queue > 0) {
-		alSourceUnqueueBuffers(m_source, 1, &bufferPointer);
-		alDeleteBuffers(1, &bufferPointer);
+bool Audio::isPlaying(){
+	return playing;
+}
 
-		alGetSourcei(m_source, AL_BUFFERS_PROCESSED, &queue);
+void Audio::push(float value){
+	buffer[writeIndex] = value;
+	writeIndex++;
+	if(writeIndex >= MAX_SIZE) writeIndex = 0;
+}
+
+float Audio::pop(){
+	float ret = buffer[readIndex];
+	readIndex++;
+	if(readIndex >= MAX_SIZE) readIndex = 0;
+	return ret;
+}
+
+size_t Audio::getLength(){
+	return (writeIndex < readIndex ? writeIndex + MAX_SIZE:writeIndex) - readIndex;
+}
+
+double Audio::getFileLength(){
+	return ov_time_total(&file,-1);
+}
+
+void Audio::destroy(){
+	if(initialized){
+		if(playing) stop();
+		checkError(Pa_CloseStream(audioStream));
+		loader.join();
+		ov_clear(&file);
+		checkError(Pa_Terminate());
+		initialized = false;
 	}
-}
-
-void Audio::reset() {
-	stop();
-	removeBuffers();
-	firstRun = true;
-	m_frequency = 0;
-	m_currentSection = 0;
-	m_songLength = 0.0;
-
-	//reset audio source
-	alDeleteSources(1, &m_source);
-	alGenSources(1, &m_source);
-	alSource3f(m_source, AL_POSITION, 0.0, 0.0, 0.0);
-}
-
-void Audio::play() {
-	int state;
-	alGetSourcei(m_source, AL_SOURCE_STATE, &state);
-	if (state == AL_STOPPED || firstRun) {
-		alSourcePlay(m_source);
-		firstRun = false;
-	}
-}
-
-bool Audio::isPlaying() const {
-	int result = 0;
-	alGetSourcei(m_source, AL_SOURCE_STATE, &result);
-	return result == AL_PLAYING;
-}
-
-void Audio::stop() const {
-	alSourceStop(m_source);
-}
-
-bool Audio::isActive(double time) const {
-	return time < m_songLength;
-}
-
-Audio::~Audio() {
-	alSourceStop(m_source);
-	alDeleteSources(1,&m_source);
-	ov_clear(&m_oggFile);
-	alcCloseDevice(m_device);
 }
