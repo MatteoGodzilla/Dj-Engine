@@ -262,7 +262,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	float height = 0.025;
 
 	if (!v.empty()) {
-		for (int i = v.size() - 1; i >= 0; i--) {
+		for (size_t i = v.size() - 1; i >= 0 && i < v.size(); i--) {
 			Note& note = v.at(i);
 			double milli = note.getMilli();
 			if (time + m_noteVisibleTime > milli) {
@@ -311,10 +311,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							glm::vec2 outer = getCirclePoint((double)m_radius + trailWidth, (double)angle);
 							glm::vec2 inner = getCirclePoint((double)m_radius - trailWidth, (double)angle);
 
-							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -BeforeInner.x + center.x, plane, -BeforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y));
-							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y));
+							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -BeforeInner.x + center.x, plane, -BeforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y));
+							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y));
 							pushQuadIndices(noteIndices, noteVertexCount);
 
 							beforeOuter = outer;
@@ -327,10 +327,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 						glm::vec2 outer = getCirclePoint((double)m_radius + trailWidth, (double)endAngle + trailEndAngle);
 						glm::vec2 inner = getCirclePoint((double)m_radius - trailWidth, (double)endAngle + trailEndAngle);
 
-						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -BeforeInner.x + center.x, plane, -BeforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y));
-						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0 - (trailEnd.y));
+						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -BeforeInner.x + center.x, plane, -BeforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y));
+						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0f - (trailEnd.y));
 						pushQuadIndices(noteIndices, noteVertexCount);
 					}
 
@@ -425,10 +425,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 								outer = getCirclePoint((double)m_radius + 0.5f + trailWidth, (double)angle);
 								inner = getCirclePoint((double)m_radius + 0.5f - trailWidth, (double)angle);
 							}
-							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y));
-							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y));
+							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y));
+							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y));
 							pushQuadIndices(noteIndices, noteVertexCount);
 
 							beforeOuter = outer;
@@ -458,56 +458,56 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 								glm::vec2 jointBottomRight = getCirclePoint(m_radius + 0.5f - trailWidth, nearAngle);
 
 								if (prevType == CROSS_C && nowType == CROSS_G) {
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushQuadIndices(noteIndices, noteVertexCount);
 
 									// counter-clockwise rotation
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 
 									//clockwise rotation
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 								} else if (prevType == CROSS_G && nowType == CROSS_C) {
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w); //
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
 									pushQuadIndices(noteIndices, noteVertexCount);
 
 									// counter-clockwise rotation
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 
 									//clockwise rotation
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 								}
 							}
@@ -524,10 +524,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							outer = getCirclePoint((double)m_radius + 0.5f + trailWidth, (double)endAngle + trailEndAngle);
 							inner = getCirclePoint((double)m_radius + 0.5f - trailWidth, (double)endAngle + trailEndAngle);
 						}
-						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y));
-						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0 - (trailEnd.y));
+						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y));
+						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0f - (trailEnd.y));
 						pushQuadIndices(noteIndices, noteVertexCount);
 					}
 
@@ -622,10 +622,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 								outer = getCirclePoint((double)m_radius - 0.5f + trailWidth, (double)angle);
 								inner = getCirclePoint((double)m_radius - 0.5f - trailWidth, (double)angle);
 							}
-							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y + trailMiddle.w));
-							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - (trailMiddle.y));
-							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0 - (trailMiddle.y));
+							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
+							pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y));
+							pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y));
 							pushQuadIndices(noteIndices, noteVertexCount);
 
 							beforeOuter = outer;
@@ -638,7 +638,6 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							int prevType = cfs.at(i - 1).getType();
 							int nowType = cfs.at(i).getType();
 
-							double prevMilli = cfs.at(i - 1).getMilli();
 							double nowMilli = cfs.at(i).getMilli();
 
 							if (nowMilli >= time && nowMilli < time + m_noteVisibleTime) {
@@ -656,56 +655,56 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 								glm::vec2 jointBottomRight = getCirclePoint(m_radius - 1.0f - trailWidth, nearAngle);
 
 								if (prevType == CROSS_C && nowType == CROSS_B) {
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w); //
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w); //
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
 									pushQuadIndices(noteIndices, noteVertexCount);
 
 									// counter-clockwise rotation
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 
 									//clockwise rotation
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 								} else if (prevType == CROSS_B && nowType == CROSS_C) {
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushQuadIndices(noteIndices, noteVertexCount);
 
 									// counter-clockwise rotation
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomRight.x + center.x, plane, -jointBottomRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomRight.x + center.x, plane, -mainBottomRight.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopRight.x + center.x, plane, -mainTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointTopRight.x + center.x, plane, -jointTopRight.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 
 									//clockwise rotation
-									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -mainBottomLeft.x + center.x, plane, -mainBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y - trailMiddle.w);
 									pushTriangleIndices(noteIndices, noteVertexCount);
-									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y - trailMiddle.w);
-									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0 - trailMiddle.y);
-									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0 - trailMiddle.y);
+									pushVertexTexture(noteVector, -jointBottomLeft.x + center.x, plane, -jointBottomLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y - trailMiddle.w);
+									pushVertexTexture(noteVector, -jointTopLeft.x + center.x, plane, -jointTopLeft.y - center.y, trailMiddle.x, 1.0f - trailMiddle.y);
+									pushVertexTexture(noteVector, -mainTopLeft.x + center.x, plane, -mainTopLeft.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - trailMiddle.y);
 									pushTriangleIndices(noteIndices, noteVertexCount);
 								}
 							}
@@ -722,10 +721,10 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							outer = getCirclePoint((double)m_radius - 0.5f + trailWidth, (double)endAngle + trailEndAngle);
 							inner = getCirclePoint((double)m_radius - 0.5f - trailWidth, (double)endAngle + trailEndAngle);
 						}
-						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y + trailEnd.w));
-						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0 - (trailEnd.y));
-						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0 - (trailEnd.y));
+						pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailEnd.x, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y + trailEnd.w));
+						pushVertexTexture(noteVector, -inner.x + center.x, plane, -inner.y - center.y, trailEnd.x + trailEnd.z, 1.0f - (trailEnd.y));
+						pushVertexTexture(noteVector, -outer.x + center.x, plane, -outer.y - center.y, trailEnd.x, 1.0f - (trailEnd.y));
 						pushQuadIndices(noteIndices, noteVertexCount);
 					}
 
@@ -913,7 +912,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 			} else if (milli >= time + m_noteVisibleTime) {
 				//if the note is outside the visible area, update lane position
-				note.setLanMod(getCrossAtTime(milli,cross));
+				note.setLanMod(getCrossAtTime(milli, cross));
 			}
 		}
 
@@ -1279,7 +1278,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 
 	//loop for every event inside event vector
 	if (!ev.empty()) {
-		for (int i = ev.size() - 1; i >= 0; i--) {
+		for (size_t i = ev.size() - 1; i >= 0 && i < ev.size(); i--) {
 			Note& event = ev.at(i);
 			double milli = event.getMilli();
 			int type = event.getType();

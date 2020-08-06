@@ -40,8 +40,8 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	float scale = 0.075f;
 
 	//selection color
-	glm::vec4 firstCol = {0.83,0.35,0.24,1.0};//yellow {1.0,0.83,0.15,1.0}
-	glm::vec4 secondCol = {0.83,0.35,0.24,0.0};//red {0.83,0.35,0.24,1.0}
+	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
+	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
 
 	float right = 0.0f;
 	int heightIndex = 0;
@@ -69,14 +69,14 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	Vertex bottomRight = topLeft;
 	Vertex topRight = topLeft;
 
-	bottomLeft.pos += glm::vec3(0.0,selHeight,0.0);
-	bottomRight.pos += glm::vec3(right,selHeight,0.0);
-	topRight.pos += glm::vec3(right,0.0,0.0);
+	bottomLeft.pos += glm::vec3(0.0, selHeight, 0.0);
+	bottomRight.pos += glm::vec3(right, selHeight, 0.0);
+	topRight.pos += glm::vec3(right, 0.0, 0.0);
 
 	bottomRight.col = secondCol;
 	topRight.col = secondCol;
 
-	pushQuadVertices(selVector,topLeft,bottomLeft,bottomRight,topRight);
+	pushQuadVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
 	pushQuadIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
@@ -131,24 +131,29 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({(float)width, (float)height});
 
+	int id = game->getPlayer()->m_useKeyboardInput ? -1 : game->getPlayer()->m_gamepadId;
+	if (id < -1) {
+		m_inputSelection = "Keyboard";
+	} else {
+		std::string name = glfwGetJoystickName(id);
+		std::string t = "Id " + std::to_string(id) + ":" + name;
+		m_inputSelection = t;
+	}
+
 	ImGui::Text("Using: ");
 	ImGui::SameLine();
 	if (ImGui::BeginCombo("Choose Input", m_inputSelection.c_str())) {
 		if (ImGui::Selectable("Keyboard")) {
 			game->getPlayer()->m_useKeyboardInput = true;
-			m_input = true;
-			m_inputSelection = "Keyboard";
 		}
 		for (int i = 0; i < 16; ++i) {
 			std::string name;
 			if (glfwJoystickPresent(i)) {
 				name = glfwGetJoystickName(i);
-				std::string t = "Id " + std::to_string(i) + ":" + name;
+				std::string t = "Id " + std::to_string(id) + ":" + name;
 				if (ImGui::Selectable(t.c_str())) {
 					game->getPlayer()->m_useKeyboardInput = false;
 					game->getPlayer()->m_gamepadId = i;
-					m_input = false;
-					m_inputSelection = t;
 				}
 			}
 		}
@@ -837,49 +842,49 @@ void MenuRender::result(Game* game) {
 	} else {
 		float stars = (float)game->getPlayer()->getScore() / (float)game->getGenerator()->m_baseScore;
 
-		Vertex topLeft = Vertex({x + 30.0f + scale * 0000.0f,y,0.0},{221.0f / 300.0f, 1.0f});
-		Vertex bottomLeft = Vertex({x + 30.0f + scale * 0000.0f,y + scale,0.0},{221.0f / 300.0f, 0.0f});
-		Vertex bottomRight = Vertex({x + 30.0f + scale * 1000.0f,y + scale,0.0},{1.0f, 1.0f});
-		Vertex topRight = Vertex({x + 30.0f + scale * 1000.0f,y,0.0},{1.0f, 1.0f});
+		Vertex topLeft = Vertex({x + 30.0f + scale * 0000.0f, y, 0.0}, {221.0f / 300.0f, 1.0f});
+		Vertex bottomLeft = Vertex({x + 30.0f + scale * 0000.0f, y + scale, 0.0}, {221.0f / 300.0f, 0.0f});
+		Vertex bottomRight = Vertex({x + 30.0f + scale * 1000.0f, y + scale, 0.0}, {1.0f, 1.0f});
+		Vertex topRight = Vertex({x + 30.0f + scale * 1000.0f, y, 0.0}, {1.0f, 1.0f});
 
 		if (stars >= 0.1) {
-			pushQuadVertices(resultVector,topLeft,bottomLeft,bottomRight,topRight);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
 			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.2) {
-			topLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector,topLeft,bottomLeft,bottomRight,topRight);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
 			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.3) {
-			topLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector,topLeft,bottomLeft,bottomRight,topRight);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
 			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.4) {
-			topLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector,topLeft,bottomLeft,bottomRight,topRight);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
 			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.5) {
-			topLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f,0.0,0.0);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector,topLeft,bottomLeft,bottomRight,topRight);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
 			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (!resultVector.empty()) {
@@ -921,21 +926,21 @@ void MenuRender::splashArt() {
 	float x = 1280.0f / 5 * 2;
 	float y = (720.0f - height) / 2;
 
-	Vertex topLeft = Vertex({x,y,0.0});
+	auto topLeft = Vertex({x, y, 0.0});
 	Vertex bottomLeft = topLeft;
 	Vertex bottomRight = topLeft;
 	Vertex topRight = topLeft;
 
-	bottomLeft.pos += glm::vec3({0.0,height,0.0});
-	bottomRight.pos += glm::vec3(width,height,0.0);
-	topRight.pos += glm::vec3(width,0.0,0.0);
+	bottomLeft.pos += glm::vec3({0.0, height, 0.0});
+	bottomRight.pos += glm::vec3(width, height, 0.0);
+	topRight.pos += glm::vec3(width, 0.0, 0.0);
 
-	topLeft.tex = {0.0,1.0};
-	bottomLeft.tex = {0.0,0.0};
-	bottomRight.tex = {1.0,0.0};
-	topRight.tex = {1.0,1.0};
+	topLeft.tex = {0.0, 1.0};
+	bottomLeft.tex = {0.0, 0.0};
+	bottomRight.tex = {1.0, 0.0};
+	topRight.tex = {1.0, 1.0};
 
-	pushQuadVertices(vector,topLeft,bottomLeft,bottomRight,topRight);
+	pushQuadVertices(vector, topLeft, bottomLeft, bottomRight, topRight);
 	pushQuadIndices(indices, indexCount);
 
 	useOrthoProj();

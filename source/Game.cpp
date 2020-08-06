@@ -5,6 +5,10 @@ using namespace std::chrono;
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
 
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		m_player.m_useKeyboardInput = false;
+		m_player.m_gamepadId = 0;
+	}
 	m_player.readMappingFile();
 
 	CSimpleIniA ini;
@@ -286,6 +290,7 @@ Generator* Game::getGenerator() {
 }
 
 Game::~Game() {
+	m_audio.destroy();
 	m_note_arr.clear();
 	m_event_arr.clear();
 }

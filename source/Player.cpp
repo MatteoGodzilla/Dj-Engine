@@ -61,6 +61,28 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				breakCombo(time);
 			}
 		}
+
+		if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_G_HOLD_TICK, noteArr)) {
+				hit(time, TAP_G_HOLD_TICK, noteArr);
+			}
+		}
+
+		if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_R_HOLD_TICK, noteArr)) {
+				hit(time, TAP_R_HOLD_TICK, noteArr);
+			}
+		}
+
+		if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_B_HOLD_TICK, noteArr)) {
+				hit(time, TAP_B_HOLD_TICK, noteArr);
+			}
+		}
+
 		if (getRisingEdge(EU_INDEX)) {
 			if (m_eu_value > 0.0) {
 				m_euphoria_active = true;
@@ -115,103 +137,61 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 
 		if (!m_euphoria_active) {
 			//manual input by player
+
+			float left = std::max(m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX), 0.0f);
+			float right = std::max(m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX), 0.0f);
+
+			float fpos = right - left;
+			int crossNow = 1;
+			if (fpos > 0.5) {
+				crossNow = 2;
+			} else if (fpos < -0.5) {
+				crossNow = 0;
+			}
+
 			if (m_cross == 0) {
-				if (m_baseMove == 0) {
-					if (getRisingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 2;
-						m_cross = 2;
-						m_cfGreenToCenter = true;
-						m_cfCenterToBlue = true;
-						if (getHittableNote(CF_SPIKE_B, noteArr)) {
-							hit(time, CF_SPIKE_B, noteArr);
-						} else {
-							hit(time, CROSS_B, cross);
-						}
-					} else if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_baseMove = 1;
-						m_cross = 1;
-						m_cfGreenToCenter = true;
-						if (getHittableNote(CF_SPIKE_C, noteArr)) {
-							hit(time, CF_SPIKE_C, noteArr);
-						} else if (!getHittableNote(CF_SPIKE_B, noteArr) && !getHittableNote(CROSS_B, cross)) {
-							hit(time, CROSS_C, cross);
-						}
+				if (crossNow == 1) {
+					if (getHittableNote(CF_SPIKE_C, noteArr)) {
+						hit(time, CF_SPIKE_C, noteArr);
+					} else if (!getHittableNote(CROSS_B, cross) && !getHittableNote(CF_SPIKE_B, noteArr)) {
+						hit(time, CROSS_C, cross);
 					}
-				} else if (m_baseMove == 2) {
-					if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 1;
-						m_cross = 2;
-						m_cfGreenToCenter = true;
-						m_cfCenterToBlue = true;
-						hit(time, CROSS_B, cross);
-					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 1;
-						m_baseMove = 0;
-					}
+					m_cfGreenToCenter = true;
 				}
 			} else if (m_cross == 1) {
-				if (getRisingEdge(CF_LEFT_INDEX)) {
-					m_baseMove = 0;
-					m_cross = 0;
-					m_cfCenterToGreen = true;
+				if (crossNow == 0) {
 					if (getHittableNote(CF_SPIKE_G, noteArr)) {
 						hit(time, CF_SPIKE_G, noteArr);
 					} else {
 						hit(time, CROSS_G, cross);
 					}
-				}
-
-				if (getRisingEdge(CF_RIGHT_INDEX)) {
-					m_baseMove = 2;
-					m_cross = 2;
-					m_cfCenterToBlue = true;
+					m_cfCenterToGreen = true;
+				} else if (crossNow == 2) {
 					if (getHittableNote(CF_SPIKE_B, noteArr)) {
 						hit(time, CF_SPIKE_B, noteArr);
 					} else {
 						hit(time, CROSS_B, cross);
 					}
+					m_cfCenterToBlue = true;
 				}
 			} else if (m_cross == 2) {
-				if (m_baseMove == 2) {
-					if (getRisingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 0;
-						m_cross = 0;
-						m_cfBlueToCenter = true;
-						m_cfCenterToGreen = true;
-						if (getHittableNote(CF_SPIKE_G, noteArr)) {
-							hit(time, CF_SPIKE_G, noteArr);
-						} else {
-							hit(time, CROSS_G, cross);
-						}
-					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_baseMove = 1;
-						m_cross = 1;
-						m_cfBlueToCenter = true;
-						if (getHittableNote(CF_SPIKE_C, noteArr)) {
-							hit(time, CF_SPIKE_C, noteArr);
-						} else if (!getHittableNote(CF_SPIKE_G, noteArr) && !getHittableNote(CROSS_G, cross)) {
-							hit(time, CROSS_C, cross);
-						}
+				if (crossNow == 1) {
+					if (getHittableNote(CF_SPIKE_C, noteArr)) {
+						hit(time, CF_SPIKE_C, noteArr);
+					} else if (!getHittableNote(CROSS_G, cross) && !getHittableNote(CF_SPIKE_G, noteArr)) {
+						hit(time, CROSS_C, cross);
 					}
-				} else if (m_baseMove == 0) {
-					if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 1;
-						m_cross = 0;
-						m_cfBlueToCenter = true;
-						m_cfCenterToGreen = true;
-						hit(time, CROSS_G, cross);
-					} else if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 1;
-						m_baseMove = 2;
-					}
+					m_cfBlueToCenter = true;
 				}
 			}
 
-			if (getHittableNoteAtZero(time, CROSS_G_TICK, cross) && m_baseMove == 0) {
+			m_cross = crossNow;
+
+			if (getHittableNoteAtZero(time, CROSS_G_TICK, cross) && m_cross == 0) {
 				hit(time, CROSS_G_TICK, cross);
 			}
 
-			if (getHittableNoteAtZero(time, CROSS_B_TICK, cross) && m_baseMove == 2) {
+			if (getHittableNoteAtZero(time, CROSS_B_TICK, cross) && m_cross == 2) {
 				hit(time, CROSS_B_TICK, cross);
 			}
 		} else {
@@ -402,14 +382,16 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			} else if (noteType == SCR_G_TICK || noteType == SCR_B_TICK) {
 				m_score += 25 * m_mult;
 				m_scr_tick++;
+			} else if (noteType == TAP_G_HOLD_TICK || noteType == TAP_R_HOLD_TICK || noteType == TAP_B_HOLD_TICK) {
+				m_score += 25 * m_mult;
 			}
 			note.click();
 
-			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
+			if (noteType == TAP_G || noteType == TAP_G_HOLD_TICK || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
 				m_greenAnimation = true;
-			} else if (noteType == TAP_R) {
+			} else if (noteType == TAP_R || noteType == TAP_R_HOLD_TICK) {
 				m_redAnimation = true;
-			} else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
+			} else if (noteType == TAP_B || noteType == TAP_B_HOLD_TICK || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
 				m_blueAnimation = true;
 			}
 

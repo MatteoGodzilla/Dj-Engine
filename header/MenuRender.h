@@ -46,7 +46,6 @@ public:
 	std::string m_testBuffer = "";
 
 	bool m_shouldClose = false;
-	bool m_input = true;
 
 	double m_timeBeforeAnimating = 3.0f;
 	double m_currentIdleTime = 0.0f;

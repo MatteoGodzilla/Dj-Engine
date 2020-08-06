@@ -1,29 +1,29 @@
 #pragma once
 
-#include <portaudio.h>
-#include <thread>
-#include <iostream>
 #include <array>
 #include <atomic>
+#include <iostream>
+#include <portaudio.h>
+#include <thread>
 #include <vorbis/vorbisfile.h>
 
 const size_t MAX_SIZE = 16384;
 
-class Audio{
+class Audio {
 public:
 	void init();
 	void play();
 	void stop();
-	void load(std::string path);
+	void load(const std::string& path);
 	void destroy();
-	bool isPlaying();
+	bool isPlaying() const;
 
 	void push(float value);
 	float pop();
-	size_t getLength();
+	size_t getLength() const;
 	double getFileLength();
 
-	std::array<float,MAX_SIZE> buffer;
+	std::array<float, MAX_SIZE> buffer;
 	OggVorbis_File file;
 	int bitstream = 0;
 	bool loaderThreadRunning = true;
@@ -32,7 +32,7 @@ public:
 	size_t readIndex = 0;
 
 private:
-	PaStream *audioStream;
+	PaStream* audioStream;
 	std::thread loader;
 	bool playing = false;
 

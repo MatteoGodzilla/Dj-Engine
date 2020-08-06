@@ -108,28 +108,43 @@ void Generator::initialLoad() {
 			//std::cout << time << "\t" << type << "\t" << length << "\t" << extra << std::endl;
 
 			//decode type from entry
-			if (type == 0) {
+			if (type == FSG_TAP_G) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, TAP_G, length, false);
-			} else if (type == 1) {
+				if (length > 15 / m_bpm) {
+					for (float t = 0; t < length; t += 15 / m_bpm) {
+						m_allTaps.emplace_back(time + t, TAP_G_HOLD_TICK, 0, false);
+					}
+				}
+			} else if (type == FSG_TAP_B) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, TAP_B, length, false);
-			} else if (type == 2) {
+				if (length > 15 / m_bpm) {
+					for (float t = 0; t < length; t += 15 / m_bpm) {
+						m_allTaps.emplace_back(time + t, TAP_B_HOLD_TICK, 0, false);
+					}
+				}
+			} else if (type == FSG_TAP_R) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, TAP_R, length, false);
-			} else if (type == 3) {
+				if (length > 15 / m_bpm) {
+					for (float t = 0; t < length; t += 15 / m_bpm) {
+						m_allTaps.emplace_back(time + t, TAP_R_HOLD_TICK, 0, false);
+					}
+				}
+			} else if (type == FSG_SCR_G_UP) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_G_UP, length, false);
-			} else if (type == 4) {
+			} else if (type == FSG_SCR_B_UP) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_B_UP, length, false);
-			} else if (type == 5) {
+			} else if (type == FSG_SCR_G_DOWN) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_G_DOWN, length, false);
-			} else if (type == 6) {
+			} else if (type == FSG_SCR_B_DOWN) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_B_DOWN, length, false);
-			} else if (type == 7) {
+			} else if (type == FSG_SCR_G_ANY) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_G_ANY, length, false);
 
@@ -141,7 +156,7 @@ void Generator::initialLoad() {
 					m_allTaps.emplace_back(time, SCR_G_TICK, length, false);
 					time += betweenTicks;
 				}
-			} else if (type == 8) {
+			} else if (type == FSG_SCR_B_ANY) {
 				m_baseScore += 400;
 				m_allTaps.emplace_back(time, SCR_B_ANY, length, false);
 				float end = time + length;
@@ -152,7 +167,7 @@ void Generator::initialLoad() {
 					m_allTaps.emplace_back(time, SCR_B_TICK, length, false);
 					time += betweenTicks;
 				}
-			} else if (type == 9) {
+			} else if (type == FSG_CROSS_B) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
@@ -160,14 +175,14 @@ void Generator::initialLoad() {
 				for (double i = 15 / m_bpm; i < length; i += 15 / m_bpm) {
 					m_allCross.emplace_back(time + i, CROSS_B_TICK, 0.0, false);
 				}
-			} else if (type == 10) {
+			} else if (type == FSG_CROSS_C) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				if (time > 0.0) {
 					m_baseScore += 400;
 					m_allCross.emplace_back(time, CROSS_C, 0.0, true);
 				}
-			} else if (type == 11) {
+			} else if (type == FSG_CROSS_G) {
 				m_firstSpikeGenerated = false;
 				m_addedCrossCenter = false;
 				m_baseScore += 400;
@@ -175,13 +190,13 @@ void Generator::initialLoad() {
 				for (double i = 15 / m_bpm; i < length; i += 15 / m_bpm) {
 					m_allCross.emplace_back(time + i, CROSS_G_TICK, 0.0, false);
 				}
-			} else if (type == 15) {
+			} else if (type == FSG_EUPHORIA) {
 				m_allEvents.emplace_back(time, EU_ZONE, length, true);
-			} else if (type == 20 || type == 48) {
+			} else if (type == FSG_SCR_G_ZONE) {
 				m_allEvents.emplace_back(time, SCR_G_ZONE, length, true);
-			} else if (type == 21 || type == 49) {
+			} else if (type == FSG_SCR_B_ZONE) {
 				m_allEvents.emplace_back(time, SCR_B_ZONE, length, true);
-			} else if (type == 27) {
+			} else if (type == FSG_CF_SPIKE_G) {
 				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
 					m_addedCrossCenter = true;
 					m_allCross.emplace_back(m_firstSpikeMilli, CROSS_C, 0.0, true);
@@ -192,7 +207,7 @@ void Generator::initialLoad() {
 				}
 				m_allTaps.emplace_back(time, CF_SPIKE_G, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_G, 0.0);
-			} else if (type == 28) {
+			} else if (type == FSG_CF_SPIKE_B) {
 				if (m_firstSpikeGenerated && !m_addedCrossCenter) {
 					m_addedCrossCenter = true;
 					m_allCross.emplace_back(m_firstSpikeMilli, CROSS_C, 0.0, true);
@@ -203,7 +218,7 @@ void Generator::initialLoad() {
 				}
 				m_allTaps.emplace_back(time, CF_SPIKE_B, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_B, 0.0);
-			} else if (type == 29) {
+			} else if (type == FSG_CF_SPIKE_C) {
 				m_allTaps.emplace_back(time, CF_SPIKE_C, 0.0, false);
 				//pushNote((double)time, CF_SPIKE_C, 0.0);
 			}
@@ -249,7 +264,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 						m_scr_tick++;
 					}
 					m_notesHit++;
-				} else {
+				} else if (type != TAP_G_HOLD_TICK && type != TAP_R_HOLD_TICK && type != TAP_B_HOLD_TICK) {
 					m_combo_reset = true;
 				}
 				m_notesTotal++;
@@ -306,7 +321,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			if (next_time + 0.15 <= time) {
 				if (cross.at(i).getTouched()) {
 					m_notesHit++;
-				} else if(type != CROSS_G_TICK && type != CROSS_B_TICK){
+				} else if (type != CROSS_G_TICK && type != CROSS_B_TICK) {
 					m_combo_reset = true;
 				}
 				m_notesTotal++;

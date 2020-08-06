@@ -1,29 +1,77 @@
 #pragma once
 #include <iostream>
 
-enum note {
-	TAP_G,
-	TAP_R,
-	TAP_B,
-	CROSS_G,
-	CROSS_B,
-	CROSS_C,
-	CF_SPIKE_G,
-	CF_SPIKE_B,
-	CF_SPIKE_C,
-	SCR_G_UP,
-	SCR_G_DOWN,
-	SCR_G_ANY,
-	SCR_G_TICK,
-	SCR_B_UP,
-	SCR_B_DOWN,
-	SCR_B_ANY,
-	SCR_B_TICK,
-	SCR_G_ZONE,
-	SCR_B_ZONE,
-	EU_ZONE,
-	CROSS_G_TICK,
-	CROSS_B_TICK
+enum NoteTypes {
+	TAP_G, //inside note vector
+	TAP_R, //inside note vector
+	TAP_B, //inside note vector
+	CROSS_G, //inside crossfade vector
+	CROSS_B, //inside crossfade vector
+	CROSS_C, //inside crossfade vector
+	CF_SPIKE_G, //inside note vector
+	CF_SPIKE_B, //inside note vector
+	CF_SPIKE_C, //inside note vector
+	SCR_G_UP, //inside note vector
+	SCR_G_DOWN, //inside note vector
+	SCR_G_ANY, //inside note vector
+	SCR_G_TICK, //inside note vector
+	SCR_B_UP, //inside note vector
+	SCR_B_DOWN, //inside note vector
+	SCR_B_ANY, //inside note vector
+	SCR_B_TICK, //inside note vector
+	SCR_G_ZONE, //inside event vector
+	SCR_B_ZONE, //inside event vector
+	EU_ZONE, //inside event vector
+	CROSS_G_TICK, //inside crossfade vector
+	CROSS_B_TICK, //inside crossfade vector
+	TAP_G_HOLD_TICK, //inside note vector
+	TAP_R_HOLD_TICK, //inside note vector
+	TAP_B_HOLD_TICK, //inside note vector
+};
+
+enum FSGNoteTypes {
+	FSG_TAP_G,
+	FSG_TAP_B,
+	FSG_TAP_R,
+	FSG_SCR_G_UP,
+	FSG_SCR_B_UP,
+	FSG_SCR_G_DOWN,
+	FSG_SCR_B_DOWN,
+	FSG_SCR_G_ANY,
+	FSG_SCR_B_ANY,
+	FSG_CROSS_B,
+	FSG_CROSS_C,
+	FSG_CROSS_G,
+	FSG_FX_G,
+	FSG_FX_B,
+	FSG_FX_R,
+	FSG_EUPHORIA,
+	FSG_FS_SAMPLES,
+	FSG_FS_CROSS,
+	FSG_SCR_G_ZONE = 20,
+	FSG_SCR_B_ZONE = 21,
+	FSG_FX_ALL,
+	FSG_CROSS_FORCE_CENTER,
+	FSG_BATTLE_TAG = 26,
+	FSG_CF_SPIKE_G,
+	FSG_CF_SPIKE_B,
+	FSG_CF_SPIKE_C,
+	FSG_MEGAMIX_TRANSITION,
+	FSG_FS_CROSS_G_MARKER,
+	FSG_FS_CROSS_B_MARKER,
+	FSG_FX_TYPE_FILTER = 0x05ffffff,
+	FSG_FX_TYPE_BEATROLL,
+	FSG_FX_TYPE_BITREDUCTION,
+	FSG_FX_TYPE_WAHWAH,
+	FSG_FX_TYPE_RINGMOD,
+	FSG_FX_TYPE_STUTTER,
+	FSG_FX_TYPE_FLANGER,
+	FSG_FX_TYPE_ROBOT,
+	FSG_FX_TYPE_BEATROLLAUTO,
+	FSG_FX_TYPE_DELAY = 0x06000009,
+	FSG_BPM_FAKE_DISTANCE = 0x0b000001,
+	FSG_BPM,
+	FSG_REWIND = 0x09ffffff
 };
 
 class Note {

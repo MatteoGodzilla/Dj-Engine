@@ -143,7 +143,7 @@ void MenuNavigator::pollInput() {
 	m_wasEscapePressed = m_isEscapePressed;
 	m_wasTabPressed = m_isTabPressed;
 
-	if (m_useKeyboardInput) {
+	if (m_game->getPlayer()->m_useKeyboardInput) {
 		m_isUpPressed = glfwGetKey(m_render.getWindowPtr(), UP_CODE);
 		m_isDownPressed = glfwGetKey(m_render.getWindowPtr(), DOWN_CODE);
 		m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), SELECT_CODE);
@@ -161,23 +161,28 @@ void MenuNavigator::pollInput() {
 		}
 	}
 
+	if (m_isUpPressed) {
+		if (m_holdingSomething == 0) {
+			m_holdingFor += m_dTime;
+		} else {
+			m_holdingSomething = 0;
+		}
+	} else if (m_isDownPressed) {
+		if (m_holdingSomething == 1) {
+			m_holdingFor += m_dTime;
+		} else {
+			m_holdingSomething = 1;
+		}
+	} else {
+		m_holdingFor = 0.0;
+		m_holdingSomething = -1;
+	}
+
 	if (glfwGetKey(m_render.getWindowPtr(), GLFW_KEY_SPACE)) {
 		if (m_scene != CALIBRATION) {
 			remap();
 		}
 	}
-	/*
-	if (m_wasTabPressed && !m_isTabPressed) {
-		if (m_useKeyboardInput) {
-			m_game->getPlayer()->m_useKeyboardInput = false;
-			std::cout << "Menu Message: Changed Input to Controller" << std::endl;
-		}else {
-			m_game->getPlayer()->m_useKeyboardInput = true;
-			std::cout << "Menu Message: Changed Input to Keyboard" << std::endl;
-		}
-		m_useKeyboardInput = !m_useKeyboardInput;
-	}
-	*/
 
 	if (m_wasBackPressed && !m_isBackPressed) {
 		if (m_popupId != -1) {
@@ -228,10 +233,6 @@ void MenuNavigator::pollInput() {
 		}
 	}
 
-	if (m_render.m_input != m_useKeyboardInput) {
-		m_useKeyboardInput = m_render.m_input;
-	}
-
 	if (m_game->m_mode == 1) {
 		m_scene = RESULTS;
 		m_game->m_mode = 0;
@@ -248,7 +249,25 @@ void MenuNavigator::update() {
 			*/
 			m_render.tick();
 			updateMenuNode();
-			if (m_wasUpPressed && !m_isUpPressed) {
+
+			double nowTime = glfwGetTime();
+			m_dTime = nowTime - m_pastTime;
+			m_pastTime = nowTime;
+
+			bool goingUp = m_isUpPressed && !m_wasUpPressed;
+			bool goingDown = m_isDownPressed && !m_wasDownPressed;
+
+			if (m_holdingSomething == 0 && m_holdingFor > m_holdingThreshold) {
+				goingUp = true;
+				m_holdingFor -= m_holdingRepeatTime;
+			}
+
+			if (m_holdingSomething == 1 && m_holdingFor > m_holdingThreshold) {
+				goingDown = true;
+				m_holdingFor -= m_holdingRepeatTime;
+			}
+
+			if (goingUp) {
 				//reset idle animation
 				m_render.m_currentIdleTime = 0.0f;
 				m_render.m_selectionDX = 0.0f;
@@ -266,7 +285,7 @@ void MenuNavigator::update() {
 					}
 				}
 			}
-			if (m_wasDownPressed && !m_isDownPressed) {
+			if (goingDown) {
 				//reset idle animation
 				m_render.m_currentIdleTime = 0.0f;
 				m_render.m_selectionDX = 0.0f;

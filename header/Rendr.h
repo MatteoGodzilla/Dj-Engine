@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-struct Vertex{
+struct Vertex {
 	Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_);
 	Vertex(glm::vec3 pos_, glm::vec2 tex_);
 	Vertex(glm::vec3 pos_, glm::vec4 col_);

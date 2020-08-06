@@ -15,28 +15,28 @@ struct CharTextureData {
 
 std::map<char, CharTextureData> ChMap;
 
-Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_){
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_) {
 	pos = pos_;
 	col = col_;
 	tex = tex_;
 }
 
-Vertex::Vertex(glm::vec3 pos_, glm::vec2 tex_){
+Vertex::Vertex(glm::vec3 pos_, glm::vec2 tex_) {
 	pos = pos_;
-	col = {1.0,1.0,1.0,1.0};
+	col = {1.0, 1.0, 1.0, 1.0};
 	tex = tex_;
 }
 
-Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_){
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_) {
 	pos = pos_;
 	col = col_;
-	tex = {0.0,0.0};
+	tex = {0.0, 0.0};
 }
 
-Vertex::Vertex(glm::vec3 pos_){
+Vertex::Vertex(glm::vec3 pos_) {
 	pos = pos_;
-	col = {1.0,1.0,1.0,1.0};
-	tex = {0.0,0.0};
+	col = {1.0, 1.0, 1.0, 1.0};
+	tex = {0.0, 0.0};
 }
 
 void Rendr::checkError() {
@@ -48,7 +48,6 @@ void Rendr::checkError() {
 	}
 	std::cout << "ended error checking" << std::endl;
 }
-
 
 //utility function
 void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a, float s, float t) const {
@@ -101,11 +100,11 @@ void Rendr::pushVertex(std::vector<float>& v, Vertex& ver) const {
 	v.push_back(ver.tex.t);
 }
 
-void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4){
-	pushVertex(v,ver1);
-	pushVertex(v,ver2);
-	pushVertex(v,ver3);
-	pushVertex(v,ver4);
+void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) {
+	pushVertex(v, ver1);
+	pushVertex(v, ver2);
+	pushVertex(v, ver3);
+	pushVertex(v, ver4);
 }
 
 //utility function

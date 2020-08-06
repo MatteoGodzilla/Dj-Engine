@@ -53,9 +53,6 @@ public:
 	void scan(bool useCache = true);
 	bool getShouldClose() const;
 
-	//switch between keyboard and gamepad
-	bool m_useKeyboardInput = true;
-
 	//default key codes for keyboard
 	int UP_CODE = GLFW_KEY_UP;
 	int DOWN_CODE = GLFW_KEY_DOWN;
@@ -99,9 +96,17 @@ private:
 	bool m_wasTabPressed = false;
 	bool m_isTabPressed = false;
 
+	int m_holdingSomething = -1;
+	double m_holdingFor = 0.0;
+	double m_holdingThreshold = 1.0;
+	double m_holdingRepeatTime = 0.05;
+
 	int m_viewOffset = 0;
 	bool m_shouldClose = false;
 	bool m_active = false;
+
+	double m_dTime = 0.0;
+	double m_pastTime = 0.0;
 
 	//menu structure
 	MenuNode m_root = MenuNode("Main Menu", 0);

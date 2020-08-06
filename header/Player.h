@@ -109,9 +109,6 @@ public:
 
 	int m_cross = 1;
 
-	int m_baseMove = 1;
-	int m_secondMove = 1;
-
 	bool m_deltaMouse = false;
 	double m_scrollX;
 	double m_scrollY;

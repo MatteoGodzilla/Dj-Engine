@@ -88,13 +88,14 @@ sudo pacman -S glfw-wayland
 Fedora:
 
 ``` bash
-sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel openal-soft-devel
+sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel portaudio-devel
 ```
 
 Ubuntu-based:
 
 ``` bash
-sudo apt install gcc cmake make clang-tidy libfreetype6-dev libglew-dev libglfw3-dev libvorbis-dev libopenal-dev
+sudo apt install gcc cmake make clang-tidy libfreetype6-dev libglew-dev libglfw3-dev libvorbis-dev portaudio19-dev
+
 ```
 
 Now to compile the program just launch the build script:
