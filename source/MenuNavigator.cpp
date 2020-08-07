@@ -27,6 +27,18 @@ MenuNode* getNodePtrById(MenuNode* node, int id) {
 	return nullptr;
 }
 
+void printDebugMenuNode(MenuNode node, int indentation = 0) {
+	std::cout << node.getText() << "\t" << node.getId() << "\t" << node.getChildCount() << std::endl;
+	if (node.getChildCount() > 0) {
+		for (auto& child : node.getChildrens()) {
+			for (int i = 0; i < indentation; ++i) {
+				std::cout << "\t";
+			}
+			printDebugMenuNode(child, indentation + 1);
+		}
+	}
+}
+
 void MenuNavigator::writeConfigFile() {
 	m_game->writeConfig();
 
@@ -101,6 +113,9 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	MenuNode pollrate("Change input poll rate:", POLL_ID);
 	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
 
+	MenuNode a("No songs found inside the song cache", DONT_CARE);
+	MenuNode b("Try Options -> Refresh song list", DONT_CARE);
+
 	//add values to text after:
 	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
@@ -118,20 +133,23 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	options.push(pollrate);
 	options.push(debug);
 
+	play.push(a);
+	play.push(b);
+
 	m_root.push(play);
 	m_root.push(options);
 	m_root.push(credits);
 	m_root.push(exit);
 
-	m_selection.push_back(0);
-	m_activeNode = m_root;
+	m_selection.push_back(ROOT_ID);
+	m_activeNode = &m_root;
 
 	m_gpDead.clear();
 	for (int i = 0; i < 15 + 6; ++i) {
 		m_gpDead.push_back(0.5);
 	}
 
-	render(0.0f);
+	render();
 	scan();
 }
 
@@ -189,9 +207,9 @@ void MenuNavigator::pollInput() {
 			if (m_popupId == HIGHWAY_SPEED || m_popupId == POLLRATE_CHANGE) {
 				writeConfigFile();
 				if (m_popupId == HIGHWAY_SPEED) {
-					m_root.getChildrens().at(1).getChildrens().at(2).setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
+					getNodePtrById(&m_root, SPEED_ID)->setText(std::string("Set Deck Speed:") + std::to_string(m_game->m_deckSpeed));
 				} else if (m_popupId == POLLRATE_CHANGE) {
-					m_root.getChildrens().at(1).getChildrens().at(6).setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
+					getNodePtrById(&m_root, POLL_ID)->setText(std::string("Change input poll rate:") + std::to_string(m_game->m_inputThreadPollRate));
 				}
 			}
 			m_popupId = -1;
@@ -199,7 +217,7 @@ void MenuNavigator::pollInput() {
 		} else {
 			glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 			resetMenu();
-			if (m_scene == MAIN_SCENE && m_activeNode.getId() == m_root.getId()) {
+			if (m_scene == MAIN_SCENE && m_activeNode->getId() == m_root.getId()) {
 				if (m_scene != 1) {
 					m_shouldClose = true;
 				}
@@ -274,12 +292,12 @@ void MenuNavigator::update() {
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
 				} else if (m_selection.back() == 0) {
-					m_selection.back() = m_activeNode.getChildCount() - 1;
-					if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
-						m_viewOffset = (int)(m_activeNode.getChildCount() - m_render.VISIBLE_ENTRIES);
+					m_selection.back() = m_activeNode->getChildCount() - 1;
+					if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
+						m_viewOffset = (int)(m_activeNode->getChildCount() - m_render.VISIBLE_ENTRIES);
 					}
 				}
-				if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+				if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
 					if (m_selection.back() < m_viewOffset) {
 						m_viewOffset--;
 					}
@@ -289,16 +307,16 @@ void MenuNavigator::update() {
 				//reset idle animation
 				m_render.m_currentIdleTime = 0.0f;
 				m_render.m_selectionDX = 0.0f;
-				if (m_selection.back() < m_activeNode.getChildCount() + 1) {
+				if (m_selection.back() < m_activeNode->getChildCount() + 1) {
 					m_selection.back()++;
 				}
-				if (m_selection.back() == m_activeNode.getChildCount()) {
+				if (m_selection.back() == m_activeNode->getChildCount()) {
 					m_selection.back() = 0;
-					if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+					if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
 						m_viewOffset = 0;
 					}
 				}
-				if (m_activeNode.getChildCount() > m_render.VISIBLE_ENTRIES) {
+				if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
 					if (m_selection.back() > m_viewOffset + m_render.VISIBLE_ENTRIES - 1) {
 						m_viewOffset++;
 					}
@@ -308,10 +326,12 @@ void MenuNavigator::update() {
 				//reset idle animation
 				m_render.m_currentIdleTime = 0.0f;
 				m_render.m_selectionDX = 0.0f;
-				MenuNode childNode = m_activeNode.getChildrens().at(m_selection.back());
+				MenuNode& childNode = m_activeNode->getChildrens().at(m_selection.back());
+				//printDebugMenuNode(childNode);
+				//std::cout << "***********************************************" << std::endl;
 				if (childNode.getChildCount() == 0) {
 					//do something based on the node id
-					activate(childNode, m_activeNode);
+					activate(childNode);
 				} else {
 					m_selection.push_back(0);
 					m_viewOffset = 0;
@@ -326,6 +346,8 @@ void MenuNavigator::update() {
 					m_viewOffset = 0;
 				}
 			}
+
+			//std::cout << m_activeNode.getText() << "\t" << m_activeNode.getChildrens().at(m_selection.back()).getChildCount() << std::endl;
 
 			/*
 			std::cout << m_activeNode.getText() << ":";
@@ -418,13 +440,13 @@ void MenuNavigator::update() {
 	}
 }
 
-void MenuNavigator::render(double dt) {
+void MenuNavigator::render() {
 	if (m_active) {
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
-			m_render.render(m_activeNode, m_selection.back(), m_viewOffset);
+			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
 
-			if (m_activeNode.getId() == m_root.getId()) {
+			if (m_activeNode->getId() == m_root.getId()) {
 				m_render.splashArt();
 			}
 		} else if (m_scene == REMAPPING) {
@@ -434,7 +456,7 @@ void MenuNavigator::render(double dt) {
 		} else if (m_scene == SCRATCHES) {
 			m_render.scratches(m_game->getPlayer());
 		} else if (m_scene == CALIBRATION) {
-			m_render.calibration(m_game, dt);
+			m_render.calibration(m_game, m_dTime);
 		} else if (m_scene == RESULTS) {
 			m_render.result(m_game);
 		}
@@ -450,9 +472,8 @@ void MenuNavigator::render(double dt) {
 	}
 }
 
-void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
+void MenuNavigator::activate(MenuNode& menu) {
 	//every case represents a function called on activate
-	size_t index = 0;
 	int id = menu.getId();
 	if (id == EXIT_ID) {
 		m_shouldClose = true;
@@ -478,26 +499,33 @@ void MenuNavigator::activate(MenuNode& menu, MenuNode& parent) {
 		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == REFRESH_ID) {
-		std::vector<MenuNode> emptyList;
-		getNodePtrById(&m_root, PLAY_ID)->getChildrens().clear();
 		m_songList.clear();
 		scan(false);
 	} else if (id == COLOR_ID) {
 		m_popupId = LANE_COLORS;
 	} else if (id == POLL_ID) {
 		m_popupId = POLLRATE_CHANGE;
-	} else if (id == SONG_GENERAL_ID) {
-		index = findIndex(menu, parent);
+	} else if (id == SONG_EXPERT_ID || id == SONG_HARD_ID || id == SONG_MEDIUM_ID || id == SONG_EASY_ID || id == SONG_BEGINNER_ID) {
+		int selected = -1;
+		if (id == SONG_EXPERT_ID) {
+			selected = 0;
+		} else if (id == SONG_HARD_ID) {
+			selected = 1;
+		} else if (id == SONG_MEDIUM_ID) {
+			selected = 2;
+		} else if (id == SONG_EASY_ID) {
+			selected = 3;
+		} else if (id == SONG_BEGINNER_ID) {
+			selected = 4;
+		}
+
+		size_t song = m_selection.at(m_selection.size() - 2);
 		m_active = false;
 		m_game->reset();
-		m_game->start(m_songList.at(index));
+		m_game->start(m_songList.at(song), selected);
 		resetMenu();
-	} else if (menu.getChildCount() == 0) {
-		if (menu.getId() == PLAY_ID) {
-			std::cout << "Menu Message: No songs found in the install path." << std::endl;
-		} else {
-			std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
-		}
+	} else if (menu.getChildCount() == 0 && id != DONT_CARE) {
+		std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
 	}
 }
 
@@ -513,6 +541,10 @@ void MenuNavigator::scan(bool useCache) {
 	} else {
 		SongScanner::readCache(m_songList);
 	}
+	if (!m_songList.empty()) {
+		std::vector<MenuNode>& ref = getNodePtrById(&m_root, PLAY_ID)->getChildrens();
+		ref.clear();
+	}
 	for (const SongEntry& entry : m_songList) {
 		std::string text;
 		if (!entry.s2.empty()) {
@@ -521,8 +553,31 @@ void MenuNavigator::scan(bool useCache) {
 			text = entry.s1;
 		}
 		MenuNode song(text, SONG_GENERAL_ID);
-		m_root.getChildrens().at(0).push(song);
+		song.getChildrens().reserve(5);
+		if (entry.difficulties & EXPERT) {
+			MenuNode temp("EXPERT", SONG_EXPERT_ID);
+			song.push(temp);
+		}
+		if (entry.difficulties & HARD) {
+			MenuNode temp("HARD", SONG_HARD_ID);
+			song.push(temp);
+		}
+		if (entry.difficulties & MEDIUM) {
+			MenuNode temp("MEDIUM", SONG_MEDIUM_ID);
+			song.push(temp);
+		}
+		if (entry.difficulties & EASY) {
+			MenuNode temp("EASY", SONG_EASY_ID);
+			song.push(temp);
+		}
+		if (entry.difficulties & BEGINNER) {
+			MenuNode temp("BEGINNER", SONG_BEGINNER_ID);
+			song.push(temp);
+		}
+		getNodePtrById(&m_root, PLAY_ID)->push(song);
 	}
+	//printDebugMenuNode(m_root);
+	//std::cout << "***********************************************" << std::endl;
 }
 
 void MenuNavigator::resetMenu() {
@@ -533,10 +588,10 @@ void MenuNavigator::resetMenu() {
 }
 
 void MenuNavigator::updateMenuNode() {
-	MenuNode activeNode = m_root;
+	MenuNode* activeNode = &m_root;
 	for (size_t i = 0; i < m_selection.size() - 1; i++) {
-		if (activeNode.getChildCount() > 0) {
-			activeNode = activeNode.getChildrens().at(m_selection.at(i));
+		if (activeNode->getChildCount() > 0) {
+			activeNode = &(activeNode->getChildrens().at(m_selection.at(i)));
 		}
 	}
 	m_activeNode = activeNode;

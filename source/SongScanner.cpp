@@ -10,7 +10,48 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 		if (fs::is_directory(entry)) {
 			checkFolder(entry.path(), list, duplicates);
 		}
-		//if it's not a directory, check for song.json/info.ini
+		//if it's not a directory, check for song.json/info.ini and chart files
+
+		//chart
+		std::string chart = p.generic_string() + std::string("/chart.xmk");
+		std::string expert = p.generic_string() + std::string("/DJ_EXPERT.xmk");
+		std::string hard = p.generic_string() + std::string("/DJ_HARD.xmk");
+		std::string medium = p.generic_string() + std::string("/DJ_MEDIUM.xmk");
+		std::string easy = p.generic_string() + std::string("/DJ_EASY.xmk");
+		std::string beginner = p.generic_string() + std::string("/DJ_BEGINNER.xmk");
+
+		int difficulties = 0;
+		if (fs::exists(chart) || fs::exists(expert)) {
+			difficulties |= EXPERT;
+			std::cout << "ADDING EXPERT" << std::endl;
+		}
+		if (fs::exists(hard)) {
+			difficulties |= HARD;
+		}
+		if (fs::exists(medium)) {
+			difficulties |= MEDIUM;
+		}
+		if (fs::exists(easy)) {
+			difficulties |= EASY;
+		}
+		if (fs::exists(beginner)) {
+			difficulties |= BEGINNER;
+		}
+
+		//audio
+		std::string redStream = p.generic_string() + std::string("/red.ogg");
+		std::string greenStream = p.generic_string() + std::string("/green.ogg");
+		std::string blueStream = p.generic_string() + std::string("/blue.ogg");
+		std::string singleStream = p.generic_string() + std::string("/song.ogg");
+
+		int streams = 0;
+		if (fs::exists(redStream) && fs::exists(greenStream) && fs::exists(blueStream)) {
+			streams = 3;
+		} else if (fs::exists(singleStream)) {
+			streams = 1;
+		}
+
+		//metadata
 		std::string file = p.generic_string() + std::string("/song.json");
 		if (fs::exists(fs::path(file))) {
 			//found song.json
@@ -21,14 +62,15 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 			auto s2 = root["song"]["second"]["name"].get<std::string>();
 			auto a1 = root["song"]["first"]["artist"].get<std::string>();
 			auto a2 = root["song"]["second"]["artist"].get<std::string>();
-			auto charter = root["song"]["charter"].get<std::string>();
-			auto mixer = root["song"]["dj"].get<std::string>();
+			//auto charter = root["song"]["charter"].get<std::string>();
+			//auto mixer = root["song"]["dj"].get<std::string>();
 			auto bpm = root["difficulty"]["bpm"].get<float>();
-			auto dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
-			auto dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
-			auto dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
-			auto dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
+			//auto dTrack = root["difficulty"]["complexity"]["track_complexity"].get<int>();
+			//auto dTap = root["difficulty"]["complexity"]["tap_complexity"].get<int>();
+			//auto dCrossfade = root["difficulty"]["complexity"]["cross_complexity"].get<int>();
+			//auto dScratch = root["difficulty"]["complexity"]["scratch_complexity"].get<int>();
 
+			/*
 			dTrack = std::min(dTrack, 100);
 			dTrack = std::max(dTrack, 0);
 
@@ -40,6 +82,7 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 
 			dScratch = std::min(dScratch, 100);
 			dScratch = std::max(dScratch, 0);
+			*/
 
 			if (s2 == std::string("NULL")) {
 				s2.clear();
@@ -67,22 +110,17 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 				}
 			}
 
-			SongEntry t = {
-				p.generic_string(),
-				s1,
-				s2,
-				a1,
-				a2,
-				charter,
-				mixer,
-				bpm,
-				dTrack,
-				dTap,
-				dCrossfade,
-				dScratch,
-			};
+			SongEntry s;
+			s.path = p.generic_string();
+			s.s1 = s1;
+			s.s2 = s2;
+			s.a1 = a1;
+			s.a2 = a2;
+			s.bpm = bpm;
+			s.difficulties = difficulties;
+			s.streams = streams;
 
-			list.push_back(t);
+			list.push_back(s);
 			std::cout << "found " << file << std::endl;
 			break;
 		} else {
@@ -98,28 +136,29 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 				std::string s2;
 				std::string a1;
 				std::string a2;
-				std::string charter;
-				std::string mixer;
+				//std::string charter;
+				//std::string mixer;
 				float bpm;
-				int dTrack;
-				int dTap;
-				int dCrossfade;
-				int dScratch;
+				//int dTrack;
+				//int dTap;
+				//int dCrossfade;
+				//int dScratch;
 
 				s1 = ini.GetValue("song", "name", "NULL");
 				s2 = ini.GetValue("song", "name2", "NULL");
 				a1 = ini.GetValue("song", "artist", "NULL");
 				a2 = ini.GetValue("song", "artist2", "NULL");
-				charter = ini.GetValue("song", "charter", "NULL");
-				mixer = ini.GetValue("song", "dj", "NULL");
+				//charter = ini.GetValue("song", "charter", "NULL");
+				//mixer = ini.GetValue("song", "dj", "NULL");
 
 				bpm = (float)ini.GetDoubleValue("song", "bpm", 60.0);
 
-				dTrack = ini.GetLongValue("song", "track_complexity", 0);
-				dTap = ini.GetLongValue("song", "tap_complexity", 0);
-				dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
-				dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
+				//dTrack = ini.GetLongValue("song", "track_complexity", 0);
+				//dTap = ini.GetLongValue("song", "tap_complexity", 0);
+				//dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
+				//dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
 
+				/*
 				dTrack = std::min(dTrack, 100);
 				dTrack = std::max(dTrack, 0);
 
@@ -131,6 +170,7 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 
 				dScratch = std::min(dScratch, 100);
 				dScratch = std::max(dScratch, 0);
+				*/
 
 				if (s2 == std::string("NULL")) {
 					s2.clear();
@@ -159,22 +199,17 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 					}
 				}
 
-				SongEntry t = {
-					p.generic_string(),
-					s1,
-					s2,
-					a1,
-					a2,
-					charter,
-					mixer,
-					bpm,
-					dTrack,
-					dTap,
-					dCrossfade,
-					dScratch,
-				};
+				SongEntry s;
+				s.path = p.generic_string();
+				s.s1 = s1;
+				s.s2 = s2;
+				s.a1 = a1;
+				s.a2 = a2;
+				s.bpm = bpm;
+				s.difficulties = difficulties;
+				s.streams = streams;
 
-				list.push_back(t);
+				list.push_back(s);
 				std::cout << "found " << file << std::endl;
 				break;
 			}
@@ -244,13 +279,15 @@ void SongScanner::writeCache(std::vector<SongEntry>& list) {
 			cache << (!entry.s2.empty() ? entry.s2 : std::string("NULL")) << std::endl;
 			cache << (!entry.a1.empty() ? entry.a1 : std::string("NULL")) << std::endl;
 			cache << (!entry.a2.empty() ? entry.a2 : std::string("NULL")) << std::endl;
-			cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << std::endl;
-			cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << std::endl;
-			cache << (entry.bpm != -1 ? entry.bpm : -1) << std::endl;
-			cache << (entry.dTrack != -1 ? entry.dTrack : -1) << std::endl;
-			cache << (entry.dTap != -1 ? entry.dTap : -1) << std::endl;
-			cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << std::endl;
-			cache << (entry.dScratch != -1 ? entry.dScratch : -1) << std::endl;
+			//cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << std::endl;
+			//cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << std::endl;
+			cache << entry.bpm << std::endl;
+			//cache << (entry.dTrack != -1 ? entry.dTrack : -1) << std::endl;
+			//cache << (entry.dTap != -1 ? entry.dTap : -1) << std::endl;
+			//cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << std::endl;
+			//cache << (entry.dScratch != -1 ? entry.dScratch : -1) << std::endl;
+			cache << entry.difficulties << std::endl;
+			cache << entry.streams << std::endl;
 		}
 		std::cout << "SongScanner Message: updated song cache" << std::endl;
 	}
@@ -270,13 +307,15 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 			std::string s2;
 			std::string a1;
 			std::string a2;
-			std::string charter;
-			std::string mixer;
+			//std::string charter;
+			//std::string mixer;
 			float bpm;
-			int dTrack;
-			int dTap;
-			int dCrossfade;
-			int dScratch;
+			//int dTrack;
+			//int dTap;
+			//int dCrossfade;
+			//int dScratch;
+			int difficulties;
+			int streams;
 
 			std::getline(cache, token);
 			path = token;
@@ -288,20 +327,24 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 			a1 = token;
 			std::getline(cache, token);
 			a2 = token;
-			std::getline(cache, token);
-			charter = token;
-			std::getline(cache, token);
-			mixer = token;
+			//std::getline(cache, token);
+			//charter = token;
+			//std::getline(cache, token);
+			//mixer = token;
 			std::getline(cache, token);
 			bpm = std::stof(token);
+			//std::getline(cache, token);
+			//dTrack = std::stoi(token);
+			//std::getline(cache, token);
+			//dTap = std::stoi(token);
+			//std::getline(cache, token);
+			//dCrossfade = std::stoi(token);
+			//std::getline(cache, token);
+			//dScratch = std::stoi(token);
 			std::getline(cache, token);
-			dTrack = std::stoi(token);
+			difficulties = std::stoi(token);
 			std::getline(cache, token);
-			dTap = std::stoi(token);
-			std::getline(cache, token);
-			dCrossfade = std::stoi(token);
-			std::getline(cache, token);
-			dScratch = std::stoi(token);
+			streams = std::stoi(token);
 
 			if (s2 == std::string("NULL")) {
 				s2.clear();
@@ -311,25 +354,21 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 				a2.clear();
 			}
 
-			SongEntry t = {
-				path,
-				s1,
-				s2,
-				a1,
-				a2,
-				charter,
-				mixer,
-				bpm,
-				dTrack,
-				dTap,
-				dCrossfade,
-				dScratch,
-			};
+			SongEntry t;
+			t.path = path;
+			t.s1 = s1;
+			t.s2 = s2;
+			t.a1 = a1;
+			t.a2 = a2;
+			t.bpm = bpm;
+			t.difficulties = difficulties;
+			t.streams = streams;
+
 			list.push_back(t);
 		}
 		cache.close();
 		std::cout << "SongScanner Message: loaded songs from cache" << std::endl;
 	} else {
-		std::cerr << "SongScanner Error: corrupted cache" << std::endl;
+		std::cerr << "SongScanner Error: Could not open cache / Cache file not found" << std::endl;
 	}
 }

@@ -29,7 +29,7 @@ public:
 	Audio* getAudio();
 	GameRender* getGameRender();
 	Generator* getGenerator();
-	void start(const SongEntry& entry);
+	void start(const SongEntry& entry, int difficulty);
 	void setButtonPos(bool value);
 	void writeConfig();
 	~Game();

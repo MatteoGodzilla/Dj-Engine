@@ -19,7 +19,7 @@ enum scenes {
 };
 
 enum actions {
-	SONG_GENERAL_ID,
+	ROOT_ID,
 	PLAY_ID,
 	OPTIONS_ID,
 	CREDITS_ID,
@@ -32,7 +32,14 @@ enum actions {
 	DEBUG_ID,
 	REFRESH_ID,
 	COLOR_ID,
-	POLL_ID
+	POLL_ID,
+	SONG_GENERAL_ID,
+	SONG_EXPERT_ID,
+	SONG_HARD_ID,
+	SONG_MEDIUM_ID,
+	SONG_EASY_ID,
+	SONG_BEGINNER_ID,
+	DONT_CARE
 };
 
 enum popupId {
@@ -46,10 +53,10 @@ public:
 	void init(GLFWwindow* w, Game* gameptr);
 	void pollInput();
 	void update();
-	void render(double dt);
+	void render();
 	void setActive(bool active);
 	bool getActive() const;
-	void activate(MenuNode& menu, MenuNode& parent);
+	void activate(MenuNode& menu);
 	void scan(bool useCache = true);
 	bool getShouldClose() const;
 
@@ -67,7 +74,6 @@ public:
 
 	int m_scene = 0;
 
-	//static int testx;
 private:
 	void remap();
 	void updateGamepadState();
@@ -110,7 +116,7 @@ private:
 
 	//menu structure
 	MenuNode m_root = MenuNode("Main Menu", 0);
-	MenuNode m_activeNode = m_root;
+	MenuNode* m_activeNode = &m_root;
 	std::vector<unsigned int> m_selection;
 
 	MenuRender m_render;

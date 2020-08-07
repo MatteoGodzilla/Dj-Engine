@@ -70,6 +70,10 @@ void Game::init(GLFWwindow* w) {
 	m_inputThread = std::thread(inputThreadFun, this);
 	std::cout << "Game Message: started input thread" << std::endl;
 	setButtonPos(m_isButtonsRight);
+
+	m_note_arr.reserve(100);
+	m_event_arr.reserve(100);
+	m_cross_arr.reserve(100);
 }
 
 void Game::inputThreadFun(Game* game) {
@@ -179,7 +183,7 @@ void Game::setButtonPos(bool value) {
 	m_player.m_isButtonsRight = value;
 }
 
-void Game::start(const SongEntry& entry) {
+void Game::start(const SongEntry& entry, int difficulty) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
 	//glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -193,7 +197,7 @@ void Game::start(const SongEntry& entry) {
 
 	m_audioLength = m_audio.getFileLength();
 
-	m_gen.init(entry);
+	m_gen.init(entry, difficulty);
 	m_bpm_arr.push_back(0.0);
 
 	m_active = true;

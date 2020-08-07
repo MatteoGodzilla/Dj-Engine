@@ -20,61 +20,48 @@ void readToFloat(std::ifstream& stream, float* f) {
 	}
 }
 
-void Generator::init(const SongEntry& entry) {
+void Generator::init(const SongEntry& entry, int difficulty) {
 	m_songEntry = entry;
 	m_allCross.emplace_back(m_initialCrossfade, CROSS_C, 0.0f, true); //Do not remove
 	m_bpm = entry.bpm;
-	std::string textPath = entry.path + std::string("/chart.txt");
-	m_chart.open(textPath);
+
+	std::string diff = std::string();
+	if (difficulty == 0) {
+		diff = std::string("/DJ_EXPERT.xmk");
+		m_chart.open(entry.path + diff);
+		if (!m_chart.is_open()) {
+			//if not available, fallback to chart.xmk
+			diff = std::string("/chart.xmk");
+		}
+		m_chart.close();
+	} else if (difficulty == 1) {
+		diff = std::string("/DJ_HARD.xmk");
+	} else if (difficulty == 2) {
+		diff = std::string("/DJ_MEDIUM.xmk");
+	} else if (difficulty == 3) {
+		diff = std::string("/DJ_EASY.xmk");
+	} else if (difficulty == 4) {
+		diff = std::string("/DJ_BEGINNER.xmk");
+	}
+
+	std::cout << "Generator msg: loading " << diff << std::endl;
+	std::string chartPath = entry.path + diff;
+	m_chart.open(chartPath, std::ios::binary);
 	if (m_chart.is_open()) {
 		//write chart data to console
-		m_isChartBinary = false;
-		std::cout << "Generator msg: loaded text chart" << std::endl;
-		std::string version;
-		m_chart >> version;
-		std::cout << "Generator msg: Chart Version: " << version << std::endl;
-		initialLoad();
+		m_isChartBinary = true;
+		std::cout << "loaded xmk chart" << std::endl;
+		int version = 0;
+		int dummy = 0;
+		readToInt(m_chart, &version);
+		readToInt(m_chart, &dummy);
+		readToInt(m_chart, &dummy);
+		readToInt(m_chart, &dummy);
+		std::cout << "version: " << version << std::endl;
 	} else {
-		std::cout << "Generator msg: text chart not found, opening fgsmub" << std::endl;
-		std::string chartPath = entry.path + std::string("/chart.fsgmub");
-		m_chart.open(chartPath, std::ios::binary);
-		if (m_chart.is_open()) {
-			//write chart data to console
-			m_isChartBinary = true;
-			std::cout << "Generator msg: loaded fgsmub chart" << std::endl;
-
-			int version = 0;
-			int dummy = 0;
-			readToInt(m_chart, &version);
-			readToInt(m_chart, &dummy);
-			readToInt(m_chart, &dummy);
-			readToInt(m_chart, &dummy);
-
-			std::cout << "version: " << version << std::endl;
-			initialLoad();
-		} else {
-			std::cout << "Generator msg: error loading fsgmub file, opening xmk file" << std::endl;
-			std::string chartPath = entry.path + std::string("/chart.xmk");
-			m_chart.open(chartPath, std::ios::binary);
-			if (m_chart.is_open()) {
-				//write chart data to console
-				m_isChartBinary = true;
-				std::cout << "loaded xmk chart" << std::endl;
-
-				int version = 0;
-				int dummy = 0;
-				readToInt(m_chart, &version);
-				readToInt(m_chart, &dummy);
-				readToInt(m_chart, &dummy);
-				readToInt(m_chart, &dummy);
-
-				std::cout << "version: " << version << std::endl;
-			} else {
-				std::cerr << "Generator Error: could not load chart file" << std::endl;
-			}
-			initialLoad();
-		}
+		std::cerr << "Generator Error: could not load chart file" << std::endl;
 	}
+	initialLoad();
 }
 
 void Generator::initialLoad() {

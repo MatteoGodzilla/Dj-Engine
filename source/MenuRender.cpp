@@ -47,7 +47,7 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	int heightIndex = 0;
 	float selHeight = 0.0f;
 
-	std::vector<MenuNode> list = node.getChildrens();
+	std::vector<MenuNode>& list = node.getChildrens();
 	if (node.getChildCount() > 0) {
 		MenuNode m = list.at(selected);
 		right = getTextWidth(m.getText(), scale);
@@ -82,10 +82,9 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 
 	if (node.getChildCount() > 0) {
 		//draw every child from node
-
 		if (node.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < node.getChildCount(); i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating) {
+				if (m_currentIdleTime > m_timeBeforeAnimating && i == selected) {
 					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
 				} else {
 					drawText(list.at(i).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
@@ -98,7 +97,6 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 				} else {
 					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
 				}
-				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 	}
@@ -132,7 +130,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	ImGui::SetWindowSize({(float)width, (float)height});
 
 	int id = game->getPlayer()->m_useKeyboardInput ? -1 : game->getPlayer()->m_gamepadId;
-	if (id < -1) {
+	if (id < 0) {
 		m_inputSelection = "Keyboard";
 	} else {
 		std::string name = glfwGetJoystickName(id);
