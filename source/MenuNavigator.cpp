@@ -268,10 +268,6 @@ void MenuNavigator::update() {
 			m_render.tick();
 			updateMenuNode();
 
-			double nowTime = glfwGetTime();
-			m_dTime = nowTime - m_pastTime;
-			m_pastTime = nowTime;
-
 			bool goingUp = m_isUpPressed && !m_wasUpPressed;
 			bool goingDown = m_isDownPressed && !m_wasDownPressed;
 
@@ -442,6 +438,10 @@ void MenuNavigator::update() {
 
 void MenuNavigator::render() {
 	if (m_active) {
+		double nowTime = glfwGetTime();
+		m_dTime = nowTime - m_pastTime;
+		m_pastTime = nowTime;
+
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
 			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);

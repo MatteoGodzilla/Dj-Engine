@@ -1008,8 +1008,11 @@ void MenuRender::calibration(Game* game, double dt) {
 		m_isCalibrating = true;
 		m_cbPlayingTime = 0.0;
 		m_latencyHits.clear();
+		SongEntry temp;
+		temp.path = "res";
+		temp.streams = 1;
 		game->getAudio()->init();
-		game->getAudio()->load("res/calibration.ogg");
+		game->getAudio()->load(temp);
 		game->getAudio()->play();
 	}
 	if (game->getAudio()->isPlaying()) {
@@ -1024,15 +1027,16 @@ void MenuRender::calibration(Game* game, double dt) {
 			for (size_t i = 0; i < m_latencyHits.size(); ++i) {
 				sum += m_latencyHits.at(i) - (2.0 + 0.5 * i);
 			}
+			std::cout << (float)(sum / m_latencyHits.size());
 			game->m_audioLatency = (float)(sum / m_latencyHits.size());
 			m_latencyHits.clear();
 		}
 	}
 	ImGui::SameLine();
 	ImGui::SliderFloat("Current audio latency (in ms.)", &(game->m_audioLatency), 0.0f, 2.0f);
-	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
-	ImGui::Text("Press the Spacebar when you hear the snare hits WITHOUT pressing for the ding");
-	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
+	ImGui::Text("When calibrating, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
+	ImGui::Text("Press the Spacebar when you hear the snare hits");
+	ImGui::Text("(Note: there's latency in the audio engine. Even with wired headphones it will be above 0)");
 
 	ImGui::Separator();
 

@@ -191,9 +191,8 @@ void Game::start(const SongEntry& entry, int difficulty) {
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
 
-	std::string audioPath = entry.path + std::string("/song.ogg");
 	m_audio.init();
-	m_audio.load(audioPath);
+	m_audio.load(entry);
 
 	m_audioLength = m_audio.getFileLength();
 
