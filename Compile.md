@@ -76,7 +76,7 @@ To install all the required tools and libraries you just have to run the followi
 Arch-based:
 
 ``` bash
-sudo pacman -S gcc cmake make clang-tools-extra freetype2 glew libvorbis openal
+sudo pacman -S gcc cmake make clang-tools-extra freetype2 glew libvorbis portaudio
 
 # Install this if you're using x11 as window manager (most likely)
 sudo pacman -S glfw-x11

@@ -945,8 +945,8 @@ void MenuRender::splashArt() {
 	renderTexture(vector, indices, m_splashTexture);
 
 	float textScale = 0.02f;
-	drawText("*This is alpha v1.4.1. There are still some bugs left,*", 10.0, 10.0, textScale);
-	drawText("*but I think most of them should be fixed by now*", 10.0, 30.0, textScale);
+	drawText("*This is alpha v1.5. There are still some bugs left.*", 10.0, 10.0, textScale);
+	drawText("*Less spaghetti code than before*", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 
 	std::string discord = "For any questions, ask on the Dj Hero Discord";

@@ -113,8 +113,7 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	MenuNode pollrate("Change input poll rate:", POLL_ID);
 	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
 
-	MenuNode a("No songs found inside the song cache", DONT_CARE);
-	MenuNode b("Try Options -> Refresh song list", DONT_CARE);
+	MenuNode a("Refresh List", REFRESH_ID);
 
 	//add values to text after:
 	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
@@ -134,7 +133,6 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	options.push(debug);
 
 	play.push(a);
-	play.push(b);
 
 	m_root.push(play);
 	m_root.push(options);
@@ -501,6 +499,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 	} else if (id == REFRESH_ID) {
 		m_songList.clear();
 		scan(false);
+		resetMenu();
 	} else if (id == COLOR_ID) {
 		m_popupId = LANE_COLORS;
 	} else if (id == POLL_ID) {

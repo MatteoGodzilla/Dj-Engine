@@ -18,6 +18,7 @@ enum diffs {
 	BEGINNER = 16
 };
 
+const int CACHE_VER = 1;
 struct SongEntry {
 	std::string path;
 	std::string s1;
