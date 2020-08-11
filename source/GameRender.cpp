@@ -298,8 +298,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					float endTime = std::min(note.getMilli() + note.getLength(), time + m_noteVisibleTime);
 
 					if (endTime > time && note.getLength() > 15 / m_genBPM) {
-						float startAngle = getAngleFromDT(startTime - time);
-						float endAngle = getAngleFromDT(endTime - time);
+						double startAngle = getAngleFromDT(startTime - time);
+						double endAngle = getAngleFromDT(endTime - time);
 
 						float trailWidth = 0.15;
 
@@ -307,9 +307,9 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 						glm::vec2 BeforeInner = getCirclePoint((double)m_radius - trailWidth, startAngle);
 
 						//trail middle part like highway
-						for (float angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
-							glm::vec2 outer = getCirclePoint((double)m_radius + trailWidth, (double)angle);
-							glm::vec2 inner = getCirclePoint((double)m_radius - trailWidth, (double)angle);
+						for (double angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
+							glm::vec2 outer = getCirclePoint((double)m_radius + trailWidth, angle);
+							glm::vec2 inner = getCirclePoint((double)m_radius - trailWidth, angle);
 
 							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
 							pushVertexTexture(noteVector, -BeforeInner.x + center.x, plane, -BeforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
@@ -397,8 +397,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					float endTime = std::min(note.getMilli() + note.getLength(), time + m_noteVisibleTime);
 
 					if (endTime > time && note.getLength() > 15 / m_genBPM) {
-						float startAngle = getAngleFromDT(startTime - time);
-						float endAngle = getAngleFromDT(endTime - time);
+						double startAngle = getAngleFromDT(startTime - time);
+						double endAngle = getAngleFromDT(endTime - time);
 
 						float trailWidth = 0.15;
 
@@ -415,15 +415,15 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 						//trail middle part like highway
 
-						for (float angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
+						for (double angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
 							glm::vec2 outer;
 							glm::vec2 inner;
 							if (getCrossAtTime(time + getDTFromAngle(angle), cross) == 0) {
-								outer = getCirclePoint((double)m_radius + 1.0f + trailWidth, (double)angle);
-								inner = getCirclePoint((double)m_radius + 1.0f - trailWidth, (double)angle);
+								outer = getCirclePoint((double)m_radius + 1.0f + trailWidth, angle);
+								inner = getCirclePoint((double)m_radius + 1.0f - trailWidth, angle);
 							} else {
-								outer = getCirclePoint((double)m_radius + 0.5f + trailWidth, (double)angle);
-								inner = getCirclePoint((double)m_radius + 0.5f - trailWidth, (double)angle);
+								outer = getCirclePoint((double)m_radius + 0.5f + trailWidth, angle);
+								inner = getCirclePoint((double)m_radius + 0.5f - trailWidth, angle);
 							}
 							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
 							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
@@ -444,8 +444,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							double nowMilli = cfs.at(i).getMilli();
 
 							if (nowMilli >= time && nowMilli < time + m_noteVisibleTime) {
-								float farAngle = getAngleFromDT(nowMilli - time) + asin(trailWidth / (m_radius + 0.75f));
-								float nearAngle = getAngleFromDT(nowMilli - time) - asin(trailWidth / (m_radius + 0.75f));
+								double farAngle = getAngleFromDT(nowMilli - time) + asin(trailWidth / (m_radius + 0.75f));
+								double nearAngle = getAngleFromDT(nowMilli - time) - asin(trailWidth / (m_radius + 0.75f));
 
 								glm::vec2 mainTopLeft = getCirclePoint(m_radius + 1.0f - trailWidth, farAngle);
 								glm::vec2 mainTopRight = getCirclePoint(m_radius + 0.5f + trailWidth, farAngle);
@@ -594,8 +594,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 					float endTime = std::min(note.getMilli() + note.getLength(), time + m_noteVisibleTime);
 
 					if (endTime > time && note.getLength() > 15 / m_genBPM) {
-						float startAngle = getAngleFromDT(startTime - time);
-						float endAngle = getAngleFromDT(endTime - time);
+						double startAngle = getAngleFromDT(startTime - time);
+						double endAngle = getAngleFromDT(endTime - time);
 
 						float trailWidth = 0.15;
 
@@ -612,15 +612,15 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 						//trail middle part like highway
 
-						for (float angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
+						for (double angle = startAngle; angle < endAngle; angle += m_deltaAngle) {
 							glm::vec2 outer;
 							glm::vec2 inner;
 							if (getCrossAtTime(time + getDTFromAngle(angle), cross) == 2) {
-								outer = getCirclePoint((double)m_radius - 1.0f + trailWidth, (double)angle);
-								inner = getCirclePoint((double)m_radius - 1.0f - trailWidth, (double)angle);
+								outer = getCirclePoint((double)m_radius - 1.0f + trailWidth, angle);
+								inner = getCirclePoint((double)m_radius - 1.0f - trailWidth, angle);
 							} else {
-								outer = getCirclePoint((double)m_radius - 0.5f + trailWidth, (double)angle);
-								inner = getCirclePoint((double)m_radius - 0.5f - trailWidth, (double)angle);
+								outer = getCirclePoint((double)m_radius - 0.5f + trailWidth, angle);
+								inner = getCirclePoint((double)m_radius - 0.5f - trailWidth, angle);
 							}
 							pushVertexTexture(noteVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, trailMiddle.x, 1.0f - (trailMiddle.y + trailMiddle.w));
 							pushVertexTexture(noteVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, trailMiddle.x + trailMiddle.z, 1.0f - (trailMiddle.y + trailMiddle.w));
@@ -641,8 +641,8 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 							double nowMilli = cfs.at(i).getMilli();
 
 							if (nowMilli >= time && nowMilli < time + m_noteVisibleTime) {
-								float farAngle = getAngleFromDT(nowMilli - time) + asin(trailWidth / (m_radius - 0.75f));
-								float nearAngle = getAngleFromDT(nowMilli - time) - asin(trailWidth / (m_radius - 0.75f));
+								double farAngle = getAngleFromDT(nowMilli - time) + asin(trailWidth / (m_radius - 0.75f));
+								double nearAngle = getAngleFromDT(nowMilli - time) - asin(trailWidth / (m_radius - 0.75f));
 
 								glm::vec2 mainTopLeft = getCirclePoint(m_radius - 0.5f - trailWidth, farAngle);
 								glm::vec2 mainTopRight = getCirclePoint(m_radius - 1.0f + trailWidth, farAngle);

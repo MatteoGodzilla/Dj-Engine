@@ -27,7 +27,7 @@ public:
 	void tick();
 	void render(MenuNode node, int selected, int vOffset);
 	void remapping(Game* game, menuinputs input);
-	void scratches(Player* player);
+	//void scratches(Player* player);
 	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
 	void setLaneColors(Game* game);

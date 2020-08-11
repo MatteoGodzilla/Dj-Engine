@@ -302,6 +302,7 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 		std::string token;
 		std::getline(cache, token);
 		ver = stoi(token);
+		std::cout << "SongScanner Message: found cache version " << ver << std::endl;
 		try {
 			std::getline(cache, token);
 			n = stoi(token);
@@ -372,9 +373,8 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 			}
 			cache.close();
 			std::cout << "SongScanner Message: loaded songs from cache" << std::endl;
-		}
-		catch(...){
-			std::cerr << "SongScanner Error: cache is invalid/too old. Please update it"<< std::endl;
+		} catch (...) {
+			std::cerr << "SongScanner Error: cache is invalid/too old. Please update it" << std::endl;
 		}
 	} else {
 		std::cerr << "SongScanner Error: Could not open cache / Cache file not found" << std::endl;

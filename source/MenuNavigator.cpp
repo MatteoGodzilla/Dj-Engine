@@ -451,9 +451,10 @@ void MenuNavigator::render() {
 			m_render.remapping(m_game, {&UP_CODE, &DOWN_CODE, &SELECT_CODE, &BACK_CODE, &UP_GAMEPAD, &DOWN_GAMEPAD, &SELECT_GAMEPAD, &BACK_GAMEPAD});
 		} else if (m_scene == CREDITS) {
 			m_render.credits();
-		} else if (m_scene == SCRATCHES) {
+		} /*else if (m_scene == SCRATCHES) {
 			m_render.scratches(m_game->getPlayer());
-		} else if (m_scene == CALIBRATION) {
+		} */
+		else if (m_scene == CALIBRATION) {
 			m_render.calibration(m_game, m_dTime);
 		} else if (m_scene == RESULTS) {
 			m_render.result(m_game);

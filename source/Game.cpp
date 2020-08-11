@@ -16,8 +16,8 @@ void Game::init(GLFWwindow* w) {
 
 	ini.LoadFile("config.ini");
 
-	m_audioLatency = ini.GetDoubleValue(section, "audioLatency", 0.0);
-	m_deckSpeed = ini.GetDoubleValue(section, "noteVisible", 1.0);
+	m_audioLatency = (float)ini.GetDoubleValue(section, "audioLatency", 0.0);
+	m_deckSpeed = (float)ini.GetDoubleValue(section, "noteVisible", 1.0);
 	m_isButtonsRight = ini.GetBoolValue(section, "buttonsRight", false);
 	m_debugView = ini.GetBoolValue(section, "debugView", false);
 	m_inputThreadPollRate = ini.GetLongValue(section, "pollRate", 240);

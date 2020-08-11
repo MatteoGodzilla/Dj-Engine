@@ -962,11 +962,11 @@ void MenuRender::splashArt() {
 	drawText(remap, (1280.0f - getTextWidth(remap, 0.03f)) / 2.0f, 680.0f, 0.03f);
 }
 
+/*
 void MenuRender::scratches(Player* player) {
 	useOrthoProj();
 	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
 
-	/*
 	if(player->m_useKeyboardInput){
 		player->updateKBMState(m_window);
 	}
@@ -982,11 +982,11 @@ void MenuRender::scratches(Player* player) {
 	if (m_testBuffer.size() > 20) {
 		m_testBuffer.erase(0, 1);
 	}
-*/
 
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
 	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
 }
+*/
 
 void MenuRender::calibration(Game* game, double dt) {
 	useOrthoProj();
