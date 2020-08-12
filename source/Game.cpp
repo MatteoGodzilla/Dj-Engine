@@ -97,7 +97,7 @@ void Game::inputThreadFun(Game* game) {
 
 		if (glfwGetKey(game->getGameRender()->getWindowPtr(), GLFW_KEY_ESCAPE) && game->m_active) {
 			game->m_mode = 1;
-			game->m_audio.stop();
+			game->m_audio.destroy();
 			game->m_active = false;
 		}
 

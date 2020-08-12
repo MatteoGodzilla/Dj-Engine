@@ -231,4 +231,5 @@ void Audio::destroy() {
 		checkError(Pa_Terminate());
 		initialized = false;
 	}
+	std::cout << "Audio Message: destroyed audio context" << std::endl;
 }
