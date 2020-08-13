@@ -27,7 +27,7 @@ public:
 	void tick();
 	void render(MenuNode node, int selected, int vOffset);
 	void remapping(Game* game, menuinputs input);
-	void scratches(Player* player);
+	//void scratches(Player* player);
 	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
 	void setLaneColors(Game* game);
@@ -46,7 +46,6 @@ public:
 	std::string m_testBuffer = "";
 
 	bool m_shouldClose = false;
-	bool m_input = true;
 
 	double m_timeBeforeAnimating = 3.0f;
 	double m_currentIdleTime = 0.0f;

@@ -55,8 +55,8 @@ target_link_libraries(${CMAKE_PROJECT_NAME} "ImGui")
 include_directories("lib/nlohmann")
 
 # OpenAL
-find_package(OpenAL REQUIRED)
-target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENAL_LIBRARY})
+# find_package(OpenAL REQUIRED)
+# target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENAL_LIBRARY})
 
 # OpenGL
 if (MSYS)
@@ -66,6 +66,10 @@ else()
 	find_package(OpenGL REQUIRED)
 	target_link_libraries(${CMAKE_PROJECT_NAME} OpenGL::GL)
 endif()
+
+# PortAudio
+# find_package(portaudio REQUIRED)
+target_link_libraries(${CMAKE_PROJECT_NAME} portaudio)
 
 # SimpleINI
 include_directories("lib/SimpleINI")

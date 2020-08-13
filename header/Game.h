@@ -29,7 +29,7 @@ public:
 	Audio* getAudio();
 	GameRender* getGameRender();
 	Generator* getGenerator();
-	void start(const SongEntry& entry);
+	void start(const SongEntry& entry, int difficulty);
 	void setButtonPos(bool value);
 	void writeConfig();
 	~Game();
@@ -40,6 +40,7 @@ public:
 	std::vector<double> m_bpm_arr;
 	double m_global_time = -2.0;
 	double m_deltaTime = 0.0;
+	double m_audioLength = 0.0f;
 	float m_audioLatency = 0.0f;
 	float m_deckSpeed = 1.0f;
 	bool m_debugView = false;
@@ -49,7 +50,7 @@ public:
 
 private:
 	double m_pastTime = 0.0;
-	bool firstRun = true;
+	bool audioStartedOnce = false;
 	GameRender m_render;
 	Generator m_gen;
 	Player m_player;

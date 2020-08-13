@@ -28,7 +28,7 @@ pacman -Su
 To install all the required tools and libraries you just have to run the following command in a MSYS2 shell.
 
 ``` bash
-pacman -S mingw-w64-x86_64-gcc cmake make mingw-w64-x86_64-clang mingw-w64-x86_64-clang-tools-extra mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-x86_64-libvorbis mingw-w64-x86_64-mesa mingw-w64-x86_64-openal
+pacman -S mingw-w64-x86_64-gcc cmake make mingw-w64-x86_64-clang mingw-w64-x86_64-clang-tools-extra mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-glfw mingw-w64-x86_64-libvorbis mingw-w64-x86_64-mesa mingw-w64-x86_64-portaudio
 ```
 
 (MSYS2 has some dependency problems with clang-tidy and to fix it both gcc and clang need to be installed)
@@ -76,7 +76,7 @@ To install all the required tools and libraries you just have to run the followi
 Arch-based:
 
 ``` bash
-sudo pacman -S gcc cmake make clang-tools-extra freetype2 glew libvorbis openal
+sudo pacman -S gcc cmake make clang-tools-extra freetype2 glew libvorbis portaudio
 
 # Install this if you're using x11 as window manager (most likely)
 sudo pacman -S glfw-x11
@@ -88,13 +88,14 @@ sudo pacman -S glfw-wayland
 Fedora:
 
 ``` bash
-sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel openal-soft-devel
+sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel portaudio-devel
 ```
 
 Ubuntu-based:
 
 ``` bash
-sudo apt install gcc cmake make clang-tidy libfreetype6-dev libglew-dev libglfw3-dev libvorbis-dev libopenal-dev
+sudo apt install gcc cmake make clang-tidy libfreetype6-dev libglew-dev libglfw3-dev libvorbis-dev portaudio19-dev
+
 ```
 
 Now to compile the program just launch the build script:

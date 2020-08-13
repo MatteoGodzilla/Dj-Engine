@@ -9,7 +9,7 @@
 int WIDTH = 1280;
 int HEIGHT = 720;
 
-std::string VERSION = "alpha v1.4.1";
+std::string VERSION = "alpha v1.5";
 
 Game game;
 MenuNavigator menu;
@@ -109,10 +109,6 @@ int main(int argc, char** argv) {
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 
-		now = glfwGetTime();
-		deltaTime = now - pastTick;
-		pastTick = now;
-
 		if (scene == 0) {
 			//change scene if not active
 			if (!menu.getActive()) {
@@ -125,7 +121,7 @@ int main(int argc, char** argv) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			menu.pollInput();
 			menu.update();
-			menu.render(deltaTime);
+			menu.render();
 		} else if (scene == 1) {
 			//change scene if not active
 			if (!game.getActive()) {

@@ -43,7 +43,9 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 		if (getRisingEdge(GREEN_INDEX)) {
 			if (getHittableNote(TAP_G, noteArr)) {
 				hit(time, TAP_G, noteArr);
-			} else if (!getHittableNote(SCR_G_ZONE, eventArr)) {
+			} else if (getHittableNote(SCR_G_ZONE, eventArr)) {
+				hit(time, SCR_G_ZONE, eventArr);
+			} else {
 				breakCombo(time);
 			}
 		}
@@ -53,10 +55,34 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 		if (getRisingEdge(BLUE_INDEX)) {
 			if (getHittableNote(TAP_B, noteArr)) {
 				hit(time, TAP_B, noteArr);
-			} else if (!getHittableNote(SCR_B_ZONE, eventArr)) {
+			} else if (getHittableNote(SCR_B_ZONE, eventArr)) {
+				hit(time, SCR_B_ZONE, eventArr);
+			} else {
 				breakCombo(time);
 			}
 		}
+
+		if (m_gpState.at(GREEN_INDEX) * m_gpMult.at(GREEN_INDEX) >= m_gpDead.at(GREEN_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_G_HOLD_TICK, noteArr)) {
+				hit(time, TAP_G_HOLD_TICK, noteArr);
+			}
+		}
+
+		if (m_gpState.at(RED_INDEX) * m_gpMult.at(RED_INDEX) >= m_gpDead.at(RED_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_R_HOLD_TICK, noteArr)) {
+				hit(time, TAP_R_HOLD_TICK, noteArr);
+			}
+		}
+
+		if (m_gpState.at(BLUE_INDEX) * m_gpMult.at(BLUE_INDEX) >= m_gpDead.at(BLUE_INDEX)) {
+			//holding green
+			if (getHittableNoteAtZero(time, TAP_B_HOLD_TICK, noteArr)) {
+				hit(time, TAP_B_HOLD_TICK, noteArr);
+			}
+		}
+
 		if (getRisingEdge(EU_INDEX)) {
 			if (m_eu_value > 0.0) {
 				m_euphoria_active = true;
@@ -65,9 +91,9 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 
 		if (getFallingZero(SCR_UP_INDEX)) {
 			if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
-				if (isAxisAboveDeadzone(GREEN_INDEX)) {
+				if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
 					hit(time, SCR_G_UP, noteArr);
-				} else if (isAxisAboveDeadzone(BLUE_INDEX)) {
+				} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
 					hit(time, SCR_B_UP, noteArr);
 				}
 			} else {
@@ -79,9 +105,9 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			}
 		} else if (getFallingZero(SCR_DOWN_INDEX)) {
 			if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
-				if (isAxisAboveDeadzone(GREEN_INDEX)) {
+				if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
 					hit(time, SCR_G_DOWN, noteArr);
-				} else if (isAxisAboveDeadzone(BLUE_INDEX)) {
+				} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
 					hit(time, SCR_B_DOWN, noteArr);
 				}
 			} else {
@@ -93,14 +119,14 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 
 		if (m_gpHistory.back().at(SCR_UP_INDEX) != m_gpState.at(SCR_UP_INDEX)) {
 			//platter moved in general
-			if (isAxisAboveDeadzone(GREEN_INDEX)) {
+			if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
 				if (getHittableNote(SCR_G_ANY, noteArr)) {
 					hit(time, SCR_G_ANY, noteArr);
 				} else if (getHittableNote(SCR_G_TICK, noteArr)) {
 					hit(time, SCR_G_TICK, noteArr);
 				}
 			}
-			if (isAxisAboveDeadzone(BLUE_INDEX)) {
+			if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
 				if (getHittableNote(SCR_B_ANY, noteArr)) {
 					hit(time, SCR_B_ANY, noteArr);
 				} else if (getHittableNote(SCR_B_TICK, noteArr)) {
@@ -111,96 +137,62 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 
 		if (!m_euphoria_active) {
 			//manual input by player
+
+			float left = std::max(m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX), 0.0f);
+			float right = std::max(m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX), 0.0f);
+
+			float fpos = right - left;
+			int crossNow = 1;
+			if (fpos > 0.5) {
+				crossNow = 2;
+			} else if (fpos < -0.5) {
+				crossNow = 0;
+			}
+
 			if (m_cross == 0) {
-				if (m_baseMove == 0) {
-					if (getRisingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 2;
-						m_cross = 2;
-						m_cfGreenToCenter = true;
-						m_cfCenterToBlue = true;
-						if (getHittableNote(CF_SPIKE_B, noteArr)) {
-							hit(time, CF_SPIKE_B, noteArr);
-						} else {
-							hit(time, CROSS_B, cross);
-						}
-					} else if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_baseMove = 1;
-						m_cross = 1;
-						m_cfGreenToCenter = true;
-						if (getHittableNote(CF_SPIKE_C, noteArr)) {
-							hit(time, CF_SPIKE_C, noteArr);
-						} else if (!getHittableNote(CF_SPIKE_B, noteArr) && !getHittableNote(CROSS_B, cross)) {
-							hit(time, CROSS_C, cross);
-						}
+				if (crossNow == 1) {
+					if (getHittableNote(CF_SPIKE_C, noteArr)) {
+						hit(time, CF_SPIKE_C, noteArr);
+					} else if (!getHittableNote(CROSS_B, cross) && !getHittableNote(CF_SPIKE_B, noteArr)) {
+						hit(time, CROSS_C, cross);
 					}
-				} else if (m_baseMove == 2) {
-					if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 1;
-						m_cross = 2;
-						m_cfGreenToCenter = true;
-						m_cfCenterToBlue = true;
-						hit(time, CROSS_B, cross);
-					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 1;
-						m_baseMove = 0;
-					}
+					m_cfGreenToCenter = true;
 				}
 			} else if (m_cross == 1) {
-				if (getRisingEdge(CF_LEFT_INDEX)) {
-					m_baseMove = 0;
-					m_cross = 0;
-					m_cfCenterToGreen = true;
+				if (crossNow == 0) {
 					if (getHittableNote(CF_SPIKE_G, noteArr)) {
 						hit(time, CF_SPIKE_G, noteArr);
 					} else {
 						hit(time, CROSS_G, cross);
 					}
-				}
-
-				if (getRisingEdge(CF_RIGHT_INDEX)) {
-					m_baseMove = 2;
-					m_cross = 2;
-					m_cfCenterToBlue = true;
+					m_cfCenterToGreen = true;
+				} else if (crossNow == 2) {
 					if (getHittableNote(CF_SPIKE_B, noteArr)) {
 						hit(time, CF_SPIKE_B, noteArr);
 					} else {
 						hit(time, CROSS_B, cross);
 					}
+					m_cfCenterToBlue = true;
 				}
 			} else if (m_cross == 2) {
-				if (m_baseMove == 2) {
-					if (getRisingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 0;
-						m_cross = 0;
-						m_cfBlueToCenter = true;
-						m_cfCenterToGreen = true;
-						if (getHittableNote(CF_SPIKE_G, noteArr)) {
-							hit(time, CF_SPIKE_G, noteArr);
-						} else {
-							hit(time, CROSS_G, cross);
-						}
-					} else if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_baseMove = 1;
-						m_cross = 1;
-						m_cfBlueToCenter = true;
-						if (getHittableNote(CF_SPIKE_C, noteArr)) {
-							hit(time, CF_SPIKE_C, noteArr);
-						} else if (!getHittableNote(CF_SPIKE_G, noteArr) && !getHittableNote(CROSS_G, cross)) {
-							hit(time, CROSS_C, cross);
-						}
+				if (crossNow == 1) {
+					if (getHittableNote(CF_SPIKE_C, noteArr)) {
+						hit(time, CF_SPIKE_C, noteArr);
+					} else if (!getHittableNote(CROSS_G, cross) && !getHittableNote(CF_SPIKE_G, noteArr)) {
+						hit(time, CROSS_C, cross);
 					}
-				} else if (m_baseMove == 0) {
-					if (getFallingEdge(CF_RIGHT_INDEX)) {
-						m_secondMove = 1;
-						m_cross = 0;
-						m_cfBlueToCenter = true;
-						m_cfCenterToGreen = true;
-						hit(time, CROSS_G, cross);
-					} else if (getFallingEdge(CF_LEFT_INDEX)) {
-						m_secondMove = 1;
-						m_baseMove = 2;
-					}
+					m_cfBlueToCenter = true;
 				}
+			}
+
+			m_cross = crossNow;
+
+			if (getHittableNoteAtZero(time, CROSS_G_TICK, cross) && m_cross == 0) {
+				hit(time, CROSS_G_TICK, cross);
+			}
+
+			if (getHittableNoteAtZero(time, CROSS_B_TICK, cross) && m_cross == 2) {
+				hit(time, CROSS_B_TICK, cross);
 			}
 		} else {
 			//euphoria enabled
@@ -227,6 +219,14 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				}
 				m_cfCenterToBlue = true;
 				m_cross = 2;
+			}
+
+			if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
+				hit(time, CROSS_G_TICK, cross);
+			}
+
+			if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
+				hit(time, CROSS_B_TICK, cross);
 			}
 
 			if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
@@ -290,6 +290,14 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			}
 			m_cfCenterToBlue = true;
 			m_cross = 2;
+		}
+
+		if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
+			hit(time, CROSS_G_TICK, cross);
+		}
+
+		if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
+			hit(time, CROSS_B_TICK, cross);
 		}
 
 		if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
@@ -363,6 +371,9 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			} else if (noteType == CROSS_G || noteType == CROSS_C || noteType == CROSS_B || noteType == CF_SPIKE_G || noteType == CF_SPIKE_C || noteType == CF_SPIKE_B) {
 				m_score += 100 * m_mult;
 				m_combo++;
+			} else if (noteType == CROSS_G_TICK || noteType == CROSS_B_TICK) {
+				m_score += 10 * m_mult;
+				m_cross_tick++;
 			} else if (noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
 				m_score += 100 * m_mult;
 				m_combo++;
@@ -371,14 +382,16 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			} else if (noteType == SCR_G_TICK || noteType == SCR_B_TICK) {
 				m_score += 25 * m_mult;
 				m_scr_tick++;
+			} else if (noteType == TAP_G_HOLD_TICK || noteType == TAP_R_HOLD_TICK || noteType == TAP_B_HOLD_TICK) {
+				m_score += 25 * m_mult;
 			}
 			note.click();
 
-			if (noteType == TAP_G || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
+			if (noteType == TAP_G || noteType == TAP_G_HOLD_TICK || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
 				m_greenAnimation = true;
-			} else if (noteType == TAP_R) {
+			} else if (noteType == TAP_R || noteType == TAP_R_HOLD_TICK) {
 				m_redAnimation = true;
-			} else if (noteType == TAP_B || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
+			} else if (noteType == TAP_B || noteType == TAP_B_HOLD_TICK || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
 				m_blueAnimation = true;
 			}
 
@@ -1187,6 +1200,10 @@ void Player::tick(double time) {
 		m_scr_tick -= 4;
 		m_combo++;
 	}
+	if (m_cross_tick >= 4) {
+		m_cross_tick -= 4;
+		m_combo++;
+	}
 
 	//decrease euphoria if active
 	if (m_euphoria_active) {
@@ -1516,7 +1533,7 @@ bool Player::getFallingZero(int index) {
 		}
 	}
 	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
-		float minVelocity = -0.05;
+		float minVelocity = -0.025;
 		std::vector<float> averages;
 		size_t i;
 		for (i = 0; i < m_gpHistory.size() - 2; ++i) {
@@ -1618,6 +1635,15 @@ bool Player::getHittableNoteAtZero(double time, int noteType, std::vector<Note>&
 		}
 	}
 	return found;
+}
+
+bool Player::getScratchZoneActive(double time, int zoneType, std::vector<Note>& events) {
+	for (auto& ev : events) {
+		if (ev.getTouched() && ev.getType() == zoneType && time >= ev.getMilli() && time < ev.getMilli() + ev.getLength()) {
+			return true;
+		}
+	}
+	return false;
 }
 
 bool Player::isAxisAboveDeadzone(int index) const {

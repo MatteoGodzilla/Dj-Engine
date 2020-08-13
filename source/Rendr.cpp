@@ -4,7 +4,7 @@
 #include "stb_image.h"
 
 //character struct to store freetype glyph data
-struct Character {
+struct CharTextureData {
 	GLuint TextureID;
 	float bx;
 	float by;
@@ -13,7 +13,31 @@ struct Character {
 	float advance;
 };
 
-std::map<char, Character> ChMap;
+std::map<char, CharTextureData> ChMap;
+
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_, glm::vec2 tex_) {
+	pos = pos_;
+	col = col_;
+	tex = tex_;
+}
+
+Vertex::Vertex(glm::vec3 pos_, glm::vec2 tex_) {
+	pos = pos_;
+	col = {1.0, 1.0, 1.0, 1.0};
+	tex = tex_;
+}
+
+Vertex::Vertex(glm::vec3 pos_, glm::vec4 col_) {
+	pos = pos_;
+	col = col_;
+	tex = {0.0, 0.0};
+}
+
+Vertex::Vertex(glm::vec3 pos_) {
+	pos = pos_;
+	col = {1.0, 1.0, 1.0, 1.0};
+	tex = {0.0, 0.0};
+}
 
 void Rendr::checkError() {
 	std::cout << "started error checking" << std::endl;
@@ -26,7 +50,7 @@ void Rendr::checkError() {
 }
 
 //utility function
-void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a) const {
+void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, float r, float g, float b, float a, float s, float t) const {
 	if (rendr_InvertedX) {
 		v.push_back(-x);
 	} else {
@@ -38,10 +62,12 @@ void Rendr::pushVertexColor(std::vector<float>& v, float x, float y, float z, fl
 	v.push_back(g);
 	v.push_back(b);
 	v.push_back(a);
+	v.push_back(s);
+	v.push_back(t);
 }
 
 //utility function
-void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t) const {
+void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, float s, float t, float r, float g, float b, float a) const {
 	if (rendr_InvertedX) {
 		v.push_back(-x);
 	} else {
@@ -49,12 +75,40 @@ void Rendr::pushVertexTexture(std::vector<float>& v, float x, float y, float z, 
 	}
 	v.push_back(y);
 	v.push_back(z);
+	v.push_back(r);
+	v.push_back(g);
+	v.push_back(b);
+	v.push_back(a);
 	v.push_back(s);
 	v.push_back(t);
 }
 
 //utility function
-void Rendr::pushRectangleIndices(std::vector<unsigned int>& v, unsigned int& value) {
+void Rendr::pushVertex(std::vector<float>& v, Vertex& ver) const {
+	if (rendr_InvertedX) {
+		v.push_back(-ver.pos.x);
+	} else {
+		v.push_back(ver.pos.x);
+	}
+	v.push_back(ver.pos.y);
+	v.push_back(ver.pos.z);
+	v.push_back(ver.col.r);
+	v.push_back(ver.col.g);
+	v.push_back(ver.col.b);
+	v.push_back(ver.col.a);
+	v.push_back(ver.tex.s);
+	v.push_back(ver.tex.t);
+}
+
+void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) {
+	pushVertex(v, ver1);
+	pushVertex(v, ver2);
+	pushVertex(v, ver3);
+	pushVertex(v, ver4);
+}
+
+//utility function
+void Rendr::pushQuadIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
 	v.push_back(value + 2);
@@ -73,16 +127,16 @@ void Rendr::pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& valu
 
 void Rendr::usePersProj() {
 	//setting up projection uniform on all programs
-	glUseProgram(m_textureProgram);
-	int location = glGetUniformLocation(m_textureProgram, "u_proj");
+	glUseProgram(m_mainProgram);
+	int location = glGetUniformLocation(m_mainProgram, "u_proj");
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
 	} else {
 		std::cerr << "error setting projection matrix" << std::endl;
 	}
 
-	glUseProgram(m_colorProgram);
-	location = glGetUniformLocation(m_colorProgram, "u_proj");
+	glUseProgram(m_mainProgram);
+	location = glGetUniformLocation(m_mainProgram, "u_proj");
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
 	} else {
@@ -100,16 +154,16 @@ void Rendr::usePersProj() {
 
 void Rendr::useOrthoProj() {
 	//setting up projection uniform
-	glUseProgram(m_textureProgram);
-	int location = glGetUniformLocation(m_textureProgram, "u_proj");
+	glUseProgram(m_mainProgram);
+	int location = glGetUniformLocation(m_mainProgram, "u_proj");
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {
 		std::cerr << "error setting projection matrix" << std::endl;
 	}
 
-	glUseProgram(m_colorProgram);
-	location = glGetUniformLocation(m_colorProgram, "u_proj");
+	glUseProgram(m_mainProgram);
+	location = glGetUniformLocation(m_mainProgram, "u_proj");
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {
@@ -125,28 +179,17 @@ void Rendr::useOrthoProj() {
 	}
 }
 
-void Rendr::setTextColor(float r, float g, float b, float a) const {
-	std::cout << "Rendr msg: Setting up color" << std::endl;
-	glUseProgram(m_textProgram);
-	int location = glGetUniformLocation(m_textProgram, "u_textColor");
-	if (location != -1) {
-		glUniform4f(location, r, g, b, a);
-	} else {
-		std::cerr << "Rendr err: error setting text color" << std::endl;
-	}
-}
-
 void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const {
 	//bind texture VAO (layout and actual buffers)
-	glBindVertexArray(m_textureVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
+	glBindVertexArray(m_mainVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_mainVBO);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//upload data on buffers
 	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
-	glUseProgram(m_textureProgram);
+	glUseProgram(m_mainProgram);
 	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
@@ -155,8 +198,8 @@ void Rendr::renderTexture(std::vector<float>& vertexArr, std::vector<unsigned in
 
 void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr, unsigned int texture) const {
 	//bind text VAO (layout and actual buffers)
-	glBindVertexArray(m_textureVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
+	glBindVertexArray(m_mainVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_mainVBO);
 	glBindTexture(GL_TEXTURE_2D, texture);
 
 	//upload data on buffers
@@ -172,13 +215,15 @@ void Rendr::renderText(std::vector<float>& vertexArr, std::vector<unsigned int>&
 
 void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>& indexArr) const {
 	//bind color VAO (layout and actual buffers)
-	glBindVertexArray(m_colorVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
+	glBindVertexArray(m_mainVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_mainVBO);
+
+	glBindTexture(GL_TEXTURE_2D, m_colorTexture);
 
 	glBufferData(GL_ARRAY_BUFFER, vertexArr.size() * sizeof(float), vertexArr.data(), GL_DYNAMIC_DRAW);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexArr.size() * sizeof(int), indexArr.data(), GL_DYNAMIC_DRAW);
 
-	glUseProgram(m_colorProgram);
+	glUseProgram(m_mainProgram);
 	glDrawElements(GL_TRIANGLES, indexArr.size(), GL_UNSIGNED_INT, nullptr);
 
 	glBindVertexArray(0);
@@ -190,7 +235,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 	//loop for every char in string
 	float maxBearing = 0.0f;
 	for (char c : s) {
-		Character temp = ChMap[c];
+		CharTextureData temp = ChMap[c];
 		temp.by *= scl;
 		if (temp.by > maxBearing) {
 			maxBearing = temp.by;
@@ -199,7 +244,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 	y += maxBearing;
 
 	for (char c : s) {
-		Character temp = ChMap[c];
+		CharTextureData temp = ChMap[c];
 		std::vector<float> textVector;
 		std::vector<unsigned int> textIndices;
 		unsigned int textVertexCount = 0;
@@ -215,7 +260,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 		pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
-		pushRectangleIndices(textIndices, textVertexCount);
+		pushQuadIndices(textIndices, textVertexCount);
 
 		useOrthoProj();
 		renderText(textVector, textIndices, temp.TextureID);
@@ -227,7 +272,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 float Rendr::getTextWidth(const std::string& s, float scale) {
 	float x = 0.0f; // return variable
 	for (char c : s) {
-		Character temp = ChMap[c];
+		CharTextureData temp = ChMap[c];
 		temp.advance *= scale;
 		x += temp.advance / 64;
 	}
@@ -238,7 +283,7 @@ float Rendr::getTextHeight(const std::string& s, float scale) {
 	float maxBearing = 0;
 	float y = 0.0f;
 	for (char c : s) {
-		Character temp = ChMap[c];
+		CharTextureData temp = ChMap[c];
 		temp.by *= scale;
 		if (temp.by > maxBearing) {
 			maxBearing = temp.by;
@@ -246,7 +291,7 @@ float Rendr::getTextHeight(const std::string& s, float scale) {
 	}
 	//std::cout << maxBearing << std::endl;
 	for (char c : s) {
-		Character temp = ChMap[c];
+		CharTextureData temp = ChMap[c];
 		temp.height *= scale;
 		temp.by *= scale;
 		float bottom = maxBearing - temp.by + temp.height;
@@ -319,161 +364,114 @@ void Rendr::init(GLFWwindow* w) {
 
 	//shader init
 	{
-		//shaders source files
-		const char* vTextureSource =
-			"\n"
-			"#version 330\n"
-			"layout(location = 0) in vec4 aPos;\n"
-			"layout(location = 1) in vec2 tCoords;\n"
-			"uniform mat4 u_proj;\n"
-			"out vec2 tex_coords;\n"
-			"\n"
-			"void main()\n"
-			"{\n"
-			"	gl_Position = u_proj * aPos;\n"
-			"	tex_coords = tCoords;\n"
-			"}";
-
-		const char* fTextureSource =
-			"\n"
-			"#version 330\n"
-			"out vec4 FragColor;\n"
-			"in vec2 tex_coords;\n"
-			"uniform sampler2D u_t;\n"
-			"\n"
-			"void main()"
-			"{\n"
-			"	FragColor = texture(u_t,tex_coords);\n"
-			"}\n";
-
-		const char* vColorSource =
+		const char* vMainSource =
 			"\n"
 			"#version 330\n"
 			"layout(location = 0) in vec4 aPos;\n"
 			"layout(location = 1) in vec4 c;\n"
+			"layout(location = 2) in vec2 texCoords;\n"
 			"uniform mat4 u_proj;\n"
 			"out vec4 color;\n"
+			"out vec2 tCoord;\n"
 			"\n"
 			"void main()\n"
 			"{\n"
 			"	gl_Position = u_proj * aPos;\n"
 			"	color = c;\n"
+			"	tCoord = texCoords;\n"
 			"}";
 
-		const char* fColorSource =
+		const char* fMainSource =
 			"\n"
 			"#version 330\n"
 			"out vec4 FragColor;\n"
 			"in vec4 color;\n"
+			"in vec2 tCoord;\n"
+			"\n"
+			"uniform sampler2D u_t;\n"
 			"\n"
 			"void main()"
 			"{\n"
-			"	FragColor = color;\n"
+			"	FragColor = texture(u_t,tCoord) * color;\n"
 			"}\n";
 
 		const char* fTextSource =
 			"\n"
 			"#version 330\n"
 			"out vec4 FragColor;\n"
-			"in vec2 tex_coords;\n"
+			"in vec4 color;\n"
+			"in vec2 tCoord;\n"
 			"\n"
 			"uniform sampler2D u_t;\n"
-			"uniform vec4 u_textColor;\n"
 			"\n"
 			"void main()"
 			"{\n"
-			"	vec4 sample = vec4(1.0f,1.0f,1.0f,texture(u_t, tex_coords).r);\n"
-			"	FragColor = u_textColor * sample;\n"
+			"	vec4 sample = vec4(1.0f,1.0f,1.0f,texture(u_t, tCoord).r);\n"
+			"	FragColor = color * sample;\n"
 			"}\n";
 
 		//shader ids
-		unsigned int vShaderTexture;
-		unsigned int fShaderTexture;
-		unsigned int vShaderColor;
-		unsigned int fShaderColor;
-		unsigned int fShaderText;
+		unsigned int vMainShader;
+		unsigned int fMainShader;
+		unsigned int fTextShader;
 
 		//create shaders
-		vShaderTexture = glCreateShader(GL_VERTEX_SHADER);
-		fShaderTexture = glCreateShader(GL_FRAGMENT_SHADER);
-		vShaderColor = glCreateShader(GL_VERTEX_SHADER);
-		fShaderColor = glCreateShader(GL_FRAGMENT_SHADER);
-		fShaderText = glCreateShader(GL_FRAGMENT_SHADER);
+		vMainShader = glCreateShader(GL_VERTEX_SHADER);
+		fMainShader = glCreateShader(GL_FRAGMENT_SHADER);
+		fTextShader = glCreateShader(GL_FRAGMENT_SHADER);
 
 		//upload shader source data (see above)
-		glShaderSource(vShaderTexture, 1, &vTextureSource, nullptr);
-		glShaderSource(fShaderTexture, 1, &fTextureSource, nullptr);
-		glShaderSource(vShaderColor, 1, &vColorSource, nullptr);
-		glShaderSource(fShaderColor, 1, &fColorSource, nullptr);
-		glShaderSource(fShaderText, 1, &fTextSource, nullptr);
+		glShaderSource(vMainShader, 1, &vMainSource, nullptr);
+		glShaderSource(fMainShader, 1, &fMainSource, nullptr);
+		glShaderSource(fTextShader, 1, &fTextSource, nullptr);
 
 		//compile shaders (hoping that they don't fail)
-		glCompileShader(vShaderTexture);
-		glCompileShader(fShaderTexture);
-		glCompileShader(vShaderColor);
-		glCompileShader(fShaderColor);
-		glCompileShader(fShaderText);
+		glCompileShader(vMainShader);
+		glCompileShader(fMainShader);
+		glCompileShader(fTextShader);
 
 		//example compile status check
 		int success;
 		std::array<char, 512> infolog;
-		glGetShaderiv(vShaderTexture, GL_COMPILE_STATUS, &success);
+		glGetShaderiv(vMainShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderTexture, 512, nullptr, infolog.data());
-			std::cerr << "error compiling vertex texture shader:" << infolog.data() << std::endl;
+			glGetShaderInfoLog(vMainShader, 512, nullptr, infolog.data());
+			std::cerr << "error compiling vertex main shader:" << infolog.data() << std::endl;
 		}
-		glGetShaderiv(fShaderTexture, GL_COMPILE_STATUS, &success);
+		glGetShaderiv(fMainShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(fShaderTexture, 512, nullptr, infolog.data());
-			std::cerr << "error compiling fragment texture shader:" << infolog.data() << std::endl;
+			glGetShaderInfoLog(fMainShader, 512, nullptr, infolog.data());
+			std::cerr << "error compiling fragment main shader:" << infolog.data() << std::endl;
 		}
-		glGetShaderiv(vShaderColor, GL_COMPILE_STATUS, &success);
+		glGetShaderiv(fTextShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
-			glGetShaderInfoLog(vShaderColor, 512, nullptr, infolog.data());
-			std::cerr << "error compiling vertex color shader:" << infolog.data() << std::endl;
-		}
-		glGetShaderiv(fShaderColor, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(fShaderColor, 512, nullptr, infolog.data());
-			std::cerr << "error compiling fragment color shader:" << infolog.data() << std::endl;
-		}
-		glGetShaderiv(fShaderText, GL_COMPILE_STATUS, &success);
-		if (!success) {
-			glGetShaderInfoLog(fShaderText, 512, nullptr, infolog.data());
+			glGetShaderInfoLog(fTextShader, 512, nullptr, infolog.data());
 			std::cerr << "error compiling fragment text shader:" << infolog.data() << std::endl;
 		}
 		//create shader programs
-		m_textureProgram = glCreateProgram();
-		glAttachShader(m_textureProgram, vShaderTexture);
-		glAttachShader(m_textureProgram, fShaderTexture);
-		glLinkProgram(m_textureProgram);
-
-		m_colorProgram = glCreateProgram();
-		glAttachShader(m_colorProgram, vShaderColor);
-		glAttachShader(m_colorProgram, fShaderColor);
-		glLinkProgram(m_colorProgram);
+		m_mainProgram = glCreateProgram();
+		glAttachShader(m_mainProgram, vMainShader);
+		glAttachShader(m_mainProgram, fMainShader);
+		glLinkProgram(m_mainProgram);
 
 		m_textProgram = glCreateProgram();
-		glAttachShader(m_textProgram, vShaderTexture);
-		glAttachShader(m_textProgram, fShaderText);
+		glAttachShader(m_textProgram, vMainShader);
+		glAttachShader(m_textProgram, fTextShader);
 		glLinkProgram(m_textProgram);
 
 		//example program linking check
 		int linked;
 		std::array<char, 512> log;
-		glGetProgramiv(m_textProgram, GL_LINK_STATUS, &linked);
+		glGetProgramiv(m_mainProgram, GL_LINK_STATUS, &linked);
 		if (!linked) {
 			glGetProgramInfoLog(m_textProgram, 512, nullptr, log.data());
 			std::cerr << "error linking program:" << log.data() << std::endl;
 		}
 
 		//delete shader object files
-		glDeleteShader(vShaderTexture);
-		glDeleteShader(fShaderTexture);
-
-		glDeleteShader(vShaderColor);
-		glDeleteShader(fShaderColor);
-		glDeleteShader(fShaderText);
+		glDeleteShader(vMainShader);
+		glDeleteShader(fMainShader);
+		glDeleteShader(fTextShader);
 	}
 
 	//projection init
@@ -497,50 +495,28 @@ void Rendr::init(GLFWwindow* w) {
 
 	//vao setup
 	{
-		//create VAOs
-		glGenVertexArrays(1, &m_textureVAO);
-		glGenVertexArrays(1, &m_colorVAO);
-
-		//texture vao
-		{
-			glBindVertexArray(m_textureVAO);
-
-			//indices buffer
-			unsigned int ebo;
-			glGenBuffers(1, &m_textureVBO);
-			glGenBuffers(1, &ebo);
-
-			glBindBuffer(GL_ARRAY_BUFFER, m_textureVBO);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-
-			//Vertex: x,y,z, u,v
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), nullptr);
-			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-			glEnableVertexAttribArray(0);
-			glEnableVertexAttribArray(1);
-
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		}
+		//create VAO
+		glGenVertexArrays(1, &m_mainVAO);
 
 		//color vao
 		{
-			glBindVertexArray(m_colorVAO);
+			glBindVertexArray(m_mainVAO);
 
 			//index buffer
 			unsigned int index;
-			glGenBuffers(1, &m_colorVBO);
+			glGenBuffers(1, &m_mainVBO);
 			glGenBuffers(1, &index);
 
-			glBindBuffer(GL_ARRAY_BUFFER, m_colorVBO);
+			glBindBuffer(GL_ARRAY_BUFFER, m_mainVBO);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index);
 
-			//Vertex: x,y,z, r,g,b,a
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), nullptr);
-			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void*)(3 * sizeof(float)));
+			//Vertex: x,y,z, r,g,b,a, s,t
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), nullptr);
+			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(3 * sizeof(float)));
+			glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)(7 * sizeof(float)));
 			glEnableVertexAttribArray(0);
 			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
 
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -577,19 +553,31 @@ void Rendr::init(GLFWwindow* w) {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			// store Character data for later use
-			Character character = {
+			CharTextureData character = {
 				texture,
 				(float)m_font->glyph->bitmap_left,
 				(float)m_font->glyph->bitmap_top,
 				(float)m_font->glyph->bitmap.width,
 				(float)m_font->glyph->bitmap.rows,
 				(float)m_font->glyph->advance.x};
-			ChMap.insert(std::pair<char, Character>(c, character));
+			ChMap.insert(std::pair<char, CharTextureData>(c, character));
 		}
 		FT_Done_Face(m_font);
 		FT_Done_FreeType(m_FTLibrary);
 	}
-	setTextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+	//basic white texture creation
+	{
+		std::array<char, 3> data = {char(0xff), char(0xff), char(0xff)};
+
+		glGenTextures(1, &m_colorTexture);
+		glBindTexture(GL_TEXTURE_2D, m_colorTexture);
+		//set parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1, 1, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data());
+	}
 }
 
 GLFWwindow* Rendr::getWindowPtr() {

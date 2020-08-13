@@ -1,35 +1,56 @@
 #pragma once
 
-#include "AL/al.h"
-#include "AL/alc.h"
-#include "vorbis/vorbisfile.h"
+#include "SongScanner.h"
 
 #include <array>
+#include <atomic>
 #include <iostream>
-#include <vector>
+#include <portaudio.h>
+#include <thread>
+#include <vorbis/vorbisfile.h>
+
+const size_t MAX_SIZE = 16384;
+
+template <typename T>
+class CircularBuffer {
+public:
+	void push(const T& value);
+	T pop();
+	size_t getLength() const;
+	void clear();
+
+private:
+	std::array<T, MAX_SIZE> buffer;
+	size_t writeIndex = 0;
+	size_t readIndex = 0;
+};
 
 class Audio {
 public:
-	Audio();
-	~Audio();
+	void init();
 	void play();
-	void load(const char* filename);
-	void stop() const;
-	void buffer(double time);
-	void reset();
-	bool isActive(double time) const;
+	void stop();
+	void load(const SongEntry& entry);
+	void destroy();
 	bool isPlaying() const;
+	double getFileLength();
+
+	CircularBuffer<float> redPCM;
+	CircularBuffer<float> greenPCM;
+	CircularBuffer<float> bluePCM;
+
+	OggVorbis_File redFile;
+	OggVorbis_File greenFile;
+	OggVorbis_File blueFile;
+	int streams = 0;
+
+	int bitstream = 0;
+	bool loaderThreadRunning = true;
 
 private:
-	void setupBuffers() const;
-	void removeBuffers() const;
-	ALCdevice* m_device;
-	ALCcontext* m_context;
-	unsigned int m_source;
-	unsigned int m_buffer;
-	bool firstRun = true;
-	OggVorbis_File m_oggFile;
-	int m_frequency = 0;
-	int m_currentSection = 0;
-	double m_songLength = 0.0;
+	PaStream* audioStream;
+	std::thread loader;
+	bool playing = false;
+
+	bool initialized = false;
 };

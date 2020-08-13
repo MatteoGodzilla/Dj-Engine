@@ -5,6 +5,10 @@ using namespace std::chrono;
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
 
+	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
+		m_player.m_useKeyboardInput = false;
+		m_player.m_gamepadId = 0;
+	}
 	m_player.readMappingFile();
 
 	CSimpleIniA ini;
@@ -12,10 +16,11 @@ void Game::init(GLFWwindow* w) {
 
 	ini.LoadFile("config.ini");
 
-	m_audioLatency = ini.GetDoubleValue(section, "audioLatency", 0.0);
-	m_deckSpeed = ini.GetDoubleValue(section, "noteVisible", 1.0);
+	m_audioLatency = (float)ini.GetDoubleValue(section, "audioLatency", 0.0);
+	m_deckSpeed = (float)ini.GetDoubleValue(section, "noteVisible", 1.0);
 	m_isButtonsRight = ini.GetBoolValue(section, "buttonsRight", false);
 	m_debugView = ini.GetBoolValue(section, "debugView", false);
+	m_inputThreadPollRate = ini.GetLongValue(section, "pollRate", 240);
 
 	m_render.m_greenLaneActiveColor.r = ini.GetDoubleValue(section, "greenLaneActiveR", 0.133333);
 	m_render.m_greenLaneActiveColor.g = ini.GetDoubleValue(section, "greenLaneActiveG", 0.874510);
@@ -65,6 +70,10 @@ void Game::init(GLFWwindow* w) {
 	m_inputThread = std::thread(inputThreadFun, this);
 	std::cout << "Game Message: started input thread" << std::endl;
 	setButtonPos(m_isButtonsRight);
+
+	m_note_arr.reserve(100);
+	m_event_arr.reserve(100);
+	m_cross_arr.reserve(100);
 }
 
 void Game::inputThreadFun(Game* game) {
@@ -86,6 +95,12 @@ void Game::inputThreadFun(Game* game) {
 		milliseconds delta = duration_cast<milliseconds>(end - start);
 		//stop timer
 
+		if (glfwGetKey(game->getGameRender()->getWindowPtr(), GLFW_KEY_ESCAPE) && game->m_active) {
+			game->m_mode = 1;
+			game->m_audio.destroy();
+			game->m_active = false;
+		}
+
 		std::this_thread::sleep_for(milliseconds(1000 / game->m_inputThreadPollRate) - delta);
 		//wait time before next input frame
 	}
@@ -99,9 +114,10 @@ void Game::tick() {
 			m_gen.m_deckSpeed = m_deckSpeed;
 
 			m_render.pollState(m_global_time, m_player, m_gen);
-			m_audio.buffer(m_global_time);
-			if (m_global_time >= (double)-m_audioLatency) {
+
+			if (m_global_time >= (double)-m_audioLatency && !audioStartedOnce) {
 				m_audio.play();
+				audioStartedOnce = true;
 			}
 
 			//add delta time to m_global_time
@@ -110,7 +126,7 @@ void Game::tick() {
 			m_global_time += m_deltaTime;
 			m_pastTime = nowTime;
 		}
-		if (!m_audio.isActive(m_global_time)) {
+		if (m_global_time > m_audioLength && audioStartedOnce) {
 			m_mode = 1;
 			m_audio.stop();
 			m_active = false;
@@ -150,7 +166,7 @@ void Game::reset() {
 
 	m_global_time = -2.0f;
 	m_active = false;
-	firstRun = true;
+	audioStartedOnce = false;
 	m_mode = 0;
 
 	m_player.m_deltaMouse = false;
@@ -158,7 +174,7 @@ void Game::reset() {
 	m_render.reset();
 	m_gen.reset();
 	m_player.reset();
-	m_audio.reset();
+	m_audio.destroy();
 }
 
 void Game::setButtonPos(bool value) {
@@ -167,7 +183,7 @@ void Game::setButtonPos(bool value) {
 	m_player.m_isButtonsRight = value;
 }
 
-void Game::start(const SongEntry& entry) {
+void Game::start(const SongEntry& entry, int difficulty) {
 	std::cout << "Game msg: started game" << std::endl;
 	glfwSetTime(0.0);
 	//glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -175,10 +191,12 @@ void Game::start(const SongEntry& entry) {
 	m_pastTime = glfwGetTime();
 	m_global_time = -2.0f;
 
-	std::string audioPath = entry.path + std::string("/song.ogg");
-	m_audio.load(audioPath.c_str());
+	m_audio.init();
+	m_audio.load(entry);
 
-	m_gen.init(entry);
+	m_audioLength = m_audio.getFileLength();
+
+	m_gen.init(entry, difficulty);
 	m_bpm_arr.push_back(0.0);
 
 	m_active = true;
@@ -192,6 +210,7 @@ void Game::writeConfig() {
 	ini.SetDoubleValue(section, "noteVisible", m_deckSpeed);
 	ini.SetBoolValue(section, "buttonsRight", m_isButtonsRight);
 	ini.SetBoolValue(section, "debugView", m_debugView);
+	ini.SetLongValue(section, "pollRate", m_inputThreadPollRate);
 
 	ini.SetDoubleValue(section, "greenLaneActiveR", m_render.m_greenLaneActiveColor.r);
 	ini.SetDoubleValue(section, "greenLaneActiveG", m_render.m_greenLaneActiveColor.g);
@@ -274,6 +293,7 @@ Generator* Game::getGenerator() {
 }
 
 Game::~Game() {
+	m_audio.destroy();
 	m_note_arr.clear();
 	m_event_arr.clear();
 }

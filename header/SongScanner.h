@@ -10,19 +10,30 @@
 #include <map>
 #include <string>
 
+enum diffs {
+	EXPERT = 1,
+	HARD = 2,
+	MEDIUM = 4,
+	EASY = 8,
+	BEGINNER = 16
+};
+
+const int CACHE_VER = 1;
 struct SongEntry {
 	std::string path;
 	std::string s1;
 	std::string s2;
 	std::string a1;
 	std::string a2;
-	std::string charter;
-	std::string mixer;
-	float bpm;
-	int dTrack;
-	int dTap;
-	int dCrossfade;
-	int dScratch;
+	//std::string charter;
+	//std::string mixer;
+	float bpm = -1;
+	//int dTrack;
+	//int dTap;
+	//int dCrossfade;
+	//int dScratch;
+	int difficulties = 0;
+	int streams = 0;
 };
 
 class SongScanner {

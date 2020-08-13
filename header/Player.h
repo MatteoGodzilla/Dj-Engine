@@ -55,6 +55,7 @@ public:
 	bool getWaveRising(int index);
 	static bool getHittableNote(int noteType, std::vector<Note>& array);
 	static bool getHittableNoteAtZero(double time, int noteType, std::vector<Note>& array);
+	static bool getScratchZoneActive(double time, int zoneType, std::vector<Note>& events);
 	bool isAxisAboveDeadzone(int index) const;
 	void tick(double time);
 	void reset();
@@ -108,9 +109,6 @@ public:
 
 	int m_cross = 1;
 
-	int m_baseMove = 1;
-	int m_secondMove = 1;
-
 	bool m_deltaMouse = false;
 	double m_scrollX;
 	double m_scrollY;
@@ -127,6 +125,7 @@ private:
 	int m_mult = 1;
 	int m_combo = 0;
 	int m_scr_tick = 0;
+	int m_cross_tick = 0;
 	double m_past_tap = -1;
 	double m_pastScratch = -1;
 	double m_scratchDebounce = 0.5;

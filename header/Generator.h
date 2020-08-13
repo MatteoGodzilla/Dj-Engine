@@ -10,7 +10,7 @@
 
 class Generator {
 public:
-	void init(const SongEntry& entry);
+	void init(const SongEntry& entry, int difficulty);
 	void tick(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	//void textParser(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void addNotesToBuffers(std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);

@@ -9,7 +9,6 @@ void MenuRender::init(GLFWwindow* w) {
 		std::cout << "GLEW INIT ERROR" << std::endl;
 		return;
 	}
-	setTextColor(0.9f, 0.9f, 0.9f, 1.0f);
 	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
 	loadTexture("res/buttons.png", &m_buttonTexture);
 	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);
@@ -41,15 +40,14 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	float scale = 0.075f;
 
 	//selection color
-	float r = 0.83f;
-	float g = 0.35f;
-	float b = 0.24f;
+	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
+	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
 
 	float right = 0.0f;
 	int heightIndex = 0;
 	float selHeight = 0.0f;
 
-	std::vector<MenuNode> list = node.getChildrens();
+	std::vector<MenuNode>& list = node.getChildrens();
 	if (node.getChildCount() > 0) {
 		MenuNode m = list.at(selected);
 		right = getTextWidth(m.getText(), scale);
@@ -66,19 +64,27 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 		}
 	}
 
-	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0f * scale * (float)heightIndex + selHeight, 0.0f, r, g, b);
-	pushVertexColor(selVector, 10.0f - m_selectionDX + right, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f, r, g, b);
-	pushRectangleIndices(selIndices, selVertexCount);
+	Vertex topLeft = Vertex({10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f}, firstCol);
+	Vertex bottomLeft = topLeft;
+	Vertex bottomRight = topLeft;
+	Vertex topRight = topLeft;
+
+	bottomLeft.pos += glm::vec3(0.0, selHeight, 0.0);
+	bottomRight.pos += glm::vec3(right, selHeight, 0.0);
+	topRight.pos += glm::vec3(right, 0.0, 0.0);
+
+	bottomRight.col = secondCol;
+	topRight.col = secondCol;
+
+	pushQuadVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
+	pushQuadIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
 	if (node.getChildCount() > 0) {
 		//draw every child from node
-
 		if (node.getChildCount() < VISIBLE_ENTRIES) {
 			for (size_t i = 0; i < node.getChildCount(); i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating) {
+				if (m_currentIdleTime > m_timeBeforeAnimating && i == selected) {
 					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
 				} else {
 					drawText(list.at(i).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
@@ -91,7 +97,6 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 				} else {
 					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
 				}
-				//drawText(list.at(i + vOffset).getText(), 10.0f, 100.0f * i + 200.0f, scale);
 			}
 		}
 	}
@@ -124,24 +129,29 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	glfwGetFramebufferSize(m_window, &width, &height);
 	ImGui::SetWindowSize({(float)width, (float)height});
 
+	int id = game->getPlayer()->m_useKeyboardInput ? -1 : game->getPlayer()->m_gamepadId;
+	if (id < 0) {
+		m_inputSelection = "Keyboard";
+	} else {
+		std::string name = glfwGetJoystickName(id);
+		std::string t = "Id " + std::to_string(id) + ":" + name;
+		m_inputSelection = t;
+	}
+
 	ImGui::Text("Using: ");
 	ImGui::SameLine();
 	if (ImGui::BeginCombo("Choose Input", m_inputSelection.c_str())) {
 		if (ImGui::Selectable("Keyboard")) {
 			game->getPlayer()->m_useKeyboardInput = true;
-			m_input = true;
-			m_inputSelection = "Keyboard";
 		}
 		for (int i = 0; i < 16; ++i) {
 			std::string name;
 			if (glfwJoystickPresent(i)) {
 				name = glfwGetJoystickName(i);
-				std::string t = "Id " + std::to_string(i) + ":" + name;
+				std::string t = "Id " + std::to_string(id) + ":" + name;
 				if (ImGui::Selectable(t.c_str())) {
 					game->getPlayer()->m_useKeyboardInput = false;
 					game->getPlayer()->m_gamepadId = i;
-					m_input = false;
-					m_inputSelection = t;
 				}
 			}
 		}
@@ -791,7 +801,7 @@ void MenuRender::credits() {
 	drawText("(now that you read the credits, DM me", x, y, fontsize / 1000.0f);
 	y += fontsize; //new line
 
-	drawText("on twitter (@MatteoGodzilla) with '#truedj')", x, y, fontsize / 1000.0f);
+	drawText("on discord (@MatteoGodzilla#6709) with '#truedj')", x, y, fontsize / 1000.0f);
 }
 
 void MenuRender::result(Game* game) {
@@ -829,40 +839,51 @@ void MenuRender::result(Game* game) {
 		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
 	} else {
 		float stars = (float)game->getPlayer()->getScore() / (float)game->getGenerator()->m_baseScore;
+
+		Vertex topLeft = Vertex({x + 30.0f + scale * 0000.0f, y, 0.0}, {221.0f / 300.0f, 1.0f});
+		Vertex bottomLeft = Vertex({x + 30.0f + scale * 0000.0f, y + scale, 0.0}, {221.0f / 300.0f, 0.0f});
+		Vertex bottomRight = Vertex({x + 30.0f + scale * 1000.0f, y + scale, 0.0}, {1.0f, 1.0f});
+		Vertex topRight = Vertex({x + 30.0f + scale * 1000.0f, y, 0.0}, {1.0f, 1.0f});
+
 		if (stars >= 0.1) {
-			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
-			pushRectangleIndices(resultIndices, resultVertexCount);
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.2) {
-			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
-			pushRectangleIndices(resultIndices, resultVertexCount);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.3) {
-			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
-			pushRectangleIndices(resultIndices, resultVertexCount);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.4) {
-			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
-			pushRectangleIndices(resultIndices, resultVertexCount);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.5) {
-			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
-			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y, 0.0f, 1.0f, 1.0f);
-			pushRectangleIndices(resultIndices, resultVertexCount);
+			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
+
+			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushQuadIndices(resultIndices, resultVertexCount);
 		}
 		if (!resultVector.empty()) {
 			useOrthoProj();
@@ -902,18 +923,30 @@ void MenuRender::splashArt() {
 	float height = width * (m_logoDimensions.y / m_logoDimensions.x);
 	float x = 1280.0f / 5 * 2;
 	float y = (720.0f - height) / 2;
-	pushVertexTexture(vector, x, y, 0.0, 0.0, 1.0);
-	pushVertexTexture(vector, x, y + height, 0.0, 0.0, 0.0);
-	pushVertexTexture(vector, x + width, y + height, 0.0, 1.0, 0.0);
-	pushVertexTexture(vector, x + width, y, 0.0, 1.0, 1.0);
-	pushRectangleIndices(indices, indexCount);
+
+	auto topLeft = Vertex({x, y, 0.0});
+	Vertex bottomLeft = topLeft;
+	Vertex bottomRight = topLeft;
+	Vertex topRight = topLeft;
+
+	bottomLeft.pos += glm::vec3({0.0, height, 0.0});
+	bottomRight.pos += glm::vec3(width, height, 0.0);
+	topRight.pos += glm::vec3(width, 0.0, 0.0);
+
+	topLeft.tex = {0.0, 1.0};
+	bottomLeft.tex = {0.0, 0.0};
+	bottomRight.tex = {1.0, 0.0};
+	topRight.tex = {1.0, 1.0};
+
+	pushQuadVertices(vector, topLeft, bottomLeft, bottomRight, topRight);
+	pushQuadIndices(indices, indexCount);
 
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
 
 	float textScale = 0.02f;
-	drawText("*This is alpha v1.4.1. There are still some bugs left,*", 10.0, 10.0, textScale);
-	drawText("*but I think most of them should be fixed by now*", 10.0, 30.0, textScale);
+	drawText("*This is alpha v1.5. There are still some bugs left.*", 10.0, 10.0, textScale);
+	drawText("*Less spaghetti code than before*", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 
 	std::string discord = "For any questions, ask on the Dj Hero Discord";
@@ -929,11 +962,11 @@ void MenuRender::splashArt() {
 	drawText(remap, (1280.0f - getTextWidth(remap, 0.03f)) / 2.0f, 680.0f, 0.03f);
 }
 
+/*
 void MenuRender::scratches(Player* player) {
 	useOrthoProj();
 	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
 
-	/*
 	if(player->m_useKeyboardInput){
 		player->updateKBMState(m_window);
 	}
@@ -949,11 +982,11 @@ void MenuRender::scratches(Player* player) {
 	if (m_testBuffer.size() > 20) {
 		m_testBuffer.erase(0, 1);
 	}
-*/
 
 	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
 	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
 }
+*/
 
 void MenuRender::calibration(Game* game, double dt) {
 	useOrthoProj();
@@ -973,17 +1006,19 @@ void MenuRender::calibration(Game* game, double dt) {
 
 	if (ImGui::Button("Calibrate")) {
 		m_isCalibrating = true;
-		game->getAudio()->reset();
 		m_cbPlayingTime = 0.0;
 		m_latencyHits.clear();
-		game->getAudio()->load("res/calibration.ogg");
+		SongEntry temp;
+		temp.path = "res";
+		temp.streams = 1;
+		game->getAudio()->init();
+		game->getAudio()->load(temp);
 		game->getAudio()->play();
 	}
 	if (game->getAudio()->isPlaying()) {
-		game->getAudio()->buffer(m_cbPlayingTime);
 		m_cbPlayingTime += dt;
 	} else {
-		game->getAudio()->reset();
+		game->getAudio()->destroy();
 		m_isCalibrating = false;
 		m_cbPlayingTime = 0.0;
 
@@ -992,15 +1027,16 @@ void MenuRender::calibration(Game* game, double dt) {
 			for (size_t i = 0; i < m_latencyHits.size(); ++i) {
 				sum += m_latencyHits.at(i) - (2.0 + 0.5 * i);
 			}
+			std::cout << (float)(sum / m_latencyHits.size());
 			game->m_audioLatency = (float)(sum / m_latencyHits.size());
 			m_latencyHits.clear();
 		}
 	}
 	ImGui::SameLine();
 	ImGui::SliderFloat("Current audio latency (in ms.)", &(game->m_audioLatency), 0.0f, 2.0f);
-	ImGui::Text("When calibrationg, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
-	ImGui::Text("Press the Spacebar when you hear the snare hits WITHOUT pressing for the ding");
-	ImGui::Text("(on zero latency the click should match the lights below on wired headphones)");
+	ImGui::Text("When calibrating, you are going to hear 4 bass hits, then 8 snare hits and then a ding.");
+	ImGui::Text("Press the Spacebar when you hear the snare hits");
+	ImGui::Text("(Note: there's latency in the audio engine. Even with wired headphones it will be above 0)");
 
 	ImGui::Separator();
 
