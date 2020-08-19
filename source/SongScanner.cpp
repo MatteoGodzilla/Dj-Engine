@@ -57,10 +57,16 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 			std::ifstream stream(file);
 			nlohmann::json root = nlohmann::json::parse(stream);
 
-			auto s1 = root["song"]["first"]["name"].get<std::string>();
-			auto s2 = root["song"]["second"]["name"].get<std::string>();
 			auto a1 = root["song"]["first"]["artist"].get<std::string>();
-			auto a2 = root["song"]["second"]["artist"].get<std::string>();
+			auto s1 = root["song"]["first"]["name"].get<std::string>();
+
+			std::string a2 = "NULL";
+			std::string s2 = "NULL";
+			if(!root["song"]["second"].is_null()){
+				root["song"]["second"]["artist"].get_to<std::string>(a2);
+				root["song"]["second"]["name"].get_to<std::string>(s2);
+			}
+			
 			//auto charter = root["song"]["charter"].get<std::string>();
 			//auto mixer = root["song"]["dj"].get<std::string>();
 			auto bpm = root["difficulty"]["bpm"].get<float>();
