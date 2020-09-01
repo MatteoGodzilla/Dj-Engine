@@ -4,11 +4,6 @@ using namespace std::chrono;
 
 void Game::init(GLFWwindow* w) {
 	m_render.init(w);
-
-	if (glfwJoystickPresent(GLFW_JOYSTICK_1)) {
-		m_player.m_useKeyboardInput = false;
-		m_player.m_gamepadId = 0;
-	}
 	m_player.readMappingFile();
 
 	CSimpleIniA ini;
@@ -66,6 +61,16 @@ void Game::init(GLFWwindow* w) {
 	m_render.m_euphoriaZoneColor.g = ini.GetDoubleValue(section, "euphoriaZoneActiveG", 1.000000);
 	m_render.m_euphoriaZoneColor.b = ini.GetDoubleValue(section, "euphoriaZoneActiveB", 1.000000);
 	m_render.m_euphoriaZoneColor.a = ini.GetDoubleValue(section, "euphoriaZoneActiveA", 0.200000);
+
+	m_render.m_fsCrossBaseGreen.r = ini.GetDoubleValue(section, "fsCrossBaseGreenR", 0.133333);
+	m_render.m_fsCrossBaseGreen.g = ini.GetDoubleValue(section, "fsCrossBaseGreenG", 0.874510);
+	m_render.m_fsCrossBaseGreen.b = ini.GetDoubleValue(section, "fsCrossBaseGreenB", 0.180392);
+	m_render.m_fsCrossBaseGreen.a = ini.GetDoubleValue(section, "fsCrossBaseGreenA", 0.200000);
+
+	m_render.m_fsCrossBaseBlue.r = ini.GetDoubleValue(section, "fsCrossBaseBlueR", 0.239216);
+	m_render.m_fsCrossBaseBlue.g = ini.GetDoubleValue(section, "fsCrossBaseBlueG", 0.305882);
+	m_render.m_fsCrossBaseBlue.b = ini.GetDoubleValue(section, "fsCrossBaseBlueB", 0.745098);
+	m_render.m_fsCrossBaseBlue.a = ini.GetDoubleValue(section, "fsCrossBaseBlueA", 0.200000);
 
 	m_inputThread = std::thread(inputThreadFun, this);
 	std::cout << "Game Message: started input thread" << std::endl;
@@ -143,7 +148,7 @@ void Game::render() {
 			m_render.meters(m_global_time);
 
 			m_render.clicker();
-			m_render.lanes(m_global_time, m_note_arr, m_cross_arr);
+			m_render.lanes(m_global_time, m_note_arr, m_event_arr, m_cross_arr);
 			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.notes(m_global_time, m_note_arr, m_cross_arr);
 
@@ -256,6 +261,16 @@ void Game::writeConfig() {
 	ini.SetDoubleValue(section, "euphoriaZoneActiveG", m_render.m_euphoriaZoneColor.g);
 	ini.SetDoubleValue(section, "euphoriaZoneActiveB", m_render.m_euphoriaZoneColor.b);
 	ini.SetDoubleValue(section, "euphoriaZoneActiveA", m_render.m_euphoriaZoneColor.a);
+
+	ini.SetDoubleValue(section, "fsCrossBaseGreenR", m_render.m_fsCrossBaseGreen.r);
+	ini.SetDoubleValue(section, "fsCrossBaseGreenG", m_render.m_fsCrossBaseGreen.g);
+	ini.SetDoubleValue(section, "fsCrossBaseGreenB", m_render.m_fsCrossBaseGreen.b);
+	ini.SetDoubleValue(section, "fsCrossBaseGreenA", m_render.m_fsCrossBaseGreen.a);
+
+	ini.SetDoubleValue(section, "fsCrossBaseBlueR", m_render.m_fsCrossBaseBlue.r);
+	ini.SetDoubleValue(section, "fsCrossBaseBlueG", m_render.m_fsCrossBaseBlue.g);
+	ini.SetDoubleValue(section, "fsCrossBaseBlueB", m_render.m_fsCrossBaseBlue.b);
+	ini.SetDoubleValue(section, "fsCrossBaseBlueA", m_render.m_fsCrossBaseBlue.a);
 
 	ini.SaveFile("config.ini");
 	std::cout << "Game Message: Written engine conigs to 'config.ini'" << std::endl;

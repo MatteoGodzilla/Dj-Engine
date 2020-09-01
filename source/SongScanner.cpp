@@ -62,11 +62,11 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 
 			std::string a2 = "NULL";
 			std::string s2 = "NULL";
-			if(!root["song"]["second"].is_null()){
+			if (!root["song"]["second"].is_null()) {
 				root["song"]["second"]["artist"].get_to<std::string>(a2);
 				root["song"]["second"]["name"].get_to<std::string>(s2);
 			}
-			
+
 			//auto charter = root["song"]["charter"].get<std::string>();
 			//auto mixer = root["song"]["dj"].get<std::string>();
 			auto bpm = root["difficulty"]["bpm"].get<float>();

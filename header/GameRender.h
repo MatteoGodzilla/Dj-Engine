@@ -45,7 +45,11 @@ enum AtlasIndices {
 	CLICKER_TRAY,
 	SCRATCH_ANYDIR,
 	SCRATCH_UP,
-	SCRATCH_DOWN
+	SCRATCH_DOWN,
+	FS_CROSS_GREEN_BASE_BOTTOM,
+	FS_CROSS_GREEN_BASE_TOP,
+	FS_CROSS_BLUE_BASE_BOTTOM,
+	FS_CROSS_BLUE_BASE_TOP,
 };
 
 class GameRender : public Rendr {
@@ -55,7 +59,7 @@ public:
 	void clicker();
 	void notes(double time, std::vector<Note>& v, std::vector<Note>& cross);
 	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
-	void lanes(double time, std::vector<Note>& v, std::vector<Note>& cross);
+	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 	void bpmTicks(double time, std::vector<double>& bpmArr);
 	void clickerAnimation();
 	void result(Player& player, Generator& generator);
@@ -81,10 +85,13 @@ public:
 	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
 	glm::vec4 m_euphoriaZoneColor = {1.0, 1.0, 1.0, 0.2};
 
+	glm::vec4 m_fsCrossBaseGreen = {0.0, 1.0, 0.0, 0.2};
+	glm::vec4 m_fsCrossBaseBlue = {0.0, 0.0, 1.0, 0.2};
+
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
 	static glm::vec2 getCirclePoint(double radius, double angle);
-	static int getCrossAtTime(double time, std::vector<Note>& crossArr);
+	int getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr = nullptr);
 	double getAngleFromDT(double dt) const;
 	double getDTFromAngle(double angle) const;
 	static double getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius);

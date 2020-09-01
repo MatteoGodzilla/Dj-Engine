@@ -66,6 +66,12 @@ void GameRender::init(GLFWwindow* w) {
 
 		m_objectAtlas.insert(std::make_pair(TRAIL_EUPHORIA_MIDDLE, glm::vec4(4 * COLSIZE, 3 * ROWSIZE, COLSIZE, ROWSIZE)));
 		m_objectAtlas.insert(std::make_pair(TRAIL_EUPHORIA_END, glm::vec4(5 * COLSIZE, 3 * ROWSIZE, COLSIZE, ROWSIZE)));
+
+		m_objectAtlas.insert(std::make_pair(FS_CROSS_GREEN_BASE_TOP, glm::vec4(4 * COLSIZE, 4 * ROWSIZE, COLSIZE * 2, ROWSIZE / 2)));
+		m_objectAtlas.insert(std::make_pair(FS_CROSS_GREEN_BASE_BOTTOM, glm::vec4(4 * COLSIZE, 4.5 * ROWSIZE, COLSIZE * 2, ROWSIZE / 2)));
+
+		m_objectAtlas.insert(std::make_pair(FS_CROSS_BLUE_BASE_TOP, glm::vec4(4 * COLSIZE, 5 * ROWSIZE, COLSIZE * 2, ROWSIZE / 2)));
+		m_objectAtlas.insert(std::make_pair(FS_CROSS_BLUE_BASE_BOTTOM, glm::vec4(4 * COLSIZE, 5.5 * ROWSIZE, COLSIZE * 2, ROWSIZE / 2)));
 	}
 }
 
@@ -921,7 +927,7 @@ void GameRender::notes(double time, std::vector<Note>& v, std::vector<Note>& cro
 	}
 }
 
-void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cross) {
+void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross) {
 	float plane = 0.0;
 
 	//vertices data for the lanes
@@ -960,6 +966,8 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 	float startAngle = asin(0.25f / m_radius);
 
+	bool isPreviousValid = false;
+
 	glm::vec2 center = {m_radius, 0.0};
 	glm::vec2 redBeforeOuter = getCirclePoint((double)m_radius + size, startAngle);
 	glm::vec2 redBeforeInner = getCirclePoint((double)m_radius - size, startAngle);
@@ -970,14 +978,17 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 	for (float angle = startAngle; angle < m_maxAngle; angle += m_deltaAngle) {
 		auto angleTime = (float)(time + getDTFromAngle(angle));
+		int position = getCrossAtTime(angleTime, cross, &ev);
 
 		glm::vec2 redOuter = getCirclePoint((double)m_radius + size, (double)angle);
 		glm::vec2 redInner = getCirclePoint((double)m_radius - size, (double)angle);
 
-		pushVertexColor(lanesVector, -redBeforeOuter.x + center.x, plane, -redBeforeOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redBeforeInner.x + center.x, plane, -redBeforeInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redInner.x + center.x, plane, -redInner.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
-		pushVertexColor(lanesVector, -redOuter.x + center.x, plane, -redOuter.y - center.y, redColor[0], redColor[1], redColor[2], redColor[3]);
+		Vertex r1(glm::vec3(-redBeforeOuter.x + center.x, plane, -redBeforeOuter.y - center.y), redColor);
+		Vertex r2(glm::vec3(-redBeforeInner.x + center.x, plane, -redBeforeInner.y - center.y), redColor);
+		Vertex r3(glm::vec3(-redInner.x + center.x, plane, -redInner.y - center.y), redColor);
+		Vertex r4(glm::vec3(-redOuter.x + center.x, plane, -redOuter.y - center.y), redColor);
+
+		pushQuadVertices(lanesVector, r1, r2, r3, r4);
 		pushQuadIndices(lanesIndices, lanesVertexCount);
 
 		redBeforeOuter = redOuter;
@@ -987,33 +998,49 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 		glm::vec2 greenOuter;
 		glm::vec2 greenInner;
-		if (getCrossAtTime(angleTime, cross) == 0) {
+
+		if (position == 0) {
 			greenOuter = getCirclePoint((double)m_radius + 1.0 + size, (double)angle);
 			greenInner = getCirclePoint((double)m_radius + 1.0f - size, (double)angle);
 
-			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-		} else if (getCrossAtTime(angleTime, cross) == 2) {
+			//green active and on the left
+			if (isPreviousValid) {
+				glm::vec4 tCoords = m_objectAtlas.at(FS_CROSS_GREEN_BASE_BOTTOM);
+
+				Vertex g1(glm::vec3(-greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y), greenActiveColor);
+				Vertex g2(glm::vec3(-greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y), greenActiveColor);
+				Vertex g3(glm::vec3(-greenInner.x + center.x, plane, -greenInner.y - center.y), greenActiveColor);
+				Vertex g4(glm::vec3(-greenOuter.x + center.x, plane, -greenOuter.y - center.y), greenActiveColor);
+				pushQuadVertices(lanesVector, g1, g2, g3, g4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
+		} else if (position == 1) {
 			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
 			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
 
-			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
-			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
-			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
-			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenInactiveColor.r, greenInactiveColor.g, greenInactiveColor.b, greenInactiveColor.a);
-		} else {
+			//green active and on the center
+			if (isPreviousValid) {
+				Vertex g1(glm::vec3(-greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y), greenActiveColor);
+				Vertex g2(glm::vec3(-greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y), greenActiveColor);
+				Vertex g3(glm::vec3(-greenInner.x + center.x, plane, -greenInner.y - center.y), greenActiveColor);
+				Vertex g4(glm::vec3(-greenOuter.x + center.x, plane, -greenOuter.y - center.y), greenActiveColor);
+				pushQuadVertices(lanesVector, g1, g2, g3, g4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
+		} else if (position == 2) {
 			greenOuter = getCirclePoint((double)m_radius + 0.5 + size, (double)angle);
 			greenInner = getCirclePoint((double)m_radius + 0.5 - size, (double)angle);
 
-			pushVertexColor(lanesVector, -greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenInner.x + center.x, plane, -greenInner.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
-			pushVertexColor(lanesVector, -greenOuter.x + center.x, plane, -greenOuter.y - center.y, greenActiveColor.r, greenActiveColor.g, greenActiveColor.b, greenActiveColor.a);
+			//green inactive and on the center
+			if (isPreviousValid) {
+				Vertex g1(glm::vec3(-greenBeforeOuter.x + center.x, plane, -greenBeforeOuter.y - center.y), greenInactiveColor);
+				Vertex g2(glm::vec3(-greenBeforeInner.x + center.x, plane, -greenBeforeInner.y - center.y), greenInactiveColor);
+				Vertex g3(glm::vec3(-greenInner.x + center.x, plane, -greenInner.y - center.y), greenInactiveColor);
+				Vertex g4(glm::vec3(-greenOuter.x + center.x, plane, -greenOuter.y - center.y), greenInactiveColor);
+				pushQuadVertices(lanesVector, g1, g2, g3, g4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
 		}
-
-		pushQuadIndices(lanesIndices, lanesVertexCount);
 
 		greenBeforeOuter = greenOuter;
 		greenBeforeInner = greenInner;
@@ -1022,36 +1049,57 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& cro
 
 		glm::vec2 blueOuter;
 		glm::vec2 blueInner;
-		if (getCrossAtTime(angleTime, cross) == 0) {
+		if (position == 0) {
 			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
 			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
 
-			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
-			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
-			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
-			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueInactiveColor.r, blueInactiveColor.g, blueInactiveColor.b, blueInactiveColor.a);
-		} else if (getCrossAtTime(angleTime, cross) == 2) {
+			//blue inactive and on the center
+
+			if (isPreviousValid) {
+				Vertex b1(glm::vec3(-blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y), blueInactiveColor);
+				Vertex b2(glm::vec3(-blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y), blueInactiveColor);
+				Vertex b3(glm::vec3(-blueInner.x + center.x, 0.0, -blueInner.y - center.y), blueInactiveColor);
+				Vertex b4(glm::vec3(-blueOuter.x + center.x, 0.0, -blueOuter.y - center.y), blueInactiveColor);
+				pushQuadVertices(lanesVector, b1, b2, b3, b4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
+		} else if (position == 1) {
+			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
+			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
+
+			//blue active and on the center
+			if (isPreviousValid) {
+				Vertex b1(glm::vec3(-blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y), blueActiveColor);
+				Vertex b2(glm::vec3(-blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y), blueActiveColor);
+				Vertex b3(glm::vec3(-blueInner.x + center.x, 0.0, -blueInner.y - center.y), blueActiveColor);
+				Vertex b4(glm::vec3(-blueOuter.x + center.x, 0.0, -blueOuter.y - center.y), blueActiveColor);
+				pushQuadVertices(lanesVector, b1, b2, b3, b4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
+		} else if (position == 2) {
 			blueOuter = getCirclePoint((double)m_radius - 1.0 + size, (double)angle);
 			blueInner = getCirclePoint((double)m_radius - 1.0f - size, (double)angle);
 
-			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-		} else {
-			blueOuter = getCirclePoint((double)m_radius - 0.5 + size, (double)angle);
-			blueInner = getCirclePoint((double)m_radius - 0.5 - size, (double)angle);
-
-			pushVertexColor(lanesVector, -blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueInner.x + center.x, 0.0, -blueInner.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
-			pushVertexColor(lanesVector, -blueOuter.x + center.x, 0.0, -blueOuter.y - center.y, blueActiveColor.r, blueActiveColor.g, blueActiveColor.b, blueActiveColor.a);
+			//blue active and on the left
+			if (isPreviousValid) {
+				Vertex b1(glm::vec3(-blueBeforeOuter.x + center.x, 0.0, -blueBeforeOuter.y - center.y), blueActiveColor);
+				Vertex b2(glm::vec3(-blueBeforeInner.x + center.x, 0.0, -blueBeforeInner.y - center.y), blueActiveColor);
+				Vertex b3(glm::vec3(-blueInner.x + center.x, 0.0, -blueInner.y - center.y), blueActiveColor);
+				Vertex b4(glm::vec3(-blueOuter.x + center.x, 0.0, -blueOuter.y - center.y), blueActiveColor);
+				pushQuadVertices(lanesVector, b1, b2, b3, b4);
+				pushQuadIndices(lanesIndices, lanesVertexCount);
+			}
 		}
-
-		pushQuadIndices(lanesIndices, lanesVertexCount);
 
 		blueBeforeOuter = blueOuter;
 		blueBeforeInner = blueInner;
+
+		if (position == -1) {
+			//make next one invalid
+			isPreviousValid = false;
+		} else {
+			isPreviousValid = true;
+		}
 	}
 	for (auto& note : v) {
 		double milli = note.getMilli();
@@ -1272,9 +1320,14 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 	float transparency = 0.35f; // euphoria transparency
 
 	//vertices data
-	std::vector<float> eventsVector = {};
-	std::vector<unsigned int> eventsIndices = {};
-	unsigned int eventsVertexCount = 0;
+	//only color
+	std::vector<float> colorVector = {};
+	std::vector<unsigned int> colorIndices = {};
+	unsigned int colorVertexCount = 0;
+	//only textures
+	std::vector<float> texVector = {};
+	std::vector<unsigned int> texIndices = {};
+	unsigned int texVertexCount = 0;
 
 	//loop for every event inside event vector
 	if (!ev.empty()) {
@@ -1313,12 +1366,12 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 							inner = getCirclePoint(m_radius + 0.75, cycleAngle);
 						}
 
-						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
-						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(colorVector, -outer.x + center.x, plane, -outer.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(colorVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(colorVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
+						pushVertexColor(colorVector, -inner.x + center.x, plane, -inner.y - center.y, m_greenScratchColor.r, m_greenScratchColor.g, m_greenScratchColor.b, m_greenScratchColor.a);
 
-						pushQuadIndices(eventsIndices, eventsVertexCount);
+						pushQuadIndices(colorIndices, colorVertexCount);
 
 						beforeOuter = outer;
 						beforeInner = inner;
@@ -1351,12 +1404,12 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 							inner = getCirclePoint(m_radius - 0.75, cycleAngle);
 						}
 
-						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
-						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(colorVector, -outer.x + center.x, plane, -outer.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(colorVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(colorVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
+						pushVertexColor(colorVector, -inner.x + center.x, plane, -inner.y - center.y, m_blueScratchColor.r, m_blueScratchColor.g, m_blueScratchColor.b, m_blueScratchColor.a);
 
-						pushQuadIndices(eventsIndices, eventsVertexCount);
+						pushQuadIndices(colorIndices, colorVertexCount);
 
 						beforeOuter = outer;
 						beforeInner = inner;
@@ -1376,15 +1429,120 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 						glm::vec2 outer = getCirclePoint((double)m_radius + m_deltaRadius, cycleAngle);
 						glm::vec2 inner = getCirclePoint((double)m_radius - m_deltaRadius, cycleAngle);
 
-						pushVertexColor(eventsVector, -outer.x + center.x, plane, -outer.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-						pushVertexColor(eventsVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-						pushVertexColor(eventsVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
-						pushVertexColor(eventsVector, -inner.x + center.x, plane, -inner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(colorVector, -outer.x + center.x, plane, -outer.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(colorVector, -beforeOuter.x + center.x, plane, -beforeOuter.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(colorVector, -beforeInner.x + center.x, plane, -beforeInner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
+						pushVertexColor(colorVector, -inner.x + center.x, plane, -inner.y - center.y, m_euphoriaZoneColor.r, m_euphoriaZoneColor.g, m_euphoriaZoneColor.b, m_euphoriaZoneColor.a);
 
-						pushQuadIndices(eventsIndices, eventsVertexCount);
+						pushQuadIndices(colorIndices, colorVertexCount);
 
 						beforeOuter = outer;
 						beforeInner = inner;
+					}
+				} else if (type == FS_CROSS_BASE) {
+					double start = std::max(milli, time - 0.1);
+					double end = std::min(milli + length, time + m_noteVisibleTime);
+
+					double startAngle = getAngleFromDT(start - time);
+					double endAngle = getAngleFromDT(end - time);
+					glm::vec2 center = {m_radius, 0.0};
+
+					double greenOuterRadius = (double)m_radius + 1.25;
+					double greenInnerRadius = (double)m_radius + 0.25;
+					double blueOuterRadius = (double)m_radius - 1.25;
+					double blueInnerRadius = (double)m_radius - 0.25;
+
+					glm::vec2 beforeOuterGreen = getCirclePoint(greenOuterRadius, startAngle);
+					glm::vec2 beforeInnerGreen = getCirclePoint(greenInnerRadius, startAngle);
+
+					glm::vec2 beforeOuterBlue = getCirclePoint(blueOuterRadius, startAngle);
+					glm::vec2 beforeInnerBlue = getCirclePoint(blueInnerRadius, startAngle);
+
+					glm::vec4 greenTopSprite = m_objectAtlas.at(FS_CROSS_GREEN_BASE_TOP);
+					glm::vec4 greenBottomSprite = m_objectAtlas.at(FS_CROSS_GREEN_BASE_BOTTOM);
+
+					glm::vec4 blueTopSprite = m_objectAtlas.at(FS_CROSS_BLUE_BASE_TOP);
+					glm::vec4 blueBottomSprite = m_objectAtlas.at(FS_CROSS_BLUE_BASE_BOTTOM);
+
+					if (start > time - 0.1) {
+						//draw start zone
+						double deltaAngle = asin(0.25 / m_radius);
+
+						glm::vec2 bottomOuterGreen = getCirclePoint(greenOuterRadius, startAngle - deltaAngle);
+						glm::vec2 bottomInnerGreen = getCirclePoint(greenInnerRadius, startAngle - deltaAngle);
+						glm::vec2 bottomOuterBlue = getCirclePoint(blueOuterRadius, startAngle - deltaAngle);
+						glm::vec2 bottomInnerBlue = getCirclePoint(blueInnerRadius, startAngle - deltaAngle);
+
+						Vertex g1(glm::vec3(-beforeOuterGreen.x + center.x, plane, -beforeOuterGreen.y - center.y), glm::vec2(greenBottomSprite.x, 1.0 - greenBottomSprite.y));
+						Vertex g2(glm::vec3(-bottomOuterGreen.x + center.x, plane, -bottomOuterGreen.y - center.y), glm::vec2(greenBottomSprite.x, 1.0 - (greenBottomSprite.y + greenBottomSprite.w)));
+						Vertex g3(glm::vec3(-bottomInnerGreen.x + center.x, plane, -bottomInnerGreen.y - center.y), glm::vec2(greenBottomSprite.x + greenBottomSprite.z, 1.0 - (greenBottomSprite.y + greenBottomSprite.w)));
+						Vertex g4(glm::vec3(-beforeInnerGreen.x + center.x, plane, -beforeInnerGreen.y - center.y), glm::vec2(greenBottomSprite.x + greenBottomSprite.z, 1.0 - greenBottomSprite.y));
+
+						pushQuadVertices(texVector, g1, g2, g3, g4);
+						pushQuadIndices(texIndices, texVertexCount);
+
+						Vertex b1(glm::vec3(-beforeOuterBlue.x + center.x, plane, -beforeOuterBlue.y - center.y), glm::vec2(blueBottomSprite.x, 1.0 - blueBottomSprite.y));
+						Vertex b2(glm::vec3(-bottomOuterBlue.x + center.x, plane, -bottomOuterBlue.y - center.y), glm::vec2(blueBottomSprite.x, 1.0 - (blueBottomSprite.y + blueBottomSprite.w)));
+						Vertex b3(glm::vec3(-bottomInnerBlue.x + center.x, plane, -bottomInnerBlue.y - center.y), glm::vec2(blueBottomSprite.x + blueBottomSprite.z, 1.0 - (blueBottomSprite.y + blueBottomSprite.w)));
+						Vertex b4(glm::vec3(-beforeInnerBlue.x + center.x, plane, -beforeInnerBlue.y - center.y), glm::vec2(blueBottomSprite.x + blueBottomSprite.z, 1.0 - blueBottomSprite.y));
+
+						pushQuadVertices(texVector, b1, b2, b3, b4);
+						pushQuadIndices(texIndices, texVertexCount);
+					}
+
+					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
+						glm::vec2 greenOuter = getCirclePoint(greenOuterRadius, cycleAngle);
+						glm::vec2 greenInner = getCirclePoint(greenInnerRadius, cycleAngle);
+
+						glm::vec2 blueOuter = getCirclePoint(blueOuterRadius, cycleAngle);
+						glm::vec2 blueInner = getCirclePoint(blueInnerRadius, cycleAngle);
+
+						Vertex g1(glm::vec3(-greenOuter.x + center.x, plane, -greenOuter.y - center.y), glm::vec2(greenBottomSprite.x, 1.0 - greenBottomSprite.y));
+						Vertex g2(glm::vec3(-beforeOuterGreen.x + center.x, plane, -beforeOuterGreen.y - center.y), glm::vec2(greenBottomSprite.x, 1.0 - greenBottomSprite.y));
+						Vertex g3(glm::vec3(-beforeInnerGreen.x + center.x, plane, -beforeInnerGreen.y - center.y), glm::vec2(greenBottomSprite.x + greenBottomSprite.z, 1.0 - greenBottomSprite.y));
+						Vertex g4(glm::vec3(-greenInner.x + center.x, plane, -greenInner.y - center.y), glm::vec2(greenBottomSprite.x + greenBottomSprite.z, 1.0 - greenBottomSprite.y));
+						pushQuadVertices(texVector, g1, g2, g3, g4);
+						pushQuadIndices(texIndices, texVertexCount);
+
+						Vertex b1(glm::vec3(-blueOuter.x + center.x, plane, -blueOuter.y - center.y), glm::vec2(blueBottomSprite.x, 1.0 - blueBottomSprite.y));
+						Vertex b2(glm::vec3(-beforeOuterBlue.x + center.x, plane, -beforeOuterBlue.y - center.y), glm::vec2(blueBottomSprite.x, 1.0 - blueBottomSprite.y));
+						Vertex b3(glm::vec3(-beforeInnerBlue.x + center.x, plane, -beforeInnerBlue.y - center.y), glm::vec2(blueBottomSprite.x + blueBottomSprite.z, 1.0 - blueBottomSprite.y));
+						Vertex b4(glm::vec3(-blueInner.x + center.x, plane, -blueInner.y - center.y), glm::vec2(blueBottomSprite.x + blueBottomSprite.z, 1.0 - blueBottomSprite.y));
+						pushQuadVertices(texVector, b1, b2, b3, b4);
+						pushQuadIndices(texIndices, texVertexCount);
+
+						beforeOuterGreen = greenOuter;
+						beforeInnerGreen = greenInner;
+
+						beforeOuterBlue = blueOuter;
+						beforeInnerBlue = blueInner;
+					}
+
+					if (end < time + m_noteVisibleTime) {
+						//draw end zone
+
+						double deltaAngle = asin(0.25 / m_radius);
+
+						glm::vec2 topOuterGreen = getCirclePoint(greenOuterRadius, endAngle + deltaAngle);
+						glm::vec2 topInnerGreen = getCirclePoint(greenInnerRadius, endAngle + deltaAngle);
+						glm::vec2 topOuterBlue = getCirclePoint(blueOuterRadius, endAngle + deltaAngle);
+						glm::vec2 topInnerblue = getCirclePoint(blueInnerRadius, endAngle + deltaAngle);
+
+						Vertex g1(glm::vec3(-topOuterGreen.x + center.x, plane, -topOuterGreen.y - center.y), glm::vec2(greenTopSprite.x, 1.0 - greenTopSprite.y));
+						Vertex g2(glm::vec3(-beforeOuterGreen.x + center.x, plane, -beforeOuterGreen.y - center.y), glm::vec2(greenTopSprite.x, 1.0 - (greenTopSprite.y + greenTopSprite.w)));
+						Vertex g3(glm::vec3(-beforeInnerGreen.x + center.x, plane, -beforeInnerGreen.y - center.y), glm::vec2(greenTopSprite.x + greenTopSprite.z, 1.0 - (greenTopSprite.y + greenTopSprite.w)));
+						Vertex g4(glm::vec3(-topInnerGreen.x + center.x, plane, -topInnerGreen.y - center.y), glm::vec2(greenTopSprite.x + greenTopSprite.z, 1.0 - greenTopSprite.y));
+
+						pushQuadVertices(texVector, g1, g2, g3, g4);
+						pushQuadIndices(texIndices, texVertexCount);
+
+						Vertex b1(glm::vec3(-topOuterBlue.x + center.x, plane, -topOuterBlue.y - center.y), glm::vec2(blueTopSprite.x, 1.0 - blueTopSprite.y));
+						Vertex b2(glm::vec3(-beforeOuterBlue.x + center.x, plane, -beforeOuterBlue.y - center.y), glm::vec2(blueTopSprite.x, 1.0 - (blueTopSprite.y + blueTopSprite.w)));
+						Vertex b3(glm::vec3(-beforeInnerBlue.x + center.x, plane, -beforeInnerBlue.y - center.y), glm::vec2(blueTopSprite.x + blueTopSprite.z, 1.0 - (blueTopSprite.y + blueTopSprite.w)));
+						Vertex b4(glm::vec3(-topInnerblue.x + center.x, plane, -topInnerblue.y - center.y), glm::vec2(blueTopSprite.x + blueTopSprite.z, 1.0 - blueTopSprite.y));
+
+						pushQuadVertices(texVector, b1, b2, b3, b4);
+						pushQuadIndices(texIndices, texVertexCount);
 					}
 				}
 			}
@@ -1406,7 +1564,8 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 			}
 		}
 		usePersProj();
-		renderColor(eventsVector, eventsIndices);
+		renderColor(colorVector, colorIndices);
+		renderTexture(texVector, texIndices, m_objTexture);
 	}
 }
 
@@ -2060,7 +2219,17 @@ glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
 	return {x, y};
 }
 
-int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr) {
+int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr) {
+	if (eventArr != nullptr) {
+		//0.5 to be considered 0.25 away from the clicker
+		double timeOffset = getDTFromAngle(0.5 / m_radius);
+		//check for freestyle crossfade at that time
+		for (auto& n : *eventArr) {
+			if (n.getType() == FS_CROSS_BASE && n.getMilli() - timeOffset <= time && n.getMilli() + n.getLength() + timeOffset > time) {
+				return -1; // no position there
+			}
+		}
+	}
 	if (!crossArr.empty() && time >= 0) {
 		int index = -1;
 		for (size_t i = 0; i < crossArr.size(); ++i) {

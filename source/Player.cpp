@@ -1243,14 +1243,14 @@ void Player::readMappingFile() {
 	const char* section = "Game Mappings";
 	ini.LoadFile("profile.ini");
 
-	GREEN_CODE = ini.GetLongValue(section, "KB_green", 0);
-	RED_CODE = ini.GetLongValue(section, "KB_red", 0);
-	BLUE_CODE = ini.GetLongValue(section, "KB_blue", 0);
-	EUPHORIA = ini.GetLongValue(section, "KB_euphoria", 0);
-	CROSS_L_CODE = ini.GetLongValue(section, "KB_crossLeft", 0);
-	CROSS_R_CODE = ini.GetLongValue(section, "KB_crossRight", 0);
-	SCRATCH_UP = ini.GetLongValue(section, "KB_scratchUp", 0);
-	SCRATCH_DOWN = ini.GetLongValue(section, "KB_scratchDown", 0);
+	GREEN_CODE = ini.GetLongValue(section, "KB_green", 256);
+	RED_CODE = ini.GetLongValue(section, "KB_red", 256);
+	BLUE_CODE = ini.GetLongValue(section, "KB_blue", 256);
+	EUPHORIA = ini.GetLongValue(section, "KB_euphoria", 256);
+	CROSS_L_CODE = ini.GetLongValue(section, "KB_crossLeft", 256);
+	CROSS_R_CODE = ini.GetLongValue(section, "KB_crossRight", 256);
+	SCRATCH_UP = ini.GetLongValue(section, "KB_scratchUp", 256);
+	SCRATCH_DOWN = ini.GetLongValue(section, "KB_scratchDown", 256);
 
 	GREEN_GAMEPAD = ini.GetLongValue(section, "GP_green", 0);
 	RED_GAMEPAD = ini.GetLongValue(section, "GP_red", 0);

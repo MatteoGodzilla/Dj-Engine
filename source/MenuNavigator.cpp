@@ -72,10 +72,10 @@ void MenuNavigator::readConfigFile() {
 
 	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
 
-	UP_CODE = ini.GetLongValue(section, "KB_up", 0);
-	DOWN_CODE = ini.GetLongValue(section, "KB_down", 0);
-	SELECT_CODE = ini.GetLongValue(section, "KB_select", 0);
-	BACK_CODE = ini.GetLongValue(section, "KB_back", 0);
+	UP_CODE = ini.GetLongValue(section, "KB_up", 256);
+	DOWN_CODE = ini.GetLongValue(section, "KB_down", 256);
+	SELECT_CODE = ini.GetLongValue(section, "KB_select", 256);
+	BACK_CODE = ini.GetLongValue(section, "KB_back", 256);
 
 	UP_GAMEPAD = ini.GetLongValue(section, "GP_up", 0);
 	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_down", 0);
