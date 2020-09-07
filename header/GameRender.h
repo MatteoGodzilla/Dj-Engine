@@ -50,12 +50,23 @@ enum AtlasIndices {
 	FS_CROSS_GREEN_BASE_TOP,
 	FS_CROSS_BLUE_BASE_BOTTOM,
 	FS_CROSS_BLUE_BASE_TOP,
+	FS_CROSS_SPEAKER_GREEN_0,
+	FS_CROSS_SPEAKER_GREEN_1,
+	FS_CROSS_SPEAKER_GREEN_2,
+	FS_CROSS_SPEAKER_GREEN_3,
+	FS_CROSS_SPEAKER_GREEN_4,
+	FS_CROSS_SPEAKER_BLUE_0,
+	FS_CROSS_SPEAKER_BLUE_1,
+	FS_CROSS_SPEAKER_BLUE_2,
+	FS_CROSS_SPEAKER_BLUE_3,
+	FS_CROSS_SPEAKER_BLUE_4,
 };
 
 class GameRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void highway(double time);
+	//TODO:Convert every draw call to either Vertex or Quad
 	void clicker();
 	void notes(double time, std::vector<Note>& v, std::vector<Note>& cross);
 	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
@@ -95,6 +106,7 @@ private:
 	double getAngleFromDT(double dt) const;
 	double getDTFromAngle(double angle) const;
 	static double getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius);
+	Quad createCircleQuad(double angle, double baseRadius, double deltaRadius, double deltaAngle, float plane = 0.0f) const;
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;

@@ -39,6 +39,18 @@ Vertex::Vertex(glm::vec3 pos_) {
 	tex = {0.0, 0.0};
 }
 
+Vertex::Vertex() {
+	pos = {0.0, 0.0, 0.0};
+	col = {1.0, 1.0, 1.0, 1.0};
+	tex = {0.0, 0.0};
+}
+
+Vertex::Vertex(const Vertex& other) {
+	pos = other.pos;
+	col = other.col;
+	tex = other.tex;
+}
+
 void Rendr::checkError() {
 	std::cout << "started error checking" << std::endl;
 	GLenum error = glGetError();
@@ -100,7 +112,7 @@ void Rendr::pushVertex(std::vector<float>& v, Vertex& ver) const {
 	v.push_back(ver.tex.t);
 }
 
-void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) {
+void Rendr::pushFourVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) const {
 	pushVertex(v, ver1);
 	pushVertex(v, ver2);
 	pushVertex(v, ver3);
@@ -108,7 +120,7 @@ void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, 
 }
 
 //utility function
-void Rendr::pushQuadIndices(std::vector<unsigned int>& v, unsigned int& value) {
+void Rendr::pushFourIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
 	v.push_back(value + 2);
@@ -123,6 +135,11 @@ void Rendr::pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& valu
 	v.push_back(value + 1);
 	v.push_back(value + 2);
 	value += 3;
+}
+
+void Rendr::pushQuad(std::vector<float>& vArr, std::vector<unsigned int>& indices, unsigned int& indexCount, Quad& quad) const {
+	pushFourVertices(vArr, quad.v1, quad.v2, quad.v3, quad.v4);
+	pushFourIndices(indices, indexCount);
 }
 
 void Rendr::usePersProj() {
@@ -230,6 +247,7 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 }
 
 void Rendr::drawText(const std::string& s, float x, float y, float scl) {
+	scl /= textFactor;
 	bool old = rendr_InvertedX;
 	rendr_InvertedX = false;
 	//loop for every char in string
@@ -260,7 +278,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 		pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
-		pushQuadIndices(textIndices, textVertexCount);
+		pushFourIndices(textIndices, textVertexCount);
 
 		useOrthoProj();
 		renderText(textVector, textIndices, temp.TextureID);
@@ -269,7 +287,8 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 	rendr_InvertedX = old;
 }
 
-float Rendr::getTextWidth(const std::string& s, float scale) {
+float Rendr::getTextWidth(const std::string& s, float scale) const {
+	scale /= textFactor;
 	float x = 0.0f; // return variable
 	for (char c : s) {
 		CharTextureData temp = ChMap[c];
@@ -279,7 +298,8 @@ float Rendr::getTextWidth(const std::string& s, float scale) {
 	return x;
 }
 
-float Rendr::getTextHeight(const std::string& s, float scale) {
+float Rendr::getTextHeight(const std::string& s, float scale) const {
+	scale /= textFactor;
 	float maxBearing = 0;
 	float y = 0.0f;
 	for (char c : s) {
@@ -532,7 +552,7 @@ void Rendr::init(GLFWwindow* w) {
 		if (FT_New_Face(m_FTLibrary, "res/NotoSans-Regular.ttf", 0, &m_font)) {
 			std::cerr << "Rendr error:error loading font" << std::endl;
 		}
-		FT_Set_Pixel_Sizes(m_font, 0, 1024);
+		FT_Set_Pixel_Sizes(m_font, 0, 1024 * textFactor);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

@@ -149,38 +149,56 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				crossNow = 0;
 			}
 
+			bool insideFSCross = false;
+
+			for (auto& e : eventArr) {
+				if (e.getType() == FS_CROSS_BASE && e.getMilli() <= time && e.getMilli() + e.getLength() > time) {
+					insideFSCross = true;
+				}
+			}
+
 			if (m_cross == 0) {
 				if (crossNow == 1) {
-					if (getHittableNote(CF_SPIKE_C, noteArr)) {
-						hit(time, CF_SPIKE_C, noteArr);
-					} else if (!getHittableNote(CROSS_B, cross) && !getHittableNote(CF_SPIKE_B, noteArr)) {
-						hit(time, CROSS_C, cross);
+					if (!insideFSCross) {
+						if (getHittableNote(CF_SPIKE_C, noteArr)) {
+							hit(time, CF_SPIKE_C, noteArr);
+						} else if (!getHittableNote(CROSS_B, cross) && !getHittableNote(CF_SPIKE_B, noteArr)) {
+							hit(time, CROSS_C, cross);
+						}
 					}
 					m_cfGreenToCenter = true;
 				}
 			} else if (m_cross == 1) {
 				if (crossNow == 0) {
-					if (getHittableNote(CF_SPIKE_G, noteArr)) {
-						hit(time, CF_SPIKE_G, noteArr);
-					} else {
-						hit(time, CROSS_G, cross);
+					if (!insideFSCross) {
+						if (getHittableNote(CF_SPIKE_G, noteArr)) {
+							hit(time, CF_SPIKE_G, noteArr);
+						} else {
+							hit(time, CROSS_G, cross);
+						}
 					}
 					m_cfCenterToGreen = true;
 				} else if (crossNow == 2) {
-					if (getHittableNote(CF_SPIKE_B, noteArr)) {
-						hit(time, CF_SPIKE_B, noteArr);
-					} else {
-						hit(time, CROSS_B, cross);
+					if (!insideFSCross) {
+						if (getHittableNote(CF_SPIKE_B, noteArr)) {
+							hit(time, CF_SPIKE_B, noteArr);
+						} else {
+							hit(time, CROSS_B, cross);
+						}
 					}
+
 					m_cfCenterToBlue = true;
 				}
 			} else if (m_cross == 2) {
 				if (crossNow == 1) {
-					if (getHittableNote(CF_SPIKE_C, noteArr)) {
-						hit(time, CF_SPIKE_C, noteArr);
-					} else if (!getHittableNote(CROSS_G, cross) && !getHittableNote(CF_SPIKE_G, noteArr)) {
-						hit(time, CROSS_C, cross);
+					if (!insideFSCross) {
+						if (getHittableNote(CF_SPIKE_C, noteArr)) {
+							hit(time, CF_SPIKE_C, noteArr);
+						} else if (!getHittableNote(CROSS_G, cross) && !getHittableNote(CF_SPIKE_G, noteArr)) {
+							hit(time, CROSS_C, cross);
+						}
 					}
+
 					m_cfBlueToCenter = true;
 				}
 			}

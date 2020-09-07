@@ -76,8 +76,8 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	bottomRight.col = secondCol;
 	topRight.col = secondCol;
 
-	pushQuadVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
-	pushQuadIndices(selIndices, selVertexCount);
+	pushFourVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
+	pushFourIndices(selIndices, selVertexCount);
 	renderColor(selVector, selIndices);
 
 	if (node.getChildCount() > 0) {
@@ -846,8 +846,8 @@ void MenuRender::result(Game* game) {
 		Vertex topRight = Vertex({x + 30.0f + scale * 1000.0f, y, 0.0}, {1.0f, 1.0f});
 
 		if (stars >= 0.1) {
-			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
-			pushQuadIndices(resultIndices, resultVertexCount);
+			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.2) {
 			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
@@ -855,8 +855,8 @@ void MenuRender::result(Game* game) {
 			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
-			pushQuadIndices(resultIndices, resultVertexCount);
+			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.3) {
 			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
@@ -864,8 +864,8 @@ void MenuRender::result(Game* game) {
 			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
-			pushQuadIndices(resultIndices, resultVertexCount);
+			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.4) {
 			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
@@ -873,8 +873,8 @@ void MenuRender::result(Game* game) {
 			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
-			pushQuadIndices(resultIndices, resultVertexCount);
+			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.5) {
 			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
@@ -882,8 +882,8 @@ void MenuRender::result(Game* game) {
 			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
 
-			pushQuadVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
-			pushQuadIndices(resultIndices, resultVertexCount);
+			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (!resultVector.empty()) {
 			useOrthoProj();
@@ -938,8 +938,8 @@ void MenuRender::splashArt() {
 	bottomRight.tex = {1.0, 0.0};
 	topRight.tex = {1.0, 1.0};
 
-	pushQuadVertices(vector, topLeft, bottomLeft, bottomRight, topRight);
-	pushQuadIndices(indices, indexCount);
+	pushFourVertices(vector, topLeft, bottomLeft, bottomRight, topRight);
+	pushFourIndices(indices, indexCount);
 
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
