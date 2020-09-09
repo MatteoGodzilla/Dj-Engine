@@ -763,6 +763,8 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 	}
 
 	ImGui::Separator();
+	ImGui::Text("Tip: you can hold CTRL and click on a slider to set the raw value. The values are not clamped");
+	ImGui::Text("Tip #2: you can click on the numbers near 'Remap' buttons and write the axis id manually. For a reference on the axis, click 'Axis Viewer' ");
 	if (ImGui::Button("Go Back to menu")) {
 		m_shouldClose = true;
 	}
