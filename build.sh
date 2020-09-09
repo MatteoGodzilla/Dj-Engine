@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if [[ -d /mingw64/bin ]]
 then
 	export PATH=/mingw64/bin:$PATH
