@@ -14,6 +14,16 @@
 #include <string>
 #include <vector>
 
+enum AnimId {
+	AN_CROSS_GREEN_TO_LEFT,
+	AN_CROSS_GREEN_TO_CENTER,
+	AN_CROSS_BLUE_TO_RIGHT,
+	AN_CROSS_BLUE_TO_CENTER,
+	AN_GREEN_CLICKER,
+	AN_RED_CLICKER,
+	AN_BLUE_CLICKER,
+};
+
 enum AtlasIndices {
 	TAP_GREEN_1,
 	TAP_GREEN_2,

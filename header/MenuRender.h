@@ -1,4 +1,5 @@
 #pragma once
+#include "AnimationManager.h"
 #include "Game.h"
 #include "Graphics.h"
 #include "MenuNode.h"
@@ -9,6 +10,11 @@
 #include <array>
 #include <iostream>
 #include <map>
+
+enum animID {
+	AN_SCROLL_UP,
+	AN_SCROLL_DOWN
+};
 
 struct menuinputs {
 	int* uk;
@@ -51,6 +57,10 @@ public:
 	double m_currentIdleTime = 0.0f;
 	float m_selectionDX = 0.0f;
 
+	AnimationManager m_animManager;
+	double m_globalTime = 0.0;
+	double m_timeWarp = 0.0;
+	double m_timeWarpStart = 0.0;
 private:
 	double m_cbPlayingTime = 0.0f;
 	bool m_isCalibrating = false;
@@ -60,8 +70,8 @@ private:
 	unsigned int m_buttonTexture = 0;
 	unsigned int m_splashTexture = 0;
 	unsigned int m_calibrationTex = 0;
-		unsigned int m_pgBarFrame = 0;
-		unsigned int m_menuVynil = 0;
+	unsigned int m_pgBarFrame = 0;
+	unsigned int m_menuVynil = 0;
 
 	void editingAxisController(int axis);
 	void editingAxisKBAM(int axis);
@@ -69,7 +79,6 @@ private:
 	std::vector<double> m_latencyHits;
 
 	double m_dTime = 0.0;
-	double m_globalTime = 0.0;
 	double m_pastTime = 0.0;
 
 	glm::vec2 m_logoDimensions;

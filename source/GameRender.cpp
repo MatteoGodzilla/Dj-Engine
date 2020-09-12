@@ -2,7 +2,14 @@
 
 void GameRender::init(GLFWwindow* w) {
 	Rendr::init(w);
-	m_animManager.init();
+
+	m_animManager.pushAnimation(Animation(AN_CROSS_GREEN_TO_LEFT, 0.100));
+	m_animManager.pushAnimation(Animation(AN_CROSS_GREEN_TO_CENTER, 0.100));
+	m_animManager.pushAnimation(Animation(AN_CROSS_BLUE_TO_RIGHT, 0.100));
+	m_animManager.pushAnimation(Animation(AN_CROSS_BLUE_TO_CENTER, 0.100));
+	m_animManager.pushAnimation(Animation(AN_GREEN_CLICKER, 0.200));
+	m_animManager.pushAnimation(Animation(AN_RED_CLICKER, 0.200));
+	m_animManager.pushAnimation(Animation(AN_BLUE_CLICKER, 0.200));
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -1177,29 +1184,29 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev,
 					drawBlue = true;
 				}
 			}
-			if(drawGreen){
+			if (drawGreen) {
 				double r = m_radius + 0.75;
 				double dAngle = asin(0.125 / r);
 
-				Quad q = createCircleQuad(noteAngle,r,0.25 + size,dAngle,plane);
+				Quad q = createCircleQuad(noteAngle, r, 0.25 + size, dAngle, plane);
 				q.v1.col = greenActiveColor;
 				q.v2.col = greenActiveColor;
 				q.v3.col = greenActiveColor;
 				q.v4.col = greenActiveColor;
 
-				pushQuad(lanesVector,lanesIndices,lanesVertexCount,q);
+				pushQuad(lanesVector, lanesIndices, lanesVertexCount, q);
 			}
-			if(drawBlue){
+			if (drawBlue) {
 				double r = m_radius - 0.75;
 				double dAngle = asin(0.125 / r);
 
-				Quad q = createCircleQuad(noteAngle,r,0.25 + size,dAngle,plane);
+				Quad q = createCircleQuad(noteAngle, r, 0.25 + size, dAngle, plane);
 				q.v1.col = blueActiveColor;
 				q.v2.col = blueActiveColor;
 				q.v3.col = blueActiveColor;
 				q.v4.col = blueActiveColor;
 
-				pushQuad(lanesVector,lanesIndices,lanesVertexCount,q);
+				pushQuad(lanesVector, lanesIndices, lanesVertexCount, q);
 			}
 		}
 	}
@@ -2008,7 +2015,7 @@ void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>
 	std::string fps = "Delta Time:";
 	fps.append(std::to_string(deltaTime));
 	fps.append(std::string(" | FPS:"));
-	fps.append(std::to_string(1/deltaTime));
+	fps.append(std::to_string(1 / deltaTime));
 	drawText(fps, 10.0f, 170.0f, 0.05f);
 
 	std::string baseScore;

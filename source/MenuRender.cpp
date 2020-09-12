@@ -3,6 +3,9 @@
 void MenuRender::init(GLFWwindow* w) {
 	Rendr::init(w);
 
+	m_animManager.pushAnimation(Animation(AN_SCROLL_UP, 0.1));
+	m_animManager.pushAnimation(Animation(AN_SCROLL_DOWN, 0.1));
+
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {
@@ -24,6 +27,8 @@ void MenuRender::tick() {
 	m_dTime = nowTime - m_pastTime;
 	m_globalTime += m_dTime;
 	m_pastTime = nowTime;
+
+	m_animManager.tick(m_globalTime);
 }
 
 void MenuRender::render(MenuNode node, int selected, int vOffset) {
@@ -42,23 +47,44 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 
 	//text scale
 	float scale = 0.075f;
+	double padding = 10;
+	double textAngle = glm::pi<double>() / 8;
 
-	double radius = 720.0 * 1/3;
-	glm::vec2 center = {radius/4,720.0/2};
-	Vertex cv = Vertex(glm::vec3(center.x,center.y,0.0));
-	Vertex before = Vertex(glm::vec3(center.x,center.y + radius,0.0));
-	cv.tex = glm::vec2(0.5,0.5);
-	before.tex = glm::vec2(1.0,0.5);
+	double radius = 720.0 * 1 / 3;
+	glm::vec2 center = {radius / 4, 720.0 / 2};
+	Vertex cv = Vertex(glm::vec3(center.x, center.y, 0.0));
+	Vertex before = Vertex(glm::vec3(center.x, center.y + radius, 0.0));
+	cv.tex = glm::vec2(0.5, 0.5);
+	before.tex = glm::vec2(1.0, 0.5);
+
+	//selection color
+	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
+	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
+												   //
+	Animation up = m_animManager.getAnimById(AN_SCROLL_UP);
+	Animation down = m_animManager.getAnimById(AN_SCROLL_DOWN);
+
+	double angleDiff = 0;
+
+	double scratchSpeed = 2;
+
+	if (up.isEnabled()) {
+		angleDiff = (1.0 - up.getPercent()) * textAngle;
+		m_timeWarp = m_timeWarpStart + scratchSpeed * up.getTime();
+	} else if (down.isEnabled()) {
+		angleDiff = (1.0 - down.getPercent()) * textAngle * -1;
+		m_timeWarp = m_timeWarpStart - scratchSpeed * down.getTime();
+	}
 
 	//vynil on the left
-	for(double angle = 0; angle < glm::two_pi<double>(); angle += m_deltaAngle){
+	for (double angle = 0; angle < glm::two_pi<double>(); angle += m_deltaAngle) {
 		glm::vec2 p = getCirclePoint(radius, angle);
-		Vertex v = Vertex(glm::vec3(p.x + center.x, -p.y + center.y,0.0));
-		double angleOffset = glm::pi<double>() * 3 / 2 * m_globalTime;
-		v.tex = glm::vec2((cos(angle + angleOffset)+1)/2,(sin(angle + angleOffset)+1)/2);
+		Vertex v = Vertex(glm::vec3(p.x + center.x, -p.y + center.y, 0.0));
+		double angleOffset = glm::pi<double>() * 3 / 2 * (m_globalTime + m_timeWarp);
+		v.tex = glm::vec2((cos(angle + angleOffset) + 1) / 2, (sin(angle + angleOffset) + 1) / 2);
 
-		pushVertex(mainVector,cv);
-		pushVertex(mainVector,v);
+		pushVertex(mainVector, cv);
+		pushVertex(mainVector, v);
 		pushVertex(mainVector, before);
 		pushTriangleIndices(mainIndices, mainVertexCount);
 		before = v;
@@ -66,79 +92,79 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 
 	useOrthoProj();
 	renderTexture(mainVector, mainIndices, m_menuVynil);
-	/*
-	//selection color
-	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
-	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
 
-	float right = 0.0f;
-	int heightIndex = 0;
-	float selHeight = 0.0f;
-
-	std::vector<MenuNode>& list = node.getChildrens();
-	if (node.getChildCount() > 0) {
-		MenuNode m = list.at(selected);
-		right = getTextWidth(m.getText(), scale);
-		heightIndex = selected - vOffset;
-		selHeight = getTextHeight(list.at(selected).getText(), scale);
+	if (selected - 4 >= 0 && selected - 4 < node.getChildCount()) {
+		glm::vec2 basePoint = getCirclePoint(radius + padding * 2, glm::pi<double>() / 2);
+		std::string s = "^";
+		float height = getTextHeight(s, scale);
+		drawText(s, basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
 	}
-	useOrthoProj();
-
-	//selection rectangle
-	if (10.0f - m_selectionDX + right > 1270.0f) {
-		m_currentIdleTime += m_dTime;
-		if (m_currentIdleTime > m_timeBeforeAnimating) {
-			m_selectionDX = 150.0f * (float)(m_currentIdleTime - m_timeBeforeAnimating);
-		}
+	if (selected - 3 >= 0 && selected - 3 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 3 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected - 3);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
 	}
-
-	Vertex topLeft = Vertex({10.0f - m_selectionDX, 200.0f + 1000.0f * scale * (float)heightIndex, 0.0f}, firstCol);
-	Vertex bottomLeft = topLeft;
-	Vertex bottomRight = topLeft;
-	Vertex topRight = topLeft;
-
-	bottomLeft.pos += glm::vec3(0.0, selHeight, 0.0);
-	bottomRight.pos += glm::vec3(right, selHeight, 0.0);
-	topRight.pos += glm::vec3(right, 0.0, 0.0);
-
-	bottomRight.col = secondCol;
-	topRight.col = secondCol;
-
-	pushFourVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
-	pushFourIndices(selIndices, selVertexCount);
-	renderColor(selVector, selIndices);
-
-	if (node.getChildCount() > 0) {
-		//draw every child from node
-		if (node.getChildCount() < VISIBLE_ENTRIES) {
-			for (size_t i = 0; i < node.getChildCount(); i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating && i == selected) {
-					drawText(list.at(i).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
-				} else {
-					drawText(list.at(i).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
-				}
-			}
-		} else {
-			for (size_t i = 0; i < VISIBLE_ENTRIES; i++) {
-				if (m_currentIdleTime > m_timeBeforeAnimating && i + vOffset == selected) {
-					drawText(list.at(i + vOffset).getText(), 10.0f - m_selectionDX, 1000.0f * scale * i + 200.0f, scale);
-				} else {
-					drawText(list.at(i + vOffset).getText(), 10.0f, 1000.0f * scale * i + 200.0f, scale);
-				}
-			}
-		}
+	if (selected - 2 >= 0 && selected - 2 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 2 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected - 2);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
 	}
-	drawText(node.getText(), 10.0f, 100.0f, 0.05f);
+	if (selected - 1 >= 0 && selected - 1 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 1 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected - 1);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
+	}
+	if (selected - 0 >= 0 && selected - 0 < node.getChildCount()) {
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 0 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected - 0);
+		float height = getTextHeight(selectedNode.getText(), scale);
+		float length = getTextWidth(selectedNode.getText(), scale);
+		/*
 
-	if (node.getChildCount() > VISIBLE_ENTRIES) {
-		if (vOffset > 0) {
-			drawText("^", 10.0f, 150.0f, scale);
-		}
-		if (vOffset < node.getChildCount() - VISIBLE_ENTRIES) {
-			float h = getTextHeight("v", scale);
-			drawText("v", 10.0f, 700.0f - h, scale);
-		}
-	}*/
+		Vertex topLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y - height / 2 + center.y, 0), firstCol);
+		Vertex bottomLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y + height / 2 + center.y, 0), firstCol);
+		Vertex bottomRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y + height / 2 + center.y, 0), secondCol);
+		Vertex topRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y - height / 2 + center.y, 0), secondCol);
+
+		pushFourVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
+		pushFourIndices(selIndices, selVertexCount);
+		renderColor(selVector, selIndices);
+		*/
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
+	}
+	if (selected + 1 >= 0 && selected + 1 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * -1 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected + 1);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
+	}
+	if (selected + 2 >= 0 && selected + 2 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * -2 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected + 2);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
+	}
+	if (selected + 3 >= 0 && selected + 3 < node.getChildCount()) {
+		float scl = scale / 2;
+		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * -3 + angleDiff);
+		MenuNode& selectedNode = node.getChildrens().at(selected + 3);
+		float height = getTextHeight(selectedNode.getText(), scl);
+		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scl);
+	}
+	if (selected + 4 >= 0 && selected + 4 < node.getChildCount()) {
+		glm::vec2 basePoint = getCirclePoint(radius + padding * 2, glm::pi<double>() / 2 * -1);
+		std::string s = "v";
+		float height = getTextHeight(s, scale);
+		drawText(s, basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
+	}
 }
 
 void MenuRender::remapping(Game* game, menuinputs input) {

@@ -105,18 +105,18 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 
 	MenuNode scratches("Test Scratches", SCRATCHES_ID);
 	MenuNode latency("Calibrate latency", LATENCY_ID);
-	MenuNode flipButtons("Toggle Buttons Right/Left:", LR_BUTTONS_ID);
+	MenuNode flipButtons("Buttons Right/Left:", LR_BUTTONS_ID);
 	MenuNode speed("Set Deck Speed:", SPEED_ID);
 	MenuNode refreshList("Refresh song list", REFRESH_ID);
 	MenuNode bot("Toggle Bot:", BOT_ID);
 	MenuNode color("Change lanes color", COLOR_ID);
 	MenuNode pollrate("Change input poll rate:", POLL_ID);
-	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
+	MenuNode debug("Debug Informations:", DEBUG_ID);
 
 	MenuNode a("Refresh List", REFRESH_ID);
 
 	//add values to text after:
-	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
+	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "Right" : "Left"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
 	bot.setText(bot.getText() + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	pollrate.setText(pollrate.getText() + std::to_string(m_game->m_inputThreadPollRate));
@@ -285,6 +285,8 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
+					m_render.m_animManager.triggerAnimation(AN_SCROLL_UP, m_render.m_globalTime);
+					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				} else if (m_selection.back() == 0) {
 					m_selection.back() = m_activeNode->getChildCount() - 1;
 					if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
@@ -303,6 +305,8 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() < m_activeNode->getChildCount() + 1) {
 					m_selection.back()++;
+					m_render.m_animManager.triggerAnimation(AN_SCROLL_DOWN, m_render.m_globalTime);
+					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				}
 				if (m_selection.back() == m_activeNode->getChildCount()) {
 					m_selection.back() = 0;
@@ -443,7 +447,7 @@ void MenuNavigator::render() {
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
 			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
-		
+
 			if (m_activeNode->getId() == m_root.getId()) {
 				m_render.splashArt();
 			}
@@ -486,7 +490,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 	} else if (id == LR_BUTTONS_ID) {
 		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
 		//update options node text
-		getNodePtrById(&m_root, LR_BUTTONS_ID)->setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
+		getNodePtrById(&m_root, LR_BUTTONS_ID)->setText(std::string("Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "Right" : "Left"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
@@ -495,7 +499,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 		getNodePtrById(&m_root, BOT_ID)->setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
 		m_game->m_debugView = !m_game->m_debugView;
-		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
+		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == REFRESH_ID) {
 		m_songList.clear();

@@ -1,22 +1,73 @@
 #include "AnimationManager.h"
 
-void AnimationManager::init() {
-	Animation anim1(AN_CROSS_GREEN_TO_LEFT, 0.100);
-	Animation anim2(AN_CROSS_GREEN_TO_CENTER, 0.100);
-	Animation anim3(AN_CROSS_BLUE_TO_RIGHT, 0.100);
-	Animation anim4(AN_CROSS_BLUE_TO_CENTER, 0.100);
+Animation::Animation() {
+	m_id = -1;
+	m_duration = 0.0;
+	m_looping = false;
+}
 
-	Animation anim5(AN_GREEN_CLICKER, 0.200);
-	Animation anim6(AN_RED_CLICKER, 0.200);
-	Animation anim7(AN_BLUE_CLICKER, 0.200);
+Animation::Animation(int id, double duration, bool looping) {
+	m_id = id;
+	m_duration = duration;
+	m_looping = looping;
+}
 
-	m_animList.push_back(anim1);
-	m_animList.push_back(anim2);
-	m_animList.push_back(anim3);
-	m_animList.push_back(anim4);
-	m_animList.push_back(anim5);
-	m_animList.push_back(anim6);
-	m_animList.push_back(anim7);
+void Animation::tick(double time) {
+	if (m_enabled) {
+		m_time += time - m_pastTick;
+		if (m_time > m_duration) {
+			reset();
+			if (!m_looping) {
+				disable();
+			}
+		}
+	}
+	m_pastTick = time;
+}
+
+void Animation::enable(double time) {
+	m_enabled = true;
+	m_pastTick = time;
+}
+
+void Animation::disable() {
+	m_enabled = false;
+}
+
+void Animation::reset() {
+	m_time = 0.0;
+}
+
+void Animation::setDuration(double time) {
+	m_duration = time;
+}
+
+void Animation::setLooping(bool loop) {
+	m_looping = loop;
+}
+
+int Animation::getId() const {
+	return m_id;
+}
+
+bool Animation::isLooping() const {
+	return m_looping;
+}
+
+bool Animation::isEnabled() const {
+	return m_enabled;
+}
+
+double Animation::getTime() const {
+	return m_time;
+}
+
+double Animation::getPercent() const {
+	return m_time / m_duration;
+}
+
+double Animation::getDuration() const {
+	return m_duration;
 }
 
 void AnimationManager::tick(double time) {
@@ -25,7 +76,7 @@ void AnimationManager::tick(double time) {
 	}
 }
 
-std::vector<Animation> AnimationManager::getAnimList() {
+std::vector<Animation>& AnimationManager::getAnimList() {
 	return m_animList;
 }
 
@@ -39,13 +90,17 @@ Animation AnimationManager::getAnimById(int id) {
 	return Animation(-1, 0.0);
 }
 
-void AnimationManager::updateAnimation(int id, Animation a) {
+void AnimationManager::updateAnimation(Animation a) {
 	for (auto& anim : m_animList) {
-		if (anim.getId() == id) {
+		if (anim.getId() == a.getId()) {
 			anim = a;
 			break;
 		}
 	}
+}
+
+void AnimationManager::pushAnimation(Animation a) {
+	m_animList.push_back(a);
 }
 
 void AnimationManager::triggerAnimation(int id, double time) {
