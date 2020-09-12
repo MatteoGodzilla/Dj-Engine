@@ -101,7 +101,6 @@ public:
 
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
-	static glm::vec2 getCirclePoint(double radius, double angle);
 	int getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr = nullptr);
 	double getAngleFromDT(double dt) const;
 	double getDTFromAngle(double angle) const;

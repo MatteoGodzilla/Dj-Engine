@@ -443,7 +443,7 @@ void MenuNavigator::render() {
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
 			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
-
+		
 			if (m_activeNode->getId() == m_root.getId()) {
 				m_render.splashArt();
 			}

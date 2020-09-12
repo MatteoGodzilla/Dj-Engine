@@ -73,7 +73,7 @@ int main(int argc, char** argv) {
 	glfwSetWindowSizeCallback(window, resizeCallback);
 	glfwSetWindowAspectRatio(window, WIDTH, HEIGHT);
 	glfwSetErrorCallback(&errorCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	if (glfwRawMouseMotionSupported()) {
 		glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 	}

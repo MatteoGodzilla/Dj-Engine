@@ -368,6 +368,12 @@ void Rendr::renderImGuiFrame() {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+glm::vec2 Rendr::getCirclePoint(double radius, double angle) {
+	double x = radius * cos(angle);
+	double y = radius * sin(angle);
+	return {x, y};
+}
+
 void Rendr::init(GLFWwindow* w) {
 	stbi_set_flip_vertically_on_load(true);
 

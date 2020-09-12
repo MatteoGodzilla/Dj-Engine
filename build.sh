@@ -43,7 +43,7 @@ mkdir build
 cd build
 if [ $DEBUG = true ]
 then
-	cmake -DCMAKE_BUILD_TYPE=Debug .. && make
+	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. && make
 elif [ $RELEASE = true ]
 then
 	cmake -DCMAKE_BUILD_TYPE=Release .. && make

@@ -60,16 +60,18 @@ private:
 	unsigned int m_buttonTexture = 0;
 	unsigned int m_splashTexture = 0;
 	unsigned int m_calibrationTex = 0;
-	unsigned int m_pgBarFrame = 0;
+		unsigned int m_pgBarFrame = 0;
+		unsigned int m_menuVynil = 0;
 
 	void editingAxisController(int axis);
 	void editingAxisKBAM(int axis);
 
 	std::vector<double> m_latencyHits;
 
-	double m_dTime = 0.0f;
-	double m_globalTime = 0.0f;
-	double m_pastTime = 0.0f;
+	double m_dTime = 0.0;
+	double m_globalTime = 0.0;
+	double m_pastTime = 0.0;
 
 	glm::vec2 m_logoDimensions;
+	double m_deltaAngle = 0.004;
 };

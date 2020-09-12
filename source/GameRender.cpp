@@ -2196,12 +2196,6 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note>& 
 	return result;
 }
 
-glm::vec2 GameRender::getCirclePoint(double radius, double angle) {
-	double x = radius * cos(angle);
-	double y = radius * sin(angle);
-	return {x, y};
-}
-
 int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr) {
 	if (eventArr != nullptr) {
 		//0.5 to be considered 0.25 away from the clicker

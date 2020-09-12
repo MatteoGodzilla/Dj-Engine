@@ -48,6 +48,7 @@ protected:
 	static void pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& value);
 	void pushQuad(std::vector<float>& vArr, std::vector<unsigned int>& indices, unsigned int& indexCount, Quad& quad) const;
 
+	static glm::vec2 getCirclePoint(double radius, double angle);
 	static glm::vec2 loadTexture(const std::string& s, unsigned int* destination);
 
 	float getTextWidth(const std::string& s, float scale) const;

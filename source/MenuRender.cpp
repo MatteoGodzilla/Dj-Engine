@@ -14,7 +14,7 @@ void MenuRender::init(GLFWwindow* w) {
 	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);
 	loadTexture("res/calibration.png", &m_calibrationTex);
 	loadTexture("res/pgBar-frame.png", &m_pgBarFrame);
-
+	loadTexture("res/menuVynil.png", &m_menuVynil);
 	m_font = ImGui::GetIO().Fonts->AddFontFromFileTTF("res/NotoSans-Regular.ttf", 24.0f);
 	m_pastTime = glfwGetTime();
 }
@@ -36,9 +36,37 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	std::vector<unsigned int> selIndices;
 	unsigned int selVertexCount = 0;
 
+	std::vector<float> mainVector;
+	std::vector<unsigned int> mainIndices;
+	unsigned int mainVertexCount = 0;
+
 	//text scale
 	float scale = 0.075f;
 
+	double radius = 720.0 * 1/3;
+	glm::vec2 center = {radius/4,720.0/2};
+	Vertex cv = Vertex(glm::vec3(center.x,center.y,0.0));
+	Vertex before = Vertex(glm::vec3(center.x,center.y + radius,0.0));
+	cv.tex = glm::vec2(0.5,0.5);
+	before.tex = glm::vec2(1.0,0.5);
+
+	//vynil on the left
+	for(double angle = 0; angle < glm::two_pi<double>(); angle += m_deltaAngle){
+		glm::vec2 p = getCirclePoint(radius, angle);
+		Vertex v = Vertex(glm::vec3(p.x + center.x, -p.y + center.y,0.0));
+		double angleOffset = glm::pi<double>() * 3 / 2 * m_globalTime;
+		v.tex = glm::vec2((cos(angle + angleOffset)+1)/2,(sin(angle + angleOffset)+1)/2);
+
+		pushVertex(mainVector,cv);
+		pushVertex(mainVector,v);
+		pushVertex(mainVector, before);
+		pushTriangleIndices(mainIndices, mainVertexCount);
+		before = v;
+	}
+
+	useOrthoProj();
+	renderTexture(mainVector, mainIndices, m_menuVynil);
+	/*
 	//selection color
 	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
 	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
@@ -110,7 +138,7 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 			float h = getTextHeight("v", scale);
 			drawText("v", 10.0f, 700.0f - h, scale);
 		}
-	}
+	}*/
 }
 
 void MenuRender::remapping(Game* game, menuinputs input) {
@@ -917,6 +945,7 @@ void MenuRender::result(Game* game) {
 }
 
 void MenuRender::splashArt() {
+	/*
 	std::vector<float> vector;
 	std::vector<unsigned int> indices;
 	unsigned int indexCount = 0;
@@ -945,7 +974,7 @@ void MenuRender::splashArt() {
 
 	useOrthoProj();
 	renderTexture(vector, indices, m_splashTexture);
-
+	*/
 	float textScale = 0.02f;
 	drawText("*This is alpha v1.5. There are still some bugs left.*", 10.0, 10.0, textScale);
 	drawText("*Less spaghetti code than before*", 10.0, 30.0, textScale);
