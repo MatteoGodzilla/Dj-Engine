@@ -213,8 +213,6 @@ void MenuNavigator::pollInput() {
 			m_popupId = -1;
 			m_debounce = true;
 		} else {
-			glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			resetMenu();
 			if (m_scene == MAIN_SCENE && m_activeNode->getId() == m_root.getId()) {
 				if (m_scene != 1) {
 					m_shouldClose = true;
@@ -446,7 +444,11 @@ void MenuNavigator::render() {
 
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
-			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
+			if (m_activeNode->getId() != getNodePtrById(&m_root, PLAY_ID)->getId()) {
+				m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
+			} else {
+				m_render.play(m_songList, m_selection.back());
+			}
 
 			if (m_activeNode->getId() == m_root.getId()) {
 				m_render.splashArt();

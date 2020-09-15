@@ -31,15 +31,15 @@ void MenuRender::tick() {
 	m_animManager.tick(m_globalTime);
 }
 
-void MenuRender::render(MenuNode node, int selected, int vOffset) {
+void MenuRender::render(MenuNode& node, int selected, int vOffset) {
 	//enable exit from remapping menu
 	m_shouldClose = false;
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
 	//vertices data
-	std::vector<float> selVector;
-	std::vector<unsigned int> selIndices;
-	unsigned int selVertexCount = 0;
+	//std::vector<float> selVector;
+	//std::vector<unsigned int> selIndices;
+	//unsigned int selVertexCount = 0;
 
 	std::vector<float> mainVector;
 	std::vector<unsigned int> mainIndices;
@@ -60,7 +60,7 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 	//selection color
 	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
 	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
-												   //
+		//
 	Animation up = m_animManager.getAnimById(AN_SCROLL_UP);
 	Animation down = m_animManager.getAnimById(AN_SCROLL_DOWN);
 
@@ -164,6 +164,152 @@ void MenuRender::render(MenuNode node, int selected, int vOffset) {
 		std::string s = "v";
 		float height = getTextHeight(s, scale);
 		drawText(s, basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
+	}
+}
+
+void MenuRender::play(std::vector<SongEntry>& list, int selected) {
+	std::vector<float> mainVector;
+	std::vector<unsigned int> mainIndices;
+	unsigned int mainVertexCount = 0;
+
+	float textSize = 0.040;
+	int otherCount = 10;
+
+	//Main Selection
+	float listWidth = 1280 / 5 * 3;
+	float infoWidth = (1280 - listWidth) / 2;
+
+	Quad q;
+	q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q.v2 = Vertex(glm::vec3(0.0, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q.v3 = Vertex(glm::vec3(infoWidth, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	Quad q2;
+	q2.v1 = Vertex(glm::vec3(1280.0 - infoWidth, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q2.v2 = Vertex(glm::vec3(1280.0 - infoWidth, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q2.v3 = Vertex(glm::vec3(1280.0, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	q2.v4 = Vertex(glm::vec3(1280.0, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+
+	pushQuad(mainVector, mainIndices, mainVertexCount, q);
+	pushQuad(mainVector, mainIndices, mainVertexCount, q2);
+	renderColor(mainVector, mainIndices);
+
+	float firstBaseX = (1280.0 - listWidth / 2) / 2;
+	float secondBaseX = (1280.0 + listWidth / 2) / 2;
+	float firstBaseY = 720.0 / 2;
+	float secondBaseY = 720.0 / 2;
+
+	if (list.size() > 0) {
+		std::string s1 = list.at(selected).s1;
+		std::string s2 = list.at(selected).s2;
+
+		if (s2.empty()) {
+			std::string rendered1 = std::string("");
+			for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize) < listWidth - 30; ++i) {
+				rendered1 += s1.at(i);
+			}
+
+			float w = getTextWidth(rendered1, textSize);
+			float h = getTextHeight(rendered1, textSize);
+			drawText(rendered1, 1280.0 / 2 - w / 2, 720.0 / 2 - h / 2, textSize);
+		} else {
+			std::string rendered1 = std::string("");
+			std::string rendered2 = std::string("");
+			for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize) < listWidth / 2 - 30; ++i) {
+				rendered1 += s1.at(i);
+			}
+			for (size_t i = 0; i < s2.size() && getTextWidth(rendered2, textSize) < listWidth / 2 - 30; ++i) {
+				rendered2 += s2.at(i);
+			}
+
+			float w = getTextWidth(rendered1, textSize);
+			float h = getTextHeight(rendered1, textSize);
+			drawText(rendered1, firstBaseX - w / 2, firstBaseY - h / 2, textSize);
+
+			w = getTextWidth(rendered2, textSize);
+			h = getTextHeight(rendered2, textSize);
+			drawText(rendered2, secondBaseX - w / 2, secondBaseY - h / 2, textSize);
+		}
+
+		for (size_t i = 1; i < otherCount; ++i) {
+			if (selected - i >= 0 && selected - i < list.size()) {
+				std::string s1 = list.at(selected - i).s1;
+				std::string s2 = list.at(selected - i).s2;
+
+				if (s2.empty()) {
+					std::string rendered1 = std::string("");
+					for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize / 2) < listWidth - 30; ++i) {
+						rendered1 += s1.at(i);
+					}
+
+					float w = getTextWidth(rendered1, textSize / 2);
+					float h = getTextHeight(rendered1, textSize / 2);
+					drawText(rendered1, 1280.0 / 2 - w / 2, firstBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+				} else {
+					std::string rendered1 = std::string("");
+					std::string rendered2 = std::string("");
+					for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize / 2) < listWidth / 2 - 30; ++i) {
+						rendered1 += s1.at(i);
+					}
+					for (size_t i = 0; i < s2.size() && getTextWidth(rendered2, textSize / 2) < listWidth / 2 - 30; ++i) {
+						rendered2 += s2.at(i);
+					}
+
+					float w = getTextWidth(rendered1, textSize / 2);
+					float h = getTextHeight(rendered1, textSize / 2);
+					drawText(rendered1, firstBaseX - w / 2, firstBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+
+					w = getTextWidth(rendered2, textSize / 2);
+					h = getTextHeight(rendered2, textSize / 2);
+					drawText(rendered2, secondBaseX - w / 2, secondBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+				}
+			} else {
+				break;
+			}
+		}
+
+		for (size_t i = 1; i < otherCount; ++i) {
+			if (selected + i >= 0 && selected + i < list.size()) {
+				std::string s1 = list.at(selected + i).s1;
+				std::string s2 = list.at(selected + i).s2;
+
+				if (s2.empty()) {
+					std::string rendered1 = std::string("");
+					for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize / 2) < listWidth - 30; ++i) {
+						rendered1 += s1.at(i);
+					}
+
+					float w = getTextWidth(rendered1, textSize / 2);
+					float h = getTextHeight(rendered1, textSize / 2);
+					drawText(rendered1, 1280.0 / 2 - w / 2, firstBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+				} else {
+					std::string rendered1 = std::string("");
+					std::string rendered2 = std::string("");
+					for (size_t i = 0; i < s1.size() && getTextWidth(rendered1, textSize / 2) < listWidth / 2 - 30; ++i) {
+						rendered1 += s1.at(i);
+					}
+					for (size_t i = 0; i < s2.size() && getTextWidth(rendered2, textSize / 2) < listWidth / 2 - 30; ++i) {
+						rendered2 += s2.at(i);
+					}
+
+					float w = getTextWidth(rendered1, textSize / 2);
+					float h = getTextHeight(rendered1, textSize / 2);
+					drawText(rendered1, firstBaseX - w / 2, firstBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+
+					w = getTextWidth(rendered2, textSize / 2);
+					h = getTextHeight(rendered2, textSize / 2);
+					drawText(rendered2, secondBaseX - w / 2, secondBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+				}
+			} else {
+				break;
+			}
+		}
+	} else {
+		std::string rendered1 = std::string("Refresh Song Cache");
+
+		float w = getTextWidth(rendered1, textSize);
+		float h = getTextHeight(rendered1, textSize);
+		drawText(rendered1, 1280.0 / 2 - w / 2, 720.0 / 2 - h / 2, textSize);
 	}
 }
 

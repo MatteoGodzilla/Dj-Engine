@@ -31,7 +31,8 @@ class MenuRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void tick();
-	void render(MenuNode node, int selected, int vOffset);
+	void render(MenuNode& node, int selected, int vOffset);
+	void play(std::vector<SongEntry>& list, int selected);
 	void remapping(Game* game, menuinputs input);
 	//void scratches(Player* player);
 	void calibration(Game* game, double dt);
@@ -61,6 +62,7 @@ public:
 	double m_globalTime = 0.0;
 	double m_timeWarp = 0.0;
 	double m_timeWarpStart = 0.0;
+
 private:
 	double m_cbPlayingTime = 0.0f;
 	bool m_isCalibrating = false;
