@@ -176,28 +176,23 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 	int otherCount = 10;
 
 	//Main Selection
-	float listWidth = 1280 / 5 * 3;
-	float infoWidth = (1280 - listWidth) / 2;
+	float listWidth = 1280 / 5 * 4;
+	float infoWidth = 1280 - listWidth;
 
 	Quad q;
 	q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
 	q.v2 = Vertex(glm::vec3(0.0, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
 	q.v3 = Vertex(glm::vec3(infoWidth, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
 	q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	Quad q2;
-	q2.v1 = Vertex(glm::vec3(1280.0 - infoWidth, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q2.v2 = Vertex(glm::vec3(1280.0 - infoWidth, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q2.v3 = Vertex(glm::vec3(1280.0, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q2.v4 = Vertex(glm::vec3(1280.0, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
 
 	pushQuad(mainVector, mainIndices, mainVertexCount, q);
-	pushQuad(mainVector, mainIndices, mainVertexCount, q2);
-	renderColor(mainVector, mainIndices);
 
-	float firstBaseX = (1280.0 - listWidth / 2) / 2;
-	float secondBaseX = (1280.0 + listWidth / 2) / 2;
-	float firstBaseY = 720.0 / 2;
-	float secondBaseY = 720.0 / 2;
+	float firstBaseX = infoWidth + listWidth / 4;
+	float secondBaseX = 1280.0 - listWidth / 4;
+	float singleTrackX = infoWidth + listWidth / 2;
+	float selectedY = 720.0 / 2;
+
+	float difficultyHeight = 720.0 / 2;
 
 	if (list.size() > 0) {
 		std::string s1 = list.at(selected).s1;
@@ -211,7 +206,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 			float w = getTextWidth(rendered1, textSize);
 			float h = getTextHeight(rendered1, textSize);
-			drawText(rendered1, 1280.0 / 2 - w / 2, 720.0 / 2 - h / 2, textSize);
+			drawText(rendered1, singleTrackX - w / 2, selectedY - h / 2, textSize);
 		} else {
 			std::string rendered1 = std::string("");
 			std::string rendered2 = std::string("");
@@ -224,11 +219,11 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 			float w = getTextWidth(rendered1, textSize);
 			float h = getTextHeight(rendered1, textSize);
-			drawText(rendered1, firstBaseX - w / 2, firstBaseY - h / 2, textSize);
+			drawText(rendered1, firstBaseX - w / 2, selectedY - h / 2, textSize);
 
 			w = getTextWidth(rendered2, textSize);
 			h = getTextHeight(rendered2, textSize);
-			drawText(rendered2, secondBaseX - w / 2, secondBaseY - h / 2, textSize);
+			drawText(rendered2, secondBaseX - w / 2, selectedY - h / 2, textSize);
 		}
 
 		for (size_t i = 1; i < otherCount; ++i) {
@@ -244,7 +239,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 					float w = getTextWidth(rendered1, textSize / 2);
 					float h = getTextHeight(rendered1, textSize / 2);
-					drawText(rendered1, 1280.0 / 2 - w / 2, firstBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+					drawText(rendered1, singleTrackX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 				} else {
 					std::string rendered1 = std::string("");
 					std::string rendered2 = std::string("");
@@ -257,11 +252,11 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 					float w = getTextWidth(rendered1, textSize / 2);
 					float h = getTextHeight(rendered1, textSize / 2);
-					drawText(rendered1, firstBaseX - w / 2, firstBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+					drawText(rendered1, firstBaseX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 
 					w = getTextWidth(rendered2, textSize / 2);
 					h = getTextHeight(rendered2, textSize / 2);
-					drawText(rendered2, secondBaseX - w / 2, secondBaseY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
+					drawText(rendered2, secondBaseX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 				}
 			} else {
 				break;
@@ -281,7 +276,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 					float w = getTextWidth(rendered1, textSize / 2);
 					float h = getTextHeight(rendered1, textSize / 2);
-					drawText(rendered1, 1280.0 / 2 - w / 2, firstBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+					drawText(rendered1, singleTrackX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 				} else {
 					std::string rendered1 = std::string("");
 					std::string rendered2 = std::string("");
@@ -294,16 +289,144 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 
 					float w = getTextWidth(rendered1, textSize / 2);
 					float h = getTextHeight(rendered1, textSize / 2);
-					drawText(rendered1, firstBaseX - w / 2, firstBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+					drawText(rendered1, firstBaseX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 
 					w = getTextWidth(rendered2, textSize / 2);
 					h = getTextHeight(rendered2, textSize / 2);
-					drawText(rendered2, secondBaseX - w / 2, secondBaseY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
+					drawText(rendered2, secondBaseX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 				}
 			} else {
 				break;
 			}
 		}
+
+		//info rendering
+		Quad q;
+		q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
+		q.v2 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
+		q.v3 = Vertex(glm::vec3(infoWidth, 720.0 / 2, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
+		q.v4 = Vertex(glm::vec3(0.0, 720.0 / 2, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
+
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+		renderColor(mainVector, mainIndices);
+
+		mainVector.clear();
+		mainIndices.clear();
+		mainVertexCount = 0;
+
+		float deltaText = difficultyHeight / 8;
+
+		glm::vec4 grayBaseColor = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		glm::vec4 greenHighlightColor = glm::vec4(0.133, 0.875, 0.180, 1.0);
+
+		//progress bar gray base
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		//General complexity
+		float v = list.at(selected).dTrack;
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		//Tap complexity
+		v = list.at(selected).dTap;
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		//Crossfade complexity
+		v = list.at(selected).dCrossfade;
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		//Scratch complexity
+		v = list.at(selected).dScratch;
+		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		renderColor(mainVector, mainIndices);
+
+		std::string rendered = std::string("");
+		std::string origin = list.at(selected).a1;
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 1 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = list.at(selected).a2;
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 2 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = std::string("BPM:") + std::to_string(list.at(selected).bpm);
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 3 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = std::string("Overall:") + std::to_string(list.at(selected).dTrack);
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 4 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = std::string("Taps:") + std::to_string(list.at(selected).dTap);
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 5 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = std::string("Crossfades:") + std::to_string(list.at(selected).dCrossfade);
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 6 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
+		rendered = std::string("");
+		origin = std::string("Scratches:") + std::to_string(list.at(selected).dScratch);
+		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
+			rendered += origin.at(i);
+		}
+		drawText(rendered, 10.0, difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+
 	} else {
 		std::string rendered1 = std::string("Refresh Song Cache");
 
