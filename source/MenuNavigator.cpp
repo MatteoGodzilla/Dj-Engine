@@ -44,6 +44,7 @@ void MenuNavigator::writeConfigFile() {
 
 	CSimpleIniA ini;
 	const char* section = "Menu Mappings";
+	/*
 	ini.SetLongValue(section, "KB_up", UP_CODE);
 	ini.SetLongValue(section, "KB_down", DOWN_CODE);
 	ini.SetLongValue(section, "KB_select", SELECT_CODE);
@@ -53,6 +54,7 @@ void MenuNavigator::writeConfigFile() {
 	ini.SetLongValue(section, "GP_down", DOWN_GAMEPAD);
 	ini.SetLongValue(section, "GP_select", SELECT_GAMEPAD);
 	ini.SetLongValue(section, "GP_back", BACK_GAMEPAD);
+	*/
 
 	std::string mappings;
 	ini.Save(mappings);
@@ -72,6 +74,7 @@ void MenuNavigator::readConfigFile() {
 
 	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
 
+	/*
 	UP_CODE = ini.GetLongValue(section, "KB_up", 256);
 	DOWN_CODE = ini.GetLongValue(section, "KB_down", 256);
 	SELECT_CODE = ini.GetLongValue(section, "KB_select", 256);
@@ -81,6 +84,7 @@ void MenuNavigator::readConfigFile() {
 	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_down", 0);
 	SELECT_GAMEPAD = ini.GetLongValue(section, "GP_select", 0);
 	BACK_GAMEPAD = ini.GetLongValue(section, "GP_back", 0);
+	*/
 }
 
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
@@ -159,11 +163,17 @@ void MenuNavigator::pollInput() {
 	m_wasEscapePressed = m_isEscapePressed;
 	m_wasTabPressed = m_isTabPressed;
 
+	m_isUpPressed = m_game->getPlayer()->isAxisAboveDeadzone(MENU_UP);
+	m_isDownPressed = m_game->getPlayer()->isAxisAboveDeadzone(MENU_DOWN);
+	m_isSelectPressed = m_game->getPlayer()->isAxisAboveDeadzone(GREEN_INDEX);
+	m_isBackPressed = m_game->getPlayer()->isAxisAboveDeadzone(RED_INDEX);
+
+	/*
 	if (m_game->getPlayer()->m_useKeyboardInput) {
 		m_isUpPressed = glfwGetKey(m_render.getWindowPtr(), UP_CODE);
 		m_isDownPressed = glfwGetKey(m_render.getWindowPtr(), DOWN_CODE);
-		m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), SELECT_CODE);
-		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), BACK_CODE);
+		m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), m_game->getPlayer()->GREEN_CODE);
+		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), m_game->getPlayer()->RED_CODE);
 	} else {
 		if (glfwJoystickPresent(m_game->getPlayer()->m_gamepadId)) {
 			updateGamepadState();
@@ -171,11 +181,11 @@ void MenuNavigator::pollInput() {
 			if (!m_gpState.empty()) {
 				m_isUpPressed = (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD));
 				m_isDownPressed = (m_gpState.at(DOWN_GAMEPAD) >= m_gpDead.at(DOWN_GAMEPAD));
-				m_isSelectPressed = (m_gpState.at(SELECT_GAMEPAD) >= m_gpDead.at(SELECT_GAMEPAD));
-				m_isBackPressed = (m_gpState.at(BACK_GAMEPAD) >= m_gpDead.at(BACK_GAMEPAD));
+				m_isSelectPressed = m_game->getPlayer()->isAxisAboveDeadzone(GREEN_INDEX);
+				m_isBackPressed = m_game->getPlayer()->isAxisAboveDeadzone(RED_INDEX);
 			}
 		}
-	}
+	}*/
 
 	if (m_isUpPressed) {
 		if (m_holdingSomething == 0) {
@@ -370,13 +380,9 @@ void MenuNavigator::update() {
 				} else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				} else if (m_render.m_ActionToChange == MENU_UP) {
-					changing = &UP_GAMEPAD;
+					changing = &(m_game->getPlayer()->UP_GAMEPAD);
 				} else if (m_render.m_ActionToChange == MENU_DOWN) {
-					changing = &DOWN_GAMEPAD;
-				} else if (m_render.m_ActionToChange == MENU_SELECT) {
-					changing = &SELECT_GAMEPAD;
-				} else if (m_render.m_ActionToChange == MENU_BACK) {
-					changing = &BACK_GAMEPAD;
+					changing = &(m_game->getPlayer()->DOWN_GAMEPAD);
 				}
 
 				float deadzone = 0.05f;
@@ -407,13 +413,9 @@ void MenuNavigator::update() {
 				} else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				} else if (m_render.m_ActionToChange == MENU_UP) {
-					changing = &UP_CODE;
+					changing = &(m_game->getPlayer()->UP_CODE);
 				} else if (m_render.m_ActionToChange == MENU_DOWN) {
-					changing = &DOWN_CODE;
-				} else if (m_render.m_ActionToChange == MENU_SELECT) {
-					changing = &SELECT_CODE;
-				} else if (m_render.m_ActionToChange == MENU_BACK) {
-					changing = &BACK_CODE;
+					changing = &(m_game->getPlayer()->DOWN_CODE);
 				}
 
 				float deadzone = 0.5f;
@@ -454,7 +456,7 @@ void MenuNavigator::render() {
 				m_render.splashArt();
 			}
 		} else if (m_scene == REMAPPING) {
-			m_render.remapping(m_game, {&UP_CODE, &DOWN_CODE, &SELECT_CODE, &BACK_CODE, &UP_GAMEPAD, &DOWN_GAMEPAD, &SELECT_GAMEPAD, &BACK_GAMEPAD});
+			m_render.remapping(m_game);
 		} else if (m_scene == CREDITS) {
 			m_render.credits();
 		} /*else if (m_scene == SCRATCHES) {

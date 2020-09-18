@@ -60,18 +60,6 @@ public:
 	void scan(bool useCache = true);
 	bool getShouldClose() const;
 
-	//default key codes for keyboard
-	int UP_CODE = GLFW_KEY_UP;
-	int DOWN_CODE = GLFW_KEY_DOWN;
-	int SELECT_CODE = GLFW_KEY_ENTER;
-	int BACK_CODE = GLFW_KEY_ESCAPE;
-
-	//default gamepad bindings for xbox 360 turntable
-	int UP_GAMEPAD = 10;
-	int DOWN_GAMEPAD = 12;
-	int SELECT_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
-	int BACK_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
-
 	int m_scene = 0;
 
 private:

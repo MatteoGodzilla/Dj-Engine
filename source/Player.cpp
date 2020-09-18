@@ -3,7 +3,7 @@
 #include <iostream>
 
 Player::Player() {
-	for (int i = 0; i < 8; ++i) {
+	for (int i = 0; i < 10; ++i) {
 		m_gpDead.push_back(0.5f);
 		m_gpMult.push_back(1.0f);
 	}
@@ -1269,6 +1269,8 @@ void Player::readMappingFile() {
 	CROSS_R_CODE = ini.GetLongValue(section, "KB_crossRight", 256);
 	SCRATCH_UP = ini.GetLongValue(section, "KB_scratchUp", 256);
 	SCRATCH_DOWN = ini.GetLongValue(section, "KB_scratchDown", 256);
+	UP_CODE = ini.GetLongValue(section, "KB_menuUp", 256);
+	DOWN_CODE = ini.GetLongValue(section, "KB_menuDown", 256);
 
 	GREEN_GAMEPAD = ini.GetLongValue(section, "GP_green", 0);
 	RED_GAMEPAD = ini.GetLongValue(section, "GP_red", 0);
@@ -1280,6 +1282,8 @@ void Player::readMappingFile() {
 	m_useSingleScrAxis = ini.GetBoolValue(section, "GP_sameAxisForScratch", false);
 	SCR_UP_GAMEPAD = ini.GetLongValue(section, "GP_scratchUp", 0);
 	SCR_DOWN_GAMEPAD = ini.GetLongValue(section, "GP_scratchDown", 0);
+	UP_GAMEPAD = ini.GetLongValue(section, "GP_menuUp", 0);
+	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_menuDown", 0);
 
 	const char* sensitivityKey = "MULT_";
 	for (size_t i = 0; i < m_gpMult.size(); i++) {
@@ -1306,6 +1310,8 @@ void Player::writeMappingFile() {
 	ini.SetLongValue(section, "KB_crossRight", CROSS_R_CODE);
 	ini.SetLongValue(section, "KB_scratchUp", SCRATCH_UP);
 	ini.SetLongValue(section, "KB_scratchDown", SCRATCH_DOWN);
+	ini.SetLongValue(section, "KB_menuUp", UP_CODE);
+	ini.SetLongValue(section, "KB_menuDown", DOWN_CODE);
 
 	ini.SetLongValue(section, "GP_green", GREEN_GAMEPAD);
 	ini.SetLongValue(section, "GP_red", RED_GAMEPAD);
@@ -1317,6 +1323,8 @@ void Player::writeMappingFile() {
 	ini.SetBoolValue(section, "GP_sameAxisForScratch", m_useSingleScrAxis);
 	ini.SetLongValue(section, "GP_scratchUp", SCR_UP_GAMEPAD);
 	ini.SetLongValue(section, "GP_scratchDown", SCR_DOWN_GAMEPAD);
+	ini.SetLongValue(section, "GP_menuUp", UP_GAMEPAD);
+	ini.SetLongValue(section, "GP_menuDown", DOWN_GAMEPAD);
 
 	const char* sensitivityKey = "MULT_";
 	for (size_t i = 0; i < m_gpMult.size(); i++) {
@@ -1346,6 +1354,8 @@ void Player::updateKBMState(GLFWwindow* w) {
 	localState.push_back(KBMState.at(CROSS_R_CODE));
 	localState.push_back(KBMState.at(SCRATCH_UP));
 	localState.push_back(KBMState.at(SCRATCH_DOWN));
+	localState.push_back(KBMState.at(UP_CODE));
+	localState.push_back(KBMState.at(DOWN_CODE));
 
 	m_gpState = localState;
 }
@@ -1414,6 +1424,12 @@ void Player::updateGamepadState() {
 				SCR_UP_GAMEPAD = std::min(SCR_UP_GAMEPAD, (int)gamepadAxes.size() - 1);
 				localState.push_back(gamepadAxes.at(SCR_UP_GAMEPAD));
 			}
+			UP_GAMEPAD = std::max(UP_GAMEPAD, 0);
+			UP_GAMEPAD = std::min(UP_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(UP_GAMEPAD));
+			DOWN_GAMEPAD = std::max(DOWN_GAMEPAD, 0);
+			DOWN_GAMEPAD = std::min(DOWN_GAMEPAD, (int)gamepadAxes.size() - 1);
+			localState.push_back(gamepadAxes.at(DOWN_GAMEPAD));
 
 			m_gpState = localState;
 		}
@@ -1521,7 +1537,7 @@ bool Player::getRisingEdge(int index) {
 			break;
 		}
 	}
-	if (m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpDead.size() >= 8 && m_gpHistory.size() >= m_historyLength && complete) {
+	if (m_gpState.size() >= 10 && m_gpMult.size() >= 10 && m_gpDead.size() >= 10 && m_gpHistory.size() >= m_historyLength && complete) {
 		float val = m_gpState.at(index) * m_gpMult.at(index);
 		float prev = m_gpHistory.back().at(index) * m_gpMult.at(index);
 		float deadzone = m_gpDead.at(index);
@@ -1550,7 +1566,7 @@ bool Player::getFallingZero(int index) {
 			break;
 		}
 	}
-	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+	if (complete && m_gpState.size() >= 10 && m_gpMult.size() >= 10 && m_gpHistory.size() >= m_historyLength) {
 		float minVelocity = -0.025;
 		std::vector<float> averages;
 		size_t i;
@@ -1575,12 +1591,12 @@ bool Player::getFallingZero(int index) {
 bool Player::getWaveTop(int index) {
 	bool complete = true;
 	for (auto& vec : m_gpHistory) {
-		if (vec.size() < 8) {
+		if (vec.size() < 10) {
 			complete = false;
 			break;
 		}
 	}
-	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+	if (complete && m_gpState.size() >= 10 && m_gpMult.size() >= 10 && m_gpHistory.size() >= m_historyLength) {
 		float deadzone = 0.0f;
 		std::vector<float> averages;
 		size_t i;
@@ -1605,12 +1621,12 @@ bool Player::getWaveTop(int index) {
 bool Player::getWaveRising(int index) {
 	bool complete = true;
 	for (auto& vec : m_gpHistory) {
-		if (vec.size() < 8) {
+		if (vec.size() < 10) {
 			complete = false;
 			break;
 		}
 	}
-	if (complete && m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
+	if (complete && m_gpState.size() >= 10 && m_gpMult.size() >= 8 && m_gpHistory.size() >= m_historyLength) {
 		float deadzone = 0.05f;
 		std::vector<float> averages;
 		size_t i;
@@ -1665,7 +1681,7 @@ bool Player::getScratchZoneActive(double time, int zoneType, std::vector<Note>& 
 }
 
 bool Player::isAxisAboveDeadzone(int index) const {
-	if (m_gpState.size() >= 8 && m_gpMult.size() >= 8 && m_gpDead.size() >= 8) {
+	if (m_gpState.size() == 10 && m_gpMult.size() == 10 && m_gpDead.size() == 10) {
 		return m_gpState.at(index) * m_gpMult.at(index) >= m_gpDead.at(index);
 	} else {
 		return false;

@@ -16,24 +16,13 @@ enum animID {
 	AN_SCROLL_DOWN
 };
 
-struct menuinputs {
-	int* uk;
-	int* dk;
-	int* sk;
-	int* bk;
-	int* ug;
-	int* dg;
-	int* sg;
-	int* bg;
-};
-
 class MenuRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void tick();
 	void render(MenuNode& node, int selected, int vOffset);
 	void play(std::vector<SongEntry>& list, int selected);
-	void remapping(Game* game, menuinputs input);
+	void remapping(Game* game);
 	//void scratches(Player* player);
 	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
@@ -74,6 +63,8 @@ private:
 	unsigned int m_calibrationTex = 0;
 	unsigned int m_pgBarFrame = 0;
 	unsigned int m_menuVynil = 0;
+	unsigned int m_album1 = 0;
+	unsigned int m_album2 = 0;
 
 	void editingAxisController(int axis);
 	void editingAxisKBAM(int axis);

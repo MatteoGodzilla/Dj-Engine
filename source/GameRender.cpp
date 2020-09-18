@@ -2223,6 +2223,7 @@ int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::ve
 				break;
 			}
 		}
+		//std::cerr << index << std::endl;
 		int type = crossArr.at(index).getType();
 		if (type == CROSS_G || type == CROSS_G_TICK) {
 			return 0;

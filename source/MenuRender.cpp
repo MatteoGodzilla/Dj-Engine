@@ -179,20 +179,63 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 	float listWidth = 1280 / 5 * 4;
 	float infoWidth = 1280 - listWidth;
 
-	Quad q;
-	q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q.v2 = Vertex(glm::vec3(0.0, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q.v3 = Vertex(glm::vec3(infoWidth, 720.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
-	q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec4(1.0, 0.0, 0.0, 1.0));
+	std::string album1Path = list.at(selected).path + std::string("/album1.png");
+	std::string album2Path = list.at(selected).path + std::string("/album2.png");
+	std::ifstream checkOne = std::ifstream(album1Path);
+	std::ifstream checkTwo = std::ifstream(album2Path);
 
+	Quad q;
+	q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec2(0.0, 1.0));
+	q.v2 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 0.0));
+	q.v3 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 0.0));
+	q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec2(1.0, 1.0));
+
+	useOrthoProj();
 	pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+	if (checkOne.is_open()) {
+		//available album
+		loadTexture(album1Path, &m_album1);
+		renderTexture(mainVector, mainIndices, m_album1);
+	} else {
+		//album not available
+		renderTexture(mainVector, mainIndices, m_menuVynil);
+	}
+	checkOne.close();
+
+	mainVector.clear();
+	mainIndices.clear();
+	mainVertexCount = 0;
+
+	Quad q2;
+	q2.v1 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 1.0));
+	q2.v2 = Vertex(glm::vec3(0.0, infoWidth * 2, 0.0), glm::vec2(0.0, 0.0));
+	q2.v3 = Vertex(glm::vec3(infoWidth, infoWidth * 2, 0.0), glm::vec2(1.0, 0.0));
+	q2.v4 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 1.0));
+
+	useOrthoProj();
+	pushQuad(mainVector, mainIndices, mainVertexCount, q2);
+
+	if (checkTwo.is_open()) {
+		//available album
+		loadTexture(album2Path, &m_album2);
+		renderTexture(mainVector, mainIndices, m_album2);
+	} else {
+		//album not available
+		renderTexture(mainVector, mainIndices, m_menuVynil);
+	}
+	checkTwo.close();
+
+	mainVector.clear();
+	mainIndices.clear();
+	mainVertexCount = 0;
 
 	float firstBaseX = infoWidth + listWidth / 4;
 	float secondBaseX = 1280.0 - listWidth / 4;
 	float singleTrackX = infoWidth + listWidth / 2;
 	float selectedY = 720.0 / 2;
 
-	float difficultyHeight = 720.0 / 2;
+	float difficultyHeight = 720.0 - infoWidth * 2;
 
 	if (list.size() > 0) {
 		std::string s1 = list.at(selected).s1;
@@ -301,14 +344,6 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		}
 
 		//info rendering
-		Quad q;
-		q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
-		q.v2 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
-		q.v3 = Vertex(glm::vec3(infoWidth, 720.0 / 2, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
-		q.v4 = Vertex(glm::vec3(0.0, 720.0 / 2, 0.0), glm::vec4(0.0, 1.0, 0.0, 1.0));
-
-		pushQuad(mainVector, mainIndices, mainVertexCount, q);
-		renderColor(mainVector, mainIndices);
 
 		mainVector.clear();
 		mainIndices.clear();
@@ -320,60 +355,60 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		glm::vec4 greenHighlightColor = glm::vec4(0.133, 0.875, 0.180, 1.0);
 
 		//progress bar gray base
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
-		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
-		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 3.5, 0.0), grayBaseColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
-		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
-		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), grayBaseColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
-		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
-		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), grayBaseColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
-		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
-		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
+		q.v3 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 7.5, 0.0), grayBaseColor);
+		q.v4 = Vertex(glm::vec3(infoWidth - 10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), grayBaseColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		//General complexity
 		float v = list.at(selected).dTrack;
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
-		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
-		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		//Tap complexity
 		v = list.at(selected).dTap;
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
-		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
-		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		//Crossfade complexity
 		v = list.at(selected).dCrossfade;
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
-		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
-		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 5.5, 0.0), greenHighlightColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		//Scratch complexity
 		v = list.at(selected).dScratch;
-		q.v1 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
-		q.v2 = Vertex(glm::vec3(10.0, difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
-		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
-		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
+		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
+		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 7.5, 0.0), greenHighlightColor);
+		q.v4 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 6.5, 0.0), greenHighlightColor);
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		renderColor(mainVector, mainIndices);
@@ -383,49 +418,49 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 1 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 1 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = list.at(selected).a2;
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 2 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 2 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("BPM:") + std::to_string(list.at(selected).bpm);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 3 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 3 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Overall:") + std::to_string(list.at(selected).dTrack);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 4 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 4 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Taps:") + std::to_string(list.at(selected).dTap);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 5 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 5 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Crossfades:") + std::to_string(list.at(selected).dCrossfade);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 6 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 6 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Scratches:") + std::to_string(list.at(selected).dScratch);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 	} else {
 		std::string rendered1 = std::string("Refresh Song Cache");
@@ -436,7 +471,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 	}
 }
 
-void MenuRender::remapping(Game* game, menuinputs input) {
+void MenuRender::remapping(Game* game) {
 	int colnum = 5;
 
 	ImGuiBackendFlags flags = 0;
@@ -903,12 +938,9 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::NextColumn();
 
 		//Menu Up
-		if (game->getPlayer()->m_useKeyboardInput) {
-			value = game->getPlayer()->getKBMValues(m_window).at(*input.uk);
-		} else {
-			value = game->getPlayer()->getGamepadValues().at(*input.ug);
-		}
-		if (value > 0) {
+		value = game->getPlayer()->m_gpState.at(MENU_UP) * game->getPlayer()->m_gpMult.at(MENU_UP);
+		dead = game->getPlayer()->m_gpDead.at(MENU_UP);
+		if (value > dead) {
 			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu up:");
 		} else {
 			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu up:");
@@ -924,7 +956,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			}
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button / move an axis for 'Menu Up' ");
+			ImGui::Text("Push a button / move an axis for 'Menu up' ");
 			ImGui::Separator();
 
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
@@ -937,29 +969,28 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		}
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
-			ImGui::InputInt("##meup", input.uk);
+			ImGui::InputInt("##menuup", &(game->getPlayer()->UP_CODE));
 		} else {
-			ImGui::InputInt("##meup", input.ug);
+			ImGui::InputInt("##menuup", &(game->getPlayer()->UP_GAMEPAD));
 		}
 		ImGui::NextColumn();
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
+		ImGui::SliderFloat("##9", &(game->getPlayer()->m_gpMult.at(MENU_UP)), -5.0, 5.0);
 		ImGui::NextColumn();
+		ImGui::SliderFloat("##91", &(game->getPlayer()->m_gpDead.at(MENU_UP)), -1.0, 1.0);
 		ImGui::NextColumn();
 
 		//Menu Down
-		if (game->getPlayer()->m_useKeyboardInput) {
-			value = game->getPlayer()->getKBMValues(m_window).at(*input.dk);
-		} else {
-			value = game->getPlayer()->getGamepadValues().at(*input.dg);
-		}
-		if (value > 0) {
+		value = game->getPlayer()->m_gpState.at(MENU_DOWN) * game->getPlayer()->m_gpMult.at(MENU_UP);
+		dead = game->getPlayer()->m_gpDead.at(MENU_DOWN);
+		if (value > dead) {
 			ImGui::TextColored({0.0f, 1.0f, 0.0f, 1.0f}, "Menu down:");
 		} else {
 			ImGui::TextColored({1.0f, 1.0f, 1.0f, 1.0f}, "Menu down:");
 		}
 		ImGui::NextColumn();
-		id = std::string("Remap") + std::string("##091");
+		id = std::string("Remap") + std::string("##100");
 		if (ImGui::Button(id.c_str())) {
 			ImGui::OpenPopup(id.c_str());
 			if (game->getPlayer()->m_useKeyboardInput) {
@@ -969,7 +1000,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 			}
 		}
 		if (ImGui::BeginPopupModal(id.c_str())) {
-			ImGui::Text("Push a button / move an axis for 'Menu Down' ");
+			ImGui::Text("Push a button / move an axis for 'Menu down' ");
 			ImGui::Separator();
 
 			if (ImGui::Button("Cancel", ImVec2(120, 0))) {
@@ -982,17 +1013,20 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		}
 		ImGui::SameLine();
 		if (game->getPlayer()->m_useKeyboardInput) {
-			ImGui::InputInt("##medown", input.dk);
+			ImGui::InputInt("##menudown", &(game->getPlayer()->DOWN_CODE));
 		} else {
-			ImGui::InputInt("##medown", input.dg);
+			ImGui::InputInt("##menudown", &(game->getPlayer()->DOWN_GAMEPAD));
 		}
 		ImGui::NextColumn();
 		ImGui::ProgressBar(value);
 		ImGui::NextColumn();
+		ImGui::SliderFloat("##100", &(game->getPlayer()->m_gpMult.at(MENU_DOWN)), -5.0, 5.0);
 		ImGui::NextColumn();
+		ImGui::SliderFloat("##101", &(game->getPlayer()->m_gpDead.at(MENU_DOWN)), -1.0, 1.0);
 		ImGui::NextColumn();
 
 		//Menu Select
+		/*
 		if (game->getPlayer()->m_useKeyboardInput) {
 			value = game->getPlayer()->getKBMValues(m_window).at(*input.sk);
 		} else {
@@ -1081,7 +1115,7 @@ void MenuRender::remapping(Game* game, menuinputs input) {
 		ImGui::NextColumn();
 		ImGui::NextColumn();
 		ImGui::NextColumn();
-
+		*/
 		ImGui::Columns();
 	}
 
