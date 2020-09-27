@@ -96,6 +96,8 @@ void Game::inputThreadFun(Game* game) {
 		game->m_player.pollState(game->m_gen);
 		game->m_player.tick(game->m_global_time);
 
+		game->m_audio.pollState(&(game->m_player));
+
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		milliseconds delta = duration_cast<milliseconds>(end - start);
 		//stop timer

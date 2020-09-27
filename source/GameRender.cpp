@@ -2204,6 +2204,8 @@ std::vector<Note> GameRender::getCrossInsideNote(Note& note, std::vector<Note>& 
 }
 
 int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr) {
+	std::vector<Note> crossCopy;
+	std::copy(crossArr.begin(), crossArr.end(), std::back_inserter(crossCopy));
 	if (eventArr != nullptr) {
 		//0.5 to be considered 0.25 away from the clicker
 		double timeOffset = getDTFromAngle(0.5 / m_radius);
@@ -2214,17 +2216,17 @@ int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::ve
 			}
 		}
 	}
-	if (!crossArr.empty() && time >= 0) {
+	if (!crossCopy.empty() && time >= 0) {
 		int index = -1;
-		for (size_t i = 0; i < crossArr.size(); ++i) {
-			if (crossArr.at(i).getMilli() <= time) {
+		for (size_t i = 0; i < crossCopy.size(); ++i) {
+			if (crossCopy.at(i).getMilli() <= time) {
 				index = i;
-			} else if (crossArr.at(i).getMilli() > time) {
+			} else if (crossCopy.at(i).getMilli() > time) {
 				break;
 			}
 		}
 		//std::cerr << index << std::endl;
-		int type = crossArr.at(index).getType();
+		int type = crossCopy.at(index).getType();
 		if (type == CROSS_G || type == CROSS_G_TICK) {
 			return 0;
 		} else if (type == CROSS_B || type == CROSS_B_TICK) {

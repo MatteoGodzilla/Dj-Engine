@@ -42,9 +42,9 @@ void printDebugMenuNode(MenuNode node, int indentation = 0) {
 void MenuNavigator::writeConfigFile() {
 	m_game->writeConfig();
 
+	/*
 	CSimpleIniA ini;
 	const char* section = "Menu Mappings";
-	/*
 	ini.SetLongValue(section, "KB_up", UP_CODE);
 	ini.SetLongValue(section, "KB_down", DOWN_CODE);
 	ini.SetLongValue(section, "KB_select", SELECT_CODE);
@@ -54,7 +54,6 @@ void MenuNavigator::writeConfigFile() {
 	ini.SetLongValue(section, "GP_down", DOWN_GAMEPAD);
 	ini.SetLongValue(section, "GP_select", SELECT_GAMEPAD);
 	ini.SetLongValue(section, "GP_back", BACK_GAMEPAD);
-	*/
 
 	std::string mappings;
 	ini.Save(mappings);
@@ -65,8 +64,10 @@ void MenuNavigator::writeConfigFile() {
 			   << mappings;
 		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'" << std::endl;
 	}
+	*/
 }
 
+/*
 void MenuNavigator::readConfigFile() {
 	CSimpleIniA ini;
 	ini.LoadFile("profile.ini");
@@ -74,7 +75,6 @@ void MenuNavigator::readConfigFile() {
 
 	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
 
-	/*
 	UP_CODE = ini.GetLongValue(section, "KB_up", 256);
 	DOWN_CODE = ini.GetLongValue(section, "KB_down", 256);
 	SELECT_CODE = ini.GetLongValue(section, "KB_select", 256);
@@ -84,8 +84,8 @@ void MenuNavigator::readConfigFile() {
 	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_down", 0);
 	SELECT_GAMEPAD = ini.GetLongValue(section, "GP_select", 0);
 	BACK_GAMEPAD = ini.GetLongValue(section, "GP_back", 0);
-	*/
 }
+*/
 
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
@@ -94,12 +94,14 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_game = gameptr;
 	m_render.init(w);
 
-	readConfigFile();
+	//readConfigFile();
 
+	/*
 	std::ifstream available("config.ini");
 	if (!available.is_open()) {
 		writeConfigFile();
 	}
+	*/
 
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);

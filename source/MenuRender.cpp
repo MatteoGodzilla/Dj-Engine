@@ -562,7 +562,7 @@ void MenuRender::remapping(Game* game) {
 		}
 	}
 
-	if (game->getPlayer()->m_gpState.size() >= 8 && game->getPlayer()->m_gpMult.size() >= 8 && game->getPlayer()->m_gpDead.size() >= 8) {
+	if (game->getPlayer()->m_gpState.size() >= 10 && game->getPlayer()->m_gpMult.size() >= 10 && game->getPlayer()->m_gpDead.size() >= 10) {
 		ImGui::Columns(colnum, "mycolumns3", false); // 3-ways, no border
 
 		ImGui::Text("Action");
@@ -847,6 +847,8 @@ void MenuRender::remapping(Game* game) {
 		ImGui::Columns();
 
 		ImGui::Checkbox("Use Single Axis for Scratch", &(game->getPlayer()->m_useSingleScrAxis));
+		ImGui::SameLine();
+		ImGui::Checkbox("Treat Scratch Axes as digital inputs", &(game->getPlayer()->m_digitalScratch));
 		ImGui::Columns(colnum, "third col", false);
 
 		//Scratch Up

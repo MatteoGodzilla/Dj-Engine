@@ -1,5 +1,7 @@
 #include "Audio.h"
 
+#include "Player.h"
+
 template <typename T>
 void CircularBuffer<T>::push(const T& value) {
 	buffer[writeIndex] = value;
@@ -61,8 +63,10 @@ void fillBuffer(Audio* audio) {
 						channel = left:0, right:1
 						pcm[channel][sample_index];
 					*/
-					audio->redPCM.push(redPCM[0][i]);
-					audio->redPCM.push(redPCM[1][i]);
+					float left = redPCM[0][i] * (audio->redPan <= 0.33 ? 0.5 : 0.0); // redPCM[0][i];
+					float right = redPCM[1][i] * (audio->redPan >= -0.33 ? 0.5 : 0.0); // redPCM[1][i];
+					audio->redPCM.push(audio->redGain * left);
+					audio->redPCM.push(audio->redGain * right);
 				}
 			}
 		}
@@ -77,8 +81,10 @@ void fillBuffer(Audio* audio) {
 							channel = left:0, right:1
 							pcm[channel][sample_index];
 						*/
-						audio->greenPCM.push(greenPCM[0][i]);
-						audio->greenPCM.push(greenPCM[1][i]);
+						float left = greenPCM[0][i] * (audio->greenPan <= 0.33 ? 0.5 : 0.0);
+						float right = greenPCM[1][i] * (audio->greenPan >= -0.33 ? 0.5 : 0.0);
+						audio->greenPCM.push(audio->greenGain * left);
+						audio->greenPCM.push(audio->greenGain * right);
 					}
 				}
 			}
@@ -92,8 +98,10 @@ void fillBuffer(Audio* audio) {
 							channel = left:0, right:1
 							pcm[channel][sample_index];
 						*/
-						audio->bluePCM.push(bluePCM[0][i]);
-						audio->bluePCM.push(bluePCM[1][i]);
+						float left = bluePCM[0][i] * (audio->bluePan <= 0.33 ? 0.5 : 0.0);
+						float right = bluePCM[1][i] * (audio->bluePan >= -0.33 ? 0.5 : 0.0);
+						audio->bluePCM.push(audio->blueGain * left);
+						audio->bluePCM.push(audio->blueGain * right);
 					}
 				}
 			}
@@ -207,6 +215,44 @@ void Audio::stop() {
 		checkError(Pa_StopStream(audioStream));
 		playing = false;
 		loaderThreadRunning = false;
+	}
+}
+
+void Audio::resetEffects() {
+	greenGain = 1.0;
+	greenPan = 0.0;
+	redGain = 1.0;
+	redPan = 0.0;
+	blueGain = 1.0;
+	bluePan = 0.0;
+}
+
+void Audio::pollState(const Player* p) {
+	if (p->m_insideFSCross) {
+		if (streams == 3) {
+			int cross = p->m_cross;
+			if (cross == 0) {
+				greenGain = 1.0;
+				blueGain = 0.0;
+			} else if (cross == 1) {
+				greenGain = 1.0;
+				blueGain = 1.0;
+			} else if (cross == 2) {
+				greenGain = 0.0;
+				blueGain = 1.0;
+			}
+		} else {
+			int cross = p->m_cross;
+			if (cross == 0) {
+				redPan = -1.0;
+			} else if (cross == 1) {
+				redPan = 0.0;
+			} else if (cross == 2) {
+				redPan = 1.0;
+			}
+		}
+	} else {
+		resetEffects();
 	}
 }
 

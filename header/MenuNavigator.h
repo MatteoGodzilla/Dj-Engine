@@ -68,7 +68,7 @@ private:
 	void updateMenuNode();
 	void resetMenu();
 	void writeConfigFile();
-	void readConfigFile();
+	//void readConfigFile();
 
 	//gamepad status
 	std::vector<float> m_gpState;

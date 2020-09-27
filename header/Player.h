@@ -82,6 +82,7 @@ public:
 	int DOWN_GAMEPAD = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
 	bool m_useSingleCfAxis = true;
 	bool m_useSingleScrAxis = true;
+	bool m_digitalScratch = false;
 
 	bool m_useKeyboardInput = true;
 
@@ -108,6 +109,7 @@ public:
 	bool m_cfGreenToCenter = false;
 	bool m_cfBlueToCenter = false;
 
+	bool m_insideFSCross = false;
 	int m_cross = 1;
 
 	bool m_deltaMouse = false;

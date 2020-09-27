@@ -25,12 +25,16 @@ private:
 	size_t readIndex = 0;
 };
 
+class Player;
+
 class Audio {
 public:
 	void init();
 	void play();
 	void stop();
 	void load(const SongEntry& entry);
+	void pollState(const Player* p);
+	void resetEffects();
 	void destroy();
 	bool isPlaying() const;
 	double getFileLength();
@@ -46,6 +50,14 @@ public:
 
 	int bitstream = 0;
 	bool loaderThreadRunning = true;
+
+	float greenGain = 1.0;
+	float redGain = 1.0;
+	float blueGain = 1.0;
+
+	float greenPan = 0.0;
+	float redPan = 0.0;
+	float bluePan = 0.0;
 
 private:
 	PaStream* audioStream;

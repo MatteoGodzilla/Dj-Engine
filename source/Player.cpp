@@ -38,8 +38,15 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			updateGamepadState();
 		}
 	}
+	m_insideFSCross = false;
 
-	if (m_gpState.size() >= 8 && m_gpHistory.size() >= m_historyLength && !m_botEnabled) {
+	for (auto& e : eventArr) {
+		if (e.getType() == FS_CROSS_BASE && e.getMilli() <= time && e.getMilli() + e.getLength() > time) {
+			m_insideFSCross = true;
+		}
+	}
+
+	if (m_gpState.size() >= 10 && m_gpHistory.size() >= m_historyLength && !m_botEnabled) {
 		if (getRisingEdge(GREEN_INDEX)) {
 			if (getHittableNote(TAP_G, noteArr)) {
 				hit(time, TAP_G, noteArr);
@@ -89,48 +96,63 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			}
 		}
 
-		if (getFallingZero(SCR_UP_INDEX)) {
-			if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
-				if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
-					hit(time, SCR_G_UP, noteArr);
-				} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
-					hit(time, SCR_B_UP, noteArr);
+		if (m_digitalScratch || m_useKeyboardInput) {
+			// digital scratch
+			//std::cout << "DIGITAL" << std::endl;
+			if (getRisingEdge(SCR_UP_INDEX)) {
+				if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
+						hit(time, SCR_G_UP, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
+						hit(time, SCR_B_UP, noteArr);
+					}
+				} else {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+						hit(time, SCR_G_UP, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+						hit(time, SCR_B_UP, noteArr);
+					}
 				}
-			} else {
-				if (isAxisAboveDeadzone(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce) {
-					hit(time, SCR_G_UP, noteArr);
-				} else if (isAxisAboveDeadzone(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce) {
-					hit(time, SCR_B_UP, noteArr);
-				}
-			}
-		} else if (getFallingZero(SCR_DOWN_INDEX)) {
-			if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
-				if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
-					hit(time, SCR_G_DOWN, noteArr);
-				} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
-					hit(time, SCR_B_DOWN, noteArr);
-				}
-			} else {
-				if (time - m_pastScratch > m_scratchDebounce && (isAxisAboveDeadzone(GREEN_INDEX) || isAxisAboveDeadzone(BLUE_INDEX))) {
-					breakCombo(time);
-				}
-			}
-		}
-
-		if (m_gpHistory.back().at(SCR_UP_INDEX) != m_gpState.at(SCR_UP_INDEX)) {
-			//platter moved in general
-			if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
-				if (getHittableNote(SCR_G_ANY, noteArr)) {
-					hit(time, SCR_G_ANY, noteArr);
-				} else if (getHittableNote(SCR_G_TICK, noteArr)) {
-					hit(time, SCR_G_TICK, noteArr);
+			} else if (getRisingEdge(SCR_DOWN_INDEX)) {
+				if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
+						hit(time, SCR_G_DOWN, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
+						hit(time, SCR_B_DOWN, noteArr);
+					}
+				} else {
+					if (time - m_pastScratch > m_scratchDebounce && (isAxisAboveDeadzone(GREEN_INDEX) || isAxisAboveDeadzone(BLUE_INDEX))) {
+						breakCombo(time);
+					}
 				}
 			}
-			if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
-				if (getHittableNote(SCR_B_ANY, noteArr)) {
-					hit(time, SCR_B_ANY, noteArr);
-				} else if (getHittableNote(SCR_B_TICK, noteArr)) {
-					hit(time, SCR_B_TICK, noteArr);
+		} else {
+			//std::cout << "ANALOG" << std::endl;
+			if (getFallingZero(SCR_UP_INDEX)) {
+				if (getHittableNote(SCR_G_UP, noteArr) || getHittableNote(SCR_B_UP, noteArr)) {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
+						hit(time, SCR_G_UP, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
+						hit(time, SCR_B_UP, noteArr);
+					}
+				} else {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+						hit(time, SCR_G_UP, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && time - m_pastScratch > m_scratchDebounce) {
+						hit(time, SCR_B_UP, noteArr);
+					}
+				}
+			} else if (getFallingZero(SCR_DOWN_INDEX)) {
+				if (getHittableNote(SCR_G_DOWN, noteArr) || getHittableNote(SCR_B_DOWN, noteArr)) {
+					if (isAxisAboveDeadzone(GREEN_INDEX) && getScratchZoneActive(time, SCR_G_ZONE, eventArr)) {
+						hit(time, SCR_G_DOWN, noteArr);
+					} else if (isAxisAboveDeadzone(BLUE_INDEX) && getScratchZoneActive(time, SCR_B_ZONE, eventArr)) {
+						hit(time, SCR_B_DOWN, noteArr);
+					}
+				} else {
+					if (time - m_pastScratch > m_scratchDebounce && (isAxisAboveDeadzone(GREEN_INDEX) || isAxisAboveDeadzone(BLUE_INDEX))) {
+						breakCombo(time);
+					}
 				}
 			}
 		}
@@ -149,17 +171,9 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				crossNow = 0;
 			}
 
-			bool insideFSCross = false;
-
-			for (auto& e : eventArr) {
-				if (e.getType() == FS_CROSS_BASE && e.getMilli() <= time && e.getMilli() + e.getLength() > time) {
-					insideFSCross = true;
-				}
-			}
-
 			if (m_cross == 0) {
 				if (crossNow == 1) {
-					if (!insideFSCross) {
+					if (!m_insideFSCross) {
 						if (getHittableNote(CF_SPIKE_C, noteArr)) {
 							hit(time, CF_SPIKE_C, noteArr);
 						} else if (!getHittableNote(CROSS_B, cross) && !getHittableNote(CF_SPIKE_B, noteArr)) {
@@ -170,7 +184,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				}
 			} else if (m_cross == 1) {
 				if (crossNow == 0) {
-					if (!insideFSCross) {
+					if (!m_insideFSCross) {
 						if (getHittableNote(CF_SPIKE_G, noteArr)) {
 							hit(time, CF_SPIKE_G, noteArr);
 						} else {
@@ -179,7 +193,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 					}
 					m_cfCenterToGreen = true;
 				} else if (crossNow == 2) {
-					if (!insideFSCross) {
+					if (!m_insideFSCross) {
 						if (getHittableNote(CF_SPIKE_B, noteArr)) {
 							hit(time, CF_SPIKE_B, noteArr);
 						} else {
@@ -191,7 +205,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				}
 			} else if (m_cross == 2) {
 				if (crossNow == 1) {
-					if (!insideFSCross) {
+					if (!m_insideFSCross) {
 						if (getHittableNote(CF_SPIKE_C, noteArr)) {
 							hit(time, CF_SPIKE_C, noteArr);
 						} else if (!getHittableNote(CROSS_G, cross) && !getHittableNote(CF_SPIKE_G, noteArr)) {
@@ -215,57 +229,88 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 		} else {
 			//euphoria enabled
 
-			if (getHittableNoteAtZero(time, CROSS_G, cross)) {
-				hit(time, CROSS_G, cross);
-				if (m_cross == 2) {
+			if (!m_insideFSCross) {
+				if (getHittableNoteAtZero(time, CROSS_G, cross)) {
+					hit(time, CROSS_G, cross);
+					if (m_cross == 2) {
+						m_cfBlueToCenter = true;
+					}
+					m_cfCenterToGreen = true;
+					m_cross = 0;
+				} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
+					hit(time, CROSS_C, cross);
+					if (m_cross == 0) {
+						m_cfGreenToCenter = true;
+					} else {
+						m_cfBlueToCenter = true;
+					}
+					m_cross = 1;
+				} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
+					hit(time, CROSS_B, cross);
+					if (m_cross == 0) {
+						m_cfGreenToCenter = true;
+					}
+					m_cfCenterToBlue = true;
+					m_cross = 2;
+				}
+
+				if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
+					hit(time, CROSS_G_TICK, cross);
+				}
+
+				if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
+					hit(time, CROSS_B_TICK, cross);
+				}
+
+				if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
+					hit(time, CF_SPIKE_G, noteArr);
+					if (m_cross == 2) {
+						m_cfCenterToBlue = true;
+					}
+					m_cfGreenToCenter = true;
+				} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
+					hit(time, CF_SPIKE_C, noteArr);
+					if (m_cross == 0) {
+						m_cfCenterToGreen = true;
+					} else {
+						m_cfCenterToBlue = true;
+					}
+				} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
+					hit(time, CF_SPIKE_B, noteArr);
+					if (m_cross == 0) {
+						m_cfCenterToGreen = true;
+					}
 					m_cfBlueToCenter = true;
 				}
-				m_cfCenterToGreen = true;
-				m_cross = 0;
-			} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
-				hit(time, CROSS_C, cross);
-				if (m_cross == 0) {
-					m_cfGreenToCenter = true;
-				} else {
-					m_cfBlueToCenter = true;
-				}
-				m_cross = 1;
-			} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
-				hit(time, CROSS_B, cross);
-				if (m_cross == 0) {
-					m_cfGreenToCenter = true;
-				}
-				m_cfCenterToBlue = true;
-				m_cross = 2;
-			}
+			} else {
+				float left = std::max(m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX), 0.0f);
+				float right = std::max(m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX), 0.0f);
 
-			if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
-				hit(time, CROSS_G_TICK, cross);
-			}
+				float fpos = right - left;
+				int crossNow = 1;
+				if (fpos > 0.5) {
+					crossNow = 2;
+				} else if (fpos < -0.5) {
+					crossNow = 0;
+				}
 
-			if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
-				hit(time, CROSS_B_TICK, cross);
-			}
+				if (m_cross == 0) {
+					if (crossNow == 1) {
+						m_cfGreenToCenter = true;
+					}
+				} else if (m_cross == 1) {
+					if (crossNow == 0) {
+						m_cfCenterToGreen = true;
+					} else if (crossNow == 2) {
+						m_cfCenterToBlue = true;
+					}
+				} else if (m_cross == 2) {
+					if (crossNow == 1) {
+						m_cfBlueToCenter = true;
+					}
+				}
 
-			if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
-				hit(time, CF_SPIKE_G, noteArr);
-				if (m_cross == 2) {
-					m_cfCenterToBlue = true;
-				}
-				m_cfGreenToCenter = true;
-			} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
-				hit(time, CF_SPIKE_C, noteArr);
-				if (m_cross == 0) {
-					m_cfCenterToGreen = true;
-				} else {
-					m_cfCenterToBlue = true;
-				}
-			} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
-				hit(time, CF_SPIKE_B, noteArr);
-				if (m_cross == 0) {
-					m_cfCenterToGreen = true;
-				}
-				m_cfBlueToCenter = true;
+				m_cross = crossNow;
 			}
 		}
 
@@ -1280,6 +1325,7 @@ void Player::readMappingFile() {
 	CF_LEFT_GAMEPAD = ini.GetLongValue(section, "GP_crossLeft", 0);
 	CF_RIGHT_GAMEPAD = ini.GetLongValue(section, "GP_crossRight", 0);
 	m_useSingleScrAxis = ini.GetBoolValue(section, "GP_sameAxisForScratch", false);
+	m_digitalScratch = ini.GetBoolValue(section, "GP_digitalScratch", false);
 	SCR_UP_GAMEPAD = ini.GetLongValue(section, "GP_scratchUp", 0);
 	SCR_DOWN_GAMEPAD = ini.GetLongValue(section, "GP_scratchDown", 0);
 	UP_GAMEPAD = ini.GetLongValue(section, "GP_menuUp", 0);
@@ -1321,6 +1367,7 @@ void Player::writeMappingFile() {
 	ini.SetLongValue(section, "GP_crossLeft", CF_LEFT_GAMEPAD);
 	ini.SetLongValue(section, "GP_crossRight", CF_RIGHT_GAMEPAD);
 	ini.SetBoolValue(section, "GP_sameAxisForScratch", m_useSingleScrAxis);
+	ini.SetBoolValue(section, "GP_digitalScratch", m_digitalScratch);
 	ini.SetLongValue(section, "GP_scratchUp", SCR_UP_GAMEPAD);
 	ini.SetLongValue(section, "GP_scratchDown", SCR_DOWN_GAMEPAD);
 	ini.SetLongValue(section, "GP_menuUp", UP_GAMEPAD);
