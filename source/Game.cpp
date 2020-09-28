@@ -98,27 +98,34 @@ void Game::inputThreadFun(Game* game) {
 
 		float audioPosition = 0.0;
 
-		if(game->getPlayer()->m_cross == 0){
-			Animation centerToGreen = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
-			if(centerToGreen.isEnabled()){
-				audioPosition = centerToGreen.getPercent() * -1;
-			} else {
-				audioPosition = -1;
-			}
-		} else if(game->getPlayer()->m_cross == 1){
-			Animation greenToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
-			Animation blueToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+		Animation greenToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+		Animation blueToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+		Animation centerToGreen = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+		Animation centerToBlue = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+
+		if(greenToCenter.isEnabled() || blueToCenter.isEnabled() || centerToGreen.isEnabled() || centerToBlue.isEnabled()){
+			//calculate fade based on positions
+			float left = 0;
+			float right = 0;
 			if(greenToCenter.isEnabled()){
-				audioPosition = (1.0-greenToCenter.getPercent()) * -1;
-			} else if(blueToCenter.isEnabled()){
-				audioPosition = (1.0-blueToCenter.getPercent()) * 1;
-			} else {
-				audioPosition = 0;
+				left = (1.0-greenToCenter.getPercent()) * -1;
+			} else if(centerToGreen.isEnabled()){
+				left = centerToGreen.getPercent() * -1;
 			}
+
+			if(blueToCenter.isEnabled()){
+				right = (1.0-blueToCenter.getPercent()) * 1;
+			} else if(centerToBlue.isEnabled()){
+				right = centerToBlue.getPercent() * 1;
+			}
+			audioPosition += left;
+			audioPosition += right;
 		} else {
-			Animation centerToBlue = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
-			if(centerToBlue.isEnabled()){
-				audioPosition = centerToBlue.getPercent() * 1;
+			//base positions
+			if(game->getPlayer()->m_cross == 0){
+				audioPosition = -1;
+			} else if(game->getPlayer()->m_cross == 1){
+				audioPosition = 0;
 			} else {
 				audioPosition = 1;
 			}

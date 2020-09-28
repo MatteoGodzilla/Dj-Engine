@@ -246,7 +246,7 @@ void Audio::pollState(const Player* p,float position) {
 		} else {
 			redPan = position;
 		}
-		//std::cout << position << std::endl;
+		std::cout << position << std::endl;
 	} else {
 		resetEffects();
 	}
