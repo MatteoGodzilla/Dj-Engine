@@ -63,8 +63,8 @@ void fillBuffer(Audio* audio) {
 						channel = left:0, right:1
 						pcm[channel][sample_index];
 					*/
-					float left = redPCM[0][i] * (audio->redPan <= 0.33 ? 0.5 : 0.0); // redPCM[0][i];
-					float right = redPCM[1][i] * (audio->redPan >= -0.33 ? 0.5 : 0.0); // redPCM[1][i];
+					float left = redPCM[0][i] * (audio->redPan <= 0 ? 1.0 : 1.0-audio->redPan); // redPCM[0][i];
+					float right = redPCM[1][i] * (audio->redPan >= 0 ? 1.0 : 1.0+audio->redPan); // redPCM[1][i];
 					audio->redPCM.push(audio->redGain * left);
 					audio->redPCM.push(audio->redGain * right);
 				}
@@ -127,6 +127,8 @@ int PACallback(const void* input, void* output, unsigned long framecount, const 
 	size_t redSize = audio->redPCM.getLength();
 	size_t greenSize = audio->greenPCM.getLength();
 	size_t blueSize = audio->bluePCM.getLength();
+
+//	std::cout << framecount << std::endl;
 
 	size_t length = 0;
 	if (audio->streams == 1) {
@@ -200,7 +202,7 @@ void Audio::load(const SongEntry& entry) {
 	loaderThreadRunning = true;
 	loader = std::thread(fillBuffer, this);
 
-	checkError(Pa_OpenDefaultStream(&audioStream, 0, 2, paFloat32, info->rate, paFramesPerBufferUnspecified, PACallback, this));
+	checkError(Pa_OpenDefaultStream(&audioStream, 0, 2, paFloat32, info->rate, 128, PACallback, this));
 }
 
 void Audio::play() {
@@ -227,7 +229,7 @@ void Audio::resetEffects() {
 	bluePan = 0.0;
 }
 
-void Audio::pollState(const Player* p) {
+void Audio::pollState(const Player* p,float position) {
 	if (p->m_insideFSCross) {
 		if (streams == 3) {
 			int cross = p->m_cross;
@@ -242,15 +244,9 @@ void Audio::pollState(const Player* p) {
 				blueGain = 1.0;
 			}
 		} else {
-			int cross = p->m_cross;
-			if (cross == 0) {
-				redPan = -1.0;
-			} else if (cross == 1) {
-				redPan = 0.0;
-			} else if (cross == 2) {
-				redPan = 1.0;
-			}
+			redPan = position;
 		}
+		//std::cout << position << std::endl;
 	} else {
 		resetEffects();
 	}

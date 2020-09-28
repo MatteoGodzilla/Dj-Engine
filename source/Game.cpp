@@ -96,7 +96,35 @@ void Game::inputThreadFun(Game* game) {
 		game->m_player.pollState(game->m_gen);
 		game->m_player.tick(game->m_global_time);
 
-		game->m_audio.pollState(&(game->m_player));
+		float audioPosition = 0.0;
+
+		if(game->getPlayer()->m_cross == 0){
+			Animation centerToGreen = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+			if(centerToGreen.isEnabled()){
+				audioPosition = centerToGreen.getPercent() * -1;
+			} else {
+				audioPosition = -1;
+			}
+		} else if(game->getPlayer()->m_cross == 1){
+			Animation greenToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+			Animation blueToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+			if(greenToCenter.isEnabled()){
+				audioPosition = (1.0-greenToCenter.getPercent()) * -1;
+			} else if(blueToCenter.isEnabled()){
+				audioPosition = (1.0-blueToCenter.getPercent()) * 1;
+			} else {
+				audioPosition = 0;
+			}
+		} else {
+			Animation centerToBlue = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+			if(centerToBlue.isEnabled()){
+				audioPosition = centerToBlue.getPercent() * 1;
+			} else {
+				audioPosition = 1;
+			}
+		}
+
+		game->m_audio.pollState(game->getPlayer(),audioPosition);
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		milliseconds delta = duration_cast<milliseconds>(end - start);
