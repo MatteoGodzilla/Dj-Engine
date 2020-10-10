@@ -110,6 +110,7 @@ public:
 	glm::vec4 m_fsCrossBaseBlue = {0.0, 0.0, 1.0, 0.2};
 
 	AnimationManager m_animManager;
+
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
 	int getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr = nullptr);

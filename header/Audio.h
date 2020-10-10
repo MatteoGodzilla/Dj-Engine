@@ -33,7 +33,7 @@ public:
 	void play();
 	void stop();
 	void load(const SongEntry& entry);
-	void pollState(const Player* p,float position);
+	void pollState(const Player* p, float position);
 	void resetEffects();
 	void destroy();
 	bool isPlaying() const;

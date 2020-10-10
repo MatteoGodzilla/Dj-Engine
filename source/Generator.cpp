@@ -265,7 +265,7 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	}
 
 	if (!ev.empty()) {
-		for (size_t i = ev.size(); i-- > 0;) {
+		for (size_t i = 0; i < ev.size(); ++i) {
 			ev.at(i).tick(time);
 			int type = ev.at(i).getType();
 			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
@@ -299,6 +299,11 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 				}
 			}
 			if (type == FS_CROSS_BASE) {
+				if (endTime < time) {
+					ev.erase(ev.begin() + i);
+				}
+			}
+			if (type == FS_SAMPLES) {
 				if (endTime < time) {
 					ev.erase(ev.begin() + i);
 				}

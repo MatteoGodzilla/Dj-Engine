@@ -96,42 +96,33 @@ void Game::inputThreadFun(Game* game) {
 		game->m_player.pollState(game->m_gen);
 		game->m_player.tick(game->m_global_time);
 
-		float audioPosition = 0.0;
-
 		Animation greenToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
 		Animation blueToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 		Animation centerToGreen = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
 		Animation centerToBlue = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
-		if(greenToCenter.isEnabled() || blueToCenter.isEnabled() || centerToGreen.isEnabled() || centerToBlue.isEnabled()){
+		if (greenToCenter.isEnabled() || blueToCenter.isEnabled() || centerToGreen.isEnabled() || centerToBlue.isEnabled()) {
 			//calculate fade based on positions
+			game->m_audioPosition = 0.0f;
 			float left = 0;
 			float right = 0;
-			if(greenToCenter.isEnabled()){
-				left = (1.0-greenToCenter.getPercent()) * -1;
-			} else if(centerToGreen.isEnabled()){
+			if (greenToCenter.isEnabled()) {
+				left = (1.0 - greenToCenter.getPercent()) * -1;
+			} else if (centerToGreen.isEnabled()) {
 				left = centerToGreen.getPercent() * -1;
 			}
 
-			if(blueToCenter.isEnabled()){
-				right = (1.0-blueToCenter.getPercent()) * 1;
-			} else if(centerToBlue.isEnabled()){
+			if (blueToCenter.isEnabled()) {
+				right = (1.0 - blueToCenter.getPercent()) * 1;
+			} else if (centerToBlue.isEnabled()) {
 				right = centerToBlue.getPercent() * 1;
 			}
-			audioPosition += left;
-			audioPosition += right;
-		} else {
-			//base positions
-			if(game->getPlayer()->m_cross == 0){
-				audioPosition = -1;
-			} else if(game->getPlayer()->m_cross == 1){
-				audioPosition = 0;
-			} else {
-				audioPosition = 1;
-			}
+			game->m_audioPosition += left;
+			game->m_audioPosition += right;
 		}
 
-		game->m_audio.pollState(game->getPlayer(),audioPosition);
+		//std::cout << audioPosition << std::endl;
+		game->m_audio.pollState(game->getPlayer(), game->m_audioPosition);
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		milliseconds delta = duration_cast<milliseconds>(end - start);
