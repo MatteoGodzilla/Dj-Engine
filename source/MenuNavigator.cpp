@@ -355,7 +355,7 @@ void MenuNavigator::update() {
 				}
 			}
 
-			//std::cout << m_activeNode.getText() << "\t" << m_activeNode.getChildrens().at(m_selection.back()).getChildCount() << std::endl;
+			//std::cout << m_activeNode->getText() << "\t" << m_activeNode->getChildrens().at(m_selection.back()).getChildCount() << std::endl;
 
 			/*
 			std::cout << m_activeNode.getText() << ":";
@@ -584,6 +584,8 @@ void MenuNavigator::scan(bool useCache) {
 			MenuNode temp("BEGINNER", SONG_BEGINNER_ID);
 			song.push(temp);
 		}
+		//printDebugMenuNode(song);
+		//std::cout << song.getText() << "\t" << entry.difficulties << std::endl;
 		getNodePtrById(&m_root, PLAY_ID)->push(song);
 	}
 	//printDebugMenuNode(m_root);

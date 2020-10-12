@@ -14,11 +14,11 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 
 		//chart
 		std::string chart = p.generic_string() + std::string("/chart.xmk");
-		std::string expert = p.generic_string() + std::string("/DJ_EXPERT.xmk");
-		std::string hard = p.generic_string() + std::string("/DJ_HARD.xmk");
-		std::string medium = p.generic_string() + std::string("/DJ_MEDIUM.xmk");
-		std::string easy = p.generic_string() + std::string("/DJ_EASY.xmk");
-		std::string beginner = p.generic_string() + std::string("/DJ_BEGINNER.xmk");
+		std::string expert = p.generic_string() + std::string("/DJ_Expert.xmk");
+		std::string hard = p.generic_string() + std::string("/DJ_Hard.xmk");
+		std::string medium = p.generic_string() + std::string("/DJ_Medium.xmk");
+		std::string easy = p.generic_string() + std::string("/DJ_Easy.xmk");
+		std::string beginner = p.generic_string() + std::string("/DJ_Beginner.xmk");
 
 		int difficulties = 0;
 		if (fs::exists(chart) || fs::exists(expert)) {

@@ -27,7 +27,7 @@ void Generator::init(const SongEntry& entry, int difficulty) {
 
 	std::string diff = std::string();
 	if (difficulty == 0) {
-		diff = std::string("/DJ_EXPERT.xmk");
+		diff = std::string("/DJ_Expert.xmk");
 		m_chart.open(entry.path + diff);
 		if (!m_chart.is_open()) {
 			//if not available, fallback to chart.xmk
@@ -35,13 +35,13 @@ void Generator::init(const SongEntry& entry, int difficulty) {
 		}
 		m_chart.close();
 	} else if (difficulty == 1) {
-		diff = std::string("/DJ_HARD.xmk");
+		diff = std::string("/DJ_Hard.xmk");
 	} else if (difficulty == 2) {
-		diff = std::string("/DJ_MEDIUM.xmk");
+		diff = std::string("/DJ_Medium.xmk");
 	} else if (difficulty == 3) {
-		diff = std::string("/DJ_EASY.xmk");
+		diff = std::string("/DJ_Easy.xmk");
 	} else if (difficulty == 4) {
-		diff = std::string("/DJ_BEGINNER.xmk");
+		diff = std::string("/DJ_Beginner.xmk");
 	}
 
 	std::cout << "Generator msg: loading " << diff << std::endl;

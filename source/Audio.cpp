@@ -242,21 +242,11 @@ void Audio::resetEffects() {
 void Audio::pollState(const Player* p, float position) {
 	if (p->m_insideFSCross) {
 		if (streams == 3) {
-			int cross = p->m_cross;
-			if (cross == 0) {
-				greenGain = 1.0;
-				blueGain = 0.0;
-			} else if (cross == 1) {
-				greenGain = 1.0;
-				blueGain = 1.0;
-			} else if (cross == 2) {
-				greenGain = 0.0;
-				blueGain = 1.0;
-			}
+			greenGain = (position < 0.1 ? 1.0f : 1.0f - position);
+			blueGain = (position > -0.1 ? 1.0f : 1.0f + position);
 		} else {
 			redPan = position;
 		}
-		//std::cout << position << std::endl;
 	} else {
 		resetEffects();
 	}
