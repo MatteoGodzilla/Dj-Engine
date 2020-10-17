@@ -15,7 +15,7 @@ void Game::init(GLFWwindow* w) {
 	m_deckSpeed = (float)ini.GetDoubleValue(section, "noteVisible", 1.0);
 	m_isButtonsRight = ini.GetBoolValue(section, "buttonsRight", false);
 	m_debugView = ini.GetBoolValue(section, "debugView", false);
-	m_inputThreadPollRate = ini.GetLongValue(section, "pollRate", 240);
+	m_inputThreadPollRate = (int)ini.GetLongValue(section, "pollRate", 240);
 
 	m_render.m_greenLaneActiveColor.r = ini.GetDoubleValue(section, "greenLaneActiveR", 0.133333);
 	m_render.m_greenLaneActiveColor.g = ini.GetDoubleValue(section, "greenLaneActiveG", 0.874510);
@@ -96,33 +96,7 @@ void Game::inputThreadFun(Game* game) {
 		game->m_player.pollState(game->m_gen);
 		game->m_player.tick(game->m_global_time);
 
-		Animation greenToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
-		Animation blueToCenter = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
-		Animation centerToGreen = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
-		Animation centerToBlue = game->getGameRender()->m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
-
-		if (greenToCenter.isEnabled() || blueToCenter.isEnabled() || centerToGreen.isEnabled() || centerToBlue.isEnabled()) {
-			//calculate fade based on positions
-			game->m_audioPosition = 0.0f;
-			float left = 0;
-			float right = 0;
-			if (greenToCenter.isEnabled()) {
-				left = (1.0 - greenToCenter.getPercent()) * -1;
-			} else if (centerToGreen.isEnabled()) {
-				left = centerToGreen.getPercent() * -1;
-			}
-
-			if (blueToCenter.isEnabled()) {
-				right = (1.0 - blueToCenter.getPercent()) * 1;
-			} else if (centerToBlue.isEnabled()) {
-				right = centerToBlue.getPercent() * 1;
-			}
-			game->m_audioPosition += left;
-			game->m_audioPosition += right;
-		}
-
-		//std::cout << audioPosition << std::endl;
-		game->m_audio.pollState(game->getPlayer(), game->m_audioPosition);
+		game->m_audio.pollState(game->m_global_time, game->getPlayer());
 
 		time_point<high_resolution_clock> end = high_resolution_clock::now();
 		milliseconds delta = duration_cast<milliseconds>(end - start);
@@ -180,8 +154,8 @@ void Game::render() {
 			m_render.events(m_global_time, m_event_arr, m_cross_arr);
 			m_render.notes(m_global_time, m_note_arr, m_cross_arr);
 
-			m_render.updateAnimations(m_global_time);
-			m_render.clickerAnimation();
+			m_render.updateTimers(m_global_time);
+			m_render.clickerTimer();
 
 			//debug
 			if (m_debugView) {

@@ -1,10 +1,10 @@
 #pragma once
-#include "AnimationManager.h"
 #include "Game.h"
 #include "Graphics.h"
 #include "MenuNode.h"
 #include "Rendr.h"
 #include "SongScanner.h"
+#include "TimerManager.h"
 
 #include <GLFW/glfw3.h>
 #include <array>
@@ -20,7 +20,7 @@ class MenuRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void tick();
-	void render(MenuNode& node, int selected, int vOffset);
+	void render(MenuNode& node, int selected);
 	void play(std::vector<SongEntry>& list, int selected);
 	void remapping(Game* game);
 	//void scratches(Player* player);
@@ -47,7 +47,7 @@ public:
 	double m_currentIdleTime = 0.0f;
 	float m_selectionDX = 0.0f;
 
-	AnimationManager m_animManager;
+	TimerManager m_animManager;
 	double m_globalTime = 0.0;
 	double m_timeWarp = 0.0;
 	double m_timeWarpStart = 0.0;

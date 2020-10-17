@@ -3,7 +3,7 @@
 // clang-format off
 #include "Rendr.h"
 // clang-format on
-#include "AnimationManager.h"
+#include "TimerManager.h"
 #include "Generator.h"
 #include "Note.h"
 #include "Player.h"
@@ -82,11 +82,11 @@ public:
 	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
 	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 	void bpmTicks(double time, std::vector<double>& bpmArr);
-	void clickerAnimation();
+	void clickerTimer();
 	void result(Player& player, Generator& generator);
 	void meters(double time);
 	void pollState(double time, Player& p, Generator& g);
-	void updateAnimations(double time);
+	void updateTimers(double time);
 	void debug(double deltaTime, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
 
@@ -109,7 +109,7 @@ public:
 	glm::vec4 m_fsCrossBaseGreen = {0.0, 1.0, 0.0, 0.2};
 	glm::vec4 m_fsCrossBaseBlue = {0.0, 0.0, 1.0, 0.2};
 
-	AnimationManager m_animManager;
+	TimerManager m_animManager;
 
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
@@ -138,7 +138,7 @@ private:
 	unsigned int m_highwayTexture = 0;
 	unsigned int m_objTexture = 0;
 	unsigned int m_metersTexture = 0;
-	unsigned int m_clickerAnimation = 0;
+	unsigned int m_clickerTimer = 0;
 	unsigned int m_pgBarFrame = 0;
 	unsigned int m_pgBarInside = 0;
 	unsigned int m_fontTexture = 0;

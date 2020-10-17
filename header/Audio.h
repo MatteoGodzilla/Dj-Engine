@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SongScanner.h"
+#include "TimerManager.h"
 
 #include <array>
 #include <atomic>
@@ -27,13 +28,21 @@ private:
 
 class Player;
 
+enum AnimationID {
+	AN_GREEN_IN,
+	AN_GREEN_OUT,
+	AN_BLUE_IN,
+	AN_BLUE_OUT
+};
+
 class Audio {
 public:
+	Audio();
 	void init();
 	void play();
 	void stop();
 	void load(const SongEntry& entry);
-	void pollState(const Player* p, float position);
+	void pollState(double time, const Player* p);
 	void resetEffects();
 	void destroy();
 	bool isPlaying() const;
@@ -60,9 +69,11 @@ public:
 	float bluePan = 0.0;
 
 private:
+	int lastPlayerPos = 0;
 	PaStream* audioStream;
 	std::thread loader;
 	bool playing = false;
 
 	bool initialized = false;
+	TimerManager animManager;
 };

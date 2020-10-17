@@ -295,7 +295,7 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
-					m_render.m_animManager.triggerAnimation(AN_SCROLL_UP, m_render.m_globalTime);
+					m_render.m_animManager.triggerTimer(AN_SCROLL_UP, m_render.m_globalTime);
 					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				} else if (m_selection.back() == 0) {
 					m_selection.back() = m_activeNode->getChildCount() - 1;
@@ -315,7 +315,7 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() < m_activeNode->getChildCount() + 1) {
 					m_selection.back()++;
-					m_render.m_animManager.triggerAnimation(AN_SCROLL_DOWN, m_render.m_globalTime);
+					m_render.m_animManager.triggerTimer(AN_SCROLL_DOWN, m_render.m_globalTime);
 					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				}
 				if (m_selection.back() == m_activeNode->getChildCount()) {
@@ -449,7 +449,7 @@ void MenuNavigator::render() {
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
 			if (m_activeNode->getId() != getNodePtrById(&m_root, PLAY_ID)->getId()) {
-				m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
+				m_render.render(*m_activeNode, m_selection.back());
 			} else {
 				m_render.play(m_songList, m_selection.back());
 			}

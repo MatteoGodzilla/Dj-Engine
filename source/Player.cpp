@@ -232,34 +232,45 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			if (!m_insideFSCross) {
 				if (getHittableNoteAtZero(time, CROSS_G, cross)) {
 					hit(time, CROSS_G, cross);
-					if (m_cross == 2) {
-						m_cfBlueToCenter = true;
+					if (!m_wasLastNoteSpike) {
+						if (m_cross == 2) {
+							m_cfBlueToCenter = true;
+						}
+						m_cfCenterToGreen = true;
 					}
-					m_cfCenterToGreen = true;
 					m_cross = 0;
+					m_wasLastNoteSpike = false;
 				} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
 					hit(time, CROSS_C, cross);
-					if (m_cross == 0) {
-						m_cfGreenToCenter = true;
-					} else {
-						m_cfBlueToCenter = true;
+					if (!m_wasLastNoteSpike) {
+						if (m_cross == 0) {
+							m_cfGreenToCenter = true;
+						} else {
+							m_cfBlueToCenter = true;
+						}
 					}
 					m_cross = 1;
+					m_wasLastNoteSpike = false;
 				} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
 					hit(time, CROSS_B, cross);
-					if (m_cross == 0) {
-						m_cfGreenToCenter = true;
+					if (!m_wasLastNoteSpike) {
+						if (m_cross == 0) {
+							m_cfGreenToCenter = true;
+						}
+						m_cfCenterToBlue = true;
 					}
-					m_cfCenterToBlue = true;
 					m_cross = 2;
+					m_wasLastNoteSpike = false;
 				}
 
 				if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
 					hit(time, CROSS_G_TICK, cross);
+					m_wasLastNoteSpike = false;
 				}
 
 				if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
 					hit(time, CROSS_B_TICK, cross);
+					m_wasLastNoteSpike = false;
 				}
 
 				if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
@@ -268,6 +279,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 						m_cfCenterToBlue = true;
 					}
 					m_cfGreenToCenter = true;
+					m_wasLastNoteSpike = true;
 				} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
 					hit(time, CF_SPIKE_C, noteArr);
 					if (m_cross == 0) {
@@ -275,14 +287,17 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 					} else {
 						m_cfCenterToBlue = true;
 					}
+					m_wasLastNoteSpike = true;
 				} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
 					hit(time, CF_SPIKE_B, noteArr);
 					if (m_cross == 0) {
 						m_cfCenterToGreen = true;
 					}
 					m_cfBlueToCenter = true;
+					m_wasLastNoteSpike = true;
 				}
 			} else {
+				// Do not block user actions when inside freestyle crossfade
 				float left = std::max(m_gpState.at(CF_LEFT_INDEX) * m_gpMult.at(CF_LEFT_INDEX), 0.0f);
 				float right = std::max(m_gpState.at(CF_RIGHT_INDEX) * m_gpMult.at(CF_RIGHT_INDEX), 0.0f);
 
@@ -333,34 +348,45 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 
 		if (getHittableNoteAtZero(time, CROSS_G, cross)) {
 			hit(time, CROSS_G, cross);
-			if (m_cross == 2) {
-				m_cfBlueToCenter = true;
+			if (!m_wasLastNoteSpike) {
+				if (m_cross == 2) {
+					m_cfBlueToCenter = true;
+				}
+				m_cfCenterToGreen = true;
 			}
-			m_cfCenterToGreen = true;
 			m_cross = 0;
+			m_wasLastNoteSpike = false;
 		} else if (getHittableNoteAtZero(time, CROSS_C, cross)) {
 			hit(time, CROSS_C, cross);
-			if (m_cross == 0) {
-				m_cfGreenToCenter = true;
-			} else {
-				m_cfBlueToCenter = true;
+			if (!m_wasLastNoteSpike) {
+				if (m_cross == 0) {
+					m_cfGreenToCenter = true;
+				} else {
+					m_cfBlueToCenter = true;
+				}
 			}
 			m_cross = 1;
+			m_wasLastNoteSpike = false;
 		} else if (getHittableNoteAtZero(time, CROSS_B, cross)) {
 			hit(time, CROSS_B, cross);
-			if (m_cross == 0) {
-				m_cfGreenToCenter = true;
+			if (!m_wasLastNoteSpike) {
+				if (m_cross == 0) {
+					m_cfGreenToCenter = true;
+				}
+				m_cfCenterToBlue = true;
 			}
-			m_cfCenterToBlue = true;
 			m_cross = 2;
+			m_wasLastNoteSpike = false;
 		}
 
 		if (getHittableNoteAtZero(time, CROSS_G_TICK, cross)) {
 			hit(time, CROSS_G_TICK, cross);
+			m_wasLastNoteSpike = false;
 		}
 
 		if (getHittableNoteAtZero(time, CROSS_B_TICK, cross)) {
 			hit(time, CROSS_B_TICK, cross);
+			m_wasLastNoteSpike = false;
 		}
 
 		if (getHittableNoteAtZero(time, CF_SPIKE_G, noteArr)) {
@@ -369,6 +395,7 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 				m_cfCenterToBlue = true;
 			}
 			m_cfGreenToCenter = true;
+			m_wasLastNoteSpike = true;
 		} else if (getHittableNoteAtZero(time, CF_SPIKE_C, noteArr)) {
 			hit(time, CF_SPIKE_C, noteArr);
 			if (m_cross == 0) {
@@ -376,12 +403,14 @@ void Player::pollInput(GLFWwindow* window, double time, std::vector<Note>& noteA
 			} else {
 				m_cfCenterToBlue = true;
 			}
+			m_wasLastNoteSpike = true;
 		} else if (getHittableNoteAtZero(time, CF_SPIKE_B, noteArr)) {
 			hit(time, CF_SPIKE_B, noteArr);
 			if (m_cross == 0) {
 				m_cfCenterToGreen = true;
 			}
 			m_cfBlueToCenter = true;
+			m_wasLastNoteSpike = true;
 		}
 
 		if (getHittableNoteAtZero(time, SCR_G_UP, noteArr)) {
@@ -451,11 +480,11 @@ void Player::hit(double time, int noteType, std::vector<Note>& array) {
 			note.click();
 
 			if (noteType == TAP_G || noteType == TAP_G_HOLD_TICK || noteType == SCR_G_UP || noteType == SCR_G_DOWN || noteType == SCR_G_ANY || noteType == SCR_G_TICK) {
-				m_greenAnimation = true;
+				m_greenTimer = true;
 			} else if (noteType == TAP_R || noteType == TAP_R_HOLD_TICK) {
-				m_redAnimation = true;
+				m_redTimer = true;
 			} else if (noteType == TAP_B || noteType == TAP_B_HOLD_TICK || noteType == SCR_B_UP || noteType == SCR_B_DOWN || noteType == SCR_B_ANY || noteType == SCR_B_TICK) {
-				m_blueAnimation = true;
+				m_blueTimer = true;
 			}
 
 			break;
@@ -600,7 +629,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_greenAnimation = true; //start animation
+				m_greenTimer = true; //start animation
 			}
 		}
 	} else {
@@ -649,7 +678,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 		if (!found) {
 			breakCombo(time);
 		} else {
-			m_redAnimation = true; //start animation
+			m_redTimer = true; //start animation
 		}
 	}
 	//blue pressed
@@ -681,7 +710,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_blueAnimation = true; // start animation
+				m_blueTimer = true; // start animation
 			}
 		}
 	} else {
@@ -820,7 +849,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_greenAnimation = true;
+				m_greenTimer = true;
 			}
 		}
 		//if the blue button is already pressed
@@ -852,7 +881,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_blueAnimation = true;
+				m_blueTimer = true;
 			}
 		}
 	}
@@ -888,7 +917,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_greenAnimation = true;
+				m_greenTimer = true;
 			}
 		}
 		//if the blue button is already pressed
@@ -919,7 +948,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 			if (!found) {
 				breakCombo(time);
 			} else {
-				m_blueAnimation = true;
+				m_blueTimer = true;
 			}
 		}
 	}
@@ -935,12 +964,12 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 				int type = note.getType();
 				if (type == SCR_G_TICK && m_isGreenPressed) {
 					note.click();
-					m_greenAnimation = true;
+					m_greenTimer = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
 				} else if (type == SCR_B_TICK && m_isBluePressed) {
 					note.click();
-					m_blueAnimation = true;
+					m_blueTimer = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
 				}
@@ -1126,7 +1155,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						m_past_tap = note.getMilli();
 					}
 					note.click();
-					m_redAnimation = true;
+					m_redTimer = true;
 					break;
 				} else if (type == TAP_G) {
 					m_score += 100 * m_mult;
@@ -1136,7 +1165,7 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						m_past_tap = note.getMilli();
 					}
 					note.click();
-					m_greenAnimation = true;
+					m_greenTimer = true;
 					break;
 				} else if (type == TAP_B) {
 					m_score += 100 * m_mult;
@@ -1145,29 +1174,29 @@ void Player::hit(double time, std::vector<Note>& v, std::vector<Note>& ev, std::
 						m_past_tap = note.getMilli();
 					}
 					note.click();
-					m_blueAnimation = true;
+					m_blueTimer = true;
 					break;
 				} else if (type == SCR_G_UP || type == SCR_G_DOWN) {
 					note.click();
-					m_greenAnimation = true;
+					m_greenTimer = true;
 					m_score += 100 * m_mult;
 					m_combo++;
 					break;
 				} else if (type == SCR_G_ANY || type == SCR_G_TICK) {
 					note.click();
-					m_greenAnimation = true;
+					m_greenTimer = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
 					break;
 				} else if (type == SCR_B_UP || type == SCR_B_DOWN) {
 					note.click();
-					m_blueAnimation = true;
+					m_blueTimer = true;
 					m_score += 100 * m_mult;
 					m_combo++;
 					break;
 				} else if (type == SCR_B_ANY || type == SCR_B_TICK) {
 					note.click();
-					m_blueAnimation = true;
+					m_blueTimer = true;
 					m_score += 25 * m_mult;
 					m_scr_tick++;
 					break;
@@ -1306,30 +1335,30 @@ void Player::readMappingFile() {
 	const char* section = "Game Mappings";
 	ini.LoadFile("profile.ini");
 
-	GREEN_CODE = ini.GetLongValue(section, "KB_green", 256);
-	RED_CODE = ini.GetLongValue(section, "KB_red", 256);
-	BLUE_CODE = ini.GetLongValue(section, "KB_blue", 256);
-	EUPHORIA = ini.GetLongValue(section, "KB_euphoria", 256);
-	CROSS_L_CODE = ini.GetLongValue(section, "KB_crossLeft", 256);
-	CROSS_R_CODE = ini.GetLongValue(section, "KB_crossRight", 256);
-	SCRATCH_UP = ini.GetLongValue(section, "KB_scratchUp", 256);
-	SCRATCH_DOWN = ini.GetLongValue(section, "KB_scratchDown", 256);
-	UP_CODE = ini.GetLongValue(section, "KB_menuUp", 256);
-	DOWN_CODE = ini.GetLongValue(section, "KB_menuDown", 256);
+	GREEN_CODE = (int)ini.GetLongValue(section, "KB_green", 256);
+	RED_CODE = (int)ini.GetLongValue(section, "KB_red", 256);
+	BLUE_CODE = (int)ini.GetLongValue(section, "KB_blue", 256);
+	EUPHORIA = (int)ini.GetLongValue(section, "KB_euphoria", 256);
+	CROSS_L_CODE = (int)ini.GetLongValue(section, "KB_crossLeft", 256);
+	CROSS_R_CODE = (int)ini.GetLongValue(section, "KB_crossRight", 256);
+	SCRATCH_UP = (int)ini.GetLongValue(section, "KB_scratchUp", 256);
+	SCRATCH_DOWN = (int)ini.GetLongValue(section, "KB_scratchDown", 256);
+	UP_CODE = (int)ini.GetLongValue(section, "KB_menuUp", 256);
+	DOWN_CODE = (int)ini.GetLongValue(section, "KB_menuDown", 256);
 
-	GREEN_GAMEPAD = ini.GetLongValue(section, "GP_green", 0);
-	RED_GAMEPAD = ini.GetLongValue(section, "GP_red", 0);
-	BLUE_GAMEPAD = ini.GetLongValue(section, "GP_blue", 0);
-	EU_GAMEPAD = ini.GetLongValue(section, "GP_euphoria", 0);
+	GREEN_GAMEPAD = (int)ini.GetLongValue(section, "GP_green", 0);
+	RED_GAMEPAD = (int)ini.GetLongValue(section, "GP_red", 0);
+	BLUE_GAMEPAD = (int)ini.GetLongValue(section, "GP_blue", 0);
+	EU_GAMEPAD = (int)ini.GetLongValue(section, "GP_euphoria", 0);
 	m_useSingleCfAxis = ini.GetBoolValue(section, "GP_sameAxisForCrossfade", false);
-	CF_LEFT_GAMEPAD = ini.GetLongValue(section, "GP_crossLeft", 0);
-	CF_RIGHT_GAMEPAD = ini.GetLongValue(section, "GP_crossRight", 0);
+	CF_LEFT_GAMEPAD = (int)ini.GetLongValue(section, "GP_crossLeft", 0);
+	CF_RIGHT_GAMEPAD = (int)ini.GetLongValue(section, "GP_crossRight", 0);
 	m_useSingleScrAxis = ini.GetBoolValue(section, "GP_sameAxisForScratch", false);
 	m_digitalScratch = ini.GetBoolValue(section, "GP_digitalScratch", false);
-	SCR_UP_GAMEPAD = ini.GetLongValue(section, "GP_scratchUp", 0);
-	SCR_DOWN_GAMEPAD = ini.GetLongValue(section, "GP_scratchDown", 0);
-	UP_GAMEPAD = ini.GetLongValue(section, "GP_menuUp", 0);
-	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_menuDown", 0);
+	SCR_UP_GAMEPAD = (int)ini.GetLongValue(section, "GP_scratchUp", 0);
+	SCR_DOWN_GAMEPAD = (int)ini.GetLongValue(section, "GP_scratchDown", 0);
+	UP_GAMEPAD = (int)ini.GetLongValue(section, "GP_menuUp", 0);
+	DOWN_GAMEPAD = (int)ini.GetLongValue(section, "GP_menuDown", 0);
 
 	const char* sensitivityKey = "MULT_";
 	for (size_t i = 0; i < m_gpMult.size(); i++) {
@@ -1488,9 +1517,9 @@ void Player::reset() {
 	m_isGreenPressed = false;
 	m_isBluePressed = false;
 
-	m_greenAnimation = false;
-	m_redAnimation = false;
-	m_blueAnimation = false;
+	m_greenTimer = false;
+	m_redTimer = false;
+	m_blueTimer = false;
 
 	m_cross = 1;
 	m_hasPlayerBrokeOnce = false;

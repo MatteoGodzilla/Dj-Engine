@@ -78,7 +78,7 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 						s1 = root["song"]["mix_info"]["title"].get<std::string>();
 					}
 				} else if (root["song"]["original"].is_array()) {
-					if (root["song"]["original"].size() >= 1) {
+					if (!root["song"]["original"].empty()) {
 						if (root["song"]["original"][0].is_string()) {
 							a1 = root["song"]["first"]["artist"].get<std::string>();
 						}
@@ -227,10 +227,10 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 
 				bpm = (float)ini.GetDoubleValue("song", "bpm", 60.0);
 
-				dTrack = ini.GetLongValue("song", "track_complexity", 0);
-				dTap = ini.GetLongValue("song", "tap_complexity", 0);
-				dCrossfade = ini.GetLongValue("song", "crossfade_complexity", 0);
-				dScratch = ini.GetLongValue("song", "scratch_complexity", 0);
+				dTrack = (int)ini.GetLongValue("song", "track_complexity", 0);
+				dTap = (int)ini.GetLongValue("song", "tap_complexity", 0);
+				dCrossfade = (int)ini.GetLongValue("song", "crossfade_complexity", 0);
+				dScratch = (int)ini.GetLongValue("song", "scratch_complexity", 0);
 
 				dTrack = std::min(dTrack, 100);
 				dTrack = std::max(dTrack, 0);

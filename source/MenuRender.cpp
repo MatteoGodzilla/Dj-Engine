@@ -3,8 +3,8 @@
 void MenuRender::init(GLFWwindow* w) {
 	Rendr::init(w);
 
-	m_animManager.pushAnimation(Animation(AN_SCROLL_UP, 0.1));
-	m_animManager.pushAnimation(Animation(AN_SCROLL_DOWN, 0.1));
+	m_animManager.pushTimer(Timer(AN_SCROLL_UP, 0.1));
+	m_animManager.pushTimer(Timer(AN_SCROLL_DOWN, 0.1));
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -31,7 +31,7 @@ void MenuRender::tick() {
 	m_animManager.tick(m_globalTime);
 }
 
-void MenuRender::render(MenuNode& node, int selected, int vOffset) {
+void MenuRender::render(MenuNode& node, int selected) {
 	//enable exit from remapping menu
 	m_shouldClose = false;
 	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -52,8 +52,8 @@ void MenuRender::render(MenuNode& node, int selected, int vOffset) {
 
 	double radius = 720.0 * 1 / 3;
 	glm::vec2 center = {radius / 4, 720.0 / 2};
-	Vertex cv = Vertex(glm::vec3(center.x, center.y, 0.0));
-	Vertex before = Vertex(glm::vec3(center.x, center.y + radius, 0.0));
+	Vertex cv(glm::vec3(center.x, center.y, 0.0));
+	Vertex before(glm::vec3(center.x, center.y + radius, 0.0));
 	cv.tex = glm::vec2(0.5, 0.5);
 	before.tex = glm::vec2(1.0, 0.5);
 
@@ -61,8 +61,8 @@ void MenuRender::render(MenuNode& node, int selected, int vOffset) {
 	glm::vec4 firstCol = {0.83, 0.35, 0.24, 1.0}; //yellow {1.0,0.83,0.15,1.0}
 	glm::vec4 secondCol = {0.83, 0.35, 0.24, 0.0}; //red {0.83,0.35,0.24,1.0}
 		//
-	Animation up = m_animManager.getAnimById(AN_SCROLL_UP);
-	Animation down = m_animManager.getAnimById(AN_SCROLL_DOWN);
+	Timer up = m_animManager.getAnimById(AN_SCROLL_UP);
+	Timer down = m_animManager.getAnimById(AN_SCROLL_DOWN);
 
 	double angleDiff = 0;
 
@@ -79,7 +79,7 @@ void MenuRender::render(MenuNode& node, int selected, int vOffset) {
 	//vynil on the left
 	for (double angle = 0; angle < glm::two_pi<double>(); angle += m_deltaAngle) {
 		glm::vec2 p = getCirclePoint(radius, angle);
-		Vertex v = Vertex(glm::vec3(p.x + center.x, -p.y + center.y, 0.0));
+		Vertex v(glm::vec3(p.x + center.x, -p.y + center.y, 0.0));
 		double angleOffset = glm::pi<double>() * 3 / 2 * (m_globalTime + m_timeWarp);
 		v.tex = glm::vec2((cos(angle + angleOffset) + 1) / 2, (sin(angle + angleOffset) + 1) / 2);
 
@@ -124,7 +124,7 @@ void MenuRender::render(MenuNode& node, int selected, int vOffset) {
 		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 0 + angleDiff);
 		MenuNode& selectedNode = node.getChildrens().at(selected - 0);
 		float height = getTextHeight(selectedNode.getText(), scale);
-		float length = getTextWidth(selectedNode.getText(), scale);
+		//float length = getTextWidth(selectedNode.getText(), scale);
 		/*
 
 		Vertex topLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y - height / 2 + center.y, 0), firstCol);
@@ -176,8 +176,8 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 	int otherCount = 10;
 
 	//Main Selection
-	float listWidth = 1280 / 5 * 4;
-	float infoWidth = 1280 - listWidth;
+	float listWidth = 1280.0f / 5.0f * 4.0f;
+	float infoWidth = 1280.0f - listWidth;
 
 	std::string album1Path = list.at(selected).path + std::string("/album1.png");
 	std::string album2Path = list.at(selected).path + std::string("/album2.png");
@@ -231,13 +231,13 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 	mainVertexCount = 0;
 
 	float firstBaseX = infoWidth + listWidth / 4;
-	float secondBaseX = 1280.0 - listWidth / 4;
+	float secondBaseX = 1280.0f - listWidth / 4;
 	float singleTrackX = infoWidth + listWidth / 2;
-	float selectedY = 720.0 / 2;
+	float selectedY = 720.0f / 2.0;
 
-	float difficultyHeight = 720.0 - infoWidth * 2;
+	float difficultyHeight = 720.0f - infoWidth * 2;
 
-	if (list.size() > 0) {
+	if (!list.empty()) {
 		std::string s1 = list.at(selected).s1;
 		std::string s2 = list.at(selected).s2;
 
@@ -281,7 +281,6 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 					}
 
 					float w = getTextWidth(rendered1, textSize / 2);
-					float h = getTextHeight(rendered1, textSize / 2);
 					drawText(rendered1, singleTrackX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 				} else {
 					std::string rendered1 = std::string("");
@@ -294,11 +293,9 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 					}
 
 					float w = getTextWidth(rendered1, textSize / 2);
-					float h = getTextHeight(rendered1, textSize / 2);
 					drawText(rendered1, firstBaseX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 
 					w = getTextWidth(rendered2, textSize / 2);
-					h = getTextHeight(rendered2, textSize / 2);
 					drawText(rendered2, secondBaseX - w / 2, selectedY - textSize * 1000 - (textSize * 750) * i, textSize / 2);
 				}
 			} else {
@@ -318,7 +315,6 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 					}
 
 					float w = getTextWidth(rendered1, textSize / 2);
-					float h = getTextHeight(rendered1, textSize / 2);
 					drawText(rendered1, singleTrackX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 				} else {
 					std::string rendered1 = std::string("");
@@ -331,11 +327,9 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 					}
 
 					float w = getTextWidth(rendered1, textSize / 2);
-					float h = getTextHeight(rendered1, textSize / 2);
 					drawText(rendered1, firstBaseX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 
 					w = getTextWidth(rendered2, textSize / 2);
-					h = getTextHeight(rendered2, textSize / 2);
 					drawText(rendered2, secondBaseX - w / 2, selectedY + textSize * 1000 + (textSize * 750) * i, textSize / 2);
 				}
 			} else {
@@ -380,7 +374,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		pushQuad(mainVector, mainIndices, mainVertexCount, q);
 
 		//General complexity
-		float v = list.at(selected).dTrack;
+		int v = list.at(selected).dTrack;
 		q.v1 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 3.5, 0.0), greenHighlightColor);
 		q.v2 = Vertex(glm::vec3(10.0, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
 		q.v3 = Vertex(glm::vec3(10.0 + (infoWidth - 20.0) * v / 100, 720.0 - difficultyHeight + deltaText * 4.5, 0.0), greenHighlightColor);
@@ -418,56 +412,56 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 1 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 1 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = list.at(selected).a2;
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 2 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 2 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("BPM:") + std::to_string(list.at(selected).bpm);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 3 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 3 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Overall:") + std::to_string(list.at(selected).dTrack);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 4 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 4 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Taps:") + std::to_string(list.at(selected).dTap);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 5 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 5 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Crossfades:") + std::to_string(list.at(selected).dCrossfade);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 6 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 6 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 		rendered = std::string("");
 		origin = std::string("Scratches:") + std::to_string(list.at(selected).dScratch);
 		for (size_t i = 0; i < origin.size() && getTextWidth(rendered, textSize / 2) < infoWidth - 30; ++i) {
 			rendered += origin.at(i);
 		}
-		drawText(rendered, 10.0, 720.0 - difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
+		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 	} else {
 		std::string rendered1 = std::string("Refresh Song Cache");
 
 		float w = getTextWidth(rendered1, textSize);
 		float h = getTextHeight(rendered1, textSize);
-		drawText(rendered1, 1280.0 / 2 - w / 2, 720.0 / 2 - h / 2, textSize);
+		drawText(rendered1, 1280.0f / 2 - w / 2, 720.0f / 2 - h / 2, textSize);
 	}
 }
 
@@ -530,7 +524,7 @@ void MenuRender::remapping(Game* game) {
 			ImGui::Columns(2, "axes");
 			std::vector<float> values = game->getPlayer()->getGamepadValues();
 			for (size_t i = 0; i < values.size(); ++i) {
-				ImGui::Text(std::to_string(i).c_str());
+				ImGui::Text("%s", std::to_string(i).c_str());
 				ImGui::NextColumn();
 				ImGui::ProgressBar(values.at(i), ImVec2(0.0f, 0.0f), std::to_string(values.at(i)).c_str());
 				ImGui::NextColumn();
@@ -552,7 +546,7 @@ void MenuRender::remapping(Game* game) {
 			ImGui::Columns(2, "axes");
 			std::vector<float> values = game->getPlayer()->getKBMValues(m_window);
 			for (size_t i = 0; i < values.size(); ++i) {
-				ImGui::Text(std::to_string(i).c_str());
+				ImGui::Text("%s", std::to_string(i).c_str());
 				ImGui::NextColumn();
 				ImGui::ProgressBar(values.at(i), ImVec2(0.0f, 0.0f), std::to_string(values.at(i)).c_str());
 				ImGui::NextColumn();

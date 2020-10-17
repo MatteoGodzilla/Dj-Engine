@@ -49,9 +49,9 @@ void fillBuffer(Audio* audio) {
 
 		//size_t length = std::max(std::max(redSize,greenSize),blueSize);
 
-		int redSamples = 0;
-		int greenSamples = 0;
-		int blueSamples = 0;
+		long redSamples = 0;
+		long greenSamples = 0;
+		long blueSamples = 0;
 
 		if (redSize + bufferLoad < MAX_SIZE) {
 			float** redPCM;
@@ -157,12 +157,12 @@ int PACallback(const void* input, void* output, unsigned long framecount, const 
 				br = audio->bluePCM.pop();
 			}
 
-			rl *= (audio->redPan < 0.1 ? 1.0f : 1.0f - audio->redPan) * audio->redGain;
-			rr *= (audio->redPan > -0.1 ? 1.0f : 1.0f + audio->redPan) * audio->redGain;
-			gl *= (audio->greenPan < 0.1 ? 1.0f : 1.0f - audio->greenPan) * audio->greenGain;
-			gr *= (audio->greenPan > -0.1 ? 1.0f : 1.0f + audio->greenPan) * audio->greenGain;
-			bl *= (audio->bluePan < 0.1 ? 1.0f : 1.0f - audio->bluePan) * audio->blueGain;
-			br *= (audio->bluePan > -0.1 ? 1.0f : 1.0f + audio->bluePan) * audio->blueGain;
+			rl *= (audio->redPan < 0.1f ? 1.0f : 1.0f - audio->redPan) * audio->redGain;
+			rr *= (audio->redPan > -0.1f ? 1.0f : 1.0f + audio->redPan) * audio->redGain;
+			gl *= (audio->greenPan < 0.1f ? 1.0f : 1.0f - audio->greenPan) * audio->greenGain;
+			gr *= (audio->greenPan > -0.1f ? 1.0f : 1.0f + audio->greenPan) * audio->greenGain;
+			bl *= (audio->bluePan < 0.1f ? 1.0f : 1.0f - audio->bluePan) * audio->blueGain;
+			br *= (audio->bluePan > -0.1f ? 1.0f : 1.0f + audio->bluePan) * audio->blueGain;
 
 			float left = rl + gl + bl;
 			float right = rr + gr + br;
@@ -177,12 +177,25 @@ int PACallback(const void* input, void* output, unsigned long framecount, const 
 	return 0;
 }
 
+Audio::Audio() {
+	Timer greenIn = Timer(AN_GREEN_IN, 0.002);
+	Timer greenOut = Timer(AN_GREEN_OUT, 0.002);
+	Timer blueIn = Timer(AN_BLUE_IN, 0.002);
+	Timer blueOut = Timer(AN_BLUE_OUT, 0.002);
+
+	animManager.pushTimer(greenIn);
+	animManager.pushTimer(greenOut);
+	animManager.pushTimer(blueIn);
+	animManager.pushTimer(blueOut);
+}
+
 void Audio::init() {
 	if (!initialized) {
 		checkError(Pa_Initialize());
 		redPCM.clear();
 		greenPCM.clear();
 		bluePCM.clear();
+
 		initialized = true;
 	}
 }
@@ -231,16 +244,67 @@ void Audio::stop() {
 }
 
 void Audio::resetEffects() {
-	greenGain = 1.0;
-	greenPan = 0.0;
-	redGain = 1.0;
-	redPan = 0.0;
-	blueGain = 1.0;
-	bluePan = 0.0;
+	greenGain = 1.0f;
+	greenPan = 0.0f;
+	redGain = 1.0f;
+	redPan = 0.0f;
+	blueGain = 1.0f;
+	bluePan = 0.0f;
 }
 
-void Audio::pollState(const Player* p, float position) {
+void Audio::pollState(double time, const Player* p) {
+	animManager.tick(time);
+	int playerCross = p->m_cross;
 	if (p->m_insideFSCross) {
+		if (playerCross != lastPlayerPos) {
+			//There is a change
+			if (lastPlayerPos == 0 && playerCross >= 1) {
+				//moved either to center or to blue
+				//aka fade in blue track
+				animManager.triggerTimer(AN_BLUE_IN, time);
+				animManager.disableTimer(AN_BLUE_OUT);
+				//std::cout << "BLUE IN" << std::endl;
+			} else if (lastPlayerPos == 1) {
+				if (playerCross == 0) {
+					//fade out blue track
+					animManager.triggerTimer(AN_BLUE_OUT, time);
+					animManager.disableTimer(AN_BLUE_IN);
+					//std::cout << "BLUE OUT" << std::endl;
+				} else if (playerCross == 2) {
+					//fade out green track
+					animManager.triggerTimer(AN_GREEN_OUT, time);
+					animManager.disableTimer(AN_GREEN_IN);
+					//std::cout << "GREEN OUT" << std::endl;
+				}
+			} else if (lastPlayerPos == 2 && playerCross <= 1) {
+				//moved either to center or to green
+				//aka fade in green track
+				animManager.triggerTimer(AN_GREEN_IN, time);
+				animManager.disableTimer(AN_GREEN_OUT);
+				//std::cout << "GREEN IN" << std::endl;
+			}
+		}
+
+		Timer greenIn = animManager.getAnimById(AN_GREEN_IN);
+		Timer greenOut = animManager.getAnimById(AN_GREEN_OUT);
+		Timer blueIn = animManager.getAnimById(AN_BLUE_IN);
+		Timer blueOut = animManager.getAnimById(AN_BLUE_OUT);
+
+		float position = 0;
+
+		if (greenIn.isEnabled()) {
+			position = (float)(1.0 - greenIn.getPercent());
+		} else if (greenOut.isEnabled()) {
+			position = (float)(0.0 + greenOut.getPercent());
+		} else if (blueIn.isEnabled()) {
+			position = (float)(-1.0 + blueIn.getPercent());
+		} else if (blueOut.isEnabled()) {
+			position = (float)(0.0 - blueOut.getPercent());
+		} else {
+			//get position from crossfade
+			position = (float)playerCross - 1.0f;
+		}
+
 		if (streams == 3) {
 			greenGain = (position < 0.1 ? 1.0f : 1.0f - position);
 			blueGain = (position > -0.1 ? 1.0f : 1.0f + position);
@@ -250,6 +314,7 @@ void Audio::pollState(const Player* p, float position) {
 	} else {
 		resetEffects();
 	}
+	lastPlayerPos = playerCross;
 }
 
 bool Audio::isPlaying() const {

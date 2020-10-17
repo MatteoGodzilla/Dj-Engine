@@ -101,13 +101,14 @@ public:
 	bool m_isGreenPressed = false;
 	bool m_isBluePressed = false;
 
-	bool m_greenAnimation = false;
-	bool m_redAnimation = false;
-	bool m_blueAnimation = false;
+	bool m_greenTimer = false;
+	bool m_redTimer = false;
+	bool m_blueTimer = false;
 	bool m_cfCenterToGreen = false;
 	bool m_cfCenterToBlue = false;
 	bool m_cfGreenToCenter = false;
 	bool m_cfBlueToCenter = false;
+	bool m_wasLastNoteSpike = false;
 
 	bool m_insideFSCross = false;
 	int m_cross = 1;

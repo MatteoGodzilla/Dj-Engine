@@ -1,18 +1,19 @@
-#include "AnimationManager.h"
+#include "TimerManager.h"
 
-Animation::Animation() {
+Timer::Timer() {
 	m_id = -1;
 	m_duration = 0.0;
 	m_looping = false;
 }
 
-Animation::Animation(int id, double duration, bool looping) {
+Timer::Timer(int id, double duration, bool looping) {
 	m_id = id;
 	m_duration = duration;
 	m_looping = looping;
 }
 
-void Animation::tick(double time) {
+void Timer::tick(double time) {
+	//time is global time, not delta time
 	if (m_enabled) {
 		m_time += time - m_pastTick;
 		if (m_time > m_duration) {
@@ -25,72 +26,73 @@ void Animation::tick(double time) {
 	m_pastTick = time;
 }
 
-void Animation::enable(double time) {
+void Timer::enable(double time) {
+	//time is global, not delta
 	m_enabled = true;
 	m_pastTick = time;
 }
 
-void Animation::disable() {
+void Timer::disable() {
 	m_enabled = false;
 }
 
-void Animation::reset() {
+void Timer::reset() {
 	m_time = 0.0;
 }
 
-void Animation::setDuration(double time) {
+void Timer::setDuration(double time) {
 	m_duration = time;
 }
 
-void Animation::setLooping(bool loop) {
+void Timer::setLooping(bool loop) {
 	m_looping = loop;
 }
 
-int Animation::getId() const {
+int Timer::getId() const {
 	return m_id;
 }
 
-bool Animation::isLooping() const {
+bool Timer::isLooping() const {
 	return m_looping;
 }
 
-bool Animation::isEnabled() const {
+bool Timer::isEnabled() const {
 	return m_enabled;
 }
 
-double Animation::getTime() const {
+double Timer::getTime() const {
 	return m_time;
 }
 
-double Animation::getPercent() const {
+double Timer::getPercent() const {
 	return m_time / m_duration;
 }
 
-double Animation::getDuration() const {
+double Timer::getDuration() const {
 	return m_duration;
 }
 
-void AnimationManager::tick(double time) {
+void TimerManager::tick(double time) {
 	for (auto& anim : m_animList) {
 		anim.tick(time);
 	}
 }
 
-std::vector<Animation>& AnimationManager::getAnimList() {
+std::vector<Timer>& TimerManager::getAnimList() {
 	return m_animList;
 }
 
-Animation AnimationManager::getAnimById(int id) {
+Timer TimerManager::getAnimById(int id) {
 	for (auto& anim : m_animList) {
 		if (anim.getId() == id) {
 			return anim;
 		}
 	}
-	std::cerr << "Animation Manager Error : Animation not found" << std::endl;
-	return Animation(-1, 0.0);
+	std::cerr << "Timer Manager Error : Animation not found" << std::endl;
+	return Timer(-1, 0.0);
 }
 
-void AnimationManager::updateAnimation(Animation a) {
+void TimerManager::updateTimer(Timer a) {
 	for (auto& anim : m_animList) {
 		if (anim.getId() == a.getId()) {
 			anim = a;
@@ -99,11 +101,11 @@ void AnimationManager::updateAnimation(Animation a) {
 	}
 }
 
-void AnimationManager::pushAnimation(Animation a) {
+void TimerManager::pushTimer(Timer a) {
 	m_animList.push_back(a);
 }
 
-void AnimationManager::triggerAnimation(int id, double time) {
+void TimerManager::triggerTimer(int id, double time) {
 	for (auto& anim : m_animList) {
 		if (anim.getId() == id) {
 			anim.enable(time);
@@ -112,7 +114,7 @@ void AnimationManager::triggerAnimation(int id, double time) {
 	}
 }
 
-void AnimationManager::disableAnimation(int id) {
+void TimerManager::disableTimer(int id) {
 	for (auto& anim : m_animList) {
 		if (anim.getId() == id) {
 			anim.disable();

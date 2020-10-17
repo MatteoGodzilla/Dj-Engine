@@ -3,10 +3,10 @@
 #include <iostream>
 #include <vector>
 
-class Animation {
+class Timer {
 public:
-	Animation();
-	Animation(int id, double duration, bool looping = false);
+	Timer();
+	Timer(int id, double duration, bool looping = false);
 	void tick(double time);
 	void setDuration(double time);
 	void setLooping(bool looping);
@@ -30,16 +30,16 @@ private:
 	double m_pastTick = 0.0;
 };
 
-class AnimationManager {
+class TimerManager {
 public:
 	void tick(double time);
-	std::vector<Animation>& getAnimList();
-	Animation getAnimById(int id);
-	void updateAnimation(Animation a);
-	void triggerAnimation(int id, double time);
-	void disableAnimation(int id);
-	void pushAnimation(Animation a);
+	std::vector<Timer>& getAnimList();
+	Timer getAnimById(int id);
+	void updateTimer(Timer a);
+	void triggerTimer(int id, double time);
+	void disableTimer(int id);
+	void pushTimer(Timer a);
 
 private:
-	std::vector<Animation> m_animList;
+	std::vector<Timer> m_animList;
 };

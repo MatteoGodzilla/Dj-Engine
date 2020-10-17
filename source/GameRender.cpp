@@ -3,13 +3,13 @@
 void GameRender::init(GLFWwindow* w) {
 	Rendr::init(w);
 
-	m_animManager.pushAnimation(Animation(AN_CROSS_GREEN_TO_LEFT, 0.100));
-	m_animManager.pushAnimation(Animation(AN_CROSS_GREEN_TO_CENTER, 0.100));
-	m_animManager.pushAnimation(Animation(AN_CROSS_BLUE_TO_RIGHT, 0.100));
-	m_animManager.pushAnimation(Animation(AN_CROSS_BLUE_TO_CENTER, 0.100));
-	m_animManager.pushAnimation(Animation(AN_GREEN_CLICKER, 0.200));
-	m_animManager.pushAnimation(Animation(AN_RED_CLICKER, 0.200));
-	m_animManager.pushAnimation(Animation(AN_BLUE_CLICKER, 0.200));
+	m_animManager.pushTimer(Timer(AN_CROSS_GREEN_TO_LEFT, 0.100));
+	m_animManager.pushTimer(Timer(AN_CROSS_GREEN_TO_CENTER, 0.100));
+	m_animManager.pushTimer(Timer(AN_CROSS_BLUE_TO_RIGHT, 0.100));
+	m_animManager.pushTimer(Timer(AN_CROSS_BLUE_TO_CENTER, 0.100));
+	m_animManager.pushTimer(Timer(AN_GREEN_CLICKER, 0.200));
+	m_animManager.pushTimer(Timer(AN_RED_CLICKER, 0.200));
+	m_animManager.pushTimer(Timer(AN_BLUE_CLICKER, 0.200));
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
@@ -24,7 +24,7 @@ void GameRender::init(GLFWwindow* w) {
 		loadTexture("res/highway.png", &m_highwayTexture);
 		loadTexture("res/objects.png", &m_objTexture);
 		loadTexture("res/meters.png", &m_metersTexture);
-		loadTexture("res/clickerAnim.png", &m_clickerAnimation);
+		loadTexture("res/clickerAnim.png", &m_clickerTimer);
 		loadTexture("res/pgBar-frame.png", &m_pgBarFrame);
 		loadTexture("res/pgBar-inside.png", &m_pgBarInside);
 	}
@@ -193,8 +193,8 @@ void GameRender::clicker() {
 		m_blueLeft = 0.25f;
 		m_blueRight = 0.75f;
 
-		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
-		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+		Timer greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_LEFT);
+		Timer blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 		if (greenToCenter.isEnabled()) {
 			float d = (float)greenToCenter.getPercent() * 0.5f;
@@ -214,8 +214,8 @@ void GameRender::clicker() {
 		m_blueLeft = 0.25f;
 		m_blueRight = 0.75f;
 
-		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
-		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
+		Timer greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+		Timer blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_CENTER);
 
 		if (greenToCenter.isEnabled()) {
 			float d = (float)greenToCenter.getPercent() * 0.5f;
@@ -235,8 +235,8 @@ void GameRender::clicker() {
 		m_blueLeft = 0.75f;
 		m_blueRight = 1.25f;
 
-		Animation greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
-		Animation blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
+		Timer greenToCenter = m_animManager.getAnimById(AN_CROSS_GREEN_TO_CENTER);
+		Timer blueToCenter = m_animManager.getAnimById(AN_CROSS_BLUE_TO_RIGHT);
 
 		if (greenToCenter.isEnabled()) {
 			float d = (float)greenToCenter.getPercent() * 0.5f;
@@ -1071,12 +1071,7 @@ void GameRender::lanes(double time, std::vector<Note>& v, std::vector<Note>& ev,
 		blueBeforeOuter = blueOuter;
 		blueBeforeInner = blueInner;
 
-		if (position == -1) {
-			//make next one invalid
-			isPreviousValid = false;
-		} else {
-			isPreviousValid = true;
-		}
+		isPreviousValid = (position != -1);
 	}
 	for (auto& note : v) {
 		double milli = note.getMilli();
@@ -1420,10 +1415,13 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 
 						pushQuad(texVector, texIndices, texVertexCount, q2);
 
+						//TODO:understand and fix this vvv
+						/*
 						glm::vec2 bottomOuterGreen = getCirclePoint(greenOuterRadius, startAngle - deltaAngle);
 						glm::vec2 bottomInnerGreen = getCirclePoint(greenInnerRadius, startAngle - deltaAngle);
 						glm::vec2 bottomOuterBlue = getCirclePoint(blueOuterRadius, startAngle - deltaAngle);
 						glm::vec2 bottomInnerBlue = getCirclePoint(blueInnerRadius, startAngle - deltaAngle);
+						*/
 					}
 					for (double cycleAngle = startAngle; cycleAngle < endAngle; cycleAngle += m_deltaAngle) {
 						glm::vec2 greenOuter = getCirclePoint(greenOuterRadius, cycleAngle);
@@ -2046,9 +2044,9 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	m_genBaseScore = g.m_baseScore;
 	m_genBPM = g.m_bpm;
 
-	bool greenAnimEnabled = p.m_greenAnimation;
-	bool redAnimEnabled = p.m_redAnimation;
-	bool blueAnimEnabled = p.m_blueAnimation;
+	bool greenAnimEnabled = p.m_greenTimer;
+	bool redAnimEnabled = p.m_redTimer;
+	bool blueAnimEnabled = p.m_blueTimer;
 
 	bool centerToGreen = p.m_cfCenterToGreen;
 	bool centerToBlue = p.m_cfCenterToBlue;
@@ -2056,45 +2054,45 @@ void GameRender::pollState(double time, Player& p, Generator& g) {
 	bool blueToCenter = p.m_cfBlueToCenter;
 
 	if (greenAnimEnabled) {
-		m_animManager.triggerAnimation(AN_GREEN_CLICKER, time);
-		p.m_greenAnimation = false;
+		m_animManager.triggerTimer(AN_GREEN_CLICKER, time);
+		p.m_greenTimer = false;
 	}
 	if (redAnimEnabled) {
-		m_animManager.triggerAnimation(AN_RED_CLICKER, time);
-		p.m_redAnimation = false;
+		m_animManager.triggerTimer(AN_RED_CLICKER, time);
+		p.m_redTimer = false;
 	}
 	if (blueAnimEnabled) {
-		m_animManager.triggerAnimation(AN_BLUE_CLICKER, time);
-		p.m_blueAnimation = false;
+		m_animManager.triggerTimer(AN_BLUE_CLICKER, time);
+		p.m_blueTimer = false;
 	}
 	if (centerToGreen) {
-		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_LEFT, time);
+		m_animManager.triggerTimer(AN_CROSS_GREEN_TO_LEFT, time);
 		p.m_cfCenterToGreen = false;
 	}
 	if (centerToBlue) {
-		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_RIGHT, time);
+		m_animManager.triggerTimer(AN_CROSS_BLUE_TO_RIGHT, time);
 		p.m_cfCenterToBlue = false;
 	}
 	if (greenToCenter) {
-		m_animManager.triggerAnimation(AN_CROSS_GREEN_TO_CENTER, time);
+		m_animManager.triggerTimer(AN_CROSS_GREEN_TO_CENTER, time);
 		p.m_cfGreenToCenter = false;
 	}
 	if (blueToCenter) {
-		m_animManager.triggerAnimation(AN_CROSS_BLUE_TO_CENTER, time);
+		m_animManager.triggerTimer(AN_CROSS_BLUE_TO_CENTER, time);
 		p.m_cfBlueToCenter = false;
 	}
 	rendr_InvertedX = m_isButtonsRight;
 }
 
-void GameRender::clickerAnimation() {
+void GameRender::clickerTimer() {
 	float plane = 0.0;
 	std::vector<float> clickerVector = {};
 	std::vector<unsigned int> clickerIndices = {};
 	unsigned int clickerVertexCount = 0;
 
-	Animation greenAnim = m_animManager.getAnimById(AN_GREEN_CLICKER);
-	Animation redAnim = m_animManager.getAnimById(AN_RED_CLICKER);
-	Animation blueAnim = m_animManager.getAnimById(AN_BLUE_CLICKER);
+	Timer greenAnim = m_animManager.getAnimById(AN_GREEN_CLICKER);
+	Timer redAnim = m_animManager.getAnimById(AN_RED_CLICKER);
+	Timer blueAnim = m_animManager.getAnimById(AN_BLUE_CLICKER);
 
 	if (greenAnim.isEnabled()) {
 		double x = greenAnim.getPercent();
@@ -2145,7 +2143,7 @@ void GameRender::clickerAnimation() {
 	}
 
 	usePersProj();
-	renderTexture(clickerVector, clickerIndices, m_clickerAnimation);
+	renderTexture(clickerVector, clickerIndices, m_clickerTimer);
 }
 
 void GameRender::reset() {
@@ -2163,7 +2161,7 @@ void GameRender::reset() {
 	m_renderEuZone = false;
 }
 
-void GameRender::updateAnimations(double time) {
+void GameRender::updateTimers(double time) {
 	m_animManager.tick(time);
 }
 
