@@ -1,5 +1,6 @@
 #pragma once
 
+#include "DJEUtils.h"
 #include "Graphics.h"
 
 #include <GLFW/glfw3.h>

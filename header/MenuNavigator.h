@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "MenuNode.h"
 #include "MenuRender.h"
 #include "SimpleIni.h"

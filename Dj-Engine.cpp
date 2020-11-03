@@ -1,3 +1,4 @@
+#include "DJEUtils.h"
 #include "Game.h"
 #include "MenuNavigator.h"
 #include "stb_image.h"
@@ -35,27 +36,27 @@ void scrollCallback(GLFWwindow* w, double xoff, double yoff) {
 }
 
 void errorCallback(int code, const char* description) {
-	std::cerr << "GLFW ERROR:(" << code << ")," << description << std::endl;
+	ErrorLog << "GLFW ERROR:(" << code << ")," << description << ENDL;
 }
 
 int main(int argc, char** argv) {
-	std::cout << "Dj-Engine " << VERSION << std::endl;
+	NormalLog << "Dj-Engine " << VERSION << ENDL;
 	if (glfwInit() == GLFW_FALSE) {
 		const char* description;
 		int errorCode = glfwGetError(&description);
-		std::cout << "Engine Error:GLFW INIT ERROR" << std::endl;
-		std::cout << "Error code:" << errorCode << std::endl;
-		std::cout << "Error Message:" << description << std::endl;
+		NormalLog << "Engine Error:GLFW INIT ERROR" << ENDL;
+		NormalLog << "Error code:" << errorCode << ENDL;
+		NormalLog << "Error Message:" << description << ENDL;
 		return -1;
 	}
-	std::cout << "Engine Message: GLFW INIT SUCCESS" << std::endl;
+	NormalLog << "Engine Message: GLFW INIT SUCCESS" << ENDL;
 
 	bool MSAActive = false;
 	if (argc > 1) {
 		for (int i = 0; i < argc - 1; ++i) {
 			if (strcmp(argv[i], "--msaa") == 0) {
 				int factor = std::stoi(argv[i + 1]);
-				std::cout << "Engine Message: Creating window with MSAA x" << factor << std::endl;
+				NormalLog << "Engine Message: Creating window with MSAA x" << factor << ENDL;
 				glfwWindowHint(GLFW_SAMPLES, factor);
 				MSAActive = true;
 			}
@@ -66,7 +67,7 @@ int main(int argc, char** argv) {
 	std::string title = std::string("Dj-Engine ") + VERSION;
 	window = glfwCreateWindow(WIDTH, HEIGHT, title.c_str(), nullptr, nullptr);
 	if (!window) {
-		std::cout << "Engine Error:GLFW WINDOW CREATION ERROR" << std::endl;
+		NormalLog << "Engine Error:GLFW WINDOW CREATION ERROR" << ENDL;
 		glfwTerminate();
 		return -1;
 	}

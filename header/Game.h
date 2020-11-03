@@ -1,5 +1,6 @@
 #pragma once
 #include "Audio.h"
+#include "DJEUtils.h"
 #include "GameRender.h"
 #include "Generator.h"
 #include "Note.h"

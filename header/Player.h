@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "Generator.h"
 #include "SimpleIni.h"
 

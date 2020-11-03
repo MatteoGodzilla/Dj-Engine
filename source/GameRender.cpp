@@ -14,10 +14,10 @@ void GameRender::init(GLFWwindow* w) {
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {
-		std::cout << "GLEW INIT ERROR" << std::endl;
+		NormalLog << "GLEW INIT ERROR" << ENDL;
 		return;
 	}
-	std::cout << "GameRender Init: " << glGetString(GL_VERSION) << std::endl;
+	NormalLog << "GameRender Init: " << glGetString(GL_VERSION) << ENDL;
 
 	//texture load
 	{
@@ -1495,7 +1495,7 @@ void GameRender::events(double time, std::vector<Note>& ev, std::vector<Note>& c
 					}
 
 					if (speakerStart > time) {
-						//std::cout << speakerStart << "\t" << speakerStart-time << "\t" << speakerAngle << std::endl;
+						//NormalLog << speakerStart << "\t" << speakerStart-time << "\t" << speakerAngle << ENDL;
 						Quad q1 = createCircleQuad(speakerAngle, m_radius + 0.5, 0.25, deltaAngle, plane);
 
 						q1.v1.tex = glm::vec2(greenSpeaker.x, 1.0 - greenSpeaker.y);
@@ -2223,7 +2223,7 @@ int GameRender::getCrossAtTime(double time, std::vector<Note>& crossArr, std::ve
 				break;
 			}
 		}
-		//std::cerr << index << std::endl;
+		//ErrorLog << index << ENDL;
 		int type = crossCopy.at(index).getType();
 		if (type == CROSS_G || type == CROSS_G_TICK) {
 			return 0;

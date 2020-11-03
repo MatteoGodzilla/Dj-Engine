@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "SimpleIni.h"
 #include "json.hpp"
 

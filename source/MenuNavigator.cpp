@@ -28,11 +28,11 @@ MenuNode* getNodePtrById(MenuNode* node, int id) {
 }
 
 void printDebugMenuNode(MenuNode node, int indentation = 0) {
-	std::cout << node.getText() << "\t" << node.getId() << "\t" << node.getChildCount() << std::endl;
+	NormalLog << node.getText() << "\t" << node.getId() << "\t" << node.getChildCount() << ENDL;
 	if (node.getChildCount() > 0) {
 		for (auto& child : node.getChildrens()) {
 			for (int i = 0; i < indentation; ++i) {
-				std::cout << "\t";
+				NormalLog << "\t";
 			}
 			printDebugMenuNode(child, indentation + 1);
 		}
@@ -60,9 +60,9 @@ void MenuNavigator::writeConfigFile() {
 
 	std::ofstream output("profile.ini", std::ios::app | std::ios::binary);
 	if (output.is_open()) {
-		output << std::endl
+		output << ENDL
 			   << mappings;
-		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'" << std::endl;
+		NormalLog << "MenuNavigator Message: written menu mappings to 'profile.ini'" << ENDL;
 	}
 	*/
 }
@@ -73,7 +73,7 @@ void MenuNavigator::readConfigFile() {
 	ini.LoadFile("profile.ini");
 	const char* section = "Menu Mappings";
 
-	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
+	NormalLog << "MenuNavigator Message: loading config from file" << ENDL;
 
 	UP_CODE = ini.GetLongValue(section, "KB_up", 256);
 	DOWN_CODE = ini.GetLongValue(section, "KB_down", 256);
@@ -90,7 +90,7 @@ void MenuNavigator::readConfigFile() {
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
 	m_pastKBMState = gameptr->getPlayer()->getKBMValues(w);
-	//std::cout << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << std::endl;
+	//NormalLog << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << ENDL;
 	m_game = gameptr;
 	m_render.init(w);
 
@@ -336,7 +336,7 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				MenuNode& childNode = m_activeNode->getChildrens().at(m_selection.back());
 				//printDebugMenuNode(childNode);
-				//std::cout << "***********************************************" << std::endl;
+				//NormalLog << "***********************************************" << ENDL;
 				if (childNode.getChildCount() == 0) {
 					//do something based on the node id
 					activate(childNode);
@@ -355,14 +355,14 @@ void MenuNavigator::update() {
 				}
 			}
 
-			//std::cout << m_activeNode->getText() << "\t" << m_activeNode->getChildrens().at(m_selection.back()).getChildCount() << std::endl;
+			//NormalLog << m_activeNode->getText() << "\t" << m_activeNode->getChildrens().at(m_selection.back()).getChildCount() << ENDL;
 
 			/*
-			std::cout << m_activeNode.getText() << ":";
+			NormalLog << m_activeNode.getText() << ":";
 			for (size_t i = 0; i < m_selection.size(); ++i) {
-				std::cout << m_selection.at(i) << "|";
+				NormalLog << m_selection.at(i) << "|";
 			}
-			std::cout << std::endl;
+			NormalLog << ENDL;
 			*/
 		} else if (m_scene == REMAPPING) {
 			if (m_render.m_editingAxis && m_render.m_ActionToChange != -1) {
@@ -535,7 +535,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 		m_game->start(m_songList.at(song), selected);
 		resetMenu();
 	} else if (menu.getChildCount() == 0 && id != DONT_CARE) {
-		std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
+		NormalLog << "Menu Error: no function attached to id " << menu.getId() << ENDL;
 	}
 }
 
@@ -585,11 +585,11 @@ void MenuNavigator::scan(bool useCache) {
 			song.push(temp);
 		}
 		//printDebugMenuNode(song);
-		//std::cout << song.getText() << "\t" << entry.difficulties << std::endl;
+		//NormalLog << song.getText() << "\t" << entry.difficulties << ENDL;
 		getNodePtrById(&m_root, PLAY_ID)->push(song);
 	}
 	//printDebugMenuNode(m_root);
-	//std::cout << "***********************************************" << std::endl;
+	//NormalLog << "***********************************************" << ENDL;
 }
 
 void MenuNavigator::resetMenu() {

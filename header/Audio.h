@@ -1,5 +1,5 @@
 #pragma once
-
+#include "DJEUtils.h"
 #include "SongScanner.h"
 #include "TimerManager.h"
 

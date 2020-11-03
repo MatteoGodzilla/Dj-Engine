@@ -9,10 +9,10 @@ void MenuRender::init(GLFWwindow* w) {
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {
-		std::cout << "GLEW INIT ERROR" << std::endl;
+		NormalLog << "GLEW INIT ERROR" << ENDL;
 		return;
 	}
-	std::cout << "MenuRender init: " << glGetString(GL_VERSION) << std::endl;
+	NormalLog << "MenuRender init: " << glGetString(GL_VERSION) << ENDL;
 	loadTexture("res/buttons.png", &m_buttonTexture);
 	m_logoDimensions = loadTexture("res/splashArt.png", &m_splashTexture);
 	loadTexture("res/calibration.png", &m_calibrationTex);
@@ -1383,7 +1383,7 @@ void MenuRender::calibration(Game* game, double dt) {
 			for (size_t i = 0; i < m_latencyHits.size(); ++i) {
 				sum += m_latencyHits.at(i) - (2.0 + 0.5 * i);
 			}
-			std::cout << (float)(sum / m_latencyHits.size());
+			NormalLog << (float)(sum / m_latencyHits.size());
 			game->m_audioLatency = (float)(sum / m_latencyHits.size());
 			m_latencyHits.clear();
 		}

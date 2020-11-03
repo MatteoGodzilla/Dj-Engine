@@ -73,7 +73,7 @@ void Game::init(GLFWwindow* w) {
 	m_render.m_fsCrossBaseBlue.a = ini.GetDoubleValue(section, "fsCrossBaseBlueA", 0.200000);
 
 	m_inputThread = std::thread(inputThreadFun, this);
-	std::cout << "Game Message: started input thread" << std::endl;
+	NormalLog << "Game Message: started input thread" << ENDL;
 	setButtonPos(m_isButtonsRight);
 
 	m_note_arr.reserve(100);
@@ -111,7 +111,7 @@ void Game::inputThreadFun(Game* game) {
 		std::this_thread::sleep_for(milliseconds(1000 / game->m_inputThreadPollRate) - delta);
 		//wait time before next input frame
 	}
-	std::cout << "Input Thread Message: stopped" << std::endl;
+	NormalLog << "Input Thread Message: stopped" << ENDL;
 }
 
 void Game::tick() {
@@ -191,7 +191,7 @@ void Game::setButtonPos(bool value) {
 }
 
 void Game::start(const SongEntry& entry, int difficulty) {
-	std::cout << "Game msg: started game" << std::endl;
+	NormalLog << "Game msg: started game" << ENDL;
 	glfwSetTime(0.0);
 	//glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	//m_player.m_deltaMouse = true;
@@ -275,7 +275,7 @@ void Game::writeConfig() {
 	ini.SetDoubleValue(section, "fsCrossBaseBlueA", m_render.m_fsCrossBaseBlue.a);
 
 	ini.SaveFile("config.ini");
-	std::cout << "Game Message: Written engine conigs to 'config.ini'" << std::endl;
+	NormalLog << "Game Message: Written engine conigs to 'config.ini'" << ENDL;
 
 	m_player.writeMappingFile();
 }

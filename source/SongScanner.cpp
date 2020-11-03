@@ -195,7 +195,7 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 			s.streams = streams;
 
 			list.push_back(s);
-			std::cout << "found " << file << std::endl;
+			NormalLog << "found " << file << ENDL;
 			break;
 		} else {
 			file = p.generic_string() + std::string("/info.ini");
@@ -288,7 +288,7 @@ void checkFolder(const fs::path& p, std::vector<SongEntry>& list, std::map<std::
 				s.streams = streams;
 
 				list.push_back(s);
-				std::cout << "found " << file << std::endl;
+				NormalLog << "found " << file << ENDL;
 				break;
 			}
 		}
@@ -337,38 +337,38 @@ void SongScanner::load(const std::string& rootPath, std::vector<SongEntry>& list
 
 		/*
 		for (auto& entry : m_duplicates) {
-			std::cout << entry.first << " | " << entry.second << std::endl;
+			NormalLog << entry.first << " | " << entry.second << ENDL;
 		}
 		*/
 		std::sort(list.begin(), list.end(), compareSongEntries);
 	} else {
-		std::cerr << "SongScanner error: Root path is not a folder" << std::endl;
+		ErrorLog << "SongScanner error: Root path is not a folder" << ENDL;
 	}
 }
 
 void SongScanner::writeCache(std::vector<SongEntry>& list) {
 	std::ofstream cache("songs/songCache.txt");
 	if (cache.is_open()) {
-		std::cout << "SongScanner Message: Writing to cache" << std::endl;
-		cache << CACHE_VER << std::endl;
-		cache << list.size() << std::endl;
+		NormalLog << "SongScanner Message: Writing to cache" << ENDL;
+		cache << CACHE_VER << ENDL;
+		cache << list.size() << ENDL;
 		for (SongEntry& entry : list) {
-			cache << (!entry.path.empty() ? entry.path : std::string("NULL")) << std::endl;
-			cache << (!entry.s1.empty() ? entry.s1 : std::string("NULL")) << std::endl;
-			cache << (!entry.s2.empty() ? entry.s2 : std::string("NULL")) << std::endl;
-			cache << (!entry.a1.empty() ? entry.a1 : std::string("NULL")) << std::endl;
-			cache << (!entry.a2.empty() ? entry.a2 : std::string("NULL")) << std::endl;
-			cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << std::endl;
-			cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << std::endl;
-			cache << entry.bpm << std::endl;
-			cache << (entry.dTrack != -1 ? entry.dTrack : -1) << std::endl;
-			cache << (entry.dTap != -1 ? entry.dTap : -1) << std::endl;
-			cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << std::endl;
-			cache << (entry.dScratch != -1 ? entry.dScratch : -1) << std::endl;
-			cache << entry.difficulties << std::endl;
-			cache << entry.streams << std::endl;
+			cache << (!entry.path.empty() ? entry.path : std::string("NULL")) << ENDL;
+			cache << (!entry.s1.empty() ? entry.s1 : std::string("NULL")) << ENDL;
+			cache << (!entry.s2.empty() ? entry.s2 : std::string("NULL")) << ENDL;
+			cache << (!entry.a1.empty() ? entry.a1 : std::string("NULL")) << ENDL;
+			cache << (!entry.a2.empty() ? entry.a2 : std::string("NULL")) << ENDL;
+			cache << (!entry.charter.empty() ? entry.charter : std::string("NULL")) << ENDL;
+			cache << (!entry.mixer.empty() ? entry.mixer : std::string("NULL")) << ENDL;
+			cache << entry.bpm << ENDL;
+			cache << (entry.dTrack != -1 ? entry.dTrack : -1) << ENDL;
+			cache << (entry.dTap != -1 ? entry.dTap : -1) << ENDL;
+			cache << (entry.dCrossfade != -1 ? entry.dCrossfade : -1) << ENDL;
+			cache << (entry.dScratch != -1 ? entry.dScratch : -1) << ENDL;
+			cache << entry.difficulties << ENDL;
+			cache << entry.streams << ENDL;
 		}
-		std::cout << "SongScanner Message: updated song cache" << std::endl;
+		NormalLog << "SongScanner Message: updated song cache" << ENDL;
 	}
 }
 
@@ -381,7 +381,7 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 		std::string token;
 		std::getline(cache, token);
 		ver = stoi(token);
-		std::cout << "SongScanner Message: found cache version " << ver << std::endl;
+		NormalLog << "SongScanner Message: found cache version " << ver << ENDL;
 		try {
 			if (ver == CACHE_VER) {
 				std::getline(cache, token);
@@ -458,14 +458,14 @@ void SongScanner::readCache(std::vector<SongEntry>& list) {
 					list.push_back(t);
 				}
 			} else {
-				std::cerr << "SongScanner Error: cache is invalid/too old. Please update it" << std::endl;
+				ErrorLog << "SongScanner Error: cache is invalid/too old. Please update it" << ENDL;
 			}
 			cache.close();
-			std::cout << "SongScanner Message: loaded songs from cache" << std::endl;
+			NormalLog << "SongScanner Message: loaded songs from cache" << ENDL;
 		} catch (...) {
-			std::cerr << "SongScanner Error: cache is invalid/too old. Please update it" << std::endl;
+			ErrorLog << "SongScanner Error: cache is invalid/too old. Please update it" << ENDL;
 		}
 	} else {
-		std::cerr << "SongScanner Error: Could not open cache / Cache file not found" << std::endl;
+		ErrorLog << "SongScanner Error: Could not open cache / Cache file not found" << ENDL;
 	}
 }
