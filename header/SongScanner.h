@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "SimpleIni.h"
 #include "json.hpp"
 
@@ -25,13 +26,13 @@ struct SongEntry {
 	std::string s2;
 	std::string a1;
 	std::string a2;
-	//std::string charter;
-	//std::string mixer;
+	std::string charter;
+	std::string mixer;
 	float bpm = -1;
-	//int dTrack;
-	//int dTap;
-	//int dCrossfade;
-	//int dScratch;
+	int dTrack;
+	int dTap;
+	int dCrossfade;
+	int dScratch;
 	int difficulties = 0;
 	int streams = 0;
 };

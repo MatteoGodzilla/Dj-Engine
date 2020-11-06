@@ -1,6 +1,7 @@
 #pragma once
-
+#include "DJEUtils.h"
 #include "SongScanner.h"
+#include "TimerManager.h"
 
 #include <array>
 #include <atomic>
@@ -25,12 +26,24 @@ private:
 	size_t readIndex = 0;
 };
 
+class Player;
+
+enum AnimationID {
+	AN_GREEN_IN,
+	AN_GREEN_OUT,
+	AN_BLUE_IN,
+	AN_BLUE_OUT
+};
+
 class Audio {
 public:
+	Audio();
 	void init();
 	void play();
 	void stop();
 	void load(const SongEntry& entry);
+	void pollState(double time, const Player* p);
+	void resetEffects();
 	void destroy();
 	bool isPlaying() const;
 	double getFileLength();
@@ -47,10 +60,20 @@ public:
 	int bitstream = 0;
 	bool loaderThreadRunning = true;
 
+	float greenGain = 1.0;
+	float redGain = 1.0;
+	float blueGain = 1.0;
+
+	float greenPan = 0.0;
+	float redPan = 0.0;
+	float bluePan = 0.0;
+
 private:
+	int lastPlayerPos = 0;
 	PaStream* audioStream;
 	std::thread loader;
 	bool playing = false;
 
 	bool initialized = false;
+	TimerManager animManager;
 };

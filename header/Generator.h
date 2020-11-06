@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "Note.h"
 #include "SongScanner.h"
 

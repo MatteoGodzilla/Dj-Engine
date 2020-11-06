@@ -28,11 +28,11 @@ MenuNode* getNodePtrById(MenuNode* node, int id) {
 }
 
 void printDebugMenuNode(MenuNode node, int indentation = 0) {
-	std::cout << node.getText() << "\t" << node.getId() << "\t" << node.getChildCount() << std::endl;
+	NormalLog << node.getText() << "\t" << node.getId() << "\t" << node.getChildCount() << ENDL;
 	if (node.getChildCount() > 0) {
 		for (auto& child : node.getChildrens()) {
 			for (int i = 0; i < indentation; ++i) {
-				std::cout << "\t";
+				NormalLog << "\t";
 			}
 			printDebugMenuNode(child, indentation + 1);
 		}
@@ -42,6 +42,7 @@ void printDebugMenuNode(MenuNode node, int indentation = 0) {
 void MenuNavigator::writeConfigFile() {
 	m_game->writeConfig();
 
+	/*
 	CSimpleIniA ini;
 	const char* section = "Menu Mappings";
 	ini.SetLongValue(section, "KB_up", UP_CODE);
@@ -59,43 +60,48 @@ void MenuNavigator::writeConfigFile() {
 
 	std::ofstream output("profile.ini", std::ios::app | std::ios::binary);
 	if (output.is_open()) {
-		output << std::endl
+		output << ENDL
 			   << mappings;
-		std::cout << "MenuNavigator Message: written menu mappings to 'profile.ini'" << std::endl;
+		NormalLog << "MenuNavigator Message: written menu mappings to 'profile.ini'" << ENDL;
 	}
+	*/
 }
 
+/*
 void MenuNavigator::readConfigFile() {
 	CSimpleIniA ini;
 	ini.LoadFile("profile.ini");
 	const char* section = "Menu Mappings";
 
-	std::cout << "MenuNavigator Message: loading config from file" << std::endl;
+	NormalLog << "MenuNavigator Message: loading config from file" << ENDL;
 
-	UP_CODE = ini.GetLongValue(section, "KB_up", 0);
-	DOWN_CODE = ini.GetLongValue(section, "KB_down", 0);
-	SELECT_CODE = ini.GetLongValue(section, "KB_select", 0);
-	BACK_CODE = ini.GetLongValue(section, "KB_back", 0);
+	UP_CODE = ini.GetLongValue(section, "KB_up", 256);
+	DOWN_CODE = ini.GetLongValue(section, "KB_down", 256);
+	SELECT_CODE = ini.GetLongValue(section, "KB_select", 256);
+	BACK_CODE = ini.GetLongValue(section, "KB_back", 256);
 
 	UP_GAMEPAD = ini.GetLongValue(section, "GP_up", 0);
 	DOWN_GAMEPAD = ini.GetLongValue(section, "GP_down", 0);
 	SELECT_GAMEPAD = ini.GetLongValue(section, "GP_select", 0);
 	BACK_GAMEPAD = ini.GetLongValue(section, "GP_back", 0);
 }
+*/
 
 void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 	m_pastGamepadValues = gameptr->getPlayer()->getGamepadValues();
 	m_pastKBMState = gameptr->getPlayer()->getKBMValues(w);
-	//std::cout << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << std::endl;
+	//NormalLog << m_pastKBMState.at(0) << ";" << m_pastKBMState.at(1) << ENDL;
 	m_game = gameptr;
 	m_render.init(w);
 
-	readConfigFile();
+	//readConfigFile();
 
+	/*
 	std::ifstream available("config.ini");
 	if (!available.is_open()) {
 		writeConfigFile();
 	}
+	*/
 
 	//create menu tree
 	MenuNode play("Play!", PLAY_ID);
@@ -105,18 +111,18 @@ void MenuNavigator::init(GLFWwindow* w, Game* gameptr) {
 
 	MenuNode scratches("Test Scratches", SCRATCHES_ID);
 	MenuNode latency("Calibrate latency", LATENCY_ID);
-	MenuNode flipButtons("Toggle Buttons Right/Left:", LR_BUTTONS_ID);
+	MenuNode flipButtons("Buttons Right/Left:", LR_BUTTONS_ID);
 	MenuNode speed("Set Deck Speed:", SPEED_ID);
 	MenuNode refreshList("Refresh song list", REFRESH_ID);
 	MenuNode bot("Toggle Bot:", BOT_ID);
 	MenuNode color("Change lanes color", COLOR_ID);
 	MenuNode pollrate("Change input poll rate:", POLL_ID);
-	MenuNode debug("Toggle Debug Informations:", DEBUG_ID);
+	MenuNode debug("Debug Informations:", DEBUG_ID);
 
 	MenuNode a("Refresh List", REFRESH_ID);
 
 	//add values to text after:
-	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
+	flipButtons.setText(flipButtons.getText() + std::string(m_game->getPlayer()->m_isButtonsRight ? "Right" : "Left"));
 	speed.setText(speed.getText() + std::to_string(m_game->m_deckSpeed));
 	bot.setText(bot.getText() + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	pollrate.setText(pollrate.getText() + std::to_string(m_game->m_inputThreadPollRate));
@@ -159,11 +165,17 @@ void MenuNavigator::pollInput() {
 	m_wasEscapePressed = m_isEscapePressed;
 	m_wasTabPressed = m_isTabPressed;
 
+	m_isUpPressed = m_game->getPlayer()->isAxisAboveDeadzone(MENU_UP);
+	m_isDownPressed = m_game->getPlayer()->isAxisAboveDeadzone(MENU_DOWN);
+	m_isSelectPressed = m_game->getPlayer()->isAxisAboveDeadzone(GREEN_INDEX);
+	m_isBackPressed = m_game->getPlayer()->isAxisAboveDeadzone(RED_INDEX);
+
+	/*
 	if (m_game->getPlayer()->m_useKeyboardInput) {
 		m_isUpPressed = glfwGetKey(m_render.getWindowPtr(), UP_CODE);
 		m_isDownPressed = glfwGetKey(m_render.getWindowPtr(), DOWN_CODE);
-		m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), SELECT_CODE);
-		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), BACK_CODE);
+		m_isSelectPressed = glfwGetKey(m_render.getWindowPtr(), m_game->getPlayer()->GREEN_CODE);
+		m_isBackPressed = glfwGetKey(m_render.getWindowPtr(), m_game->getPlayer()->RED_CODE);
 	} else {
 		if (glfwJoystickPresent(m_game->getPlayer()->m_gamepadId)) {
 			updateGamepadState();
@@ -171,11 +183,11 @@ void MenuNavigator::pollInput() {
 			if (!m_gpState.empty()) {
 				m_isUpPressed = (m_gpState.at(UP_GAMEPAD) >= m_gpDead.at(UP_GAMEPAD));
 				m_isDownPressed = (m_gpState.at(DOWN_GAMEPAD) >= m_gpDead.at(DOWN_GAMEPAD));
-				m_isSelectPressed = (m_gpState.at(SELECT_GAMEPAD) >= m_gpDead.at(SELECT_GAMEPAD));
-				m_isBackPressed = (m_gpState.at(BACK_GAMEPAD) >= m_gpDead.at(BACK_GAMEPAD));
+				m_isSelectPressed = m_game->getPlayer()->isAxisAboveDeadzone(GREEN_INDEX);
+				m_isBackPressed = m_game->getPlayer()->isAxisAboveDeadzone(RED_INDEX);
 			}
 		}
-	}
+	}*/
 
 	if (m_isUpPressed) {
 		if (m_holdingSomething == 0) {
@@ -213,8 +225,6 @@ void MenuNavigator::pollInput() {
 			m_popupId = -1;
 			m_debounce = true;
 		} else {
-			glfwSetInputMode(m_render.getWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-			resetMenu();
 			if (m_scene == MAIN_SCENE && m_activeNode->getId() == m_root.getId()) {
 				if (m_scene != 1) {
 					m_shouldClose = true;
@@ -285,6 +295,8 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() > 0) {
 					m_selection.back()--;
+					m_render.m_animManager.triggerTimer(AN_SCROLL_UP, m_render.m_globalTime);
+					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				} else if (m_selection.back() == 0) {
 					m_selection.back() = m_activeNode->getChildCount() - 1;
 					if (m_activeNode->getChildCount() > m_render.VISIBLE_ENTRIES) {
@@ -303,6 +315,8 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				if (m_selection.back() < m_activeNode->getChildCount() + 1) {
 					m_selection.back()++;
+					m_render.m_animManager.triggerTimer(AN_SCROLL_DOWN, m_render.m_globalTime);
+					m_render.m_timeWarpStart = m_render.m_timeWarp;
 				}
 				if (m_selection.back() == m_activeNode->getChildCount()) {
 					m_selection.back() = 0;
@@ -322,7 +336,7 @@ void MenuNavigator::update() {
 				m_render.m_selectionDX = 0.0f;
 				MenuNode& childNode = m_activeNode->getChildrens().at(m_selection.back());
 				//printDebugMenuNode(childNode);
-				//std::cout << "***********************************************" << std::endl;
+				//NormalLog << "***********************************************" << ENDL;
 				if (childNode.getChildCount() == 0) {
 					//do something based on the node id
 					activate(childNode);
@@ -341,14 +355,14 @@ void MenuNavigator::update() {
 				}
 			}
 
-			//std::cout << m_activeNode.getText() << "\t" << m_activeNode.getChildrens().at(m_selection.back()).getChildCount() << std::endl;
+			//NormalLog << m_activeNode->getText() << "\t" << m_activeNode->getChildrens().at(m_selection.back()).getChildCount() << ENDL;
 
 			/*
-			std::cout << m_activeNode.getText() << ":";
+			NormalLog << m_activeNode.getText() << ":";
 			for (size_t i = 0; i < m_selection.size(); ++i) {
-				std::cout << m_selection.at(i) << "|";
+				NormalLog << m_selection.at(i) << "|";
 			}
-			std::cout << std::endl;
+			NormalLog << ENDL;
 			*/
 		} else if (m_scene == REMAPPING) {
 			if (m_render.m_editingAxis && m_render.m_ActionToChange != -1) {
@@ -368,13 +382,9 @@ void MenuNavigator::update() {
 				} else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCR_DOWN_GAMEPAD);
 				} else if (m_render.m_ActionToChange == MENU_UP) {
-					changing = &UP_GAMEPAD;
+					changing = &(m_game->getPlayer()->UP_GAMEPAD);
 				} else if (m_render.m_ActionToChange == MENU_DOWN) {
-					changing = &DOWN_GAMEPAD;
-				} else if (m_render.m_ActionToChange == MENU_SELECT) {
-					changing = &SELECT_GAMEPAD;
-				} else if (m_render.m_ActionToChange == MENU_BACK) {
-					changing = &BACK_GAMEPAD;
+					changing = &(m_game->getPlayer()->DOWN_GAMEPAD);
 				}
 
 				float deadzone = 0.05f;
@@ -405,13 +415,9 @@ void MenuNavigator::update() {
 				} else if (m_render.m_ActionToChange == SCR_DOWN_INDEX) {
 					changing = &(m_game->getPlayer()->SCRATCH_DOWN);
 				} else if (m_render.m_ActionToChange == MENU_UP) {
-					changing = &UP_CODE;
+					changing = &(m_game->getPlayer()->UP_CODE);
 				} else if (m_render.m_ActionToChange == MENU_DOWN) {
-					changing = &DOWN_CODE;
-				} else if (m_render.m_ActionToChange == MENU_SELECT) {
-					changing = &SELECT_CODE;
-				} else if (m_render.m_ActionToChange == MENU_BACK) {
-					changing = &BACK_CODE;
+					changing = &(m_game->getPlayer()->DOWN_CODE);
 				}
 
 				float deadzone = 0.5f;
@@ -442,13 +448,17 @@ void MenuNavigator::render() {
 
 		if (m_scene == MAIN_SCENE) {
 			updateMenuNode();
-			m_render.render(*m_activeNode, m_selection.back(), m_viewOffset);
+			if (m_activeNode->getId() != getNodePtrById(&m_root, PLAY_ID)->getId()) {
+				m_render.render(*m_activeNode, m_selection.back());
+			} else {
+				m_render.play(m_songList, m_selection.back());
+			}
 
 			if (m_activeNode->getId() == m_root.getId()) {
 				m_render.splashArt();
 			}
 		} else if (m_scene == REMAPPING) {
-			m_render.remapping(m_game, {&UP_CODE, &DOWN_CODE, &SELECT_CODE, &BACK_CODE, &UP_GAMEPAD, &DOWN_GAMEPAD, &SELECT_GAMEPAD, &BACK_GAMEPAD});
+			m_render.remapping(m_game);
 		} else if (m_scene == CREDITS) {
 			m_render.credits();
 		} /*else if (m_scene == SCRATCHES) {
@@ -486,7 +496,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 	} else if (id == LR_BUTTONS_ID) {
 		m_game->setButtonPos(!m_game->getPlayer()->m_isButtonsRight);
 		//update options node text
-		getNodePtrById(&m_root, LR_BUTTONS_ID)->setText(std::string("Toggle Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "true" : "false"));
+		getNodePtrById(&m_root, LR_BUTTONS_ID)->setText(std::string("Buttons Right/Left:") + std::string(m_game->getPlayer()->m_isButtonsRight ? "Right" : "Left"));
 		writeConfigFile();
 	} else if (id == SPEED_ID) {
 		m_popupId = HIGHWAY_SPEED;
@@ -495,7 +505,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 		getNodePtrById(&m_root, BOT_ID)->setText(std::string("Toggle Bot:") + std::string(m_game->getPlayer()->m_botEnabled ? "true" : "false"));
 	} else if (id == DEBUG_ID) {
 		m_game->m_debugView = !m_game->m_debugView;
-		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Toggle Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
+		getNodePtrById(&m_root, DEBUG_ID)->setText(std::string("Debug Informations:") + std::string(m_game->m_debugView ? "true" : "false"));
 		writeConfigFile();
 	} else if (id == REFRESH_ID) {
 		m_songList.clear();
@@ -525,7 +535,7 @@ void MenuNavigator::activate(MenuNode& menu) {
 		m_game->start(m_songList.at(song), selected);
 		resetMenu();
 	} else if (menu.getChildCount() == 0 && id != DONT_CARE) {
-		std::cout << "Menu Error: no function attached to id " << menu.getId() << std::endl;
+		NormalLog << "Menu Error: no function attached to id " << menu.getId() << ENDL;
 	}
 }
 
@@ -574,10 +584,12 @@ void MenuNavigator::scan(bool useCache) {
 			MenuNode temp("BEGINNER", SONG_BEGINNER_ID);
 			song.push(temp);
 		}
+		//printDebugMenuNode(song);
+		//NormalLog << song.getText() << "\t" << entry.difficulties << ENDL;
 		getNodePtrById(&m_root, PLAY_ID)->push(song);
 	}
 	//printDebugMenuNode(m_root);
-	//std::cout << "***********************************************" << std::endl;
+	//NormalLog << "***********************************************" << ENDL;
 }
 
 void MenuNavigator::resetMenu() {

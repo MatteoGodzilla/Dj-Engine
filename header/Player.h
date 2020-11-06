@@ -1,4 +1,5 @@
 #pragma once
+#include "DJEUtils.h"
 #include "Generator.h"
 #include "SimpleIni.h"
 
@@ -19,8 +20,6 @@ enum indices {
 	SCR_DOWN_INDEX,
 	MENU_UP,
 	MENU_DOWN,
-	MENU_SELECT,
-	MENU_BACK
 };
 
 class Player {
@@ -68,6 +67,8 @@ public:
 	int SCRATCH_UP = GLFW_KEY_W;
 	int SCRATCH_DOWN = GLFW_KEY_S;
 	int EUPHORIA = GLFW_KEY_E;
+	int UP_CODE = GLFW_KEY_W;
+	int DOWN_CODE = GLFW_KEY_S;
 
 	int GREEN_GAMEPAD = GLFW_GAMEPAD_BUTTON_A;
 	int RED_GAMEPAD = GLFW_GAMEPAD_BUTTON_B;
@@ -78,9 +79,11 @@ public:
 	int CF_RIGHT_GAMEPAD = GLFW_GAMEPAD_AXIS_RIGHT_Y + GLFW_GAMEPAD_BUTTON_LAST + 1;
 	int SCR_DOWN_GAMEPAD = GLFW_GAMEPAD_AXIS_LEFT_Y + GLFW_GAMEPAD_BUTTON_LAST;
 	int SCR_UP_GAMEPAD = GLFW_GAMEPAD_AXIS_LEFT_Y + GLFW_GAMEPAD_BUTTON_LAST + 1;
-
+	int UP_GAMEPAD = GLFW_GAMEPAD_BUTTON_DPAD_UP;
+	int DOWN_GAMEPAD = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
 	bool m_useSingleCfAxis = true;
 	bool m_useSingleScrAxis = true;
+	bool m_digitalScratch = false;
 
 	bool m_useKeyboardInput = true;
 
@@ -99,14 +102,16 @@ public:
 	bool m_isGreenPressed = false;
 	bool m_isBluePressed = false;
 
-	bool m_greenAnimation = false;
-	bool m_redAnimation = false;
-	bool m_blueAnimation = false;
+	bool m_greenTimer = false;
+	bool m_redTimer = false;
+	bool m_blueTimer = false;
 	bool m_cfCenterToGreen = false;
 	bool m_cfCenterToBlue = false;
 	bool m_cfGreenToCenter = false;
 	bool m_cfBlueToCenter = false;
+	bool m_wasLastNoteSpike = false;
 
+	bool m_insideFSCross = false;
 	int m_cross = 1;
 
 	bool m_deltaMouse = false;

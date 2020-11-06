@@ -27,6 +27,8 @@ enum NoteTypes {
 	TAP_G_HOLD_TICK, //inside note vector
 	TAP_R_HOLD_TICK, //inside note vector
 	TAP_B_HOLD_TICK, //inside note vector
+	FS_CROSS_BASE, //inside event vector
+	FS_SAMPLES //inside event vector
 };
 
 enum FSGNoteTypes {

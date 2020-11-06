@@ -39,14 +39,26 @@ Vertex::Vertex(glm::vec3 pos_) {
 	tex = {0.0, 0.0};
 }
 
+Vertex::Vertex() {
+	pos = {0.0, 0.0, 0.0};
+	col = {1.0, 1.0, 1.0, 1.0};
+	tex = {0.0, 0.0};
+}
+
+Vertex::Vertex(const Vertex& other) {
+	pos = other.pos;
+	col = other.col;
+	tex = other.tex;
+}
+
 void Rendr::checkError() {
-	std::cout << "started error checking" << std::endl;
+	NormalLog << "started error checking" << ENDL;
 	GLenum error = glGetError();
 	while (error != GL_NO_ERROR) {
-		std::cout << "OpenGL Error: " << error << std::endl;
+		NormalLog << "OpenGL Error: " << error << ENDL;
 		error = glGetError();
 	}
-	std::cout << "ended error checking" << std::endl;
+	NormalLog << "ended error checking" << ENDL;
 }
 
 //utility function
@@ -100,7 +112,7 @@ void Rendr::pushVertex(std::vector<float>& v, Vertex& ver) const {
 	v.push_back(ver.tex.t);
 }
 
-void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) {
+void Rendr::pushFourVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, Vertex& ver3, Vertex& ver4) const {
 	pushVertex(v, ver1);
 	pushVertex(v, ver2);
 	pushVertex(v, ver3);
@@ -108,7 +120,7 @@ void Rendr::pushQuadVertices(std::vector<float>& v, Vertex& ver1, Vertex& ver2, 
 }
 
 //utility function
-void Rendr::pushQuadIndices(std::vector<unsigned int>& v, unsigned int& value) {
+void Rendr::pushFourIndices(std::vector<unsigned int>& v, unsigned int& value) {
 	v.push_back(value);
 	v.push_back(value + 1);
 	v.push_back(value + 2);
@@ -125,6 +137,11 @@ void Rendr::pushTriangleIndices(std::vector<unsigned int>& v, unsigned int& valu
 	value += 3;
 }
 
+void Rendr::pushQuad(std::vector<float>& vArr, std::vector<unsigned int>& indices, unsigned int& indexCount, Quad& quad) const {
+	pushFourVertices(vArr, quad.v1, quad.v2, quad.v3, quad.v4);
+	pushFourIndices(indices, indexCount);
+}
+
 void Rendr::usePersProj() {
 	//setting up projection uniform on all programs
 	glUseProgram(m_mainProgram);
@@ -132,7 +149,7 @@ void Rendr::usePersProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 
 	glUseProgram(m_mainProgram);
@@ -140,7 +157,7 @@ void Rendr::usePersProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 
 	glUseProgram(m_textProgram);
@@ -148,7 +165,7 @@ void Rendr::usePersProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 }
 
@@ -159,7 +176,7 @@ void Rendr::useOrthoProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 
 	glUseProgram(m_mainProgram);
@@ -167,7 +184,7 @@ void Rendr::useOrthoProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 
 	glUseProgram(m_textProgram);
@@ -175,7 +192,7 @@ void Rendr::useOrthoProj() {
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {
-		std::cerr << "error setting projection matrix" << std::endl;
+		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 }
 
@@ -230,6 +247,7 @@ void Rendr::renderColor(std::vector<float>& vertexArr, std::vector<unsigned int>
 }
 
 void Rendr::drawText(const std::string& s, float x, float y, float scl) {
+	scl /= textFactor;
 	bool old = rendr_InvertedX;
 	rendr_InvertedX = false;
 	//loop for every char in string
@@ -260,7 +278,7 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 		pushVertexTexture(textVector, x + temp.bx, y - temp.by + temp.height, 0.0f, 0.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by + temp.height, 0.0f, 1.0f, 1.0f);
 		pushVertexTexture(textVector, x + temp.bx + temp.width, y - temp.by, 0.0f, 1.0f, 0.0f);
-		pushQuadIndices(textIndices, textVertexCount);
+		pushFourIndices(textIndices, textVertexCount);
 
 		useOrthoProj();
 		renderText(textVector, textIndices, temp.TextureID);
@@ -269,7 +287,8 @@ void Rendr::drawText(const std::string& s, float x, float y, float scl) {
 	rendr_InvertedX = old;
 }
 
-float Rendr::getTextWidth(const std::string& s, float scale) {
+float Rendr::getTextWidth(const std::string& s, float scale) const {
+	scale /= textFactor;
 	float x = 0.0f; // return variable
 	for (char c : s) {
 		CharTextureData temp = ChMap[c];
@@ -279,7 +298,8 @@ float Rendr::getTextWidth(const std::string& s, float scale) {
 	return x;
 }
 
-float Rendr::getTextHeight(const std::string& s, float scale) {
+float Rendr::getTextHeight(const std::string& s, float scale) const {
+	scale /= textFactor;
 	float maxBearing = 0;
 	float y = 0.0f;
 	for (char c : s) {
@@ -289,7 +309,7 @@ float Rendr::getTextHeight(const std::string& s, float scale) {
 			maxBearing = temp.by;
 		}
 	}
-	//std::cout << maxBearing << std::endl;
+	//NormalLog << maxBearing << ENDL;
 	for (char c : s) {
 		CharTextureData temp = ChMap[c];
 		temp.height *= scale;
@@ -324,11 +344,11 @@ glm::vec2 Rendr::loadTexture(const std::string& s, unsigned int* destination) {
 		} else {
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		}
-		std::cout << "Rendr Msg: successfully loaded texture at " << s << std::endl;
+		//NormalLog << "Rendr Msg: successfully loaded texture at " << s << ENDL;
 		stbi_image_free(data);
 		return glm::vec2(width, height);
 	} else {
-		std::cerr << "Rendr Err: cannot load texture. Does the file at " << s << " exist?" << std::endl;
+		ErrorLog << "Rendr Err: cannot load texture. Does the file at " << s << " exist?" << ENDL;
 		return glm::vec2(0.0, 0.0);
 	}
 }
@@ -348,16 +368,22 @@ void Rendr::renderImGuiFrame() {
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
+glm::vec2 Rendr::getCirclePoint(double radius, double angle) {
+	double x = radius * cos(angle);
+	double y = radius * sin(angle);
+	return {x, y};
+}
+
 void Rendr::init(GLFWwindow* w) {
 	stbi_set_flip_vertically_on_load(true);
 
 	m_window = w;
 	glfwMakeContextCurrent(m_window);
 	if (glewInit() != GLEW_OK) {
-		std::cout << "GLEW INIT ERROR" << std::endl;
+		NormalLog << "GLEW INIT ERROR" << ENDL;
 		return;
 	}
-	std::cout << "Rendr Init: " << glGetString(GL_VERSION) << std::endl;
+	NormalLog << "Rendr Init: " << glGetString(GL_VERSION) << ENDL;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -436,17 +462,17 @@ void Rendr::init(GLFWwindow* w) {
 		glGetShaderiv(vMainShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(vMainShader, 512, nullptr, infolog.data());
-			std::cerr << "error compiling vertex main shader:" << infolog.data() << std::endl;
+			ErrorLog << "error compiling vertex main shader:" << infolog.data() << ENDL;
 		}
 		glGetShaderiv(fMainShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fMainShader, 512, nullptr, infolog.data());
-			std::cerr << "error compiling fragment main shader:" << infolog.data() << std::endl;
+			ErrorLog << "error compiling fragment main shader:" << infolog.data() << ENDL;
 		}
 		glGetShaderiv(fTextShader, GL_COMPILE_STATUS, &success);
 		if (!success) {
 			glGetShaderInfoLog(fTextShader, 512, nullptr, infolog.data());
-			std::cerr << "error compiling fragment text shader:" << infolog.data() << std::endl;
+			ErrorLog << "error compiling fragment text shader:" << infolog.data() << ENDL;
 		}
 		//create shader programs
 		m_mainProgram = glCreateProgram();
@@ -465,7 +491,7 @@ void Rendr::init(GLFWwindow* w) {
 		glGetProgramiv(m_mainProgram, GL_LINK_STATUS, &linked);
 		if (!linked) {
 			glGetProgramInfoLog(m_textProgram, 512, nullptr, log.data());
-			std::cerr << "error linking program:" << log.data() << std::endl;
+			ErrorLog << "error linking program:" << log.data() << ENDL;
 		}
 
 		//delete shader object files
@@ -527,19 +553,19 @@ void Rendr::init(GLFWwindow* w) {
 	//freetype init
 	{
 		if (FT_Init_FreeType(&m_FTLibrary)) {
-			std::cerr << "Rendr error:error opening freetype" << std::endl;
+			ErrorLog << "Rendr error:error opening freetype" << ENDL;
 		}
 		if (FT_New_Face(m_FTLibrary, "res/NotoSans-Regular.ttf", 0, &m_font)) {
-			std::cerr << "Rendr error:error loading font" << std::endl;
+			ErrorLog << "Rendr error:error loading font" << ENDL;
 		}
-		FT_Set_Pixel_Sizes(m_font, 0, 1024);
+		FT_Set_Pixel_Sizes(m_font, 0, 1024 * textFactor);
 
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		for (unsigned char c = 0; c < 128; c++) {
 			// Load character glyph
 			if (FT_Load_Char(m_font, c, FT_LOAD_RENDER)) {
-				std::cout << "Rendr error::FREETYTPE: Failed to load Glyph:" << c << std::endl;
+				NormalLog << "Rendr error::FREETYTPE: Failed to load Glyph:" << c << ENDL;
 			}
 			// generate texture
 			unsigned int texture;

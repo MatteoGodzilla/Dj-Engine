@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 if [[ -d /mingw64/bin ]]
 then
 	export PATH=/mingw64/bin:$PATH
@@ -41,7 +43,7 @@ mkdir build
 cd build
 if [ $DEBUG = true ]
 then
-	cmake -DCMAKE_BUILD_TYPE=Debug .. && make
+	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. && make
 elif [ $RELEASE = true ]
 then
 	cmake -DCMAKE_BUILD_TYPE=Release .. && make

@@ -1,8 +1,12 @@
 #pragma once
-class Animation {
+
+#include <iostream>
+#include <vector>
+
+class Timer {
 public:
-	Animation();
-	Animation(int id, double duration, bool looping = false);
+	Timer();
+	Timer(int id, double duration, bool looping = false);
 	void tick(double time);
 	void setDuration(double time);
 	void setLooping(bool looping);
@@ -24,4 +28,18 @@ private:
 	bool m_enabled = false;
 
 	double m_pastTick = 0.0;
+};
+
+class TimerManager {
+public:
+	void tick(double time);
+	std::vector<Timer>& getAnimList();
+	Timer getAnimById(int id);
+	void updateTimer(Timer a);
+	void triggerTimer(int id, double time);
+	void disableTimer(int id);
+	void pushTimer(Timer a);
+
+private:
+	std::vector<Timer> m_animList;
 };

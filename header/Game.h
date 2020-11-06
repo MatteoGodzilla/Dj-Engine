@@ -1,6 +1,6 @@
 #pragma once
-#include "Animation.h"
 #include "Audio.h"
+#include "DJEUtils.h"
 #include "GameRender.h"
 #include "Generator.h"
 #include "Note.h"
@@ -42,6 +42,7 @@ public:
 	double m_deltaTime = 0.0;
 	double m_audioLength = 0.0f;
 	float m_audioLatency = 0.0f;
+	float m_audioPosition = 0.0f;
 	float m_deckSpeed = 1.0f;
 	bool m_debugView = false;
 

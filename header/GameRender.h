@@ -1,9 +1,9 @@
 #pragma once
-
+#include "DJEUtils.h"
 // clang-format off
 #include "Rendr.h"
 // clang-format on
-#include "AnimationManager.h"
+#include "TimerManager.h"
 #include "Generator.h"
 #include "Note.h"
 #include "Player.h"
@@ -13,6 +13,16 @@
 #include <math.h>
 #include <string>
 #include <vector>
+
+enum AnimId {
+	AN_CROSS_GREEN_TO_LEFT,
+	AN_CROSS_GREEN_TO_CENTER,
+	AN_CROSS_BLUE_TO_RIGHT,
+	AN_CROSS_BLUE_TO_CENTER,
+	AN_GREEN_CLICKER,
+	AN_RED_CLICKER,
+	AN_BLUE_CLICKER,
+};
 
 enum AtlasIndices {
 	TAP_GREEN_1,
@@ -45,23 +55,38 @@ enum AtlasIndices {
 	CLICKER_TRAY,
 	SCRATCH_ANYDIR,
 	SCRATCH_UP,
-	SCRATCH_DOWN
+	SCRATCH_DOWN,
+	FS_CROSS_GREEN_BASE_BOTTOM,
+	FS_CROSS_GREEN_BASE_TOP,
+	FS_CROSS_BLUE_BASE_BOTTOM,
+	FS_CROSS_BLUE_BASE_TOP,
+	FS_CROSS_SPEAKER_GREEN_0,
+	FS_CROSS_SPEAKER_GREEN_1,
+	FS_CROSS_SPEAKER_GREEN_2,
+	FS_CROSS_SPEAKER_GREEN_3,
+	FS_CROSS_SPEAKER_GREEN_4,
+	FS_CROSS_SPEAKER_BLUE_0,
+	FS_CROSS_SPEAKER_BLUE_1,
+	FS_CROSS_SPEAKER_BLUE_2,
+	FS_CROSS_SPEAKER_BLUE_3,
+	FS_CROSS_SPEAKER_BLUE_4,
 };
 
 class GameRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void highway(double time);
+	//TODO:Convert every draw call to either Vertex or Quad
 	void clicker();
 	void notes(double time, std::vector<Note>& v, std::vector<Note>& cross);
 	void events(double time, std::vector<Note>& ev, std::vector<Note>& cross);
-	void lanes(double time, std::vector<Note>& v, std::vector<Note>& cross);
+	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 	void bpmTicks(double time, std::vector<double>& bpmArr);
-	void clickerAnimation();
+	void clickerTimer();
 	void result(Player& player, Generator& generator);
 	void meters(double time);
 	void pollState(double time, Player& p, Generator& g);
-	void updateAnimations(double time);
+	void updateTimers(double time);
 	void debug(double deltaTime, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c);
 	void reset();
 
@@ -81,13 +106,18 @@ public:
 	glm::vec4 m_euphoriaLaneColor = {1.0, 1.0, 1.0, 1.0};
 	glm::vec4 m_euphoriaZoneColor = {1.0, 1.0, 1.0, 0.2};
 
+	glm::vec4 m_fsCrossBaseGreen = {0.0, 1.0, 0.0, 0.2};
+	glm::vec4 m_fsCrossBaseBlue = {0.0, 0.0, 1.0, 0.2};
+
+	TimerManager m_animManager;
+
 private:
 	static std::vector<Note> getCrossInsideNote(Note& note, std::vector<Note>& crossArr);
-	static glm::vec2 getCirclePoint(double radius, double angle);
-	static int getCrossAtTime(double time, std::vector<Note>& crossArr);
+	int getCrossAtTime(double time, std::vector<Note>& crossArr, std::vector<Note>* eventArr = nullptr);
 	double getAngleFromDT(double dt) const;
 	double getDTFromAngle(double angle) const;
 	static double getAngleHorizontal(double innerAngle, double innerRadius, double outerRadius);
+	Quad createCircleQuad(double angle, double baseRadius, double deltaRadius, double deltaAngle, float plane = 0.0f) const;
 
 	bool m_red = false, m_green = false, m_blue = false;
 	int m_playerCross = 1;
@@ -108,7 +138,7 @@ private:
 	unsigned int m_highwayTexture = 0;
 	unsigned int m_objTexture = 0;
 	unsigned int m_metersTexture = 0;
-	unsigned int m_clickerAnimation = 0;
+	unsigned int m_clickerTimer = 0;
 	unsigned int m_pgBarFrame = 0;
 	unsigned int m_pgBarInside = 0;
 	unsigned int m_fontTexture = 0;
@@ -119,8 +149,6 @@ private:
 
 	FT_Library m_FTLibrary;
 	FT_Face m_font;
-
-	AnimationManager m_animManager;
 
 	std::map<int, glm::vec4> m_objectAtlas;
 

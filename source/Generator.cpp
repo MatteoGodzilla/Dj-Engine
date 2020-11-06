@@ -27,7 +27,7 @@ void Generator::init(const SongEntry& entry, int difficulty) {
 
 	std::string diff = std::string();
 	if (difficulty == 0) {
-		diff = std::string("/DJ_EXPERT.xmk");
+		diff = std::string("/DJ_Expert.xmk");
 		m_chart.open(entry.path + diff);
 		if (!m_chart.is_open()) {
 			//if not available, fallback to chart.xmk
@@ -35,13 +35,13 @@ void Generator::init(const SongEntry& entry, int difficulty) {
 		}
 		m_chart.close();
 	} else if (difficulty == 1) {
-		diff = std::string("/DJ_HARD.xmk");
+		diff = std::string("/DJ_Hard.xmk");
 	} else if (difficulty == 2) {
-		diff = std::string("/DJ_MEDIUM.xmk");
+		diff = std::string("/DJ_Medium.xmk");
 	} else if (difficulty == 3) {
-		diff = std::string("/DJ_EASY.xmk");
+		diff = std::string("/DJ_Easy.xmk");
 	} else if (difficulty == 4) {
-		diff = std::string("/DJ_BEGINNER.xmk");
+		diff = std::string("/DJ_Beginner.xmk");
 	}
 
 	std::cout << "Generator msg: loading " << diff << std::endl;
@@ -179,6 +179,10 @@ void Generator::initialLoad() {
 				}
 			} else if (type == FSG_EUPHORIA) {
 				m_allEvents.emplace_back(time, EU_ZONE, length, true);
+			} else if (type == FSG_FS_CROSS) {
+				m_allEvents.emplace_back(time, FS_CROSS_BASE, length, true);
+			} else if (type == FSG_FS_SAMPLES) {
+				m_allEvents.emplace_back(time, FS_SAMPLES, length, true);
 			} else if (type == FSG_SCR_G_ZONE) {
 				m_allEvents.emplace_back(time, SCR_G_ZONE, length, true);
 			} else if (type == FSG_SCR_B_ZONE) {
@@ -261,9 +265,10 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 	}
 
 	if (!ev.empty()) {
-		for (size_t i = ev.size(); i-- > 0;) {
+		for (size_t i = 0; i < ev.size(); ++i) {
 			ev.at(i).tick(time);
 			int type = ev.at(i).getType();
+			double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 
 			/*
 			every event has a different way to be removed
@@ -272,7 +277,6 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 			*/
 
 			if (type == SCR_G_ZONE || type == SCR_B_ZONE) {
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				if (endTime < time - ev.at(i).hitWindow) {
 					ev.erase(ev.begin() + i);
 				}
@@ -283,7 +287,6 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 					m_eu_start = true;
 					ev.at(i).click();
 				}
-				double endTime = ev.at(i).getMilli() + ev.at(i).getLength();
 				//set signal for player
 				if (endTime < time) {
 					m_eu_check = true;
@@ -293,6 +296,16 @@ void Generator::tick(double time, std::vector<Note>& v, std::vector<Note>& ev, s
 					if (ev.at(i).getMilli() + ev.at(i).hitWindow < time) {
 						ev.erase(ev.begin() + i);
 					}
+				}
+			}
+			if (type == FS_CROSS_BASE) {
+				if (endTime < time) {
+					ev.erase(ev.begin() + i);
+				}
+			}
+			if (type == FS_SAMPLES) {
+				if (endTime < time) {
+					ev.erase(ev.begin() + i);
 				}
 			}
 		}

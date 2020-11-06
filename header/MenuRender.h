@@ -1,32 +1,29 @@
 #pragma once
+#include "DJEUtils.h"
 #include "Game.h"
 #include "Graphics.h"
 #include "MenuNode.h"
 #include "Rendr.h"
 #include "SongScanner.h"
+#include "TimerManager.h"
 
 #include <GLFW/glfw3.h>
 #include <array>
 #include <iostream>
 #include <map>
 
-struct menuinputs {
-	int* uk;
-	int* dk;
-	int* sk;
-	int* bk;
-	int* ug;
-	int* dg;
-	int* sg;
-	int* bg;
+enum animID {
+	AN_SCROLL_UP,
+	AN_SCROLL_DOWN
 };
 
 class MenuRender : public Rendr {
 public:
 	void init(GLFWwindow* w);
 	void tick();
-	void render(MenuNode node, int selected, int vOffset);
-	void remapping(Game* game, menuinputs input);
+	void render(MenuNode& node, int selected);
+	void play(std::vector<SongEntry>& list, int selected);
+	void remapping(Game* game);
 	//void scratches(Player* player);
 	void calibration(Game* game, double dt);
 	void setDeckSpeed(Game* game);
@@ -51,6 +48,11 @@ public:
 	double m_currentIdleTime = 0.0f;
 	float m_selectionDX = 0.0f;
 
+	TimerManager m_animManager;
+	double m_globalTime = 0.0;
+	double m_timeWarp = 0.0;
+	double m_timeWarpStart = 0.0;
+
 private:
 	double m_cbPlayingTime = 0.0f;
 	bool m_isCalibrating = false;
@@ -61,15 +63,18 @@ private:
 	unsigned int m_splashTexture = 0;
 	unsigned int m_calibrationTex = 0;
 	unsigned int m_pgBarFrame = 0;
+	unsigned int m_menuVynil = 0;
+	unsigned int m_album1 = 0;
+	unsigned int m_album2 = 0;
 
 	void editingAxisController(int axis);
 	void editingAxisKBAM(int axis);
 
 	std::vector<double> m_latencyHits;
 
-	double m_dTime = 0.0f;
-	double m_globalTime = 0.0f;
-	double m_pastTime = 0.0f;
+	double m_dTime = 0.0;
+	double m_pastTime = 0.0;
 
 	glm::vec2 m_logoDimensions;
+	double m_deltaAngle = 0.004;
 };
