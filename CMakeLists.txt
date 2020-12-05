@@ -54,10 +54,6 @@ target_link_libraries(${CMAKE_PROJECT_NAME} "ImGui")
 # JSON
 include_directories("lib/nlohmann")
 
-# OpenAL
-# find_package(OpenAL REQUIRED)
-# target_link_libraries(${CMAKE_PROJECT_NAME} ${OPENAL_LIBRARY})
-
 # OpenGL
 if (MSYS)
 	find_library(OPENGL_gl_LIBRARY opengl32)
@@ -69,9 +65,10 @@ endif()
 
 # PortAudio
 # find_package(portaudio REQUIRED)
+#target_link_libraries(${CMAKE_PROJECT_NAME} portaudio)
+add_subdirectory("lib/portaudio" EXCLUDE_FROM_ALL)
 target_link_libraries(${CMAKE_PROJECT_NAME} portaudio)
 
-# SimpleINI
 include_directories("lib/SimpleINI")
 add_library("SimpleINI" STATIC "lib/SimpleINI/ConvertUTF.c")
 target_link_libraries(${CMAKE_PROJECT_NAME} "SimpleINI")

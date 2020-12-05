@@ -124,18 +124,6 @@ void MenuRender::render(MenuNode& node, int selected) {
 		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 0 + angleDiff);
 		MenuNode& selectedNode = node.getChildrens().at(selected - 0);
 		float height = getTextHeight(selectedNode.getText(), scale);
-		//float length = getTextWidth(selectedNode.getText(), scale);
-		/*
-
-		Vertex topLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y - height / 2 + center.y, 0), firstCol);
-		Vertex bottomLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y + height / 2 + center.y, 0), firstCol);
-		Vertex bottomRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y + height / 2 + center.y, 0), secondCol);
-		Vertex topRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y - height / 2 + center.y, 0), secondCol);
-
-		pushFourVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
-		pushFourIndices(selIndices, selVertexCount);
-		renderColor(selVector, selIndices);
-		*/
 		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
 	}
 	if (selected + 1 >= 0 && selected + 1 < node.getChildCount()) {
@@ -168,76 +156,76 @@ void MenuRender::render(MenuNode& node, int selected) {
 }
 
 void MenuRender::play(std::vector<SongEntry>& list, int selected) {
-	std::vector<float> mainVector;
-	std::vector<unsigned int> mainIndices;
-	unsigned int mainVertexCount = 0;
-
 	float textSize = 0.040;
-	int otherCount = 10;
-
-	//Main Selection
-	float listWidth = 1280.0f / 5.0f * 4.0f;
-	float infoWidth = 1280.0f - listWidth;
-
-	std::string album1Path = list.at(selected).path + std::string("/album1.png");
-	std::string album2Path = list.at(selected).path + std::string("/album2.png");
-	std::ifstream checkOne = std::ifstream(album1Path);
-	std::ifstream checkTwo = std::ifstream(album2Path);
-
-	Quad q;
-	q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec2(0.0, 1.0));
-	q.v2 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 0.0));
-	q.v3 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 0.0));
-	q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec2(1.0, 1.0));
-
-	useOrthoProj();
-	pushQuad(mainVector, mainIndices, mainVertexCount, q);
-
-	if (checkOne.is_open()) {
-		//available album
-		loadTexture(album1Path, &m_album1);
-		renderTexture(mainVector, mainIndices, m_album1);
-	} else {
-		//album not available
-		renderTexture(mainVector, mainIndices, m_menuVynil);
-	}
-	checkOne.close();
-
-	mainVector.clear();
-	mainIndices.clear();
-	mainVertexCount = 0;
-
-	Quad q2;
-	q2.v1 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 1.0));
-	q2.v2 = Vertex(glm::vec3(0.0, infoWidth * 2, 0.0), glm::vec2(0.0, 0.0));
-	q2.v3 = Vertex(glm::vec3(infoWidth, infoWidth * 2, 0.0), glm::vec2(1.0, 0.0));
-	q2.v4 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 1.0));
-
-	useOrthoProj();
-	pushQuad(mainVector, mainIndices, mainVertexCount, q2);
-
-	if (checkTwo.is_open()) {
-		//available album
-		loadTexture(album2Path, &m_album2);
-		renderTexture(mainVector, mainIndices, m_album2);
-	} else {
-		//album not available
-		renderTexture(mainVector, mainIndices, m_menuVynil);
-	}
-	checkTwo.close();
-
-	mainVector.clear();
-	mainIndices.clear();
-	mainVertexCount = 0;
-
-	float firstBaseX = infoWidth + listWidth / 4;
-	float secondBaseX = 1280.0f - listWidth / 4;
-	float singleTrackX = infoWidth + listWidth / 2;
-	float selectedY = 720.0f / 2.0;
-
-	float difficultyHeight = 720.0f - infoWidth * 2;
-
 	if (!list.empty()) {
+		std::vector<float> mainVector;
+		std::vector<unsigned int> mainIndices;
+		unsigned int mainVertexCount = 0;
+
+		int otherCount = 10;
+
+		//Main Selection
+		float listWidth = 1280.0f / 5.0f * 4.0f;
+		float infoWidth = 1280.0f - listWidth;
+
+		std::string album1Path = list.at(selected).path + std::string("/album1.png");
+		std::string album2Path = list.at(selected).path + std::string("/album2.png");
+		std::ifstream checkOne = std::ifstream(album1Path);
+		std::ifstream checkTwo = std::ifstream(album2Path);
+
+		Quad q;
+		q.v1 = Vertex(glm::vec3(0.0, 0.0, 0.0), glm::vec2(0.0, 1.0));
+		q.v2 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 0.0));
+		q.v3 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 0.0));
+		q.v4 = Vertex(glm::vec3(infoWidth, 0.0, 0.0), glm::vec2(1.0, 1.0));
+
+		useOrthoProj();
+		pushQuad(mainVector, mainIndices, mainVertexCount, q);
+
+		if (checkOne.is_open()) {
+			//available album
+			loadTexture(album1Path, &m_album1);
+			renderTexture(mainVector, mainIndices, m_album1);
+		} else {
+			//album not available
+			renderTexture(mainVector, mainIndices, m_menuVynil);
+		}
+		checkOne.close();
+
+		mainVector.clear();
+		mainIndices.clear();
+		mainVertexCount = 0;
+
+		Quad q2;
+		q2.v1 = Vertex(glm::vec3(0.0, infoWidth, 0.0), glm::vec2(0.0, 1.0));
+		q2.v2 = Vertex(glm::vec3(0.0, infoWidth * 2, 0.0), glm::vec2(0.0, 0.0));
+		q2.v3 = Vertex(glm::vec3(infoWidth, infoWidth * 2, 0.0), glm::vec2(1.0, 0.0));
+		q2.v4 = Vertex(glm::vec3(infoWidth, infoWidth, 0.0), glm::vec2(1.0, 1.0));
+
+		useOrthoProj();
+		pushQuad(mainVector, mainIndices, mainVertexCount, q2);
+
+		if (checkTwo.is_open()) {
+			//available album
+			loadTexture(album2Path, &m_album2);
+			renderTexture(mainVector, mainIndices, m_album2);
+		} else {
+			//album not available
+			renderTexture(mainVector, mainIndices, m_menuVynil);
+		}
+		checkTwo.close();
+
+		mainVector.clear();
+		mainIndices.clear();
+		mainVertexCount = 0;
+
+		float firstBaseX = infoWidth + listWidth / 4;
+		float secondBaseX = 1280.0f - listWidth / 4;
+		float singleTrackX = infoWidth + listWidth / 2;
+		float selectedY = 720.0f / 2.0;
+
+		float difficultyHeight = 720.0f - infoWidth * 2;
+
 		std::string s1 = list.at(selected).s1;
 		std::string s2 = list.at(selected).s2;
 
@@ -457,11 +445,14 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		drawText(rendered, 10.0f, 720.0f - difficultyHeight + deltaText * 7 - getTextHeight(rendered, textSize / 2) / 2, textSize / 2);
 
 	} else {
-		std::string rendered1 = std::string("Refresh Song Cache");
+		std::string rendered1 = std::string("No songs found in the song Cache");
+		std::string rendered2 = std::string("Press Green to scan now");
 
 		float w = getTextWidth(rendered1, textSize);
-		float h = getTextHeight(rendered1, textSize);
+		float h = getTextHeight(rendered1, textSize) + getTextHeight(rendered2, textSize);
 		drawText(rendered1, 1280.0f / 2 - w / 2, 720.0f / 2 - h / 2, textSize);
+		w = getTextWidth(rendered2, textSize);
+		drawText(rendered2, 1280.0f / 2 - w / 2, 720.0f / 2 , textSize);
 	}
 }
 
@@ -1270,79 +1261,28 @@ void MenuRender::result(Game* game) {
 }
 
 void MenuRender::splashArt() {
-	/*
-	std::vector<float> vector;
-	std::vector<unsigned int> indices;
-	unsigned int indexCount = 0;
-
-	float width = 700.0;
-	float height = width * (m_logoDimensions.y / m_logoDimensions.x);
-	float x = 1280.0f / 5 * 2;
-	float y = (720.0f - height) / 2;
-
-	auto topLeft = Vertex({x, y, 0.0});
-	Vertex bottomLeft = topLeft;
-	Vertex bottomRight = topLeft;
-	Vertex topRight = topLeft;
-
-	bottomLeft.pos += glm::vec3({0.0, height, 0.0});
-	bottomRight.pos += glm::vec3(width, height, 0.0);
-	topRight.pos += glm::vec3(width, 0.0, 0.0);
-
-	topLeft.tex = {0.0, 1.0};
-	bottomLeft.tex = {0.0, 0.0};
-	bottomRight.tex = {1.0, 0.0};
-	topRight.tex = {1.0, 1.0};
-
-	pushFourVertices(vector, topLeft, bottomLeft, bottomRight, topRight);
-	pushFourIndices(indices, indexCount);
-
-	useOrthoProj();
-	renderTexture(vector, indices, m_splashTexture);
-	*/
 	float textScale = 0.02f;
-	drawText("*This is alpha v1.5. There are still some bugs left.*", 10.0, 10.0, textScale);
-	drawText("*Less spaghetti code than before*", 10.0, 30.0, textScale);
+	std::string firstLine = std::string("*This is ") + VERSION + std::string(". There are still some bugs left.*");
+	drawText(firstLine, 10.0, 10.0, textScale);
+	drawText("*I hope you like the new Menu*", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 
 	std::string discord = "For any questions, ask on the Dj Hero Discord";
 	std::string discord2 = "https://discord.gg/HZ82gKR";
-	std::string donation = "If you want to support the development, you can donate at";
-	std::string donation2 = "paypal.me/MatteoGodzilla";
+	//std::string donation = "If you want to support the development, you can donate at";
+	//std::string donation2 = "paypal.me/MatteoGodzilla";
 	drawText(discord, 1270.0f - getTextWidth(discord, textScale), 10.0f, textScale);
 	drawText(discord2, 1270.0f - getTextWidth(discord2, textScale), 30.0f, textScale);
-	drawText(donation, 1270.0f - getTextWidth(donation, textScale), 50.0f, textScale);
-	drawText(donation2, 1270.0f - getTextWidth(donation2, textScale), 70.0f, textScale);
+	//drawText(donation, 1270.0f - getTextWidth(donation, textScale), 50.0f, textScale);
+	//drawText(donation2, 1270.0f - getTextWidth(donation2, textScale), 70.0f, textScale);
 
+
+	float hintTextScale = 0.03f;
+	std::string controls = std::string("Move with Up/Down Arrow. Select with Green (Enter). Go back with Red (Escape)");
 	std::string remap = std::string("Press spacebar to enter Remapping screen");
-	drawText(remap, (1280.0f - getTextWidth(remap, 0.03f)) / 2.0f, 680.0f, 0.03f);
+	drawText(controls, (1280.0f - getTextWidth(controls, hintTextScale)) / 2.0f, 720.0f - getTextHeight(controls,hintTextScale) - getTextHeight(remap, hintTextScale), hintTextScale);
+	drawText(remap, (1280.0f - getTextWidth(remap, hintTextScale)) / 2.0f, 720.0f - getTextHeight(remap, hintTextScale), hintTextScale);
 }
-
-/*
-void MenuRender::scratches(Player* player) {
-	useOrthoProj();
-	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
-
-	if(player->m_useKeyboardInput){
-		player->updateKBMState(m_window);
-	}
-	else{
-		player->updateGamepadState();
-	}
-	if (player->getFallingZero(SCR_UP_INDEX)) {
-		m_testBuffer.push_back('^');
-	}
-	if (player->getFallingZero(SCR_DOWN_INDEX)) {
-		m_testBuffer.push_back('v');
-	}
-	if (m_testBuffer.size() > 20) {
-		m_testBuffer.erase(0, 1);
-	}
-
-	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
-	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
-}
-*/
 
 void MenuRender::calibration(Game* game, double dt) {
 	useOrthoProj();

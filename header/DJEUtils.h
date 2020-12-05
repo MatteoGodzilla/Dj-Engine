@@ -30,5 +30,7 @@ private:
 	bool m_toCERR = false;
 };
 
+static std::string VERSION = "alpha v1.6";
+
 static Log NormalLog = Log();
 static Log ErrorLog = Log(true);
