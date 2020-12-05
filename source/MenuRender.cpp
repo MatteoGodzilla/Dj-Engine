@@ -124,18 +124,6 @@ void MenuRender::render(MenuNode& node, int selected) {
 		glm::vec2 basePoint = getCirclePoint(radius + padding, textAngle * 0 + angleDiff);
 		MenuNode& selectedNode = node.getChildrens().at(selected - 0);
 		float height = getTextHeight(selectedNode.getText(), scale);
-		//float length = getTextWidth(selectedNode.getText(), scale);
-		/*
-
-		Vertex topLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y - height / 2 + center.y, 0), firstCol);
-		Vertex bottomLeft = Vertex(glm::vec3(basePoint.x + center.x, -basePoint.y + height / 2 + center.y, 0), firstCol);
-		Vertex bottomRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y + height / 2 + center.y, 0), secondCol);
-		Vertex topRight = Vertex(glm::vec3(basePoint.x + center.x + length, -basePoint.y - height / 2 + center.y, 0), secondCol);
-
-		pushFourVertices(selVector, topLeft, bottomLeft, bottomRight, topRight);
-		pushFourIndices(selIndices, selVertexCount);
-		renderColor(selVector, selIndices);
-		*/
 		drawText(selectedNode.getText(), basePoint.x + center.x, -basePoint.y - height / 2 + center.y, scale);
 	}
 	if (selected + 1 >= 0 && selected + 1 < node.getChildCount()) {
@@ -1290,37 +1278,11 @@ void MenuRender::splashArt() {
 
 
 	float hintTextScale = 0.03f;
-	std::string controls = std::string("Move with Menu Up/Menu Down, Select with Green and go back with Red");
+	std::string controls = std::string("Move with Up/Down Arrow. Select with Green (Enter). Go back with Red (Escape)");
 	std::string remap = std::string("Press spacebar to enter Remapping screen");
 	drawText(controls, (1280.0f - getTextWidth(controls, hintTextScale)) / 2.0f, 720.0f - getTextHeight(controls,hintTextScale) - getTextHeight(remap, hintTextScale), hintTextScale);
 	drawText(remap, (1280.0f - getTextWidth(remap, hintTextScale)) / 2.0f, 720.0f - getTextHeight(remap, hintTextScale), hintTextScale);
 }
-
-/*
-void MenuRender::scratches(Player* player) {
-	useOrthoProj();
-	drawText("Here you can test your scatches", 20.0, 20.0, 0.05f);
-
-	if(player->m_useKeyboardInput){
-		player->updateKBMState(m_window);
-	}
-	else{
-		player->updateGamepadState();
-	}
-	if (player->getFallingZero(SCR_UP_INDEX)) {
-		m_testBuffer.push_back('^');
-	}
-	if (player->getFallingZero(SCR_DOWN_INDEX)) {
-		m_testBuffer.push_back('v');
-	}
-	if (m_testBuffer.size() > 20) {
-		m_testBuffer.erase(0, 1);
-	}
-
-	drawText(m_testBuffer, 20.0f, 310.0f, 0.1f);
-	drawText("Press Menu Back to exit", 20.0, 670.0f, 0.05f);
-}
-*/
 
 void MenuRender::calibration(Game* game, double dt) {
 	useOrthoProj();
