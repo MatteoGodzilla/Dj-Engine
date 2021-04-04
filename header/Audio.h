@@ -66,6 +66,7 @@ public:
 	float greenPan = 0.0;
 	float redPan = 0.0;
 	float bluePan = 0.0;
+
 private:
 	int lastPlayerPos = 0;
 	sf::Music greenStream;

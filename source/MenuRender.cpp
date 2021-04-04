@@ -456,7 +456,7 @@ void MenuRender::play(std::vector<SongEntry>& list, int selected) {
 		float h = getTextHeight(rendered1, textSize) + getTextHeight(rendered2, textSize);
 		drawText(rendered1, 1280.0f / 2 - w / 2, 720.0f / 2 - h / 2, textSize);
 		w = getTextWidth(rendered2, textSize);
-		drawText(rendered2, 1280.0f / 2 - w / 2, 720.0f / 2 , textSize);
+		drawText(rendered2, 1280.0f / 2 - w / 2, 720.0f / 2, textSize);
 	}
 }
 
@@ -1280,11 +1280,10 @@ void MenuRender::splashArt() {
 	//drawText(donation, 1270.0f - getTextWidth(donation, textScale), 50.0f, textScale);
 	//drawText(donation2, 1270.0f - getTextWidth(donation2, textScale), 70.0f, textScale);
 
-
 	float hintTextScale = 0.03f;
 	std::string controls = std::string("Move with Up/Down Arrow. Select with Green (Enter). Go back with Red (Escape)");
 	std::string remap = std::string("Press spacebar to enter Remapping screen");
-	drawText(controls, (1280.0f - getTextWidth(controls, hintTextScale)) / 2.0f, 720.0f - getTextHeight(controls,hintTextScale) - getTextHeight(remap, hintTextScale), hintTextScale);
+	drawText(controls, (1280.0f - getTextWidth(controls, hintTextScale)) / 2.0f, 720.0f - getTextHeight(controls, hintTextScale) - getTextHeight(remap, hintTextScale), hintTextScale);
 	drawText(remap, (1280.0f - getTextWidth(remap, hintTextScale)) / 2.0f, 720.0f - getTextHeight(remap, hintTextScale), hintTextScale);
 }
 

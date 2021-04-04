@@ -72,8 +72,8 @@ void Audio::load(const SongEntry& entry) {
 }
 
 void Audio::play() {
-	if(!playing){
-		if(streams == 3){
+	if (!playing) {
+		if (streams == 3) {
 			greenStream.play();
 			blueStream.play();
 		}
@@ -83,8 +83,8 @@ void Audio::play() {
 }
 
 void Audio::stop() {
-	if(playing){
-		if(streams == 3){
+	if (playing) {
+		if (streams == 3) {
 			greenStream.stop();
 			blueStream.stop();
 		}
@@ -172,7 +172,7 @@ bool Audio::isPlaying() const {
 }
 
 double Audio::getFileLength() {
-	return (double) redStream.getDuration().asSeconds();
+	return (double)redStream.getDuration().asSeconds();
 }
 
 void Audio::destroy() {
