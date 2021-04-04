@@ -63,12 +63,10 @@ else()
 	target_link_libraries(${CMAKE_PROJECT_NAME} OpenGL::GL)
 endif()
 
-# PortAudio
-# find_package(portaudio REQUIRED)
-#target_link_libraries(${CMAKE_PROJECT_NAME} portaudio)
-add_subdirectory("lib/portaudio" EXCLUDE_FROM_ALL)
-target_link_libraries(${CMAKE_PROJECT_NAME} portaudio)
+# SFML
+target_link_libraries(${CMAKE_PROJECT_NAME} sfml-system sfml-audio)
 
+# SimpleINI
 include_directories("lib/SimpleINI")
 add_library("SimpleINI" STATIC "lib/SimpleINI/ConvertUTF.c")
 target_link_libraries(${CMAKE_PROJECT_NAME} "SimpleINI")

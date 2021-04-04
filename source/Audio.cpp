@@ -32,6 +32,7 @@ void CircularBuffer<T>::clear() {
 	readIndex = 0;
 }
 
+/*
 void checkError(PaError code) {
 	if (code != paNoError) {
 		std::cerr << "PortAudio Error:" << Pa_GetErrorText(code) << std::endl;
@@ -39,6 +40,7 @@ void checkError(PaError code) {
 		exit(1);
 	}
 }
+
 
 void fillBuffer(Audio* audio) {
 	size_t bufferLoad = 2048;
@@ -62,8 +64,7 @@ void fillBuffer(Audio* audio) {
 					/*  audio layout
 						channel = left:0, right:1
 						pcm[channel][sample_index];
-					*/
-					float left = redPCM[0][i];
+									float left = redPCM[0][i];
 					float right = redPCM[1][i];
 
 					audio->redPCM.push(left);
@@ -78,10 +79,7 @@ void fillBuffer(Audio* audio) {
 
 				if (greenSamples > 0) {
 					for (int i = 0; i < greenSamples; ++i) {
-						/*  audio layout
-							channel = left:0, right:1
-							pcm[channel][sample_index];
-						*/
+						
 						float left = greenPCM[0][i];
 						float right = greenPCM[1][i];
 
@@ -96,10 +94,7 @@ void fillBuffer(Audio* audio) {
 
 				if (blueSamples > 0) {
 					for (int i = 0; i < blueSamples; ++i) {
-						/*  audio layout
-							channel = left:0, right:1
-							pcm[channel][sample_index];
-						*/
+						
 
 						float left = bluePCM[0][i];
 						float right = bluePCM[1][i];
@@ -176,6 +171,7 @@ int PACallback(const void* input, void* output, unsigned long framecount, const 
 	//std::cout << framecount << std::endl;
 	return 0;
 }
+*/
 
 Audio::Audio() {
 	Timer greenIn = Timer(AN_GREEN_IN, 0.002);
@@ -191,7 +187,7 @@ Audio::Audio() {
 
 void Audio::init() {
 	if (!initialized) {
-		checkError(Pa_Initialize());
+		//checkError(Pa_Initialize());
 		redPCM.clear();
 		greenPCM.clear();
 		bluePCM.clear();
@@ -223,24 +219,28 @@ void Audio::load(const SongEntry& entry) {
 	ov_time_seek(&blueFile, 0.0);
 
 	loaderThreadRunning = true;
-	loader = std::thread(fillBuffer, this);
+	//loader = std::thread(fillBuffer, this);
 
-	checkError(Pa_OpenDefaultStream(&audioStream, 0, 2, paFloat32, info->rate, paFramesPerBufferUnspecified, PACallback, this));
+	//checkError(Pa_OpenDefaultStream(&audioStream, 0, 2, paFloat32, info->rate, paFramesPerBufferUnspecified, PACallback, this));
 }
 
 void Audio::play() {
+	/*
 	if (!Pa_IsStreamActive(audioStream)) {
 		checkError(Pa_StartStream(audioStream));
 		playing = true;
 	}
+	*/
 }
 
 void Audio::stop() {
+	/*
 	if (Pa_IsStreamActive(audioStream)) {
 		checkError(Pa_StopStream(audioStream));
 		playing = false;
 		loaderThreadRunning = false;
 	}
+	*/
 }
 
 void Audio::resetEffects() {
@@ -330,12 +330,12 @@ void Audio::destroy() {
 		if (playing) {
 			stop();
 		}
-		checkError(Pa_CloseStream(audioStream));
+		//checkError(Pa_CloseStream(audioStream));
 		loader.join();
 		ov_clear(&redFile);
 		ov_clear(&greenFile);
 		ov_clear(&blueFile);
-		checkError(Pa_Terminate());
+		//checkError(Pa_Terminate());
 		initialized = false;
 	}
 	std::cout << "Audio Message: destroyed audio context" << std::endl;

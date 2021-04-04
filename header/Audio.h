@@ -6,7 +6,8 @@
 #include <array>
 #include <atomic>
 #include <iostream>
-#include <portaudio.h>
+//#include <portaudio.h>
+#include <SFML/Audio.hpp>
 #include <thread>
 #include <vorbis/vorbisfile.h>
 
@@ -70,7 +71,10 @@ public:
 
 private:
 	int lastPlayerPos = 0;
-	PaStream* audioStream;
+	//PaStream* audioStream;
+	sf::Music greenStream;
+	sf::Music redStream;
+	sf::Music blueStream;
 	std::thread loader;
 	bool playing = false;
 
