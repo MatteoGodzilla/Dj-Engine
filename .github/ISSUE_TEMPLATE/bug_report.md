@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 MatteoGodzilla
+
+SPDX-License-Identifier: CC0-1.0
+-->
+
 ---
 name: Bug report
 about: Create a bug report to help us
