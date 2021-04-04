@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 #include "../trigonometric.hpp"
 #include "../geometric.hpp"
 #include "../exponential.hpp"

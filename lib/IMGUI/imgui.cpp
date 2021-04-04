@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2014-2021 Omar Cornut
+//
+// SPDX-License-Identifier: MIT
+
 // dear imgui, v1.75
 // (main code and documentation)
 

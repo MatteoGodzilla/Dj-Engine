@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2005 G-Truc Creation
+#
+# SPDX-License-Identifier: MIT
+
 set(PACKAGE_VERSION 0.9.9)
 
 if(${PACKAGE_FIND_VERSION_MAJOR} EQUAL 0)

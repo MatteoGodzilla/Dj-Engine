@@ -1,3 +1,8 @@
+// Copyright (c) 2004, 2005 Tristan Grimmer
+// SPDX-FileCopyrightText: 2014-2021 Omar Cornut
+//
+// SPDX-License-Identifier: MIT
+
 // dear imgui, v1.75
 // (drawing and font code)
 

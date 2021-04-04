@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_io
 /// @file glm/gtx/io.hpp
 /// @author Jan P Springer (regnirpsj@gmail.com)

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include <fstream>
 #include <iostream>
@@ -30,7 +34,7 @@ private:
 	bool m_toCERR = false;
 };
 
-static std::string VERSION = "alpha v1.6";
+static std::string VERSION = "alpha v1.6.1";
 
 static Log NormalLog = Log();
 static Log ErrorLog = Log(true);

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtc_noise
 ///
 // Based on the work of Stefan Gustavson and Ashima Arts on "webgl-noise":

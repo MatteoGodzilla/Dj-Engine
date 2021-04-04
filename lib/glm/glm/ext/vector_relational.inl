@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 #include "../vector_relational.hpp"
 #include "../common.hpp"
 #include "../detail/qualifier.hpp"

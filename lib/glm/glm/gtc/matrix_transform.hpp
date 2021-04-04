@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtc_matrix_transform
 /// @file glm/gtc/matrix_transform.hpp
 ///

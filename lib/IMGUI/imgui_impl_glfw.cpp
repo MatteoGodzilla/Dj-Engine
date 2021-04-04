@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2014-2021 Omar Cornut
+//
+// SPDX-License-Identifier: MIT
+
 // dear imgui: Platform Binding for GLFW
 // This needs to be used along with a Renderer (e.g. OpenGL3, Vulkan..)
 // (Info: GLFW is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan graphics context creation, etc.)

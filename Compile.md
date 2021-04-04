@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 MatteoGodzilla
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 ﻿# How to setup the working environment
 
 Before being able to compile (and work) on the project you need to setup a few things.
@@ -88,7 +94,7 @@ sudo pacman -S glfw-wayland
 Fedora:
 
 ``` bash
-sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel sfml-devel
+sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel SFML-devel
 ```
 
 Ubuntu-based:

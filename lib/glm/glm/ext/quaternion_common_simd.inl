@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 #if GLM_ARCH & GLM_ARCH_SSE2_BIT
 
 namespace glm{

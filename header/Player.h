@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include "DJEUtils.h"
 #include "Generator.h"
@@ -120,7 +124,7 @@ public:
 	bool m_changedScroll = false;
 
 	bool m_isButtonsRight = false;
-	bool m_botEnabled;
+	bool m_botEnabled = false;
 
 protected:
 private:

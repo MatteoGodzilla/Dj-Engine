@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_quaternion_double_precision
 /// @file glm/ext/quaternion_double_precision.hpp
 ///

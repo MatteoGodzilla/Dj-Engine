@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "Rendr.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -152,14 +156,6 @@ void Rendr::usePersProj() {
 		ErrorLog << "error setting projection matrix" << ENDL;
 	}
 
-	glUseProgram(m_mainProgram);
-	location = glGetUniformLocation(m_mainProgram, "u_proj");
-	if (location != -1) {
-		glUniformMatrix4fv(location, 1, GL_FALSE, &m_persProj[0][0]);
-	} else {
-		ErrorLog << "error setting projection matrix" << ENDL;
-	}
-
 	glUseProgram(m_textProgram);
 	location = glGetUniformLocation(m_textProgram, "u_proj");
 	if (location != -1) {
@@ -173,14 +169,6 @@ void Rendr::useOrthoProj() {
 	//setting up projection uniform
 	glUseProgram(m_mainProgram);
 	int location = glGetUniformLocation(m_mainProgram, "u_proj");
-	if (location != -1) {
-		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
-	} else {
-		ErrorLog << "error setting projection matrix" << ENDL;
-	}
-
-	glUseProgram(m_mainProgram);
-	location = glGetUniformLocation(m_mainProgram, "u_proj");
 	if (location != -1) {
 		glUniformMatrix4fv(location, 1, GL_FALSE, &m_orthoProj[0][0]);
 	} else {

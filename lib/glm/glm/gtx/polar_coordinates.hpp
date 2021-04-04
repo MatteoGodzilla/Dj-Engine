@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_polar_coordinates
 /// @file glm/gtx/polar_coordinates.hpp
 ///

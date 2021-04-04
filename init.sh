@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 MatteoGodzilla
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 echo "Copying dll from source"
 
 cp /mingw64/bin/glew32.dll . 

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 MatteoGodzilla
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 AccessModifierOffset: -4
 AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: false

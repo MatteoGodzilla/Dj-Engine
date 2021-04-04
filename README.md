@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 MatteoGodzilla
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Dj-Engine, A Dj Hero Clone :)
 
 ![Dj-Engine logo](res/splashArt.png)

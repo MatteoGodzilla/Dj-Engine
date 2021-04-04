@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_vector_int1_precision
 /// @file glm/ext/vector_int1_precision.hpp
 ///

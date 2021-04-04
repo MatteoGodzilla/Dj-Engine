@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include "DJEUtils.h"
 // clang-format off
@@ -83,7 +87,7 @@ public:
 	void lanes(double time, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& cross);
 	void bpmTicks(double time, std::vector<double>& bpmArr);
 	void clickerTimer();
-	void result(Player& player, Generator& generator);
+	//void result(Player& player, Generator& generator);
 	void meters(double time);
 	void pollState(double time, Player& p, Generator& g);
 	void updateTimers(double time);

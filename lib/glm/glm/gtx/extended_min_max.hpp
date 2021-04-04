@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_extended_min_max
 /// @file glm/gtx/extended_min_max.hpp
 ///

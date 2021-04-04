@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_normalize_dot
 /// @file glm/gtx/normalize_dot.hpp
 ///

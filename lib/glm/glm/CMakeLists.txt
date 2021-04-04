@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2005 G-Truc Creation
+#
+# SPDX-License-Identifier: MIT
+
 file(GLOB ROOT_SOURCE *.cpp)
 file(GLOB ROOT_INLINE *.inl)
 file(GLOB ROOT_HEADER *.hpp)
