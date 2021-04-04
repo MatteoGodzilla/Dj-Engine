@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #pragma once
 #include "DJEUtils.h"
 #include "SongScanner.h"
@@ -11,6 +15,7 @@
 #include <thread>
 #include <vorbis/vorbisfile.h>
 
+/*
 const size_t MAX_SIZE = 16384;
 
 template <typename T>
@@ -26,6 +31,7 @@ private:
 	size_t writeIndex = 0;
 	size_t readIndex = 0;
 };
+*/
 
 class Player;
 
@@ -49,17 +55,9 @@ public:
 	bool isPlaying() const;
 	double getFileLength();
 
-	CircularBuffer<float> redPCM;
-	CircularBuffer<float> greenPCM;
-	CircularBuffer<float> bluePCM;
-
-	OggVorbis_File redFile;
-	OggVorbis_File greenFile;
-	OggVorbis_File blueFile;
 	int streams = 0;
 
 	int bitstream = 0;
-	bool loaderThreadRunning = true;
 
 	float greenGain = 1.0;
 	float redGain = 1.0;
@@ -68,14 +66,11 @@ public:
 	float greenPan = 0.0;
 	float redPan = 0.0;
 	float bluePan = 0.0;
-
 private:
 	int lastPlayerPos = 0;
-	//PaStream* audioStream;
 	sf::Music greenStream;
 	sf::Music redStream;
 	sf::Music blueStream;
-	std::thread loader;
 	bool playing = false;
 
 	bool initialized = false;

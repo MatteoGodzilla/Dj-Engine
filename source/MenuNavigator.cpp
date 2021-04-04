@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "MenuNavigator.h"
 
 size_t findIndex(MenuNode& element, MenuNode& parent) {

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "Note.h"
 
 Note::Note(double milli, int ty, double length, bool ev) {

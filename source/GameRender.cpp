@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2021 MatteoGodzilla
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 #include "GameRender.h"
 
 void GameRender::init(GLFWwindow* w) {
