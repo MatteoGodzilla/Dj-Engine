@@ -1190,49 +1190,39 @@ void MenuRender::result(Game* game) {
 	} else {
 		float stars = (float)game->getPlayer()->getScore() / (float)game->getGenerator()->m_baseScore;
 
-		Vertex topLeft = Vertex({x + 30.0f + scale * 0000.0f, y, 0.0}, {221.0f / 300.0f, 1.0f});
-		Vertex bottomLeft = Vertex({x + 30.0f + scale * 0000.0f, y + scale, 0.0}, {221.0f / 300.0f, 0.0f});
-		Vertex bottomRight = Vertex({x + 30.0f + scale * 1000.0f, y + scale, 0.0}, {1.0f, 1.0f});
-		Vertex topRight = Vertex({x + 30.0f + scale * 1000.0f, y, 0.0}, {1.0f, 1.0f});
-
 		if (stars >= 0.1) {
-			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.2) {
-			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-
-			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 1000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.3) {
-			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-
-			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 2000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.4) {
-			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-
-			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 3000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (stars >= 0.5) {
-			topLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomLeft.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			bottomRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-			topRight.pos += glm::vec3(scale * 1000.0f, 0.0, 0.0);
-
-			pushFourVertices(resultVector, topLeft, bottomLeft, bottomRight, topRight);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 4000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y + scale * 1000.0f, 0.0f, 1.0f, 0.0f);
+			pushVertexTexture(resultVector, x + 30.0f + scale * 5000.0f, y, 0.0f, 1.0f, 1.0f);
 			pushFourIndices(resultIndices, resultVertexCount);
 		}
 		if (!resultVector.empty()) {
@@ -1266,9 +1256,9 @@ void MenuRender::result(Game* game) {
 
 void MenuRender::splashArt() {
 	float textScale = 0.02f;
-	std::string firstLine = std::string("*This is ") + VERSION + std::string(". There are still some bugs left.*");
+	std::string firstLine = std::string("*This is ") + VERSION + std::string(". Hopefully audio should work now.*");
 	drawText(firstLine, 10.0, 10.0, textScale);
-	drawText("*I hope you like the new Menu*", 10.0, 30.0, textScale);
+	drawText("*Also, I hope you like the new Menu :D *", 10.0, 30.0, textScale);
 	drawText("*Have Fun! :)*", 10.0, 50.0, textScale);
 
 	std::string discord = "For any questions, ask on the Dj Hero Discord";

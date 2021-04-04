@@ -124,7 +124,7 @@ public:
 	bool m_changedScroll = false;
 
 	bool m_isButtonsRight = false;
-	bool m_botEnabled;
+	bool m_botEnabled = false;
 
 protected:
 private:

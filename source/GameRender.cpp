@@ -1888,6 +1888,7 @@ void GameRender::meters(double time) {
 	rendr_InvertedX = oldButtonsPos;
 }
 
+/*
 void GameRender::result(Player& player, Generator& generator) {
 	std::vector<float> resultVector;
 	std::vector<unsigned int> resultIndices;
@@ -1919,10 +1920,12 @@ void GameRender::result(Player& player, Generator& generator) {
 	y += scale * 1000.0f;
 	drawText("Result:", 10.0f, y, scale);
 	float x = getTextWidth("Result:", scale);
+	std::cout << player.m_botEnabled << ENDL;
 	if (player.m_botEnabled) {
 		drawText("!BOT ACTIVE!", x + 30.0f, y, scale);
 	} else {
 		float stars = (float)player.getScore() / (float)generator.m_baseScore;
+		
 		if (stars >= 0.1) {
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y, 0.0f, 221.0f / 300.0f, 1.0f);
 			pushVertexTexture(resultVector, x + 30.0f + scale * 0000.0f, y + scale * 1000.0f, 0.0f, 221.0f / 300.0f, 0.0f);
@@ -1983,6 +1986,7 @@ void GameRender::result(Player& player, Generator& generator) {
 		drawText(t, x, 100.0f, scale);
 	}
 }
+*/
 
 void GameRender::debug(double deltaTime, std::vector<Note>& v, std::vector<Note>& ev, std::vector<Note>& c) {
 	std::string text = "Notes";

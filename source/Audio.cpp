@@ -158,8 +158,12 @@ void Audio::pollState(double time, const Player* p) {
 		if (streams == 3) {
 			greenGain = (position < 0.1 ? 1.0f : 1.0f - position);
 			blueGain = (position > -0.1 ? 1.0f : 1.0f + position);
+
+			greenStream.setVolume(greenGain * 100);
+			blueStream.setVolume(blueGain * 100);
 		} else {
 			redPan = position;
+			redStream.setPosition(sf::Vector3f(redPan * 10,0,0));
 		}
 	} else {
 		resetEffects();
