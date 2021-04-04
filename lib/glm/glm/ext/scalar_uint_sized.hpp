@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_scalar_uint_sized
 /// @file glm/ext/scalar_uint_sized.hpp
 ///

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_rotate_normalized_axis
 /// @file glm/gtx/rotate_normalized_axis.hpp
 ///

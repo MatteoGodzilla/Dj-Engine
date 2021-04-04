@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 #pragma once
 
 #define GLM_SWIZZLE_GEN_VEC2_ENTRY(T, P, CONST, A, B)	\

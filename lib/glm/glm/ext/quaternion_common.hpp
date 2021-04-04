@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_quaternion_common
 /// @file glm/ext/quaternion_common.hpp
 ///

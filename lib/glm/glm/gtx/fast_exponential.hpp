@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_fast_exponential
 /// @file glm/gtx/fast_exponential.hpp
 ///

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref core
 /// @file glm/ext/matrix_double2x3_precision.hpp
 

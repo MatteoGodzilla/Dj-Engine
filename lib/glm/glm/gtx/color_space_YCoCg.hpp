@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_color_space_YCoCg
 /// @file glm/gtx/color_space_YCoCg.hpp
 ///

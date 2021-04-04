@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_vector_query
 /// @file glm/gtx/vector_query.hpp
 ///

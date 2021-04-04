@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_matrix_major_storage
 /// @file glm/gtx/matrix_major_storage.hpp
 ///

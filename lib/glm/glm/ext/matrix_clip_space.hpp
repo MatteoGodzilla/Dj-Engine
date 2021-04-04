@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_matrix_clip_space
 /// @file glm/ext/matrix_clip_space.hpp
 ///

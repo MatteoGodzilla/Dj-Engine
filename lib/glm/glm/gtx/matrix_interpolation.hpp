@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref gtx_matrix_interpolation
 /// @file glm/gtx/matrix_interpolation.hpp
 /// @author Ghenadii Ursachi (the.asteroth@gmail.com)

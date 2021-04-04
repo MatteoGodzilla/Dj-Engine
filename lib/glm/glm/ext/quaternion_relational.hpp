@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2005 G-Truc Creation
+//
+// SPDX-License-Identifier: MIT
+
 /// @ref ext_quaternion_relational
 /// @file glm/ext/quaternion_relational.hpp
 ///

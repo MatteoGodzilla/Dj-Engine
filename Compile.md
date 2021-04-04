@@ -94,7 +94,7 @@ sudo pacman -S glfw-wayland
 Fedora:
 
 ``` bash
-sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel sfml-devel
+sudo dnf install gcc cmake make clang-tools-extra freetype-devel glew-devel glfw-devel libvorbis-devel SFML-devel
 ```
 
 Ubuntu-based:
